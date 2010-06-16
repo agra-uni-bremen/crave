@@ -175,6 +175,56 @@ BOOST_AUTO_TEST_CASE( greater_equal )
   BOOST_CHECK_EQUAL( generated.size(), 257);
 }
 
+BOOST_AUTO_TEST_CASE( divide ) 
+{
+  Variable<unsigned char, 0> a;
+  Variable<unsigned char, 1> b;
+  Variable<unsigned char, 2> q;
+  Variable<unsigned char, 3> r;
+
+  Generator<> gen;
+  gen
+    ( b != (unsigned char)  0 )
+    ( a  < (unsigned char) 16 )
+    ( b  < (unsigned char) 16 )
+    ( q == a/b )
+    ( r == a%b )
+  ;
+
+  while( gen.next() ) {
+    gen( a != gen[a] || b != gen[b] );
+    //printf("result: a=%d, b=%d, q=%d, r=%d\n", gen[a], gen[b], gen[q], gen[r]);
+    BOOST_CHECK_EQUAL( gen[a]/gen[b], gen[q] );
+    BOOST_CHECK_EQUAL( gen[a]%gen[b], gen[r] );
+  }
+}
+
+BOOST_AUTO_TEST_CASE ( shiftleft )
+{
+  Variable<unsigned , 0> a;
+  Variable<unsigned , 1> b;
+  Variable<unsigned , 2> c;
+
+  Generator<> gen;
+  gen
+    ( a <  16 )
+    ( b <  256 )
+    ( c == (a << b) )
+  ;
+
+  while( gen.next() ) {
+    BOOST_CHECK(true);
+    unsigned av = gen[a];
+    BOOST_CHECK(true);
+    unsigned bv = gen[b];
+    BOOST_CHECK(true);
+    gen( a != gen[a] || b != gen[b] );
+    BOOST_CHECK(true);
+    printf("result: a=%d, b=%d, c=%d\n", gen[a], gen[b], gen[c]);
+    BOOST_REQUIRE_EQUAL( (unsigned) (gen[a] << gen[b]), gen[c] );
+  }
+}
+
 
 BOOST_AUTO_TEST_SUITE_END() // Context
 

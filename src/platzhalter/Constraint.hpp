@@ -51,6 +51,7 @@ namespace platzhalter {
   struct Variable : public Constraint< typename boost::proto::terminal< var_tag<value_type_, ID> >::type >
   {
     typedef value_type_ value_type;
+    static int id() { return ID; };
   };
 
 

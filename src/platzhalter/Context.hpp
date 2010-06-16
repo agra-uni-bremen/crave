@@ -23,7 +23,7 @@ namespace platzhalter {
     : proto::callable_context< metaSMT_Context, proto::null_context >
   {
 
-    metaSMT_Context(std::string const & solvername="SolverSWORD") 
+    metaSMT_Context(std::string const & solvername="SolverBoolector") 
     : _solver(new metaSMT::MetaSolver())
     , _logic(_solver->logic<metaSMT::QF_BV>(solvername))
     {}
@@ -124,6 +124,31 @@ namespace platzhalter {
     }
 
     template< typename Expr1, typename Expr2>
+    result_type operator() (proto::tag::modulus, Expr1 const & e1, Expr2 const &  e2) {
+      return _logic->bvurem(
+          proto::eval( e1, *this )
+        , proto::eval( e2, *this )
+      );
+    }
+
+    template< typename Expr1, typename Expr2>
+    result_type operator() (proto::tag::divides, Expr1 const & e1, Expr2 const &  e2) {
+      return _logic->bvudiv(
+          proto::eval( e1, *this )
+        , proto::eval( e2, *this )
+      );
+    }
+
+    template< typename Expr1, typename Expr2>
+    result_type operator() (proto::tag::shift_left, Expr1 const & e1, Expr2 const &  e2) {
+      return _logic->bvshl(
+          proto::eval( e1, *this )
+        , proto::eval( e2, *this )
+      );
+    }
+
+
+    template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::multiplies, Expr1 const & e1, Expr2 const &  e2) {
       return _logic->bvmul(
           proto::eval( e1, *this )
@@ -152,6 +177,7 @@ namespace platzhalter {
     T read ( Variable<T,ID> const & v) {
       std::map<int, result_type>::const_iterator ite
         = _variables.find(ID);
+      //printf("read id: %d\n", ID);
       assert ( ite != _variables.end() );
       std::string solution = _solver->readAssignment(ite->second);
       return metaSMT::bits2Cu(solution);
