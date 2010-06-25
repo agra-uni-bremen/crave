@@ -1,13 +1,18 @@
-#define BOOST_TEST_MODULE Context
+#define BOOST_TEST_MODULE Context_t
 #include <boost/test/unit_test.hpp>
 
 #include <platzhalter/Constraint.hpp>
 #include <platzhalter/Context.hpp>
 
+#include <boost/format.hpp>
+
 #include <set>
+#include <iostream>
 
 //using namespace std;
 using namespace platzhalter;
+
+using boost::format;
 
 struct Context_Fixture {
   Context_Fixture ()
@@ -18,11 +23,11 @@ struct Context_Fixture {
     Context ctx;
 };
 
-BOOST_FIXTURE_TEST_SUITE(Context, Context_Fixture )
+BOOST_FIXTURE_TEST_SUITE(Context_t, Context_Fixture )
 
 BOOST_AUTO_TEST_CASE( constants )
 {
-  Variable<unsigned,0> x;
+  Variable<unsigned> x;
   Generator<> gen( x == 135421 );
   gen();
   BOOST_CHECK_EQUAL( gen[x], 135421 );
@@ -30,9 +35,9 @@ BOOST_AUTO_TEST_CASE( constants )
 
 BOOST_AUTO_TEST_CASE( alu )
 {
-  Variable<unsigned,0> op;
-  Variable<unsigned,1> a;
-  Variable<unsigned,2> b;
+  Variable<unsigned> op;
+  Variable<unsigned> a;
+  Variable<unsigned> b;
 
   Generator<> gen;  
   gen
@@ -51,9 +56,9 @@ BOOST_AUTO_TEST_CASE( alu )
 
 BOOST_AUTO_TEST_CASE( alu_enum )
 {
-  Variable<unsigned,0> op;
-  Variable<unsigned,1> a;
-  Variable<unsigned,2> b;
+  Variable<unsigned> op;
+  Variable<unsigned> a;
+  Variable<unsigned> b;
 
   Generator<> gen;  
   gen
@@ -77,7 +82,7 @@ BOOST_AUTO_TEST_CASE( alu_enum )
 
 BOOST_AUTO_TEST_CASE( boolean )
 {
-  Variable<bool,0> b;
+  Variable<bool> b;
 
   Generator<> gen;  
   gen(b == b)(); // create a new assignment
@@ -93,9 +98,9 @@ BOOST_AUTO_TEST_CASE( boolean )
 
 BOOST_AUTO_TEST_CASE( pythagoras )
 {
-  Variable<unsigned long long,0> a;
-  Variable<unsigned long long,1> b;
-  Variable<unsigned long long,2> c;
+  Variable<unsigned long long> a;
+  Variable<unsigned long long> b;
+  Variable<unsigned long long> c;
 
   Generator<> gen;  
   gen(a*a + b*b == c*c)(); // create a new assignment
@@ -109,7 +114,7 @@ BOOST_AUTO_TEST_CASE( pythagoras )
 
 BOOST_AUTO_TEST_CASE( less )
 {
-  Variable<unsigned,0> a;
+  Variable<unsigned> a;
 
   Generator<> gen;  
   gen(a < 256);
@@ -126,7 +131,7 @@ BOOST_AUTO_TEST_CASE( less )
 
 BOOST_AUTO_TEST_CASE( less_equal )
 {
-  Variable<unsigned,0> a;
+  Variable<unsigned> a;
 
   Generator<> gen;  
   gen(a <= 256);
@@ -143,7 +148,7 @@ BOOST_AUTO_TEST_CASE( less_equal )
 
 BOOST_AUTO_TEST_CASE( greater )
 {
-  Variable<unsigned,0> a;
+  Variable<unsigned> a;
 
   Generator<> gen;  
   gen(a > (std::numeric_limits<unsigned>::max()-256) );
@@ -160,7 +165,7 @@ BOOST_AUTO_TEST_CASE( greater )
 
 BOOST_AUTO_TEST_CASE( greater_equal )
 {
-  Variable<unsigned,0> a;
+  Variable<unsigned> a;
 
   Generator<> gen;  
   gen(a >= (std::numeric_limits<unsigned>::max()-256) );
@@ -177,10 +182,10 @@ BOOST_AUTO_TEST_CASE( greater_equal )
 
 BOOST_AUTO_TEST_CASE( divide ) 
 {
-  Variable<unsigned char, 0> a;
-  Variable<unsigned char, 1> b;
-  Variable<unsigned char, 2> q;
-  Variable<unsigned char, 3> r;
+  Variable<unsigned char> a;
+  Variable<unsigned char> b;
+  Variable<unsigned char> q;
+  Variable<unsigned char> r;
 
   Generator<> gen;
   gen
@@ -201,9 +206,9 @@ BOOST_AUTO_TEST_CASE( divide )
 
 BOOST_AUTO_TEST_CASE ( shiftleft )
 {
-  Variable<unsigned , 0> a;
-  Variable<unsigned , 1> b;
-  Variable<unsigned , 2> c;
+  Variable<unsigned> a;
+  Variable<unsigned> b;
+  Variable<unsigned> c;
 
   Generator<> gen;
   gen
@@ -220,7 +225,7 @@ BOOST_AUTO_TEST_CASE ( shiftleft )
     BOOST_CHECK(true);
     gen( a != gen[a] || b != gen[b] );
     BOOST_CHECK(true);
-    printf("result: a=%d, b=%d, c=%d\n", gen[a], gen[b], gen[c]);
+    std::cout << format("result: a=%d, b=%d, c=%d\n") % gen[a]% gen[b]% gen[c];
     BOOST_REQUIRE_EQUAL( (unsigned) (gen[a] << gen[b]), gen[c] );
   }
 }

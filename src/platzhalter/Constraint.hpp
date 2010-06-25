@@ -38,20 +38,27 @@ namespace platzhalter {
      BOOST_MPL_ASSERT_NOT((proto::matches<Expr, Constraint_Grammar>));
    }
 
-  template<typename value_type, int id>
-  struct var_tag {};
+  template<typename value_type>
+  struct var_tag { var_tag(int id_): id(id_) { }; int id; };
 
-  template <typename OUT, typename value_type, int id>
-  OUT & operator<< (OUT & out, var_tag<value_type, id> const & tag) {
-    out << "var<" << id << ">" ;
+  template <typename OUT, typename value_type>
+  OUT & operator<< (OUT & out, var_tag<value_type> const & tag) {
+    out << "var<" << tag.id << ">" ;
     return out;
   }
  
-  template<typename value_type_, int ID>
-  struct Variable : public Constraint< typename boost::proto::terminal< var_tag<value_type_, ID> >::type >
+  int new_var_id() { static int _ID=0; return ++_ID;}
+
+  template<typename value_type_>
+  struct Variable : public Constraint< typename boost::proto::terminal< var_tag<value_type_> >::type >
   {
+    typedef Constraint< typename proto::terminal< var_tag<value_type_> >::type > base_type;
+    Variable() 
+      : base_type( proto::make_expr< proto::tag::terminal>
+        ( var_tag<value_type_>(new_var_id()) ) )
+    {}
     typedef value_type_ value_type;
-    static int id() { return ID; };
+    int id() const {  return boost::proto::value(*this).id; };
   };
 
 

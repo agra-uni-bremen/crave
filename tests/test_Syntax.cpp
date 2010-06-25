@@ -14,7 +14,7 @@ BOOST_FIXTURE_TEST_SUITE(Syntax, Syntax_Fixture )
 
 BOOST_AUTO_TEST_CASE( constants )
 {
-  Variable<unsigned,0> x;
+  Variable<unsigned> x;
   check(x <  10);
   check(x == 100); 
   check(x >= 3); 

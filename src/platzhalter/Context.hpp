@@ -13,7 +13,6 @@
 
 #include <map>
 #include <string>
-#include <iostream>
 #include <stdexcept>
 
 namespace platzhalter {
@@ -35,19 +34,19 @@ namespace platzhalter {
     typedef metaSMT::Expression result_type;
 
 
-    template<typename value_type, int ID>
-    result_type operator() (proto::tag::terminal, var_tag<value_type,ID> const & tag ) {
+    template<typename value_type>
+    result_type operator() (proto::tag::terminal, var_tag<value_type> const & tag ) {
       std::map<int, result_type>::const_iterator ite
-        = _variables.find(ID);
+        = _variables.find(tag.id);
       if ( ite != _variables.end() ) {
         return ite->second;
       } else {
         std::ostringstream buf;
-        buf << "var_" << ID;
+        buf << "var_" << tag.id;
         unsigned width=bitsize_traits<value_type>::nbits;
         //std::cout << "creating " << buf.str() << ", width= " << width << std::endl;
         result_type var = _logic->bitvec(buf.str(), width);
-        _variables.insert( std::make_pair(ID, var) );
+        _variables.insert( std::make_pair(tag.id, var) );
         return var;
       }
     }
@@ -173,11 +172,11 @@ namespace platzhalter {
       return _solver->solve( );
     }
 
-    template<typename T, int ID>
-    T read ( Variable<T,ID> const & v) {
+    template<typename T>
+    T read ( Variable<T> const & v) {
+      //std::cout << boost::format("read id: %d\n")% v.id();
       std::map<int, result_type>::const_iterator ite
-        = _variables.find(ID);
-      //printf("read id: %d\n", ID);
+        = _variables.find(v.id());
       assert ( ite != _variables.end() );
       std::string solution = _solver->readAssignment(ite->second);
       return metaSMT::bits2Cu(solution);
@@ -232,8 +231,8 @@ namespace platzhalter {
     /**
      * read variable "var"
      **/
-    template<typename T, int ID>
-    T operator[] (Variable<T, ID> const & var) { return ctx.read(var); };
+    template<typename T>
+    T operator[] (Variable<T> const & var) { return ctx.read(var); };
 
     private:
       ContextT ctx;
