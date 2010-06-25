@@ -6,12 +6,14 @@
 #include <boost/proto/debug.hpp>
 #include <boost/proto/context/callable.hpp>
 #include <boost/proto/context/null.hpp>
+#include <boost/function.hpp>
 
 #include <MetaSolver.hpp>
 #include <logic/QF_BV.hpp>
 #include <tools/Convert_QF_BV.hpp>
 
 #include <map>
+#include <vector>
 #include <string>
 #include <stdexcept>
 
@@ -163,6 +165,36 @@ namespace platzhalter {
       );
     }
 
+    template<typename Integer>
+    struct getLazyReference{
+      getLazyReference(Integer const & i, metaSMT::QF_BV* logic, result_type var) 
+      : _i (i), _logic(logic), _var(var)
+      {}
+      result_type operator() () {
+        return _logic->equal(_var, _logic->bvuint(_i, bitsize_traits<Integer>::nbits) );
+      }
+      Integer const & _i;
+      metaSMT::QF_BV* _logic;
+      result_type _var;
+    };
+
+    template< typename Integer>
+    result_type operator() (proto::tag::terminal t, ref_tag<Integer> const & ref) {
+      unsigned width=bitsize_traits<Integer>::nbits;
+
+      std::map<int, result_type>::const_iterator ite
+        = _variables.find(ref.id);
+      if ( ite != _variables.end() ) {
+        return ite->second;
+      } else {
+        result_type var = (*this)(t, static_cast<var_tag<Integer> >(ref));
+        boost::function0<result_type> f = getLazyReference<Integer>(ref.ref, _logic, var);
+        _lazy.push_back(f);
+
+        return var;
+      }
+    }
+
     template< typename Integer>
     result_type operator() (proto::tag::terminal, Integer const & i) {
       unsigned width=bitsize_traits<Integer>::nbits;
@@ -177,6 +209,9 @@ namespace platzhalter {
     }
 
     bool solve () {
+      for (unsigned i = 0; i < _lazy.size(); ++i) {
+        _solver->addAssumption( _lazy[i]() );
+      }
       return _solver->solve( );
     }
 
@@ -195,6 +230,7 @@ namespace platzhalter {
       metaSMT::MetaSolver* _solver;
       metaSMT::QF_BV*      _logic;
       std::map<int, result_type> _variables;
+      std::vector<boost::function0<result_type> > _lazy;
 
   }; // metaSMT_Context
 

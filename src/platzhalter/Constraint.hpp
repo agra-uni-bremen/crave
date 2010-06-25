@@ -41,6 +41,10 @@ namespace platzhalter {
   template<typename value_type>
   struct var_tag { var_tag(int id_): id(id_) { }; int id; };
 
+  template<typename value_type>
+  struct ref_tag : public var_tag<value_type> { 
+  ref_tag(int id_,  value_type const & ref_) : var_tag<value_type>(id_), ref(ref_) { }; value_type const & ref; };
+
   template <typename OUT, typename value_type>
   OUT & operator<< (OUT & out, var_tag<value_type> const & tag) {
     out << "var<" << tag.id << ">" ;
@@ -61,6 +65,17 @@ namespace platzhalter {
     int id() const {  return boost::proto::value(*this).id; };
   };
 
+
+      template<typename T>
+      typename proto::result_of::make_expr< 
+          proto::tag::terminal
+        , Constraint_Domain
+        , ref_tag<T>
+      > ::type 
+      reference( T const &  ref )
+      {
+        return proto::make_expr< proto::tag::terminal, Constraint_Domain >( ref_tag<T>( new_var_id(), ref )) ;
+      } 
 
 
 } // namespace platzhalter

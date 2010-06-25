@@ -218,18 +218,62 @@ BOOST_AUTO_TEST_CASE ( shiftleft )
   ;
 
   while( gen.next() ) {
-    BOOST_CHECK(true);
     unsigned av = gen[a];
-    BOOST_CHECK(true);
     unsigned bv = gen[b];
-    BOOST_CHECK(true);
     gen( a != gen[a] || b != gen[b] );
-    BOOST_CHECK(true);
     std::cout << format("result: a=%d, b=%d, c=%d\n") % gen[a]% gen[b]% gen[c];
     BOOST_REQUIRE_EQUAL( (unsigned) (gen[a] << gen[b]), gen[c] );
   }
 }
 
+/**
+ * temporaly fix a variable to a certain value using the assign operator
+ **/
+BOOST_AUTO_TEST_CASE ( fix_variable )
+{
+  Variable<unsigned> a;
+  Variable<unsigned> b;
+
+  Generator<> gen (a < b);
+  //gen ( b = 7 ) ;
+  gen ( b == 7 ) ;
+
+  unsigned c = 0;
+  while( gen.next() ) {
+    ++c;
+    unsigned av = gen[a];
+    unsigned bv = gen[b];
+    BOOST_REQUIRE_LT( av, 7 );
+    BOOST_REQUIRE_EQUAL( bv, 7);
+    gen( a != gen[a] || b != gen[b] );
+    if (c > 10) break;
+  }
+  // found 7 solutions
+  BOOST_REQUIRE_EQUAL( c, 7);
+
+  //gen( b = free );
+
+  gen();
+}
+
+/**
+ * temporaly fix a variable to a certain value using the assign operator
+ **/
+BOOST_AUTO_TEST_CASE ( by_reference )
+{
+  unsigned b=0;
+  Variable<unsigned> a;
+
+  Generator<> gen (a == reference(b) );
+  //gen ( b = 7 ) ;
+
+  while( gen.next() ) {
+    unsigned av = gen[a];
+    BOOST_REQUIRE_EQUAL( av, b);
+    ++b;
+    if (b > 10) break;
+  }
+}
 
 BOOST_AUTO_TEST_SUITE_END() // Context
 
