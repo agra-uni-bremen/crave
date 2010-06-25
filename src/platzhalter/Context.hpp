@@ -123,6 +123,14 @@ namespace platzhalter {
     }
 
     template< typename Expr1, typename Expr2>
+    result_type operator() (proto::tag::minus, Expr1 const & e1, Expr2 const &  e2) {
+      return _logic->bvsub(
+          proto::eval( e1, *this )
+        , proto::eval( e2, *this )
+      );
+    }
+
+    template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::modulus, Expr1 const & e1, Expr2 const &  e2) {
       return _logic->bvurem(
           proto::eval( e1, *this )
