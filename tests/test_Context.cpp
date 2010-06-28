@@ -212,17 +212,19 @@ BOOST_AUTO_TEST_CASE ( shiftleft )
 
   Generator<> gen;
   gen
-    ( a <  16 )
-    ( b <  256 )
+    ( a <  256 )
+    ( b <  (unsigned) (sizeof(unsigned)*8) )
     ( c == (a << b) )
   ;
 
   while( gen.next() ) {
     unsigned av = gen[a];
     unsigned bv = gen[b];
+    unsigned r  = av << bv;
+
     gen( a != gen[a] || b != gen[b] );
-    std::cout << format("result: a=%d, b=%d, c=%d\n") % gen[a]% gen[b]% gen[c];
-    BOOST_REQUIRE_EQUAL( (unsigned) (gen[a] << gen[b]), gen[c] );
+    //std::cout << format("result: a=%d, b=%d, r=%d,  c=%d\n") % gen[a]% gen[b] %r % gen[c];
+    BOOST_REQUIRE_EQUAL( r, gen[c] );
   }
 }
 
