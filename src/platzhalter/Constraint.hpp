@@ -65,6 +65,17 @@ namespace platzhalter {
     int id() const {  return boost::proto::value(*this).id; };
   };
 
+  template<typename value_type_>
+  struct Reference : public Constraint< typename boost::proto::terminal< ref_tag<value_type_> >::type >
+  {
+    typedef Constraint< typename proto::terminal< ref_tag<value_type_> >::type > base_type;
+    Reference(value_type_ &  ref) 
+      : base_type( proto::make_expr< proto::tag::terminal>
+        ( ref_tag<value_type_>(new_var_id(), ref) ) )
+    {}
+    typedef value_type_ value_type;
+    int id() const {  return boost::proto::value(*this).id; };
+  };
 
       template<typename T>
       typename proto::result_of::make_expr< 

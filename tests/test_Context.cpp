@@ -275,6 +275,30 @@ BOOST_AUTO_TEST_CASE ( by_reference )
   }
 }
 
+/**
+ * temporaly fix a variable to a certain value using the assign operator
+ **/
+BOOST_AUTO_TEST_CASE ( named_reference )
+{
+  unsigned b=0;
+  Variable<unsigned> a, c;
+  Reference<unsigned> rb(b);
+
+  Generator<> gen (a == rb);
+  gen(c != b);
+  //gen ( b = 7 ) ;
+
+  while( gen.next() ) {
+    unsigned av = gen[a];
+    unsigned cv = gen[c];
+    BOOST_REQUIRE_EQUAL( av, b);
+    BOOST_REQUIRE_NE   ( cv, b);
+    std::cout << b << std::endl;
+    ++b;
+    if (b > 10) break;
+  }
+}
+
 BOOST_AUTO_TEST_SUITE_END() // Context
 
 //  vim: ft=cpp:ts=2:sw=2:expandtab
