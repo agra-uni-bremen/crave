@@ -22,7 +22,7 @@ class SystemC_Data_Fixture {
 
 BOOST_FIXTURE_TEST_SUITE(SystemC_Data, SystemC_Data_Fixture )
 
-BOOST_AUTO_TEST_CASE( sv_bv_t )
+BOOST_AUTO_TEST_CASE( sc_bv_t )
 {
   using namespace sc_dt;
   const unsigned w = 4;
@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE( sv_bv_t )
   BOOST_CHECK_NE(iv, jv);
 }
 
-BOOST_AUTO_TEST_CASE( sv_uint_t )
+BOOST_AUTO_TEST_CASE( sc_uint_t )
 {
   using namespace sc_dt;
   const unsigned w = 4;
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE( sv_uint_t )
   BOOST_CHECK_EQUAL(rv, kv);
 }
 
-BOOST_AUTO_TEST_CASE( sv_int_t )
+BOOST_AUTO_TEST_CASE( sc_int_t )
 {
   using namespace sc_dt;
   const unsigned w = 4;
