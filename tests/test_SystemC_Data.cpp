@@ -74,9 +74,9 @@ BOOST_AUTO_TEST_CASE( sc_int_t )
   sc_int<w> jv = gen[j];
   sc_int<w> kv = gen[k];
 
-  sc_uint<w> rv = iv-jv;
+  sc_int<w> rv = iv-jv;
 
-  std::cout << format("iv: %d, jv: %d, kv: %d\n") %iv%jv%kv;
+  //std::cout << format("iv: %d, jv: %d, kv: %d\n") %iv%jv%kv;
 
   BOOST_CHECK_LT(iv, jv);
   BOOST_CHECK_EQUAL( rv, kv );
