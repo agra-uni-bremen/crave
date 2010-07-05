@@ -258,16 +258,12 @@ BOOST_AUTO_TEST_CASE ( fix_variable )
   gen();
 }
 
-/**
- * temporaly fix a variable to a certain value using the assign operator
- **/
 BOOST_AUTO_TEST_CASE ( by_reference )
 {
   unsigned b=0;
   Variable<unsigned> a;
 
   Generator<> gen (a == reference(b) );
-  //gen ( b = 7 ) ;
 
   while( gen.next() ) {
     unsigned av = gen[a];
@@ -282,22 +278,20 @@ BOOST_AUTO_TEST_CASE ( by_reference )
  **/
 BOOST_AUTO_TEST_CASE ( named_reference )
 {
-  unsigned b=0;
+  unsigned bv=0;
   Variable<unsigned> a, c;
-  Reference<unsigned> rb(b);
+  Reference<unsigned> b(bv);
 
-  Generator<> gen (a == rb);
+  Generator<> gen (a == b);
   gen(c != b);
-  //gen ( b = 7 ) ;
 
   while( gen.next() ) {
     unsigned av = gen[a];
     unsigned cv = gen[c];
-    BOOST_REQUIRE_EQUAL( av, b);
-    BOOST_REQUIRE_NE   ( cv, b);
-    std::cout << b << std::endl;
-    ++b;
-    if (b > 10) break;
+    BOOST_REQUIRE_EQUAL( av, bv);
+    BOOST_REQUIRE_NE   ( cv, bv);
+    ++bv;
+    if (bv > 10) break;
   }
 }
 
