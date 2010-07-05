@@ -21,6 +21,20 @@ namespace platzhalter {
       : base_type(expr)
     {
     }
+
+    
+   template<typename T, typename E2>
+   typename proto::result_of::make_expr< 
+          proto::tag::assign
+        , Constraint_Domain
+        , Expr
+        , E2
+      > ::type 
+      operator= ( E2 e ) {
+      return proto::make_expr< proto::tag::assign>
+        ( *this, e);
+      }
+
   };
 
 
@@ -45,9 +59,18 @@ namespace platzhalter {
   struct ref_tag : public var_tag<value_type> { 
   ref_tag(int id_,  value_type const & ref_) : var_tag<value_type>(id_), ref(ref_) { }; value_type const & ref; };
 
+  struct randomize_tag { unsigned id; };
+  const randomize_tag randomize = { 0 };
+
   template <typename OUT, typename value_type>
   OUT & operator<< (OUT & out, var_tag<value_type> const & tag) {
     out << "var<" << tag.id << ">" ;
+    return out;
+  }
+
+  template <typename OUT>
+  OUT & operator<< (OUT & out, randomize_tag const & tag ) {
+    out << "randomize_tag <" << tag.id << ">"  ;
     return out;
   }
  
@@ -63,6 +86,27 @@ namespace platzhalter {
     {}
     typedef value_type_ value_type;
     int id() const {  return boost::proto::value(*this).id; };
+
+   typename proto::result_of::make_expr< 
+          proto::tag::assign
+        , Constraint_Domain
+        , Variable<value_type_> const & 
+        , value_type_ const & 
+      > ::type const
+      operator= ( value_type_ const & e ) const {
+      return proto::make_expr< proto::tag::assign, Constraint_Domain>
+        ( boost::cref(*this), boost::cref(e));
+      }
+
+    proto::result_of::make_expr<
+        proto::tag::terminal
+      , Constraint_Domain
+      , randomize_tag 
+      > ::type
+    operator= ( randomize_tag const & e ) const {
+      const randomize_tag tag = { id() };
+      return proto::make_expr< proto::tag::terminal > ( tag );
+    }
   };
 
   template<typename value_type_>

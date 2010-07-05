@@ -237,8 +237,7 @@ BOOST_AUTO_TEST_CASE ( fix_variable )
   Variable<unsigned> b;
 
   Generator<> gen (a < b);
-  //gen ( b = 7 ) ;
-  gen ( b == 7 ) ;
+  gen ( b = 7 ) ;
 
   unsigned c = 0;
   while( gen.next() ) {
@@ -247,13 +246,14 @@ BOOST_AUTO_TEST_CASE ( fix_variable )
     unsigned bv = gen[b];
     BOOST_REQUIRE_LT( av, 7 );
     BOOST_REQUIRE_EQUAL( bv, 7);
-    gen( a != gen[a] || b != gen[b] );
+    gen( a != gen[a] );
     if (c > 10) break;
   }
   // found 7 solutions
   BOOST_REQUIRE_EQUAL( c, 7);
 
-  //gen( b = free );
+  //display_expr( b =  randomize );
+  gen( b = randomize );
 
   gen();
 }

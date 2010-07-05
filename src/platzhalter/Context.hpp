@@ -165,6 +165,31 @@ namespace platzhalter {
       );
     }
 
+    template< typename Expr1, typename Expr2>
+    result_type operator() (proto::tag::assign, Expr1 const & e1, Expr2 const &  e2) {
+      //std::cout << "eval assign" << std::endl;
+      result_type expr1, expr2;
+      expr1 = proto::eval( e1, *this );
+      expr2 = proto::eval( e2, *this );
+
+      boost::function0<result_type> f = getID( _logic->equal(expr1, expr2) );
+      _lazy[proto::value(e1).id] = f;
+      
+      return _logic->bit1();
+    }
+
+    result_type operator() (proto::tag::terminal t, randomize_tag const & tag )
+    {
+      _lazy.erase(tag.id);
+      return _logic->bit1();
+    }
+
+    struct getID {
+      getID( result_type id) : id(id) {}
+      result_type id;
+      result_type operator() () { return id; }
+    };
+
     template<typename Integer>
     struct getLazyReference{
       getLazyReference(Integer const & i, metaSMT::QF_BV* logic, result_type var) 
@@ -189,7 +214,7 @@ namespace platzhalter {
       } else {
         result_type var = (*this)(t, static_cast<var_tag<Integer> >(ref));
         boost::function0<result_type> f = getLazyReference<Integer>(ref.ref, _logic, var);
-        _lazy.push_back(f);
+        _lazy[ref.id] = f;
 
         return var;
       }
@@ -209,8 +234,11 @@ namespace platzhalter {
     }
 
     bool solve () {
-      for (unsigned i = 0; i < _lazy.size(); ++i) {
-        _solver->addAssumption( _lazy[i]() );
+      for (
+        std::map<unsigned, boost::function0<result_type> > ::const_iterator 
+        ite = _lazy.begin();
+        ite != _lazy.end(); ++ite) {
+        _solver->addAssumption( (ite->second)() );
       }
       return _solver->solve( );
     }
@@ -230,7 +258,7 @@ namespace platzhalter {
       metaSMT::MetaSolver* _solver;
       metaSMT::QF_BV*      _logic;
       std::map<int, result_type> _variables;
-      std::vector<boost::function0<result_type> > _lazy;
+      std::map<unsigned, boost::function0<result_type> > _lazy;
 
   }; // metaSMT_Context
 
