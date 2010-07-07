@@ -9,6 +9,8 @@ add_test("test_Syntax" test_Syntax )
 add_executable (test_Context test_Context.cpp )
 add_test("test_Context" test_Context )
 
+add_executable (test_Inheritence test_Inheritence.cpp )
+add_test("test_Inheritence" test_Inheritence )
 
 if(SystemC_FOUND)
   find_package(Threads REQUIRED)
