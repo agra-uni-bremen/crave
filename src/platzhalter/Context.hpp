@@ -269,6 +269,13 @@ namespace platzhalter {
   }
 
   template<typename ContextT=Context>
+  struct Generator;
+  template<typename ContextT=Context>
+  struct Soft_Generator;
+
+  struct Soft;
+
+  template<typename ContextT>
   struct Generator {
 
     Generator() {};
@@ -296,6 +303,13 @@ namespace platzhalter {
       return *this;
     }
 
+    /**
+     * generate soft constraints
+     **/
+    Soft_Generator<ContextT> & operator() ( Soft const & ) {
+      return (Soft_Generator<ContextT>&) (*this);
+    }
+
     bool next() {
       return ctx.solve();
     }
@@ -309,6 +323,19 @@ namespace platzhalter {
     private:
       ContextT ctx;
   };
+
+  template< typename T>
+  struct Soft_Generator : public Generator<T> {};
+
+  struct Soft {
+    template< typename T >
+    Soft_Generator<T> & operator() (Generator<T> & gen) const {
+      return (Soft_Generator<T>&) gen;
+    }
+  };
+
+  const Soft soft = {};
+
 
 
 } // namespace platzhalter
