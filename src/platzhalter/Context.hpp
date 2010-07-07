@@ -27,6 +27,7 @@ namespace platzhalter {
     metaSMT_Context(std::string const & solvername="SolverBoolector") 
     : _solver(new metaSMT::MetaSolver())
     , _logic(_solver->logic<metaSMT::QF_BV>(solvername))
+    , _soft(_logic->bit1())
     {}
 
     ~metaSMT_Context() {
@@ -233,6 +234,12 @@ namespace platzhalter {
       _solver->addAssertion( proto::eval(e, *this) );
     }
 
+    template<typename Expr>
+    void soft_assertion (Expr e) {
+      check(e);
+      _soft = _logic->bvand(_soft, proto::eval(e, *this) );
+    }
+
     bool solve () {
       for (
         std::map<unsigned, boost::function0<result_type> > ::const_iterator 
@@ -240,6 +247,10 @@ namespace platzhalter {
         ite != _lazy.end(); ++ite) {
         _solver->addAssumption( (ite->second)() );
       }
+      _solver->addAssumption(_soft);
+      // if soft constraint satisfiable
+      if ( _solver->solve() ) return true;
+      // if not satisfiable
       return _solver->solve( );
     }
 
@@ -257,6 +268,7 @@ namespace platzhalter {
     private:
       metaSMT::MetaSolver* _solver;
       metaSMT::QF_BV*      _logic;
+      result_type          _soft;
       std::map<int, result_type> _variables;
       std::map<unsigned, boost::function0<result_type> > _lazy;
 
@@ -270,8 +282,15 @@ namespace platzhalter {
 
   template<typename ContextT=Context>
   struct Generator;
-  template<typename ContextT=Context>
-  struct Soft_Generator;
+
+  template< typename T=Context>
+  struct Soft_Generator {
+    Soft_Generator(Generator<T> & gen) : gen(gen) {}
+
+    template< typename Expr >
+    Soft_Generator<T> & operator() (Expr e);
+    Generator<T> & gen;
+  };
 
   struct Soft;
 
@@ -303,11 +322,16 @@ namespace platzhalter {
       return *this;
     }
 
+    template<typename Expr>
+    Generator<ContextT> & soft( Expr e) {
+      ctx.soft_assertion( e );
+    }
+
     /**
      * generate soft constraints
      **/
-    Soft_Generator<ContextT> & operator() ( Soft const & ) {
-      return (Soft_Generator<ContextT>&) (*this);
+    Soft_Generator<ContextT> operator() ( Soft const & ) {
+      return Soft_Generator<ContextT> (*this);
     }
 
     bool next() {
@@ -324,13 +348,18 @@ namespace platzhalter {
       ContextT ctx;
   };
 
-  template< typename T>
-  struct Soft_Generator : public Generator<T> {};
+  template< typename T >
+  template< typename Expr >
+  Soft_Generator<T> &
+  Soft_Generator<T>::operator() (Expr e) {
+    gen.soft(e);
+    return *this;
+  }
 
   struct Soft {
     template< typename T >
-    Soft_Generator<T> & operator() (Generator<T> & gen) const {
-      return (Soft_Generator<T>&) gen;
+    Soft_Generator<T> operator() (Generator<T> & gen) const {
+      return Soft_Generator<T>( gen );
     }
   };
 
