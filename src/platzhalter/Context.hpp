@@ -240,18 +240,22 @@ namespace platzhalter {
       _soft = _logic->bvand(_soft, proto::eval(e, *this) );
     }
 
-    bool solve () {
+    bool solve (bool soft=true) {
       for (
         std::map<unsigned, boost::function0<result_type> > ::const_iterator 
         ite = _lazy.begin();
         ite != _lazy.end(); ++ite) {
         _solver->addAssumption( (ite->second)() );
       }
+      if(soft) {
       _solver->addAssumption(_soft);
-      // if soft constraint satisfiable
-      if ( _solver->solve() ) return true;
-      // if not satisfiable
-      return _solver->solve( );
+        // if soft constraint satisfiable
+        if ( _solver->solve() ) return true;
+        // if not satisfiable
+        return solve(false);
+      } else {
+        return _solver->solve( );
+      }
     }
 
     template<typename T>
