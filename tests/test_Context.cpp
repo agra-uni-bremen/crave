@@ -3,6 +3,7 @@
 
 #include <platzhalter/Constraint.hpp>
 #include <platzhalter/Context.hpp>
+#include <platzhalter/ConstrainedRandom.hpp>
 
 #include <boost/format.hpp>
 
@@ -24,6 +25,54 @@ struct Context_Fixture {
 };
 
 BOOST_FIXTURE_TEST_SUITE(Context_t, Context_Fixture )
+
+BOOST_AUTO_TEST_CASE ( multiple_solver_instances )
+{
+  Generator<> gen1, gen2;
+  Variable<int> r1, r2;
+  gen1(r1 < 6);
+  gen2(r2 < 6);
+  gen1.next();
+  gen2.next();
+}
+
+BOOST_AUTO_TEST_CASE ( randv_test )
+{
+  Generator<> gen;
+  randv<int> a(0);
+  randv<int> b(0);
+  std::cout << "init: a = " <<  a << ", b = " << b << std::endl;
+  gen
+    (4 <= a() && a() <= 6)
+    (9 <= a() + b() && a() + b() <= 11)
+    (b() % 2 == 0);
+  unsigned count=0;
+  while( gen.next() && count < 6) {
+    ++count;
+    std::cout << "result: a = " <<  a << ", b = " << b << std::endl;
+    gen(a() != a || b() != b);
+  }
+  BOOST_CHECK_EQUAL(count, 4);
+}
+
+BOOST_AUTO_TEST_CASE ( variable_ref_mixed_test )
+{
+  Generator<> gen;
+  randv<int> a(0);
+  Variable<int> b;
+  gen
+    (4 <= a() && a() <= 6)
+    (9 <= a() + b && a() + b <= 11)
+    (b % 2 == 0);
+  unsigned count=0;
+  while( gen.next()) {
+    ++count;
+    std::cout << "result: a = " <<  a << ", b = " << gen[b] << std::endl;
+    gen(a() != a || b != gen[b]);
+  }
+  BOOST_CHECK_EQUAL(count, 4);
+}
+
 
 BOOST_AUTO_TEST_CASE( constants )
 {
@@ -280,7 +329,7 @@ BOOST_AUTO_TEST_CASE ( named_reference )
 {
   unsigned bv=0;
   Variable<unsigned> a, c;
-  Reference<unsigned> b(bv);
+  ReadReference<unsigned> b(bv);
 
   Generator<> gen (a == b);
   gen(c != b);
@@ -330,7 +379,6 @@ BOOST_AUTO_TEST_CASE ( static_dist_t )
   }
   BOOST_CHECK_GT(c, 0);
 }
-
 
 BOOST_AUTO_TEST_CASE ( soft_constraint_t )
 {

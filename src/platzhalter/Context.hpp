@@ -54,6 +54,33 @@ namespace platzhalter {
       }
     }
 
+    template<typename value_type>
+    struct writeReference{
+      writeReference(value_type & i, metaSMT_Context & ctx, unsigned id) 
+      : _i (i), _ctx(ctx), _id(id)
+      {}
+      void operator() () {
+        _ctx.read(_i, _id);
+      }
+      value_type & _i;
+      metaSMT_Context & _ctx;
+      unsigned _id;
+    };
+
+    template<typename value_type>
+    result_type operator() (proto::tag::terminal t, write_ref_tag<value_type> const & ref ) {
+      std::map<int, result_type>::const_iterator ite
+        = _variables.find(ref.id);
+      if ( ite != _variables.end() ) {
+        return ite->second;
+      } else {
+        result_type var = (*this)(t, static_cast<var_tag<value_type> >(ref));
+        boost::function0<void> f = writeReference<value_type>(ref.ref, *this, ref.id);
+        _post_hook.push_back(f);
+        return var;
+      }
+    }
+
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::equal_to, Expr1 const & e1, Expr2 const &  e2) {
       return _logic->equal(
@@ -205,7 +232,7 @@ namespace platzhalter {
     };
 
     template< typename Integer>
-    result_type operator() (proto::tag::terminal t, ref_tag<Integer> const & ref) {
+    result_type operator() (proto::tag::terminal t, read_ref_tag<Integer> const & ref) {
       unsigned width=bitsize_traits<Integer>::nbits;
 
       std::map<int, result_type>::const_iterator ite
@@ -224,7 +251,7 @@ namespace platzhalter {
     template< typename Integer>
     result_type operator() (proto::tag::terminal, Integer const & i) {
       unsigned width=bitsize_traits<Integer>::nbits;
-      //std::cout << "creating int " << i << ", width= " << width << std::endl;
+//      std::cout << "creating int " << i << ", width= " << width << std::endl;
       return _logic->bvuint(i, width);
     }
 
@@ -240,34 +267,51 @@ namespace platzhalter {
       _soft = _logic->bvand(_soft, proto::eval(e, *this) );
     }
 
-    bool solve (bool soft=true) {
+    void pre_solve() {       
       for (
         std::map<unsigned, boost::function0<result_type> > ::const_iterator 
         ite = _lazy.begin();
         ite != _lazy.end(); ++ite) {
         _solver->addAssumption( (ite->second)() );
       }
-      if(soft) {
+    }
+
+    void post_solve(bool sat) {
+      if (sat) for (uint i = 0; i < _post_hook.size(); i++) _post_hook[i]();
+    }
+
+    bool solve (bool soft=true) {
+      pre_solve();
       _solver->addAssumption(_soft);
-        // if soft constraint satisfiable
-        if ( _solver->solve() ) return true;
+      // if soft constraint satisfiable
+      if ( _solver->solve() ) {
+         post_solve(true);
+         return true;
+      }
+      else {
         // if not satisfiable
-        return solve(false);
-      } else {
-        return _solver->solve( );
+        pre_solve();
+        bool ret = _solver->solve( );
+        post_solve(ret);
+        return ret;
       }
     }
 
     template<typename T>
     T read ( Variable<T> const & v) {
-      //std::cout << boost::format("read id: %d\n")% v.id();
-      std::map<int, result_type>::const_iterator ite
-        = _variables.find(v.id());
-      assert ( ite != _variables.end() );
-      std::string solution = _solver->readAssignment(ite->second);
-      return metaSMT::bits2Cu(solution);
+      T ret;
+      read(ret, v.id());
+      return ret;
     }
 
+    template<typename T>
+    void read ( T & v, unsigned id) {
+      std::map<int, result_type>::const_iterator ite
+        = _variables.find(id);
+      assert ( ite != _variables.end() );
+      std::string solution = _solver->readAssignment(ite->second);
+      v = metaSMT::bits2Cu(solution);
+    }
 
     private:
       metaSMT::MetaSolver* _solver;
@@ -275,6 +319,7 @@ namespace platzhalter {
       result_type          _soft;
       std::map<int, result_type> _variables;
       std::map<unsigned, boost::function0<result_type> > _lazy;
+      std::vector<boost::function0<void> > _post_hook;
 
   }; // metaSMT_Context
 
@@ -312,7 +357,7 @@ namespace platzhalter {
     template<typename Expr>
     Generator<ContextT> & operator() (Expr expr)
     {
-      //display_expr(expr);
+//      display_expr(expr);
       ctx.assertion(expr);
       return *this;
     }
@@ -368,8 +413,6 @@ namespace platzhalter {
   };
 
   const Soft soft = {};
-
-
 
 } // namespace platzhalter
 //  vim: ft=cpp:ts=2:sw=2:expandtab
