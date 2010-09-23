@@ -13,6 +13,7 @@
 #include <tools/Convert_QF_BV.hpp>
 
 #include <map>
+#include <set>
 #include <vector>
 #include <string>
 #include <stdexcept>
@@ -24,7 +25,8 @@ namespace platzhalter {
     : proto::callable_context< metaSMT_Context, proto::null_context >
   {
 
-    metaSMT_Context(std::string const & solvername="SolverBoolector") 
+//    metaSMT_Context(std::string const & solvername="SolverBoolector") 
+    metaSMT_Context(std::string const & solvername="SolverSWORD") 
     : _solver(new metaSMT::MetaSolver())
     , _logic(_solver->logic<metaSMT::QF_BV>(solvername))
     , _soft(_logic->bit1())
@@ -262,12 +264,49 @@ namespace platzhalter {
     }
 
     template<typename Expr>
+    void assertion (std::string group, Expr e) {
+      check(e);
+
+      result_type var;
+      if (_group_variables.find(group) != _group_variables.end() ) 
+        var = _group_variables[group];
+      else {
+        var = _logic->bitvec(group, 1);
+        _group_variables.insert( std::make_pair(group, var) );
+      }
+
+      _solver->addAssertion( _logic->implies( var, proto::eval(e, *this) ) );
+    }
+
+    bool enable_group(std::string group) {
+      if (_group_variables.find(group) == _group_variables.end()) return false;
+      _disabled_groups.erase(group);
+      return true;
+    }
+
+    bool disable_group(std::string group) {
+      if (_group_variables.find(group) == _group_variables.end()) return false;
+      _disabled_groups.insert(group);
+      return true;
+    }
+
+    template<typename Expr>
     void soft_assertion (Expr e) {
       check(e);
       _soft = _logic->bvand(_soft, proto::eval(e, *this) );
     }
 
     void pre_solve() {       
+      for (
+        std::map<std::string, result_type >::const_iterator 
+        ite = _group_variables.begin();
+        ite != _group_variables.end(); ++ite) {
+        if (_disabled_groups.find(ite->first) == _disabled_groups.end())
+          _solver->addAssumption( _logic->equal(ite->second, _logic->bit1()) );
+        else
+          _solver->addAssumption( _logic->equal(ite->second, _logic->bit0()) );
+      }
+
       for (
         std::map<unsigned, boost::function0<result_type> > ::const_iterator 
         ite = _lazy.begin();
@@ -318,6 +357,8 @@ namespace platzhalter {
       metaSMT::QF_BV*      _logic;
       result_type          _soft;
       std::map<int, result_type> _variables;
+      std::map<std::string, result_type> _group_variables;
+      std::set<std::string> _disabled_groups;
       std::map<unsigned, boost::function0<result_type> > _lazy;
       std::vector<boost::function0<void> > _post_hook;
 
@@ -361,6 +402,16 @@ namespace platzhalter {
       ctx.assertion(expr);
       return *this;
     }
+
+    template<typename Expr>
+    Generator<ContextT> & operator() (std::string group, Expr expr)
+    {
+      ctx.assertion(group, expr);
+      return *this;
+    }
+
+    bool enable_group(std::string group) { return ctx.enable_group(group); }
+    bool disable_group(std::string group) { return ctx.disable_group(group); }
 
     /**
      * generate a new assignment

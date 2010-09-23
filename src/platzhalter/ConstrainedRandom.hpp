@@ -30,6 +30,8 @@ namespace platzhalter {
         if (!constraint.next()) return false;
         return true;
       }
+      bool enable_constraint_group(std::string group) { return constraint.enable_group(group); }
+      bool disable_constraint_group(std::string group) { return constraint.disable_group(group); }
       void addChild(rand_base* rb) { children.push_back(rb); }
 
     protected:

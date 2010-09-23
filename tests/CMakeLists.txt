@@ -12,6 +12,9 @@ add_test("test_Context" test_Context )
 add_executable (test_Inheritence test_Inheritence.cpp )
 add_test("test_Inheritence" test_Inheritence )
 
+add_executable (test_Constraint_Management test_Constraint_Management.cpp )
+add_test("test_Constraint_Management" test_Constraint_Management )
+
 if(SystemC_FOUND)
   find_package(Threads REQUIRED)
   include_directories(${SystemC_INCLUDE_DIR})

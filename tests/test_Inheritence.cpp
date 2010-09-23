@@ -176,7 +176,7 @@ BOOST_AUTO_TEST_CASE( t5 )
     std::cout << *it << std::endl;
   }
 
-  obj1* it1 = new obj1(0);
+  obj2* it1 = new obj2(0);
   for (int i = 0; i < 20; i++) {
     it1->next();
     std::cout << *it1 << std::endl;
