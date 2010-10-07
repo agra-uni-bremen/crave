@@ -12,5 +12,6 @@ enable_testing ()
 include_directories( ${metaSMT_INCLUDE_DIR} )
 
 add_subdirectory ( tests )
+add_subdirectory ( doc/concept/resources )
 
 
