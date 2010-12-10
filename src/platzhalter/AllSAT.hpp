@@ -35,7 +35,7 @@ namespace platzhalter {
             , bind(&metaSMT::QF_BV::bvbin, _logic, bind(&solution_t::value_type::second, arg2) )
           )
         );
-      _solver->addAssertion(accumulate(solution, _logic->bit0(), createOrNeq)());
+      _solver->addAssertion(boost::phoenix::accumulate(solution, _logic->bit0(), createOrNeq)());
     }
 
     bool solve()  {
