@@ -21,14 +21,16 @@
 #include <stdexcept>
 
 namespace platzhalter {
+
+  std::string default_solver();
+
   namespace proto = boost::proto;
 
   struct metaSMT_Context
     : proto::callable_context< metaSMT_Context, proto::null_context >
   {
 
-//    metaSMT_Context(std::string const & solvername="SolverBoolector") 
-    metaSMT_Context(std::string const & solvername="SolverSWORD") 
+    metaSMT_Context(std::string const & solvername) 
     : _solver(new metaSMT::MetaSolver())
     , _logic(_solver->logic<metaSMT::QF_BV>(solvername))
     , _soft(_logic->bit1())
@@ -393,10 +395,13 @@ namespace platzhalter {
   template<typename ContextT>
   struct Generator {
 
-    Generator() {};
+    Generator() 
+    : ctx(default_solver())
+    {};
 
     template<typename Expr>
     Generator(Expr expr)
+    : ctx(default_solver())
     {
       (*this)(expr);
     }

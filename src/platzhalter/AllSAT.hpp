@@ -11,7 +11,7 @@ namespace platzhalter {
 
   struct AllSAT : public metaSMT_Context
   {
-    AllSAT(std::string const & solvername="SolverBoolector") 
+    AllSAT(std::string const & solvername) 
     : metaSMT_Context(solvername), is_solved(false)
     { }
 
