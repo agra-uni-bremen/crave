@@ -24,6 +24,22 @@ struct Context_Fixture {
 
 BOOST_FIXTURE_TEST_SUITE(Context_t, Context_Fixture )
 
+BOOST_AUTO_TEST_CASE ( allsat )
+{
+  Generator<AllSAT> gen;
+  Variable<bool> r1, r2;
+  gen( !r1 || r2);
+
+  for (int i=0;i<8; i++) {
+    gen();
+    std::cout << " r1= " <<  gen[r1] << ", r2= " << gen[r2] << std::endl;
+  }
+
+  
+
+
+}
+
 BOOST_AUTO_TEST_CASE ( multiple_solver_instances )
 {
   Generator<> gen1, gen2;
