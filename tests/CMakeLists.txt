@@ -18,9 +18,6 @@ function (add_all_tests prog cfile)
   endforeach(test)
 endfunction(add_all_tests)
 
-add_executable(demo test)
-target_link_libraries(demo ${metaSMT_LIBRARIES})
-
 add_library (boost_test boost_test.cpp)
 link_libraries (${metaSMT_LIBRARIES} boost_test)
 
