@@ -353,11 +353,12 @@ namespace platzhalter {
       v = metaSMT::bits2Cu(solution);
     }
 
-    private:
+    protected:
+      std::map<int, result_type> _variables;
       metaSMT::MetaSolver* _solver;
       metaSMT::QF_BV*      _logic;
+    private:
       result_type          _soft;
-      std::map<int, result_type> _variables;
       std::map<std::string, result_type> _group_variables;
       std::set<std::string> _disabled_groups;
       std::map<unsigned, boost::function0<result_type> > _lazy;
