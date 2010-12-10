@@ -1,3 +1,3 @@
 add_library (crub ConstrainedRandom.cpp)
-link_libraries (${metaSMT_LIBRARIES} crub)
+target_link_libraries (crub ${metaSMT_LIBRARIES})
 
