@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/proto/core.hpp>
+#include <ostream>
 
 using std::ostream;
 

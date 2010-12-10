@@ -1,6 +1,7 @@
 #pragma once
 
 #include "bitsize_traits.hpp"
+#include "Constraint.hpp"
 
 #include <boost/proto/core.hpp>
 #include <boost/proto/debug.hpp>
