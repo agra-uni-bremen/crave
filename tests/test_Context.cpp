@@ -1,8 +1,6 @@
 #define BOOST_TEST_MODULE Context_t
 #include <boost/test/unit_test.hpp>
 
-#include <platzhalter/Constraint.hpp>
-#include <platzhalter/Context.hpp>
 #include <platzhalter/ConstrainedRandom.hpp>
 
 #include <boost/format.hpp>
@@ -72,7 +70,6 @@ BOOST_AUTO_TEST_CASE ( variable_ref_mixed_test )
   }
   BOOST_CHECK_EQUAL(count, 4);
 }
-
 
 BOOST_AUTO_TEST_CASE( constants )
 {

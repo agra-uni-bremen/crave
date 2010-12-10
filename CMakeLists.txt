@@ -5,9 +5,11 @@ find_package ( Boost REQUIRED )
 find_package ( metaSMT REQUIRED )
 find_package ( SystemC )
 
-enable_testing ()
-
 include_directories( ${metaSMT_INCLUDE_DIR} )
+
+add_subdirectory ( src/platzhalter )
+
+enable_testing ()
 
 add_subdirectory ( tests )
 

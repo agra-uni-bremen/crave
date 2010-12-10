@@ -148,6 +148,11 @@ namespace platzhalter {
       );
     }
 
+    template< typename Expr>
+    result_type operator() (proto::tag::logical_not, Expr const & e) {
+      return _logic->bvnot( proto::eval( e, *this ) );
+    }
+
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::plus, Expr1 const & e1, Expr2 const &  e2) {
       return _logic->bvadd(
@@ -369,9 +374,7 @@ namespace platzhalter {
 
   typedef metaSMT_Context Context;
 
-  Context get_context(std::string const & solvername="") {
-    return metaSMT_Context(solvername);
-  }
+  Context get_context(std::string const & solvername="");
 
   template<typename ContextT=Context>
   struct Generator;
@@ -470,3 +473,4 @@ namespace platzhalter {
 
 } // namespace platzhalter
 //  vim: ft=cpp:ts=2:sw=2:expandtab
+

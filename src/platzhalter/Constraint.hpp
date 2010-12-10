@@ -88,7 +88,7 @@ namespace platzhalter {
     return out;
   }
  
-  int new_var_id() { static int _ID=0; return ++_ID;}
+  int new_var_id();
 
   template<typename value_type_>
   struct Variable : public Constraint< typename boost::proto::terminal< var_tag<value_type_> >::type >
@@ -189,3 +189,4 @@ namespace platzhalter {
 } // namespace platzhalter
 
 //  vim: ft=cpp:ts=2:sw=2:expandtab
+

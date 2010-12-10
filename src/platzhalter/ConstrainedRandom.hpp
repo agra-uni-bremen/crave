@@ -37,20 +37,29 @@ namespace platzhalter {
       void addChild(rand_base* rb) { children.push_back(rb); }
 
     protected:
+      rand_obj() { }
       std::vector<rand_base*> children;
+    
+    public:
       Generator<> constraint;
   };
 
   template<typename T>
   class randv_prim_base : public rand_base
   {
+    public:
+      operator T() const { return value; }
+      friend ostream& operator<<(ostream& os, const randv_prim_base<T>& e) { os << e.value; return os; }
+      WriteReference<T>& operator()() { return var; }
+
     protected:
       randv_prim_base(rand_obj* parent) : var(value) { if (parent != 0) parent->addChild(this); }
+      randv_prim_base(const randv_prim_base& other) : var(value), value(other.value) { }
       T value;
       WriteReference<T> var;
   };
 
-  boost::mt19937 rng;
+  extern boost::mt19937 rng;
 
   template<typename T>
   class randomize_base
@@ -76,12 +85,10 @@ namespace platzhalter {
 #define _COMMON_INTERFACE(typename) \
 public: \
   randv(rand_obj* parent) : randv_prim_base<typename>(parent) { } \
+  randv(const randv& other) : randv_prim_base<typename>(other) { } \
+  bool next() { value = (*dist)(rng); return true; } \
   randv<typename>& operator=(const randv<typename>& i) { value = i.value; return *this; } \
   randv<typename>& operator=(typename i) { value = i; return *this; } \
-  operator typename() const { return value; } \
-  friend ostream& operator<<(ostream& os, const randv<typename>& e) { os << e.value; return os; } \
-  WriteReference<typename>& operator()() { return var; } \
-  bool next() { value = (*dist)(rng); return true; }
 
 #define _INTEGER_INTERFACE(typename) \
 public: \

@@ -18,11 +18,8 @@ function (add_all_tests prog cfile)
   endforeach(test)
 endfunction(add_all_tests)
 
-add_executable(demo test)
-target_link_libraries(demo ${metaSMT_LIBRARIES})
-
 add_library (boost_test boost_test.cpp)
-link_libraries (${metaSMT_LIBRARIES} boost_test)
+link_libraries (${metaSMT_LIBRARIES} boost_test crub)
 
 add_executable (Syntax test_Syntax.cpp )
 add_all_tests(Syntax test_Syntax.cpp )
@@ -40,7 +37,7 @@ if(SystemC_FOUND)
   find_package(Threads REQUIRED)
   include_directories(${SystemC_INCLUDE_DIR})
   add_executable (test_SystemC_Data test_SystemC_Data.cpp)
-  target_link_libraries ( test_SystemC_Data ${SystemC_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+  target_link_libraries ( test_SystemC_Data ${SystemC_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} crub)
   add_test("test_SystemC_Data" test_SystemC_Data)
 endif(SystemC_FOUND)
 

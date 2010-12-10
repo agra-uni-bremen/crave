@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE Syntax
 #include <boost/test/unit_test.hpp>
 
-#include <platzhalter/Constraint.hpp>
+#include <platzhalter/ConstrainedRandom.hpp>
 
 //using namespace std;
 using namespace platzhalter;
@@ -14,6 +14,7 @@ BOOST_FIXTURE_TEST_SUITE(Syntax, Syntax_Fixture )
 
 BOOST_AUTO_TEST_CASE( constants )
 {
+//  Generator<> gen;
   Variable<unsigned> x;
   check(x <  10);
   check(x == 100); 
