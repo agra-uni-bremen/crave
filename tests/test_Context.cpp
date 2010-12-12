@@ -2,6 +2,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <platzhalter/ConstrainedRandom.hpp>
+#include <platzhalter/AllSAT.hpp>
 
 #include <boost/format.hpp>
 
