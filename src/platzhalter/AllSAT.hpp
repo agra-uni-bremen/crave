@@ -22,7 +22,7 @@ namespace platzhalter {
     typedef std::vector< solution_t > all_solutions_t;
 
     void store_solution (solution_t & sol, std::pair<int, result_type> const & p ) {
-        std::cout << "p " << p.first << " " << _solver->readAssignment(p.second) << std::endl;
+        //std::cout << "p " << p.first << " " << _solver->readAssignment(p.second) << std::endl;
         sol.insert( make_pair(p.second, _solver->readAssignment(p.second)));
     }
 
