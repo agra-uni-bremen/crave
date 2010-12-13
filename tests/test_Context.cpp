@@ -54,8 +54,8 @@ BOOST_AUTO_TEST_CASE ( multiple_solver_instances )
 BOOST_AUTO_TEST_CASE ( randv_test )
 {
   Generator<> gen;
-  randv<int> a(0);
-  randv<int> b(0);
+  randv<int> a(NULL);
+  randv<int> b(NULL);
   std::cout << "init: a = " <<  a << ", b = " << b << std::endl;
   gen
     (4 <= a() && a() <= 6)

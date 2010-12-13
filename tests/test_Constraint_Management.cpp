@@ -15,7 +15,7 @@ using namespace platzhalter;
 
 class Item : public rand_obj {
 public:
-  Item() : rand_obj(0), a(this), b(this) {
+  Item() : rand_obj(), a(this), b(this) {
     constraint("sum", a() + b() == 4);
     constraint("product", a() * b() == 4);
     constraint(a() < 10);

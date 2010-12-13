@@ -2,6 +2,7 @@
 
 #include "Constraint.hpp"
 #include "Context.hpp"
+#include "AllSAT.hpp"
 
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -22,10 +23,12 @@ namespace platzhalter {
       virtual bool next() = 0;
   };
 
-  class rand_obj : public rand_base
+  template<typename context_type=Context>
+  class rand_obj_of : public rand_base
   {
     public:
-      rand_obj(rand_obj* parent) { if (parent != 0) parent->addChild(this); }
+      template<typename context>
+      rand_obj_of(rand_obj_of<context>* parent = 0) { if (parent != 0) parent->addChild(this); }
       bool next() {
         for (uint i = 0; i < children.size(); i++) 
           if (!children[i]->next()) return false; 
@@ -37,11 +40,22 @@ namespace platzhalter {
       void addChild(rand_base* rb) { children.push_back(rb); }
 
     protected:
-      rand_obj() { }
+      rand_obj_of() { }
       std::vector<rand_base*> children;
     
     public:
-      Generator<> constraint;
+      Generator<context_type> constraint;
+  };
+
+  class rand_obj : public rand_obj_of<> 
+  {
+    public:
+      template<typename context>
+      rand_obj(rand_obj_of<context>* parent) 
+      : rand_obj_of<>(parent)
+      { }
+    protected:
+      rand_obj() { }
   };
 
   template<typename T>
@@ -53,7 +67,8 @@ namespace platzhalter {
       WriteReference<T>& operator()() { return var; }
 
     protected:
-      randv_prim_base(rand_obj* parent) : var(value) { if (parent != 0) parent->addChild(this); }
+      template<typename context>
+      randv_prim_base(rand_obj_of<context>* parent) : var(value) { if (parent != 0) parent->addChild(this); }
       randv_prim_base(const randv_prim_base& other) : var(value), value(other.value) { }
       T value;
       WriteReference<T> var;
@@ -82,30 +97,32 @@ namespace platzhalter {
       boost::uniform_int<char> *dist;
   };
 
-#define _COMMON_INTERFACE(typename) \
+#define _COMMON_INTERFACE(Typename) \
 public: \
-  randv(rand_obj* parent) : randv_prim_base<typename>(parent) { } \
-  randv(const randv& other) : randv_prim_base<typename>(other) { } \
+  template<typename context> \
+  randv(rand_obj_of<context>* parent) : randv_prim_base<Typename>(parent) { } \
+  randv(rand_obj* parent) : randv_prim_base<Typename>(parent) { } \
+  randv(const randv& other) : randv_prim_base<Typename>(other) { } \
   bool next() { value = (*dist)(rng); return true; } \
-  randv<typename>& operator=(const randv<typename>& i) { value = i.value; return *this; } \
-  randv<typename>& operator=(typename i) { value = i; return *this; } \
+  randv<Typename>& operator=(const randv<Typename>& i) { value = i.value; return *this; } \
+  randv<Typename>& operator=(Typename i) { value = i; return *this; } \
 
-#define _INTEGER_INTERFACE(typename) \
+#define _INTEGER_INTERFACE(Typename) \
 public: \
-  randv<typename>& operator++() { ++value;  return *this; } \
-  typename operator++(int) { typename tmp = value; ++value; return tmp; } \
-  randv<typename>& operator--() { --value;  return *this; } \
-  typename operator--(int) { typename tmp = value; --value; return tmp; } \
-  randv<typename>& operator+=(typename i) { value += i;  return *this; } \
-  randv<typename>& operator-=(typename i) { value -= i;  return *this; } \
-  randv<typename>& operator*=(typename i) { value *= i;  return *this; } \
-  randv<typename>& operator/=(typename i) { value /= i;  return *this; } \
-  randv<typename>& operator%=(typename i) { value %= i;  return *this; } \
-  randv<typename>& operator&=(typename i) { value &= i;  return *this; } \
-  randv<typename>& operator|=(typename i) { value |= i;  return *this; } \
-  randv<typename>& operator^=(typename i) { value ^= i;  return *this; } \
-  randv<typename>& operator<<=(typename i) { value <<= i;  return *this; } \
-  randv<typename>& operator>>=(typename i) { value >>= i;  return *this; } \
+  randv<Typename>& operator++() { ++value;  return *this; } \
+  Typename operator++(int) { Typename tmp = value; ++value; return tmp; } \
+  randv<Typename>& operator--() { --value;  return *this; } \
+  Typename operator--(int) { Typename tmp = value; --value; return tmp; } \
+  randv<Typename>& operator+=(Typename i) { value += i;  return *this; } \
+  randv<Typename>& operator-=(Typename i) { value -= i;  return *this; } \
+  randv<Typename>& operator*=(Typename i) { value *= i;  return *this; } \
+  randv<Typename>& operator/=(Typename i) { value /= i;  return *this; } \
+  randv<Typename>& operator%=(Typename i) { value %= i;  return *this; } \
+  randv<Typename>& operator&=(Typename i) { value &= i;  return *this; } \
+  randv<Typename>& operator|=(Typename i) { value |= i;  return *this; } \
+  randv<Typename>& operator^=(Typename i) { value ^= i;  return *this; } \
+  randv<Typename>& operator<<=(Typename i) { value <<= i;  return *this; } \
+  randv<Typename>& operator>>=(Typename i) { value >>= i;  return *this; } \
 
 // bool
   template<>
