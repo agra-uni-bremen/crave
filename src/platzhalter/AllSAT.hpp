@@ -9,17 +9,20 @@
 
 namespace platzhalter {
 
-  struct AllSAT : public metaSMT_Context
+  struct AllSAT : public metaSMT_Context_base<AllSAT>
   {
     AllSAT(std::string const & solvername) 
-    : metaSMT_Context(solvername), is_solved(false)
+    : metaSMT_Context_base<AllSAT>(solvername), is_solved(false)
     { }
+
+    typedef metaSMT_Context_base<AllSAT> Super;
+
 
     typedef std::map<result_type, std::string> solution_t;
     typedef std::vector< solution_t > all_solutions_t;
 
     void store_solution (solution_t & sol, std::pair<int, result_type> const & p ) {
-        //std::cout << "p " << p.first << " " << _solver->readAssignment(p.second) << std::endl;
+        std::cout << "p " << p.first << " " << _solver->readAssignment(p.second) << std::endl;
         sol.insert( make_pair(p.second, _solver->readAssignment(p.second)));
     }
 
@@ -38,7 +41,7 @@ namespace platzhalter {
       _solver->addAssertion(boost::phoenix::accumulate(solution, _logic->bit0(), createOrNeq)());
     }
 
-    bool solve()  {
+    bool do_solve(bool _ )  {
       if(is_solved) {
         // use next shuffled solution
         ++current;
@@ -51,7 +54,7 @@ namespace platzhalter {
         using namespace boost::phoenix::arg_names;
         // gather all solutions
         solution_t solution;
-        while( Context::solve() ) {
+        while( Super::do_solve(true) ) {
           is_solved = true;
 
           std::for_each(_variables.begin(), _variables.end(),
@@ -76,11 +79,14 @@ namespace platzhalter {
 
     template<typename T>
     void read ( T & v, unsigned id) {
+      assert(is_solved && "AllSAT::solve was not called or not successful");
       std::map<int, result_type>::const_iterator ite
         = _variables.find(id);
       assert ( ite != _variables.end() );
-      std::string solution = (*current)[ite->second];
-      v = metaSMT::bits2Cu(solution);
+      assert ( current != all_solutions.end() );
+      solution_t::const_iterator sit = current->find(ite->second);
+      assert( sit != current->end() && "ERROR: not assignment for variable" );
+      v = metaSMT::bits2Cu(sit->second);
     }
 
     struct RNG {

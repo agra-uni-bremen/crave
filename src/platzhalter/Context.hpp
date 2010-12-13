@@ -26,17 +26,17 @@ namespace platzhalter {
 
   namespace proto = boost::proto;
 
-  struct metaSMT_Context
-    : proto::callable_context< metaSMT_Context, proto::null_context >
+  template< typename derived_context >
+  struct metaSMT_Context_base
+    : proto::callable_context< metaSMT_Context_base<derived_context>, proto::null_context >
   {
-
-    metaSMT_Context(std::string const & solvername) 
+    metaSMT_Context_base(std::string const & solvername) 
     : _solver(new metaSMT::MetaSolver())
     , _logic(_solver->logic<metaSMT::QF_BV>(solvername))
     , _soft(_logic->bit1())
     {}
 
-    ~metaSMT_Context() {
+    ~metaSMT_Context_base() {
       delete _solver;
     }
 
@@ -61,15 +61,15 @@ namespace platzhalter {
     }
 
     template<typename value_type>
-    struct writeReference{
-      writeReference(value_type & i, metaSMT_Context & ctx, unsigned id) 
+    struct writeReference {
+      writeReference(value_type & i, derived_context & ctx, unsigned id) 
       : _i (i), _ctx(ctx), _id(id)
       {}
       void operator() () {
         _ctx.read(_i, _id);
       }
       value_type & _i;
-      metaSMT_Context & _ctx;
+      derived_context & _ctx;
       unsigned _id;
     };
 
@@ -80,8 +80,8 @@ namespace platzhalter {
       if ( ite != _variables.end() ) {
         return ite->second;
       } else {
-        result_type var = (*this)(t, static_cast<var_tag<value_type> >(ref));
-        boost::function0<void> f = writeReference<value_type>(ref.ref, *this, ref.id);
+        result_type var = (ctx())(t, static_cast<var_tag<value_type> >(ref));
+        boost::function0<void> f = writeReference<value_type>(ref.ref, ctx(), ref.id);
         _post_hook.push_back(f);
         return var;
       }
@@ -90,108 +90,108 @@ namespace platzhalter {
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::equal_to, Expr1 const & e1, Expr2 const &  e2) {
       return _logic->equal(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
       );
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::not_equal_to, Expr1 const & e1, Expr2 const &  e2) {
       return _logic->nequal(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
       );
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::less_equal, Expr1 const & e1, Expr2 const &  e2) {
       return _logic->bvule(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
       );
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::less, Expr1 const & e1, Expr2 const &  e2) {
       return _logic->bvult(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
       );
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::greater, Expr1 const & e1, Expr2 const &  e2) {
       return _logic->bvugt(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
       );
     }
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::greater_equal, Expr1 const & e1, Expr2 const &  e2) {
       return _logic->bvuge(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
       );
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::logical_and, Expr1 const & e1, Expr2 const &  e2) {
       return _logic->bvand(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
       );
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::logical_or, Expr1 const & e1, Expr2 const &  e2) {
       return _logic->bvor(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
       );
     }
 
     template< typename Expr>
     result_type operator() (proto::tag::logical_not, Expr const & e) {
-      return _logic->bvnot( proto::eval( e, *this ) );
+      return _logic->bvnot( proto::eval( e, ctx() ) );
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::plus, Expr1 const & e1, Expr2 const &  e2) {
       return _logic->bvadd(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
       );
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::minus, Expr1 const & e1, Expr2 const &  e2) {
       return _logic->bvsub(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
       );
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::modulus, Expr1 const & e1, Expr2 const &  e2) {
       return _logic->bvurem(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
       );
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::divides, Expr1 const & e1, Expr2 const &  e2) {
       return _logic->bvudiv(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
       );
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::shift_left, Expr1 const & e1, Expr2 const &  e2) {
       return _logic->bvshl(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
       );
     }
 
@@ -199,8 +199,8 @@ namespace platzhalter {
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::multiplies, Expr1 const & e1, Expr2 const &  e2) {
       return _logic->bvmul(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
       );
     }
 
@@ -208,8 +208,8 @@ namespace platzhalter {
     result_type operator() (proto::tag::assign, Expr1 const & e1, Expr2 const &  e2) {
       //std::cout << "eval assign" << std::endl;
       result_type expr1, expr2;
-      expr1 = proto::eval( e1, *this );
-      expr2 = proto::eval( e2, *this );
+      expr1 = proto::eval( e1, ctx() );
+      expr2 = proto::eval( e2, ctx() );
 
       boost::function0<result_type> f = getID( _logic->equal(expr1, expr2) );
       _lazy[proto::value(e1).id] = f;
@@ -251,7 +251,7 @@ namespace platzhalter {
       if ( ite != _variables.end() ) {
         return ite->second;
       } else {
-        result_type var = (*this)(t, static_cast<var_tag<Integer> >(ref));
+        result_type var = (ctx())(t, static_cast<var_tag<Integer> >(ref));
         boost::function0<result_type> f = getLazyReference<Integer>(ref.ref, _logic, var);
         _lazy[ref.id] = f;
 
@@ -269,7 +269,7 @@ namespace platzhalter {
     template<typename Expr>
     void assertion (Expr e) {
       check(e);
-      _solver->addAssertion( proto::eval(e, *this) );
+      _solver->addAssertion( proto::eval(e, ctx()) );
     }
 
     template<typename Expr>
@@ -284,7 +284,7 @@ namespace platzhalter {
         _group_variables.insert( std::make_pair(group, var) );
       }
 
-      _solver->addAssertion( _logic->implies( var, proto::eval(e, *this) ) );
+      _solver->addAssertion( _logic->implies( var, proto::eval(e, ctx()) ) );
     }
 
     bool enable_group(std::string group) {
@@ -302,7 +302,7 @@ namespace platzhalter {
     template<typename Expr>
     void soft_assertion (Expr e) {
       check(e);
-      _soft = _logic->bvand(_soft, proto::eval(e, *this) );
+      _soft = _logic->bvand(_soft, proto::eval(e, ctx()) );
     }
 
     void pre_solve() {       
@@ -328,19 +328,23 @@ namespace platzhalter {
       if (sat) for (uint i = 0; i < _post_hook.size(); i++) _post_hook[i]();
     }
 
-    bool solve (bool soft=true) {
+    bool solve () {
+      bool const ret = ctx().do_solve(true);
+      post_solve(ret );
+      return ret;
+    }
+
+    bool do_solve (bool soft) {
       pre_solve();
       _solver->addAssumption(_soft);
       // if soft constraint satisfiable
       if ( _solver->solve() ) {
-         post_solve(true);
          return true;
       }
       else {
         // if not satisfiable
         pre_solve();
         bool ret = _solver->solve( );
-        post_solve(ret);
         return ret;
       }
     }
@@ -362,6 +366,8 @@ namespace platzhalter {
     }
 
     protected:
+      inline derived_context & ctx() {  return  static_cast<derived_context&>(*this); }
+
       std::map<int, result_type> _variables;
       metaSMT::MetaSolver* _solver;
       metaSMT::QF_BV*      _logic;
@@ -373,6 +379,12 @@ namespace platzhalter {
       std::vector<boost::function0<void> > _post_hook;
 
   }; // metaSMT_Context
+
+  struct metaSMT_Context : metaSMT_Context_base<metaSMT_Context> {
+    metaSMT_Context(std::string const & solvername) 
+    : metaSMT_Context_base<metaSMT_Context>(solvername)
+    { }
+  };
 
   typedef metaSMT_Context Context;
 
@@ -446,14 +458,16 @@ namespace platzhalter {
     }
 
     bool next() {
-      return ctx.solve();
+      return static_cast<ContextT&>(ctx).solve();
     }
 
     /**
      * read variable "var"
      **/
     template<typename T>
-    T operator[] (Variable<T> const & var) { return ctx.read(var); };
+    T operator[] (Variable<T> const & var) { 
+      return ctx.read(var); 
+    };
 
     private:
       ContextT ctx;
