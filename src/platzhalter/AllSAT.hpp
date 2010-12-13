@@ -95,7 +95,8 @@ namespace platzhalter {
             boost::uniform_int<> rng(0, i - 1);
             return rng(_state);
         }
-      RNG() :_state(time(NULL)) {}
+      //RNG() :_state(time(NULL)) {}
+      RNG() :_state(0) {}
     } rng;
 
     bool is_solved;
