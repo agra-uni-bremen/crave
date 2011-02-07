@@ -6,8 +6,15 @@
 #include <boost/spirit/home/phoenix/algorithm.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
+#include <boost/foreach.hpp>
 
 namespace platzhalter {
+
+  struct bitvector_less {
+    bool operator() (qf_bv::bitvector const & a, qf_bv::bitvector const & b) {
+      return boost::proto::value(a).id < boost::proto::value(b).id;
+    }
+  };
 
   struct AllSAT : public metaSMT_Context_base<AllSAT>
   {
@@ -18,27 +25,25 @@ namespace platzhalter {
     typedef metaSMT_Context_base<AllSAT> Super;
 
 
-    typedef std::map<result_type, std::string> solution_t;
+    typedef std::map<qf_bv::bitvector, metaSMT::result_wrapper, bitvector_less> solution_t;
     typedef std::vector< solution_t > all_solutions_t;
 
-    void store_solution (solution_t & sol, std::pair<int, result_type> const & p ) {
+    void store_solution (solution_t & sol, std::pair<int, qf_bv::bitvector> const & p ) {
         //std::cout << "p " << p.first << " " << _solver->readAssignment(p.second) << std::endl;
-        sol.insert( make_pair(p.second, _solver->readAssignment(p.second)));
+       sol.insert( make_pair(p.second, read_value(solver, p.second) ));
     }
 
     void block_solution(solution_t const & solution) {
       using namespace boost::phoenix;
       using namespace boost::phoenix::arg_names;
 
-      boost::function<result_type ( result_type, solution_t::value_type const &)> createOrNeq 
-        = bind(&metaSMT::QF_BV::bvor, _logic
-          ,  arg1
-          , bind(&metaSMT::QF_BV::nequal, _logic
-            , bind(&solution_t::value_type::first, arg2) 
-            , bind(&metaSMT::QF_BV::bvbin, _logic, bind(&solution_t::value_type::second, arg2) )
-          )
-        );
-      _solver->addAssertion(boost::phoenix::accumulate(solution, _logic->bit0(), createOrNeq)());
+      result_type block = evaluate(solver, preds::False);
+      
+      BOOST_FOREACH( solution_t::value_type p, solution) {
+        block = evaluate(solver, preds::Or( block, preds::nequal( p.first
+            , qf_bv::bvbin(p.second))));
+      }
+      metaSMT::assertion( solver, block);
     }
 
     bool do_solve(bool _ )  {
@@ -80,13 +85,13 @@ namespace platzhalter {
     template<typename T>
     void read ( T & v, unsigned id) {
       assert(is_solved && "AllSAT::solve was not called or not successful");
-      std::map<int, result_type>::const_iterator ite
+      std::map<int, qf_bv::bitvector>::const_iterator ite
         = _variables.find(id);
       assert ( ite != _variables.end() );
       assert ( current != all_solutions.end() );
       solution_t::const_iterator sit = current->find(ite->second);
       assert( sit != current->end() && "ERROR: not assignment for variable" );
-      v = metaSMT::bits2Cu(sit->second);
+      v = sit->second;
     }
 
     struct RNG {

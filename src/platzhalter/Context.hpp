@@ -9,9 +9,12 @@
 #include <boost/proto/context/null.hpp>
 #include <boost/function.hpp>
 
-#include <MetaSolver.hpp>
-#include <logic/QF_BV.hpp>
-#include <tools/Convert_QF_BV.hpp>
+//#include <MetaSolver.hpp>
+//#include <logic/QF_BV.hpp>
+//#include <tools/Convert_QF_BV.hpp>
+#include <metaSMT/DirectSolver_Context.hpp>
+#include <metaSMT/backend/Boolector_Context.hpp>
+#include <metaSMT/frontend/QF_BV.hpp>
 
 #include <map>
 #include <set>
@@ -19,6 +22,14 @@
 #include <string>
 #include <sstream>
 #include <stdexcept>
+
+namespace preds = metaSMT::logic;
+namespace qf_bv = metaSMT::logic::QF_BV;
+
+using metaSMT::assumption;
+using metaSMT::evaluate;
+using metaSMT::solve;
+
 
 namespace platzhalter {
 
@@ -31,32 +42,31 @@ namespace platzhalter {
     : proto::callable_context< metaSMT_Context_base<derived_context>, proto::null_context >
   {
     metaSMT_Context_base(std::string const & solvername) 
-    : _solver(new metaSMT::MetaSolver())
-    , _logic(_solver->logic<metaSMT::QF_BV>(solvername))
-    , _soft(_logic->bit1())
+    : solver()
+    , _soft( evaluate(solver, preds::True) )
     {}
 
     ~metaSMT_Context_base() {
-      delete _solver;
     }
 
-    typedef metaSMT::Expression result_type;
+    typedef metaSMT::DirectSolver_Context< metaSMT::solver::Boolector_Context > SolverType;
+    typedef SolverType::result_type result_type;
 
 
     template<typename value_type>
     result_type operator() (proto::tag::terminal, var_tag<value_type> const & tag ) {
-      std::map<int, result_type>::const_iterator ite
+      std::map<int, qf_bv::bitvector>::const_iterator ite
         = _variables.find(tag.id);
       if ( ite != _variables.end() ) {
-        return ite->second;
+          return evaluate(solver, ite->second);
       } else {
         std::ostringstream buf;
         buf << "var_" << tag.id;
         unsigned width=bitsize_traits<value_type>::nbits;
         //std::cout << "creating " << buf.str() << ", width= " << width << std::endl;
-        result_type var = _logic->bitvec(buf.str(), width);
-        _variables.insert( std::make_pair(tag.id, var) );
-        return var;
+        qf_bv::bitvector bv = qf_bv::new_bitvector(width);  
+        _variables.insert( std::make_pair(tag.id, bv) );
+        return evaluate(solver, bv);
       }
     }
 
@@ -75,10 +85,10 @@ namespace platzhalter {
 
     template<typename value_type>
     result_type operator() (proto::tag::terminal t, write_ref_tag<value_type> const & ref ) {
-      std::map<int, result_type>::const_iterator ite
+      std::map<int, qf_bv::bitvector>::const_iterator ite
         = _variables.find(ref.id);
       if ( ite != _variables.end() ) {
-        return ite->second;
+        return evaluate(solver, ite->second);
       } else {
         result_type var = (ctx())(t, static_cast<var_tag<value_type> >(ref));
         boost::function0<void> f = writeReference<value_type>(ref.ref, ctx(), ref.id);
@@ -89,119 +99,119 @@ namespace platzhalter {
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::equal_to, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->equal(
+      return evaluate(solver, preds::equal(
           proto::eval( e1, ctx() )
         , proto::eval( e2, ctx() )
-      );
+      ));
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::not_equal_to, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->nequal(
+      return evaluate(solver, preds::nequal(
           proto::eval( e1, ctx() )
         , proto::eval( e2, ctx() )
-      );
+      ));
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::less_equal, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvule(
+      return evaluate( solver, qf_bv::bvule(
           proto::eval( e1, ctx() )
         , proto::eval( e2, ctx() )
-      );
+      ));
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::less, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvult(
+      return evaluate( solver, qf_bv::bvult(
           proto::eval( e1, ctx() )
         , proto::eval( e2, ctx() )
-      );
+      ));
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::greater, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvugt(
+      return evaluate( solver, qf_bv::bvugt(
           proto::eval( e1, ctx() )
         , proto::eval( e2, ctx() )
-      );
+      ));
     }
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::greater_equal, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvuge(
+      return evaluate( solver, qf_bv::bvuge(
           proto::eval( e1, ctx() )
         , proto::eval( e2, ctx() )
-      );
+      ));
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::logical_and, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvand(
+      return evaluate( solver, preds::And(
           proto::eval( e1, ctx() )
         , proto::eval( e2, ctx() )
-      );
+      ));
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::logical_or, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvor(
+      return evaluate( solver, preds::Or(
           proto::eval( e1, ctx() )
         , proto::eval( e2, ctx() )
-      );
+      ));
     }
 
     template< typename Expr>
     result_type operator() (proto::tag::logical_not, Expr const & e) {
-      return _logic->bvnot( proto::eval( e, ctx() ) );
+      return evaluate( solver, preds::Not( proto::eval( e, ctx() ) ) );
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::plus, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvadd(
+      return evaluate( solver, qf_bv::bvadd(
           proto::eval( e1, ctx() )
         , proto::eval( e2, ctx() )
-      );
+      ));
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::minus, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvsub(
+      return evaluate( solver, qf_bv::bvsub(
           proto::eval( e1, ctx() )
         , proto::eval( e2, ctx() )
-      );
+      ));
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::modulus, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvurem(
+      return evaluate( solver, qf_bv::bvurem(
           proto::eval( e1, ctx() )
         , proto::eval( e2, ctx() )
-      );
+      ));
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::divides, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvudiv(
+      return evaluate( solver, qf_bv::bvudiv(
           proto::eval( e1, ctx() )
         , proto::eval( e2, ctx() )
-      );
+      ));
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::shift_left, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvshl(
+      return evaluate( solver, qf_bv::bvshl(
           proto::eval( e1, ctx() )
         , proto::eval( e2, ctx() )
-      );
+      ));
     }
 
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::multiplies, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvmul(
+      return evaluate( solver, qf_bv::bvmul(
           proto::eval( e1, ctx() )
         , proto::eval( e2, ctx() )
-      );
+      ));
     }
 
     template< typename Expr1, typename Expr2>
@@ -211,16 +221,18 @@ namespace platzhalter {
       expr1 = proto::eval( e1, ctx() );
       expr2 = proto::eval( e2, ctx() );
 
-      boost::function0<result_type> f = getID( _logic->equal(expr1, expr2) );
+      boost::function0<result_type> f = getID( evaluate(solver, 
+          preds::equal(expr1, expr2)) );
       _lazy[proto::value(e1).id] = f;
       
-      return _logic->bit1();
+    
+      return evaluate( solver, preds::True);
     }
 
     result_type operator() (proto::tag::terminal t, randomize_tag const & tag )
     {
       _lazy.erase(tag.id);
-      return _logic->bit1();
+      return evaluate( solver, preds::True);
     }
 
     struct getID {
@@ -231,14 +243,15 @@ namespace platzhalter {
 
     template<typename Integer>
     struct getLazyReference{
-      getLazyReference(Integer const & i, metaSMT::QF_BV* logic, result_type var) 
-      : _i (i), _logic(logic), _var(var)
+      getLazyReference(Integer const & i, SolverType & solver, result_type var) 
+      : _i (i), solver(solver), _var(var)
       {}
       result_type operator() () {
-        return _logic->equal(_var, _logic->bvuint(_i, bitsize_traits<Integer>::nbits) );
+        return evaluate( solver, preds::equal(_var, 
+                  qf_bv::bvuint(_i, bitsize_traits<Integer>::nbits))); 
       }
       Integer const & _i;
-      metaSMT::QF_BV* _logic;
+      SolverType & solver;
       result_type _var;
     };
 
@@ -246,13 +259,13 @@ namespace platzhalter {
     result_type operator() (proto::tag::terminal t, read_ref_tag<Integer> const & ref) {
       unsigned width=bitsize_traits<Integer>::nbits;
 
-      std::map<int, result_type>::const_iterator ite
+      std::map<int, qf_bv::bitvector>::const_iterator ite
         = _variables.find(ref.id);
       if ( ite != _variables.end() ) {
-        return ite->second;
+        return evaluate(solver, ite->second);
       } else {
         result_type var = (ctx())(t, static_cast<var_tag<Integer> >(ref));
-        boost::function0<result_type> f = getLazyReference<Integer>(ref.ref, _logic, var);
+        boost::function0<result_type> f = getLazyReference<Integer>(ref.ref, solver, var);
         _lazy[ref.id] = f;
 
         return var;
@@ -263,13 +276,13 @@ namespace platzhalter {
     result_type operator() (proto::tag::terminal, Integer const & i) {
       unsigned width=bitsize_traits<Integer>::nbits;
 //      std::cout << "creating int " << i << ", width= " << width << std::endl;
-      return _logic->bvuint(i, width);
+      return evaluate( solver, qf_bv::bvuint(i,width) );
     }
 
     template<typename Expr>
     void assertion (Expr e) {
       check(e);
-      _solver->addAssertion( proto::eval(e, ctx()) );
+      metaSMT::assertion(solver, proto::eval(e, ctx()) );
     }
 
     template<typename Expr>
@@ -279,12 +292,12 @@ namespace platzhalter {
       result_type var;
       if (_group_variables.find(group) != _group_variables.end() ) 
         var = _group_variables[group];
-      else {
-        var = _logic->bitvec(group, 1);
+    else {
+        var = evaluate(solver, preds::new_variable());
         _group_variables.insert( std::make_pair(group, var) );
       }
 
-      _solver->addAssertion( _logic->implies( var, proto::eval(e, ctx()) ) );
+      metaSMT::assertion(solver, preds::implies( var, proto::eval(e, ctx()) ) );
     }
 
     bool enable_group(std::string group) {
@@ -302,7 +315,7 @@ namespace platzhalter {
     template<typename Expr>
     void soft_assertion (Expr e) {
       check(e);
-      _soft = _logic->bvand(_soft, proto::eval(e, ctx()) );
+      _soft = evaluate( solver, preds::And(_soft, proto::eval(e, ctx())));
     }
 
     void pre_solve() {       
@@ -311,16 +324,16 @@ namespace platzhalter {
         ite = _group_variables.begin();
         ite != _group_variables.end(); ++ite) {
         if (_disabled_groups.find(ite->first) == _disabled_groups.end())
-          _solver->addAssumption( _logic->equal(ite->second, _logic->bit1()) );
+          assumption(solver, ite->second);
         else
-          _solver->addAssumption( _logic->equal(ite->second, _logic->bit0()) );
+          assumption(solver, preds::Not(ite->second));
       }
 
       for (
         std::map<unsigned, boost::function0<result_type> > ::const_iterator 
         ite = _lazy.begin();
         ite != _lazy.end(); ++ite) {
-        _solver->addAssumption( (ite->second)() );
+        assumption(solver, (ite->second)() );
       }
     }
 
@@ -336,15 +349,15 @@ namespace platzhalter {
 
     bool do_solve (bool soft) {
       pre_solve();
-      _solver->addAssumption(_soft);
+      assumption(solver,_soft);
       // if soft constraint satisfiable
-      if ( _solver->solve() ) {
+      if ( metaSMT::solve(solver) ) {
          return true;
       }
       else {
         // if not satisfiable
         pre_solve();
-        bool ret = _solver->solve( );
+        bool ret =  metaSMT::solve(solver) ;
         return ret;
       }
     }
@@ -358,19 +371,19 @@ namespace platzhalter {
 
     template<typename T>
     void read ( T & v, unsigned id) {
-      std::map<int, result_type>::const_iterator ite
+      std::map<int, qf_bv::bitvector>::const_iterator ite
         = _variables.find(id);
       assert ( ite != _variables.end() );
-      std::string solution = _solver->readAssignment(ite->second);
-      v = metaSMT::bits2Cu(solution);
+      v = read_value(solver, ite->second);
     }
 
     protected:
       inline derived_context & ctx() {  return  static_cast<derived_context&>(*this); }
 
-      std::map<int, result_type> _variables;
-      metaSMT::MetaSolver* _solver;
-      metaSMT::QF_BV*      _logic;
+      std::map<int, qf_bv::bitvector> _variables;
+      //metaSMT::MetaSolver* _solver;
+      //metaSMT::QF_BV*      _logic;
+        SolverType solver ;
     private:
       result_type          _soft;
       std::map<std::string, result_type> _group_variables;
