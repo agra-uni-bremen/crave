@@ -11,7 +11,6 @@
 #include <limits>
 #include <vector>
 
-
 namespace platzhalter {
 
   class rand_base
@@ -65,6 +64,7 @@ namespace platzhalter {
       operator T() const { return value; }
       friend ostream& operator<<(ostream& os, const randv_prim_base<T>& e) { os << e.value; return os; }
       WriteReference<T>& operator()() { return var; }
+      CppType type() { return UNSUPPORTED; }
 
     protected:
       template<typename context>
@@ -150,6 +150,10 @@ class randv<typename> : public randv_prim_base<typename>, public randomize_base<
   _INTEGER_TYPE(unsigned long)
   _INTEGER_TYPE(long long)
   _INTEGER_TYPE(unsigned long long)
+
+#undef _COMMON_INTERFACE
+#undef _INTEGER_INTERFACE
+#undef _INTEGER_TYPE
 
 } // namespace platzhalter
 

@@ -274,6 +274,25 @@ BOOST_AUTO_TEST_CASE ( shiftleft )
   }
 }
 
+BOOST_AUTO_TEST_CASE ( mixed )
+{
+  Variable<int> a;
+  Variable<int> b;
+  Variable<int> c;
+
+  Generator<> gen;
+  gen
+    ( a + b >= 120 )
+    ( a >= 1 )
+    ( b >= 0 )
+//    ( a <= 100 )
+    ( b <= 100 )
+  ;
+
+  gen.next();
+  std::cout << format("result: a=%d, b=%d\n") % gen[a]% gen[b];
+}
+
 /**
  * temporaly fix a variable to a certain value using the assign operator
  **/

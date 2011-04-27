@@ -66,6 +66,9 @@ namespace platzhalter {
   struct var_tag { var_tag(int id_): id(id_) { }; int id; };
 
   template<typename value_type>
+  struct vector_tag { vector_tag(int id_): id(id_) { }; int id; };
+
+  template<typename value_type>
   struct write_ref_tag : public var_tag<value_type> { 
   write_ref_tag(int id_,  value_type & ref_) : var_tag<value_type>(id_), ref(ref_) { }; value_type & ref; };
 
@@ -79,6 +82,12 @@ namespace platzhalter {
   template <typename OUT, typename value_type>
   OUT & operator<< (OUT & out, var_tag<value_type> const & tag) {
     out << "var<" << tag.id << ">" ;
+    return out;
+  }
+
+  template <typename OUT, typename value_type>
+  OUT & operator<< (OUT & out, vector_tag<value_type> const & tag) {
+    out << "vector<" << tag.id << ">" ;
     return out;
   }
 
@@ -127,6 +136,22 @@ namespace platzhalter {
       const randomize_tag tag = { id() };
       return proto::make_expr< proto::tag::terminal, Constraint_Domain> ( tag );
     }
+  };
+
+  template<typename value_type_>
+  struct Vector : public Constraint< typename boost::proto::terminal< vector_tag<value_type_> >::type >
+  {
+    typedef Constraint< typename proto::terminal< vector_tag<value_type_> >::type > base_type;
+    Vector() 
+      : base_type( proto::make_expr< proto::tag::terminal>
+        ( vector_tag<value_type_>(new_var_id() ) ) )
+    {}
+
+    typedef value_type_ value_type;
+    int id() const {  return boost::proto::value(*this).id; };
+
+    Variable<unsigned int> _size;
+    const Variable<unsigned int>& size() const { return _size; }
   };
 
   template<typename value_type_>

@@ -2,6 +2,7 @@
 
 #include "bitsize_traits.hpp"
 #include "Constraint.hpp"
+#include "VectorConstraint.hpp"
 
 #include <boost/proto/core.hpp>
 #include <boost/proto/debug.hpp>
@@ -13,7 +14,7 @@
 //#include <logic/QF_BV.hpp>
 //#include <tools/Convert_QF_BV.hpp>
 #include <metaSMT/DirectSolver_Context.hpp>
-#include <metaSMT/backend/Boolector_Context.hpp>
+#include <metaSMT/backend/SWORD_Context.hpp>
 #include <metaSMT/frontend/QF_BV.hpp>
 
 #include <map>
@@ -37,6 +38,40 @@ namespace platzhalter {
 
   namespace proto = boost::proto;
 
+  struct vectorSubscript_Context
+    : proto::callable_context< vectorSubscript_Context, proto::null_context > {
+
+    vectorSubscript_Context() {}
+
+    typedef vecIdx result_type;
+
+    template< typename Expr1, typename Expr2>
+    result_type operator() (proto::tag::minus, Expr1 const & e1, Expr2 const &  e2) {
+      return proto::eval( e1, *this ) - proto::eval( e2, *this );
+    }
+
+    template< typename Expr1, typename Expr2>
+    result_type operator() (proto::tag::plus, Expr1 const & e1, Expr2 const &  e2) {
+      return proto::eval( e1, *this ) + proto::eval( e2, *this );
+    }
+
+    template<typename value_type>
+    result_type operator() (proto::tag::terminal, Variable<value_type> const & tag ) {
+      return vecIdx(0, proto::value(tag).id);
+    }
+
+    template<typename value_type>
+    result_type operator() (proto::tag::terminal, var_tag<value_type> const & tag ) {
+      return vecIdx(0, tag.id);
+    }
+
+    template< typename Integer>
+    result_type operator() (proto::tag::terminal, Integer const & i) {
+      return vecIdx(i, 0);
+    }
+
+  };  
+
   template< typename derived_context >
   struct metaSMT_Context_base
     : proto::callable_context< metaSMT_Context_base<derived_context>, proto::null_context >
@@ -49,9 +84,8 @@ namespace platzhalter {
     ~metaSMT_Context_base() {
     }
 
-    typedef metaSMT::DirectSolver_Context< metaSMT::solver::Boolector_Context > SolverType;
+    typedef metaSMT::DirectSolver_Context< metaSMT::solver::SWORD_Context > SolverType;
     typedef SolverType::result_type result_type;
-
 
     template<typename value_type>
     result_type operator() (proto::tag::terminal, var_tag<value_type> const & tag ) {
@@ -279,6 +313,34 @@ namespace platzhalter {
       return evaluate( solver, qf_bv::bvuint(i,width) );
     }
 
+    template< typename Expr1, typename Expr2>
+    result_type operator() (proto::tag::subscript, Expr1 const & e1, Expr2 const &  e2) {
+      // e1 should be a terminal vector_tag
+      BOOST_STATIC_ASSERT((
+        boost::is_same<
+          typename proto::tag_of<Expr1>::type, 
+          proto::tag::terminal
+        >::value
+      ));
+
+      vectorSubscript_Context vsctx;
+      vecVar vv(proto::value(e1).id, proto::eval(e2, vsctx)); 
+
+      std::map<vecVar, qf_bv::bitvector>::const_iterator ite = _vector_variables.find(vv);
+      if ( ite != _vector_variables.end() ) {
+        return evaluate(solver, ite->second);
+      } else {
+        std::ostringstream buf;
+        buf << vv;
+        typedef typename proto::result_of::value<Expr1>::type value_type;
+        unsigned width=bitsize_traits<value_type >::nbits;
+
+        qf_bv::bitvector bv = qf_bv::new_bitvector(width);
+        _vector_variables.insert( std::make_pair(vv, bv) );
+        return evaluate(solver, bv);
+      }
+    }
+
     template<typename Expr>
     void assertion (Expr e) {
       check(e);
@@ -292,7 +354,7 @@ namespace platzhalter {
       result_type var;
       if (_group_variables.find(group) != _group_variables.end() ) 
         var = _group_variables[group];
-    else {
+      else {
         var = evaluate(solver, preds::new_variable());
         _group_variables.insert( std::make_pair(group, var) );
       }
@@ -335,6 +397,13 @@ namespace platzhalter {
         ite != _lazy.end(); ++ite) {
         assumption(solver, (ite->second)() );
       }
+
+      for (
+        std::map<vecVar, boost::function0<result_type> > ::const_iterator 
+        ite = _lazy_vec.begin();
+        ite != _lazy_vec.end(); ++ite) {
+        assumption(solver, (ite->second)() );
+      }
     }
 
     void post_solve(bool sat) {
@@ -365,30 +434,63 @@ namespace platzhalter {
     template<typename T>
     T read ( Variable<T> const & v) {
       T ret;
-      read(ret, v.id());
+      assert( read(ret, v.id()) );
       return ret;
     }
 
     template<typename T>
-    void read ( T & v, unsigned id) {
+    bool read ( T & v, unsigned id) {
       std::map<int, qf_bv::bitvector>::const_iterator ite
         = _variables.find(id);
-      assert ( ite != _variables.end() );
-      v = read_value(solver, ite->second);
+      if ( ite != _variables.end() ) {
+        v = read_value(solver, ite->second);
+        return true;
+      }
+      return false;
+    }
+
+    template<typename T>
+    bool read ( T & v, vecVar & vv) {
+      std::map<vecVar, qf_bv::bitvector>::const_iterator ite
+        = _vector_variables.find(vv);
+      if ( ite != _vector_variables.end() ) {
+        v = read_value(solver, ite->second);
+        return true;
+      }
+      return false;
+    }
+
+    void dump_vec_var_list(std::vector<vecVar>& v) {
+      for (std::map<vecVar, qf_bv::bitvector>::const_iterator ite = _vector_variables.begin(); ite != _vector_variables.end(); ++ite) {
+          v.push_back(ite->first);
+      }
+    }
+
+    template<typename T>
+    void vec_assign (vecVar & vv, T & val) {
+      boost::function0<result_type> f = getLazyReference<T>(val, solver, evaluate(solver, _vector_variables[vv]) );
+      _lazy_vec[vv] = f;
+    }
+
+    void vec_free (vecVar & vv) {
+      _lazy_vec.erase(vv);
     }
 
     protected:
       inline derived_context & ctx() {  return  static_cast<derived_context&>(*this); }
 
       std::map<int, qf_bv::bitvector> _variables;
+      std::map<vecVar, qf_bv::bitvector> _vector_variables;
       //metaSMT::MetaSolver* _solver;
       //metaSMT::QF_BV*      _logic;
-        SolverType solver ;
+      SolverType solver;
+
     private:
       result_type          _soft;
       std::map<std::string, result_type> _group_variables;
       std::set<std::string> _disabled_groups;
       std::map<unsigned, boost::function0<result_type> > _lazy;
+      std::map<vecVar, boost::function0<result_type> > _lazy_vec;
       std::vector<boost::function0<void> > _post_hook;
 
   }; // metaSMT_Context
@@ -464,14 +566,102 @@ namespace platzhalter {
     }
 
     /**
+     * foreach
+     **/
+    template<typename value_type, typename Expr>
+    Generator<ContextT> & foreach(const rand_vec<value_type> & v, const IndexVariable & i, Expr e) {
+      assert(i.id() == _i.id());
+      if ( vecCtx.find(v().id()) == vecCtx.end() ) {
+        vecCtx.insert( std::make_pair(v().id(), new Context(default_solver()) ) );
+      }
+      vecCtx[v().id()]->assertion(e);
+      return *this;
+    }
+
+    /**
+     * unique
+     **/
+    template<typename value_type>
+    Generator<ContextT> & unique(const rand_vec<value_type> & v) {
+      if ( vecCtx.find(v().id()) == vecCtx.end() ) {
+        vecCtx.insert( std::make_pair(v().id(), new Context(default_solver()) ) );
+      }
+      uniqueVecSet.insert(v().id());
+      return *this;
+    }
+
+    /**
      * generate soft constraints
      **/
     Soft_Generator<ContextT> operator() ( Soft const & ) {
       return Soft_Generator<ContextT> (*this);
     }
 
+    template<typename T> 
+    bool gen_vector(rand_vec<T>* rvp, Context* rvctx) {
+      rand_vec<T>& rv = *rvp;
+      std::cout << "generate vector " << rv().id() << std::endl;
+      unsigned int size = rv.default_size();
+      if (!ctx.read(size, rv().size().id())) {
+        std::cout << "size not specified, use default" << std::endl;
+      } 
+      std::cout << "size = " << size << std::endl;  
+
+      std::vector<vecVar> vvv;
+      rvctx->dump_vec_var_list(vvv);
+      int _i_idx = -1;
+      // check vvv
+      for (unsigned int j = 0; j < vvv.size(); j++) {
+        assert(vvv[j].vecId == rv().id());
+        assert(vvv[j].index.bound == _i.id());
+        if (vvv[j].index.val == 0) _i_idx = j;
+        else assert(vvv[j].index.val < 0);
+        rvctx->vec_free(vvv[j]);
+      }
+      assert(_i_idx != -1);
+
+      rv.clear();
+      for (unsigned int i = 0; i < size; i++) {
+        // substitute the known values
+        for (unsigned int j = 0; j < vvv.size(); j++) {
+          int idx = i + vvv[j].index.val;
+          if (0 <= idx && idx < i) {
+            rvctx->vec_assign( vvv[j], rv[idx] );
+          }
+        }
+        rvctx->assertion(_i = i);
+
+        // unique
+        if (uniqueVecSet.find(rv().id()) != uniqueVecSet.end()) {
+          for (unsigned int k = 0; k < i; k++) {
+            // TODO
+          }
+        }
+      
+        // solve 
+        if (!rvctx->solve()) return false;
+        T tmp;
+        rvctx->read(tmp, vvv[_i_idx]);
+        rv.push_back(tmp);
+      }
+
+      return true;
+    }
+
     bool next() {
-      return static_cast<ContextT&>(ctx).solve();
+      if (!ctx.solve()) return false;
+      // solve vector constraints
+      for (ContextMap::iterator ite = vecCtx.begin(); ite != vecCtx.end(); ++ite) {
+        rand_vec_base* rvb = rand_vec_map[ite->first];
+        switch (rvb->element_type()){
+          case INT: if (!gen_vector(static_cast<rand_vec<int>* > (rvb), ite->second)) return false; break;
+          case UINT: if (!gen_vector(static_cast<rand_vec<unsigned int>* > (rvb), ite->second)) return false; break;
+          default:
+            // not supported yet
+            assert(false); 
+        }
+      }
+      return true;
     }
 
     /**
@@ -483,7 +673,10 @@ namespace platzhalter {
     };
 
     private:
-      ContextT ctx;
+      Context ctx;
+      typedef std::map<int, Context*> ContextMap;
+      ContextMap vecCtx;
+      std::set<int> uniqueVecSet;
   };
 
   template< typename T >
