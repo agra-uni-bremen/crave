@@ -32,43 +32,7 @@ BOOST_AUTO_TEST_CASE ( multiple_solver_instances )
   gen2(r2 < 6);
   gen1.next();
   gen2.next();
-}
-
-BOOST_AUTO_TEST_CASE ( randv_test )
-{
-  Generator<> gen;
-  randv<int> a(NULL);
-  randv<int> b(NULL);
-  std::cout << "init: a = " <<  a << ", b = " << b << std::endl;
-  gen
-    (4 <= a() && a() <= 6)
-    (9 <= a() + b() && a() + b() <= 11)
-    (b() % 2 == 0);
-  unsigned count=0;
-  while( gen.next() && count < 6) {
-    ++count;
-    std::cout << "result: a = " <<  a << ", b = " << b << std::endl;
-    gen(a() != a || b() != b);
-  }
-  BOOST_CHECK_EQUAL(count, 4);
-}
-
-BOOST_AUTO_TEST_CASE ( variable_ref_mixed_test )
-{
-  Generator<> gen;
-  randv<int> a(0);
-  Variable<int> b;
-  gen
-    (4 <= a() && a() <= 6)
-    (9 <= a() + b && a() + b <= 11)
-    (b % 2 == 0);
-  unsigned count=0;
-  while( gen.next()) {
-    ++count;
-    std::cout << "result: a = " <<  a << ", b = " << gen[b] << std::endl;
-    gen(a() != a || b != gen[b]);
-  }
-  BOOST_CHECK_EQUAL(count, 4);
+  
 }
 
 BOOST_AUTO_TEST_CASE( constants )
@@ -77,53 +41,6 @@ BOOST_AUTO_TEST_CASE( constants )
   Generator<> gen( x == 135421 );
   gen();
   BOOST_CHECK_EQUAL( gen[x], 135421 );
-}
-
-BOOST_AUTO_TEST_CASE( alu )
-{
-  Variable<unsigned> op;
-  Variable<unsigned> a;
-  Variable<unsigned> b;
-
-  Generator<> gen;  
-  gen
-    ( a < 16)
-    ( b < 16)
-    (op < 4 )  // 4 opcodes
-    (op != 0 || a + b < 16 )  // no add overflow
-    (op != 1 || a > b      )  // no sub underflow
-    (op != 2 || a * b < 16 )  // no m overflow
-    (op != 3 || b != 0     )  // div valid
-  ;
-  gen(); // create a new assignment
-
-  //printf("result: op=%d, a=%d, b=%d\n", gen[op], gen[a], gen[b]);
-}
-
-BOOST_AUTO_TEST_CASE( alu_enum )
-{
-  Variable<unsigned> op;
-  Variable<unsigned> a;
-  Variable<unsigned> b;
-
-  Generator<> gen;  
-  gen
-    ( a < 16)
-    ( b < 16)
-    (op < 4 )  // 4 opcodes
-    (op != 0 || a + b < 16 )  // no add overflow
-    (op != 1 || a > b      )  // no sub underflow
-    (op != 2 || a * b < 16 )  // no m overflow
-    (op != 3 || b != 0     )  // div valid
-  ;
-
-  unsigned count=0;
-  while( gen.next() ) {
-    ++count;
-    gen( op != gen[op] || a != gen[a] || b != gen[b] );
-    //printf("result: op=%d, a=%d, b=%d\n", gen[op], gen[a], gen[b]);
-  }
-  BOOST_CHECK_EQUAL(count, 572);
 }
 
 BOOST_AUTO_TEST_CASE( boolean )
@@ -140,22 +57,6 @@ BOOST_AUTO_TEST_CASE( boolean )
   //printf("result: b2=%d\n", b2);
 
   BOOST_CHECK_THROW ( gen( b != b2 )(), std::runtime_error );
-}
-
-BOOST_AUTO_TEST_CASE( pythagoras )
-{
-  Variable<unsigned long long> a;
-  Variable<unsigned long long> b;
-  Variable<unsigned long long> c;
-
-  Generator<> gen;  
-  gen(a*a + b*b == c*c)(); // create a new assignment
-
-  unsigned long long av = gen[a];
-  unsigned long long bv = gen[b];
-  unsigned long long cv = gen[c];
-
-  BOOST_CHECK_EQUAL( av*av + bv*bv, cv*cv);
 }
 
 BOOST_AUTO_TEST_CASE( less )
@@ -274,25 +175,6 @@ BOOST_AUTO_TEST_CASE ( shiftleft )
   }
 }
 
-BOOST_AUTO_TEST_CASE ( mixed )
-{
-  Variable<int> a;
-  Variable<int> b;
-  Variable<int> c;
-
-  Generator<> gen;
-  gen
-    ( a + b >= 120 )
-    ( a >= 1 )
-    ( b >= 0 )
-//    ( a <= 100 )
-    ( b <= 100 )
-  ;
-
-  gen.next();
-  std::cout << format("result: a=%d, b=%d\n") % gen[a]% gen[b];
-}
-
 /**
  * temporaly fix a variable to a certain value using the assign operator
  **/
@@ -360,42 +242,6 @@ BOOST_AUTO_TEST_CASE ( named_reference )
   }
 }
 
-struct Dist {
-  template <typename T1, typename T2>
-  Dist & operator() (T1, T2) {return *this;}
-};
-
-template<typename T1, typename T2>
-Dist dist( T1, T2 ) {
-  return Dist();
-}
-
-template<typename T1, typename T2>
-int interval(T1, T2) {
-  return 1;
-}
-
-BOOST_AUTO_TEST_CASE ( static_dist_t )
-{
-  Generator<> gen;
-  Variable<int> r;
-  dist(gen,r)(1, 10000)( interval(2,10000), 1);
-
-  int c=0;
-
-  for (unsigned i = 0; i < 10; ++i) {
-    gen();
-    int rv = gen[r];
-    BOOST_REQUIRE_MESSAGE( rv >=1 && rv <= 10000, "rv not a valid value: " << rv);
-    if (rv ==1) {
-      ++c;
-    } else {
-      --c;
-    }
-  }
-  BOOST_CHECK_GT(c, 0);
-}
-
 BOOST_AUTO_TEST_CASE ( soft_constraint_t )
 {
   Generator<> gen;
@@ -410,6 +256,142 @@ BOOST_AUTO_TEST_CASE ( soft_constraint_t )
 
   BOOST_REQUIRE( gen.next() );
 }
+
+BOOST_AUTO_TEST_CASE ( randv_test )
+{
+  Generator<> gen;
+  randv<int> a(NULL);
+  randv<int> b(NULL);
+  std::cout << "init: a = " <<  a << ", b = " << b << std::endl;
+  gen
+    (4 <= a() && a() <= 6)
+    (9 <= a() + b() && a() + b() <= 11)
+    (b() % 2 == 0);
+  unsigned count=0;
+  while( gen.next() ) {
+    ++count;
+    std::cout << "result: a = " <<  a << ", b = " << b << std::endl;
+    gen(a() != a || b() != b);
+  }
+  BOOST_CHECK_EQUAL(count, 4);
+}
+
+BOOST_AUTO_TEST_CASE ( randv_var_ref_mixed_test )
+{
+  Generator<> gen;
+  randv<int> a(0);
+  Variable<int> b;
+  gen
+    (4 <= a() && a() <= 6)
+    (9 <= a() + b && a() + b <= 11)
+    (b % 2 == 0);
+  unsigned count=0;
+  while( gen.next()) {
+    ++count;
+    std::cout << "result: a = " <<  a << ", b = " << gen[b] << std::endl;
+    gen(a() != a || b != gen[b]);
+  }
+  BOOST_CHECK_EQUAL(count, 4);
+}
+
+BOOST_AUTO_TEST_CASE( alu )
+{
+  Variable<unsigned> op;
+  Variable<unsigned> a;
+  Variable<unsigned> b;
+
+  Generator<> gen;  
+  gen
+    ( a < 16)
+    ( b < 16)
+    (op < 4 )  // 4 opcodes
+    (op != 0 || a + b < 16 )  // no add overflow
+    (op != 1 || a > b      )  // no sub underflow
+    (op != 2 || a * b < 16 )  // no m overflow
+    (op != 3 || b != 0     )  // div valid
+  ;
+  gen(); // create a new assignment
+
+  //printf("result: op=%d, a=%d, b=%d\n", gen[op], gen[a], gen[b]);
+}
+
+BOOST_AUTO_TEST_CASE( alu_enum )
+{
+  Variable<unsigned> op;
+  Variable<unsigned> a;
+  Variable<unsigned> b;
+
+  Generator<> gen;  
+  gen
+    ( a < 16)
+    ( b < 16)
+    (op < 4 )  // 4 opcodes
+    (op != 0 || a + b < 16 )  // no add overflow
+    (op != 1 || a > b      )  // no sub underflow
+    (op != 2 || a * b < 16 )  // no m overflow
+    (op != 3 || b != 0     )  // div valid
+  ;
+
+  unsigned count=0;
+  while( gen.next() ) {
+    ++count;
+    gen( op != gen[op] || a != gen[a] || b != gen[b] );
+    //printf("result: op=%d, a=%d, b=%d\n", gen[op], gen[a], gen[b]);
+  }
+  BOOST_CHECK_EQUAL(count, 572);
+}
+
+BOOST_AUTO_TEST_CASE( pythagoras )
+{
+  Variable<unsigned long long> a;
+  Variable<unsigned long long> b;
+  Variable<unsigned long long> c;
+
+  Generator<> gen;  
+  gen(a*a + b*b == c*c)(); // create a new assignment
+
+  unsigned long long av = gen[a];
+  unsigned long long bv = gen[b];
+  unsigned long long cv = gen[c];
+
+  BOOST_CHECK_EQUAL( av*av + bv*bv, cv*cv);
+}
+
+BOOST_AUTO_TEST_CASE ( signed_int_t )
+{
+  randv<int> a(NULL);
+  randv<int> b(NULL);
+
+  Generator<> gen;
+  gen
+    ( a() + b() >= 120 )
+  ;
+
+  gen.next();
+
+  std::cout << format("result: a=%d, b=%d\n") % a % b;
+
+  BOOST_CHECK(a + b >= 120);
+}
+
+
+BOOST_AUTO_TEST_CASE ( mixed_bv_width )
+{
+  randv<long> a(NULL);
+  randv<short> b(NULL);
+
+  Generator<> gen;
+  gen
+    ( a() + b() >= 120 )
+  ;
+
+  gen.next();
+
+  std::cout << format("result: a=%d, b=%d\n") % a % b;
+
+  BOOST_CHECK(a + b >= 120);
+}
+
 
 BOOST_AUTO_TEST_SUITE_END() // Context
 

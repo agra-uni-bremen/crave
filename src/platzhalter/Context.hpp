@@ -656,6 +656,7 @@ namespace platzhalter {
         switch (rvb->element_type()){
           case INT: if (!gen_vector(static_cast<rand_vec<int>* > (rvb), ite->second)) return false; break;
           case UINT: if (!gen_vector(static_cast<rand_vec<unsigned int>* > (rvb), ite->second)) return false; break;
+          case USHORT: if (!gen_vector(static_cast<rand_vec<unsigned short>* > (rvb), ite->second)) return false; break;
           default:
             // not supported yet
             assert(false); 

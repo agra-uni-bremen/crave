@@ -30,11 +30,17 @@ add_all_tests(AllSAT AllSAT.cpp )
 add_executable (Context test_Context.cpp )
 add_all_tests(Context test_Context.cpp )
 
-add_executable (Inheritence test_Inheritence.cpp )
-add_all_tests(Inheritence test_Inheritence.cpp )
+add_executable (Random_Object test_Random_Object.cpp )
+add_all_tests(Random_Object test_Random_Object.cpp )
 
 add_executable (Constraint_Management test_Constraint_Management.cpp )
 add_all_tests(Constraint_Management test_Constraint_Management.cpp )
+
+add_executable (Vector_Constraint test_Vector_Constraint.cpp )
+add_all_tests(Vector_Constraint test_Vector_Constraint.cpp )
+
+add_executable (Distribution test_Distribution.cpp )
+add_all_tests(Distribution test_Distribution.cpp )
 
 if(SystemC_FOUND)
   find_package(Threads REQUIRED)
