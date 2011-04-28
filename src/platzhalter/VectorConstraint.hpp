@@ -56,20 +56,19 @@ class TypeInfo<typename> \
   typedef Variable<unsigned int> IndexVariable;
   static const IndexVariable _i;
 
-  class rand_vec_base {
+  class __rand_vec_base {
     public:
       virtual CppType element_type() { }
-      unsigned int default_size() { return 5; }
   };
 
-  typedef std::map<int, rand_vec_base*> RandVecMap;
-  extern RandVecMap rand_vec_map;
+  typedef std::map<int, __rand_vec_base*> RandVecMap;
+  extern RandVecMap __rand_vec_map;
 
   template<typename T>
-  class rand_vec : public rand_vec_base
+  class __rand_vec : public __rand_vec_base
   {
     public:
-      rand_vec() { rand_vec_map[sym_vec.id()] = this; }
+      __rand_vec() { __rand_vec_map[sym_vec.id()] = this; }
       const Vector<T>& operator()() const { return sym_vec; }
 
       CppType element_type() { return TypeInfo<T>(); }

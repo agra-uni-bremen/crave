@@ -569,7 +569,7 @@ namespace platzhalter {
      * foreach
      **/
     template<typename value_type, typename Expr>
-    Generator<ContextT> & foreach(const rand_vec<value_type> & v, const IndexVariable & i, Expr e) {
+    Generator<ContextT> & foreach(const __rand_vec<value_type> & v, const IndexVariable & i, Expr e) {
       assert(i.id() == _i.id());
       if ( vecCtx.find(v().id()) == vecCtx.end() ) {
         vecCtx.insert( std::make_pair(v().id(), new Context(default_solver()) ) );
@@ -582,7 +582,7 @@ namespace platzhalter {
      * unique
      **/
     template<typename value_type>
-    Generator<ContextT> & unique(const rand_vec<value_type> & v) {
+    Generator<ContextT> & unique(const __rand_vec<value_type> & v) {
       if ( vecCtx.find(v().id()) == vecCtx.end() ) {
         vecCtx.insert( std::make_pair(v().id(), new Context(default_solver()) ) );
       }
@@ -598,12 +598,12 @@ namespace platzhalter {
     }
 
     template<typename T> 
-    bool gen_vector(rand_vec<T>* rvp, Context* rvctx) {
-      rand_vec<T>& rv = *rvp;
+    bool gen_vector(__rand_vec<T>* rvp, Context* rvctx) {
+      __rand_vec<T>& rv = *rvp;
       std::cout << "generate vector " << rv().id() << std::endl;
-      unsigned int size = rv.default_size();
+      unsigned int size = rv.size();
       if (!ctx.read(size, rv().size().id())) {
-        std::cout << "size not specified, use default" << std::endl;
+        std::cout << "size not specified, use current" << std::endl;
       } 
       std::cout << "size = " << size << std::endl;  
 
@@ -652,11 +652,11 @@ namespace platzhalter {
       if (!ctx.solve()) return false;
       // solve vector constraints
       for (ContextMap::iterator ite = vecCtx.begin(); ite != vecCtx.end(); ++ite) {
-        rand_vec_base* rvb = rand_vec_map[ite->first];
+        __rand_vec_base* rvb = __rand_vec_map[ite->first];
         switch (rvb->element_type()){
-          case INT: if (!gen_vector(static_cast<rand_vec<int>* > (rvb), ite->second)) return false; break;
-          case UINT: if (!gen_vector(static_cast<rand_vec<unsigned int>* > (rvb), ite->second)) return false; break;
-          case USHORT: if (!gen_vector(static_cast<rand_vec<unsigned short>* > (rvb), ite->second)) return false; break;
+          case INT: if (!gen_vector(static_cast<__rand_vec<int>* > (rvb), ite->second)) return false; break;
+          case UINT: if (!gen_vector(static_cast<__rand_vec<unsigned int>* > (rvb), ite->second)) return false; break;
+          case USHORT: if (!gen_vector(static_cast<__rand_vec<unsigned short>* > (rvb), ite->second)) return false; break;
           default:
             // not supported yet
             assert(false); 

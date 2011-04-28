@@ -155,5 +155,26 @@ class randv<typename> : public randv_prim_base<typename>, public randomize_base<
 #undef _INTEGER_INTERFACE
 #undef _INTEGER_TYPE
 
+  template<typename T>
+  class rand_vec : public __rand_vec<T>, public rand_base
+  {  
+    public:
+      template<typename context>
+      rand_vec(rand_obj_of<context>* parent) : __rand_vec<T>() { if (parent != 0) parent->addChild(this); }
+
+      bool next() { 
+        static randv<unsigned> default_size(NULL);
+        default_size.range(5, 10);
+        default_size.next();        
+        static randv<T> r(NULL);
+        for (uint i = 0; i < default_size; i++) {
+            r.next();
+            push_back(r);
+        }
+        return true; 
+      }
+            
+  };
+
 } // namespace platzhalter
 

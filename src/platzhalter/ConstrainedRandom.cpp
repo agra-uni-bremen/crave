@@ -11,7 +11,7 @@ namespace platzhalter {
   //boost::mt19937 rng(std::time(0));
   boost::mt19937 rng(0);
 
-  RandVecMap rand_vec_map;
+  RandVecMap __rand_vec_map;
 
   Context get_context(std::string const & solvername) {
     if(solvername.empty()) {
