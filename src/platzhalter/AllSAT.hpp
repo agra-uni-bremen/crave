@@ -30,7 +30,7 @@ namespace platzhalter {
 
     void store_solution (solution_t & sol, std::pair<int, qf_bv::bitvector> const & p ) {
         //std::cout << "p " << p.first << " " << _solver->readAssignment(p.second) << std::endl;
-       sol.insert( make_pair(p.second, read_value(solver, p.second) ));
+       sol.insert( std::make_pair(p.second, read_value(solver, p.second) ));
     }
 
     void block_solution(solution_t const & solution) {
