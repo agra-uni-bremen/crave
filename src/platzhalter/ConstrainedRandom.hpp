@@ -34,8 +34,8 @@ namespace platzhalter {
         if (!constraint.next()) return false;
         return true;
       }
-      bool enable_constraint(std::string name) { return constraint.enable_group(name); }
-      bool disable_constraint(std::string name) { return constraint.disable_group(name); }
+      bool enable_constraint(std::string name) { return constraint.enable_constraint(name); }
+      bool disable_constraint(std::string name) { return constraint.disable_constraint(name); }
       void addChild(rand_base* rb) { children.push_back(rb); }
 
     protected:
@@ -161,6 +161,7 @@ class randv<typename> : public randv_prim_base<typename>, public randomize_base<
     public:
       template<typename context>
       rand_vec(rand_obj_of<context>* parent) : __rand_vec<T>() { if (parent != 0) parent->addChild(this); }
+      rand_vec(rand_obj* parent) : __rand_vec<T>() { if (parent != 0) parent->addChild(this); }
 
       bool next() { 
         static randv<unsigned> default_size(NULL);

@@ -348,30 +348,25 @@ namespace platzhalter {
     }
 
     template<typename Expr>
-    void assertion (std::string group, Expr e) {
+    void assertion (std::string constraint_name, Expr e) {
       check(e);
 
       result_type var;
-      if (_group_variables.find(group) != _group_variables.end() ) 
-        var = _group_variables[group];
-      else {
-        var = evaluate(solver, preds::new_variable());
-        _group_variables.insert( std::make_pair(group, var) );
-      }
+      assert (_constraint_name_variables.find(constraint_name) == _constraint_name_variables.end() ); 
 
+      var = evaluate(solver, preds::new_variable());
+      _constraint_name_variables.insert( std::make_pair(constraint_name, var) );
       metaSMT::assertion(solver, preds::implies( var, proto::eval(e, ctx()) ) );
     }
 
-    bool enable_group(std::string group) {
-      if (_group_variables.find(group) == _group_variables.end()) return false;
-      _disabled_groups.erase(group);
-      return true;
+    void enable_constraint(std::string constraint_name) {
+      assert (_constraint_name_variables.find(constraint_name) != _constraint_name_variables.end());
+      _disabled_constraint_names.erase(constraint_name);
     }
 
-    bool disable_group(std::string group) {
-      if (_group_variables.find(group) == _group_variables.end()) return false;
-      _disabled_groups.insert(group);
-      return true;
+    void disable_constraint(std::string constraint_name) {
+      assert (_constraint_name_variables.find(constraint_name) != _constraint_name_variables.end());
+      _disabled_constraint_names.insert(constraint_name);
     }
 
     template<typename Expr>
@@ -383,9 +378,9 @@ namespace platzhalter {
     void pre_solve() {       
       for (
         std::map<std::string, result_type >::const_iterator 
-        ite = _group_variables.begin();
-        ite != _group_variables.end(); ++ite) {
-        if (_disabled_groups.find(ite->first) == _disabled_groups.end())
+        ite = _constraint_name_variables.begin();
+        ite != _constraint_name_variables.end(); ++ite) {
+        if (_disabled_constraint_names.find(ite->first) == _disabled_constraint_names.end())
           assumption(solver, ite->second);
         else
           assumption(solver, preds::Not(ite->second));
@@ -476,6 +471,28 @@ namespace platzhalter {
       _lazy_vec.erase(vv);
     }
 
+    template<typename T>
+    struct makeUnique {
+      makeUnique(__rand_vec<T> & rv, SolverType & solver, result_type var) 
+      : _rv(rv), solver(solver), _var(var)
+      {}
+      result_type operator() () {
+        result_type ret = evaluate( solver, preds::True);
+        for (uint i = 0; i < _rv.size(); i++)
+          ret = evaluate( solver, preds::And(ret, evaluate( solver, preds::nequal(_var, qf_bv::bvuint(_rv[i], bitsize_traits<T>::nbits))))); 
+        return ret;
+      }
+      __rand_vec<T> & _rv;
+      SolverType & solver;
+      result_type _var;
+    };
+
+    template<typename T>
+    void vec_unique (vecVar & vv, __rand_vec<T> & rv) {
+      boost::function0<result_type> f = makeUnique<T>(rv, solver, evaluate(solver, _vector_variables[vv]) );
+      _lazy_vec[vv] = f;        
+    }
+
     protected:
       inline derived_context & ctx() {  return  static_cast<derived_context&>(*this); }
 
@@ -487,8 +504,8 @@ namespace platzhalter {
 
     private:
       result_type          _soft;
-      std::map<std::string, result_type> _group_variables;
-      std::set<std::string> _disabled_groups;
+      std::map<std::string, result_type> _constraint_name_variables;
+      std::set<std::string> _disabled_constraint_names;
       std::map<unsigned, boost::function0<result_type> > _lazy;
       std::map<vecVar, boost::function0<result_type> > _lazy_vec;
       std::vector<boost::function0<void> > _post_hook;
@@ -542,14 +559,33 @@ namespace platzhalter {
     }
 
     template<typename Expr>
-    Generator<ContextT> & operator() (std::string group, Expr expr)
+    Generator<ContextT> & operator() (std::string constraint_name, Expr expr)
     {
-      ctx.assertion(group, expr);
+      addCstrToCtx(constraint_name, &ctx);
+      ctx.assertion(constraint_name, expr);
       return *this;
     }
 
-    bool enable_group(std::string group) { return ctx.enable_group(group); }
-    bool disable_group(std::string group) { return ctx.disable_group(group); }
+    void addCstrToCtx(std::string constraint_name, ContextT* context) {
+      typename std::map<std::string, ContextT*>::iterator ite = ctxOfCstr.find(constraint_name);
+      if (ite != ctxOfCstr.end())
+        throw std::runtime_error("Constraint already exists.");
+      ctxOfCstr[constraint_name] = context;
+    }
+
+    bool enable_constraint(std::string constraint_name) { 
+      typename std::map<std::string, ContextT*>::iterator ite = ctxOfCstr.find(constraint_name);
+      if (ite == ctxOfCstr.end()) return false;
+      ite->second->enable_constraint(constraint_name);
+      return true;    
+    }
+
+    bool disable_constraint(std::string constraint_name) { 
+      typename std::map<std::string, ContextT*>::iterator ite = ctxOfCstr.find(constraint_name);
+      if (ite == ctxOfCstr.end()) return false;
+      ite->second->disable_constraint(constraint_name);
+      return true;    
+    }
 
     /**
      * generate a new assignment
@@ -572,21 +608,38 @@ namespace platzhalter {
     Generator<ContextT> & foreach(const __rand_vec<value_type> & v, const IndexVariable & i, Expr e) {
       assert(i.id() == _i.id());
       if ( vecCtx.find(v().id()) == vecCtx.end() ) {
-        vecCtx.insert( std::make_pair(v().id(), new Context(default_solver()) ) );
+        vecCtx.insert( std::make_pair(v().id(), new ContextT(default_solver()) ) );
       }
       vecCtx[v().id()]->assertion(e);
       return *this;
     }
 
+    template<typename value_type, typename Expr>
+    Generator<ContextT> & foreach(std::string constraint_name, const __rand_vec<value_type> & v, const IndexVariable & i, Expr e) {
+      assert(i.id() == _i.id());
+      if ( vecCtx.find(v().id()) == vecCtx.end() ) {
+        vecCtx.insert( std::make_pair(v().id(), new ContextT(default_solver()) ) );
+      }
+      addCstrToCtx(constraint_name, vecCtx[v().id()]);
+      vecCtx[v().id()]->assertion(constraint_name, e);
+      return *this;
+    }
+
     /**
-     * unique
+     * unique & non_unique
      **/
     template<typename value_type>
     Generator<ContextT> & unique(const __rand_vec<value_type> & v) {
       if ( vecCtx.find(v().id()) == vecCtx.end() ) {
-        vecCtx.insert( std::make_pair(v().id(), new Context(default_solver()) ) );
+        vecCtx.insert( std::make_pair(v().id(), new ContextT(default_solver()) ) );
       }
       uniqueVecSet.insert(v().id());
+      return *this;
+    }
+
+    template<typename value_type>
+    Generator<ContextT> & non_unique(const __rand_vec<value_type> & v) {
+      uniqueVecSet.erase(v().id());
       return *this;
     }
 
@@ -632,12 +685,7 @@ namespace platzhalter {
         rvctx->assertion(_i = i);
 
         // unique
-        if (uniqueVecSet.find(rv().id()) != uniqueVecSet.end()) {
-          for (unsigned int k = 0; k < i; k++) {
-            // TODO
-          }
-        }
-      
+        if (uniqueVecSet.find(rv().id()) != uniqueVecSet.end()) rvctx->vec_unique(vvv[_i_idx], rv);      
         // solve 
         if (!rvctx->solve()) return false;
         T tmp;
@@ -651,11 +699,12 @@ namespace platzhalter {
     bool next() {
       if (!ctx.solve()) return false;
       // solve vector constraints
-      for (ContextMap::iterator ite = vecCtx.begin(); ite != vecCtx.end(); ++ite) {
+      for (typename std::map<int, ContextT*>::iterator ite = vecCtx.begin(); ite != vecCtx.end(); ++ite) {
         __rand_vec_base* rvb = __rand_vec_map[ite->first];
         switch (rvb->element_type()){
           case INT: if (!gen_vector(static_cast<__rand_vec<int>* > (rvb), ite->second)) return false; break;
           case UINT: if (!gen_vector(static_cast<__rand_vec<unsigned int>* > (rvb), ite->second)) return false; break;
+          case SHORT: if (!gen_vector(static_cast<__rand_vec<short>* > (rvb), ite->second)) return false; break;
           case USHORT: if (!gen_vector(static_cast<__rand_vec<unsigned short>* > (rvb), ite->second)) return false; break;
           default:
             // not supported yet
@@ -674,9 +723,9 @@ namespace platzhalter {
     };
 
     private:
-      Context ctx;
-      typedef std::map<int, Context*> ContextMap;
-      ContextMap vecCtx;
+      ContextT ctx;
+      std::map<int, ContextT*> vecCtx;
+      std::map<std::string, ContextT*> ctxOfCstr;
       std::set<int> uniqueVecSet;
   };
 

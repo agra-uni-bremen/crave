@@ -62,6 +62,22 @@ BOOST_AUTO_TEST_CASE( t1 )
   BOOST_REQUIRE(it.a == 2 && it.b == 2);
 }
 
+class Item1 : public rand_obj {
+public:
+  Item1() : rand_obj(), a(this) {
+    constraint("abc", a() == 4);
+    constraint("def", a() == 3);
+    constraint("abc", a() == 3);
+  }
+  randv<uint> a;
+};
+
+BOOST_AUTO_TEST_CASE( t2 )
+{
+  BOOST_CHECK_THROW ( Item1 it, std::runtime_error );
+}
+
+
 BOOST_AUTO_TEST_SUITE_END() // Context
 
 //  vim: ft=cpp:ts=2:sw=2:expandtab
