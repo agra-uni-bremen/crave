@@ -599,6 +599,7 @@ namespace platzhalter {
     template<typename Expr>
     Generator<ContextT> & soft( Expr e) {
       ctx.soft_assertion( e );
+      return *this;
     }
 
     /**
@@ -611,6 +612,16 @@ namespace platzhalter {
         vecCtx.insert( std::make_pair(v().id(), new ContextT(default_solver()) ) );
       }
       vecCtx[v().id()]->assertion(e);
+      return *this;
+    }
+
+    template<typename value_type, typename Expr>
+    Generator<ContextT> & soft_foreach(const __rand_vec<value_type> & v, const IndexVariable & i, Expr e) {
+      assert(i.id() == _i.id());
+      if ( vecCtx.find(v().id()) == vecCtx.end() ) {
+        vecCtx.insert( std::make_pair(v().id(), new ContextT(default_solver()) ) );
+      }
+      vecCtx[v().id()]->soft_assertion(e);
       return *this;
     }
 
@@ -696,23 +707,31 @@ namespace platzhalter {
       return true;
     }
 
+#define _GEN_VEC(typename) if (!gen_vector(static_cast<__rand_vec<typename>* > (rvb), ite->second)) return false
     bool next() {
       if (!ctx.solve()) return false;
       // solve vector constraints
       for (typename std::map<int, ContextT*>::iterator ite = vecCtx.begin(); ite != vecCtx.end(); ++ite) {
         __rand_vec_base* rvb = __rand_vec_map[ite->first];
         switch (rvb->element_type()){
-          case INT: if (!gen_vector(static_cast<__rand_vec<int>* > (rvb), ite->second)) return false; break;
-          case UINT: if (!gen_vector(static_cast<__rand_vec<unsigned int>* > (rvb), ite->second)) return false; break;
-          case SHORT: if (!gen_vector(static_cast<__rand_vec<short>* > (rvb), ite->second)) return false; break;
-          case USHORT: if (!gen_vector(static_cast<__rand_vec<unsigned short>* > (rvb), ite->second)) return false; break;
+//          case BOOL: _GEN_VEC(bool); break;
+          case INT: _GEN_VEC(int); break;
+          case UINT: _GEN_VEC(unsigned int); break;
+          case CHAR: _GEN_VEC(char); break;
+          case UCHAR: _GEN_VEC(unsigned char); break;
+          case SHORT: _GEN_VEC(short); break;
+          case USHORT: _GEN_VEC(unsigned short); break;
+          case LONG:  _GEN_VEC(long); break;
+          case ULONG:  _GEN_VEC(unsigned long); break;
+          case LLONG: _GEN_VEC(long long); break;
+          case ULLONG: _GEN_VEC(unsigned long long); break;
           default:
-            // not supported yet
-            assert(false); 
+            assert(false && "not supported yet"); 
         }
       }
       return true;
     }
+#undef _GEN_VEC
 
     /**
      * read variable "var"

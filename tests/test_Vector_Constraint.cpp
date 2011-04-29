@@ -170,6 +170,28 @@ BOOST_AUTO_TEST_CASE ( index_constraint_test )
   }
 }
 
+BOOST_AUTO_TEST_CASE ( soft_vec_constraint )
+{
+  rand_vec<unsigned int> v(NULL);
+
+  Generator<> gen;
+  gen(v().size() == 10);
+  gen.foreach(v, _i, v()[_i] >= v()[_i - 1]);  
+  gen.soft_foreach(v, _i, v()[_i] < v()[_i - 1]);  
+  BOOST_REQUIRE(gen.next());
+
+  Generator<> gen1;
+  gen1(v().size() == 4);
+  gen1.foreach(v, _i, v()[_i] >= v()[_i - 1]);  
+  gen1.soft_foreach(v, _i, v()[_i] <= v()[_i - 1]);  
+  gen1.soft_foreach(v, _i, IMPL(_i == 0, v()[_i] % 13 == 3));  
+  BOOST_REQUIRE(gen1.next());
+  BOOST_REQUIRE(v.size() == 4);  
+  std::cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << std::endl;
+  BOOST_REQUIRE(v[0] == v[1] && v[1] == v[2] && v[2] == v[3] && v[0] % 13 == 3);  
+}
+
+
 BOOST_AUTO_TEST_SUITE_END() // Context
 
 //  vim: ft=cpp:ts=2:sw=2:expandtab
