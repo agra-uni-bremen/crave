@@ -406,12 +406,12 @@ namespace platzhalter {
     }
 
     bool solve () {
-      bool const ret = ctx().do_solve(true);
+      bool const ret = ctx().do_solve();
       post_solve(ret );
       return ret;
     }
 
-    bool do_solve (bool soft) {
+    bool do_solve () {
       pre_solve();
       assumption(solver,_soft);
       // if soft constraint satisfiable

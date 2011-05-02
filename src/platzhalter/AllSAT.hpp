@@ -46,7 +46,7 @@ namespace platzhalter {
       metaSMT::assertion( solver, block);
     }
 
-    bool do_solve(bool _ )  {
+    bool do_solve()  {
       if(is_solved) {
         // use next shuffled solution
         ++current;
@@ -59,7 +59,7 @@ namespace platzhalter {
         using namespace boost::phoenix::arg_names;
         // gather all solutions
         solution_t solution;
-        while( Super::do_solve(true) ) {
+        while( Super::do_solve() ) {
           is_solved = true;
 
           std::for_each(_variables.begin(), _variables.end(),
