@@ -662,7 +662,7 @@ namespace platzhalter {
     }
 
     template<typename T> 
-    bool gen_vector(__rand_vec<T>* rvp, Context* rvctx) {
+    bool gen_vector(__rand_vec<T>* rvp, ContextT* rvctx) {
       __rand_vec<T>& rv = *rvp;
       std::cout << "generate vector " << rv().id() << std::endl;
       unsigned int size = rv.size();

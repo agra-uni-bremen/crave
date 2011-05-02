@@ -83,7 +83,7 @@ namespace platzhalter {
     }
 
     template<typename T>
-    void read ( T & v, unsigned id) {
+    bool read ( T & v, unsigned id) {
       assert(is_solved && "AllSAT::solve was not called or not successful");
       std::map<int, qf_bv::bitvector>::const_iterator ite
         = _variables.find(id);
@@ -92,6 +92,17 @@ namespace platzhalter {
       solution_t::const_iterator sit = current->find(ite->second);
       assert( sit != current->end() && "ERROR: not assignment for variable" );
       v = sit->second;
+    }
+
+    template<typename T>
+    bool read ( T & v, vecVar & vv) {
+      std::map<vecVar, qf_bv::bitvector>::const_iterator ite
+        = _vector_variables.find(vv);
+      if ( ite != _vector_variables.end() ) {
+        v = read_value(solver, ite->second);
+        return true;
+      }
+      return false;
     }
 
     struct RNG {
