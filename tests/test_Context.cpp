@@ -2,6 +2,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <platzhalter/ConstrainedRandom.hpp>
+#include <platzhalter/ExpressionSize.hpp>
 
 #include <boost/format.hpp>
 
@@ -377,12 +378,28 @@ BOOST_AUTO_TEST_CASE ( signed_int_t )
 
 BOOST_AUTO_TEST_CASE ( mixed_bv_width )
 {
-  randv<long> a(NULL);
-  randv<short> b(NULL);
+  randv<unsigned long> a(NULL);
+  randv<unsigned short> b(NULL);
+
+
+  ExpressionSize es;
+
+  BOOST_CHECK_EQUAL( es(a()).value, sizeof(long)*8);
+  BOOST_CHECK_EQUAL( es(b()).value, sizeof(short)*8);
+  BOOST_CHECK_EQUAL( es (a()+b()).value, std::max( sizeof(short), sizeof(long))*8 );
+
+  //boost::proto::display_expr( b()+a());
+  //boost::proto::display_expr( FixWidth()( b()+a() ));
+
+  //boost::proto::display_expr( a()+b());
+  //boost::proto::display_expr( FixWidth()( a()+b() ));
+
+  //boost::proto::display_expr( b()+a() >= 120);
+  //boost::proto::display_expr( FixWidth()(b()+a() >= 120));
 
   Generator<> gen;
   gen
-    ( a() + b() >= 120 )
+    (  a() + b() >= 120 )
   ;
 
   gen.next();
@@ -394,5 +411,8 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width )
 
 
 BOOST_AUTO_TEST_SUITE_END() // Context
+
+bitsize_traits<long> _instanciate1;
+bitsize_traits<short> _instanciate2;
 
 //  vim: ft=cpp:ts=2:sw=2:expandtab

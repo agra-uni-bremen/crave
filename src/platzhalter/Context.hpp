@@ -3,6 +3,7 @@
 #include "bitsize_traits.hpp"
 #include "Constraint.hpp"
 #include "VectorConstraint.hpp"
+#include "ExpressionSize.hpp"
 
 #include <boost/proto/core.hpp>
 #include <boost/proto/debug.hpp>
@@ -87,6 +88,7 @@ namespace platzhalter {
     typedef metaSMT::DirectSolver_Context< metaSMT::solver::SWORD_Context > SolverType;
     typedef SolverType::result_type result_type;
 
+
     template<typename value_type>
     result_type operator() (proto::tag::terminal, var_tag<value_type> const & tag ) {
       std::map<int, qf_bv::bitvector>::const_iterator ite
@@ -96,7 +98,7 @@ namespace platzhalter {
       } else {
         std::ostringstream buf;
         buf << "var_" << tag.id;
-        unsigned width=bitsize_traits<value_type>::nbits;
+        unsigned width=bitsize_traits<value_type>::value;
         //std::cout << "creating " << buf.str() << ", width= " << width << std::endl;
         qf_bv::bitvector bv = qf_bv::new_bitvector(width);  
         _variables.insert( std::make_pair(tag.id, bv) );
@@ -248,6 +250,14 @@ namespace platzhalter {
       ));
     }
 
+    template< typename Integral, typename Expr>
+    result_type operator() (extend_tag, Integral const & by_width, Expr const &  e) {
+      return evaluate( solver, 
+        qf_bv::zero_extend( proto::value(by_width).value,
+          proto::eval( e, ctx() )
+      ));
+    }
+
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::assign, Expr1 const & e1, Expr2 const &  e2) {
       //std::cout << "eval assign" << std::endl;
@@ -282,7 +292,7 @@ namespace platzhalter {
       {}
       result_type operator() () {
         return evaluate( solver, preds::equal(_var, 
-                  qf_bv::bvuint(_i, bitsize_traits<Integer>::nbits))); 
+                  qf_bv::bvuint(_i, bitsize_traits<Integer>::value))); 
       }
       Integer const & _i;
       SolverType & solver;
@@ -291,7 +301,7 @@ namespace platzhalter {
 
     template< typename Integer>
     result_type operator() (proto::tag::terminal t, read_ref_tag<Integer> const & ref) {
-      unsigned width=bitsize_traits<Integer>::nbits;
+      unsigned width=bitsize_traits<Integer>::value;
 
       std::map<int, qf_bv::bitvector>::const_iterator ite
         = _variables.find(ref.id);
@@ -308,7 +318,7 @@ namespace platzhalter {
 
     template< typename Integer>
     result_type operator() (proto::tag::terminal, Integer const & i) {
-      unsigned width=bitsize_traits<Integer>::nbits;
+      unsigned width=bitsize_traits<Integer>::value;
 //      std::cout << "creating int " << i << ", width= " << width << std::endl;
       return evaluate( solver, qf_bv::bvuint(i,width) );
     }
@@ -333,7 +343,7 @@ namespace platzhalter {
         std::ostringstream buf;
         buf << vv;
         typedef typename proto::result_of::value<Expr1>::type value_type;
-        unsigned width=bitsize_traits<value_type >::nbits;
+        unsigned width=bitsize_traits<value_type >::value;
 
         qf_bv::bitvector bv = qf_bv::new_bitvector(width);
         _vector_variables.insert( std::make_pair(vv, bv) );
@@ -343,13 +353,13 @@ namespace platzhalter {
 
     template<typename Expr>
     void assertion (Expr e) {
-      check(e);
+      //check(e);
       metaSMT::assertion(solver, proto::eval(e, ctx()) );
     }
 
     template<typename Expr>
     void assertion (std::string constraint_name, Expr e) {
-      check(e);
+      //check(e);
 
       result_type var;
       assert (_constraint_name_variables.find(constraint_name) == _constraint_name_variables.end() ); 
@@ -371,8 +381,8 @@ namespace platzhalter {
 
     template<typename Expr>
     void soft_assertion (Expr e) {
-      check(e);
-      _soft = evaluate( solver, preds::And(_soft, proto::eval(e, ctx())));
+      //check(e);
+      _soft = evaluate( solver, preds::And(_soft, proto::eval( e, ctx())));
     }
 
     void pre_solve() {       
@@ -479,7 +489,7 @@ namespace platzhalter {
       result_type operator() () {
         result_type ret = evaluate( solver, preds::True);
         for (uint i = 0; i < _rv.size(); i++)
-          ret = evaluate( solver, preds::And(ret, evaluate( solver, preds::nequal(_var, qf_bv::bvuint(_rv[i], bitsize_traits<T>::nbits))))); 
+          ret = evaluate( solver, preds::And(ret, evaluate( solver, preds::nequal(_var, qf_bv::bvuint(_rv[i], bitsize_traits<T>::value))))); 
         return ret;
       }
       __rand_vec<T> & _rv;
@@ -554,7 +564,7 @@ namespace platzhalter {
     Generator<ContextT> & operator() (Expr expr)
     {
 //      display_expr(expr);
-      ctx.assertion(expr);
+      ctx.assertion( FixWidth()(expr) );
       return *this;
     }
 
@@ -562,7 +572,7 @@ namespace platzhalter {
     Generator<ContextT> & operator() (std::string constraint_name, Expr expr)
     {
       addCstrToCtx(constraint_name, &ctx);
-      ctx.assertion(constraint_name, expr);
+      ctx.assertion(constraint_name, FixWidth()(expr) );
       return *this;
     }
 
@@ -598,7 +608,7 @@ namespace platzhalter {
 
     template<typename Expr>
     Generator<ContextT> & soft( Expr e) {
-      ctx.soft_assertion( e );
+      ctx.soft_assertion( FixWidth()(e) );
       return *this;
     }
 
@@ -611,7 +621,7 @@ namespace platzhalter {
       if ( vecCtx.find(v().id()) == vecCtx.end() ) {
         vecCtx.insert( std::make_pair(v().id(), new ContextT(default_solver()) ) );
       }
-      vecCtx[v().id()]->assertion(e);
+      vecCtx[v().id()]->assertion( FixWidth()(e) );
       return *this;
     }
 
@@ -621,7 +631,7 @@ namespace platzhalter {
       if ( vecCtx.find(v().id()) == vecCtx.end() ) {
         vecCtx.insert( std::make_pair(v().id(), new ContextT(default_solver()) ) );
       }
-      vecCtx[v().id()]->soft_assertion(e);
+      vecCtx[v().id()]->soft_assertion( FixWidth()(e) );
       return *this;
     }
 
@@ -632,7 +642,7 @@ namespace platzhalter {
         vecCtx.insert( std::make_pair(v().id(), new ContextT(default_solver()) ) );
       }
       addCstrToCtx(constraint_name, vecCtx[v().id()]);
-      vecCtx[v().id()]->assertion(constraint_name, e);
+      vecCtx[v().id()]->assertion(constraint_name, FixWidth()(e) );
       return *this;
     }
 
