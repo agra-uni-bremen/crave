@@ -2,7 +2,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <platzhalter/ConstrainedRandom.hpp>
-#include <platzhalter/ExpressionSize.hpp>
+#include <platzhalter/ExpressionTraits.hpp>
 
 #include <boost/format.hpp>
 

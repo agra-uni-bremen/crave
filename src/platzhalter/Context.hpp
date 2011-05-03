@@ -3,7 +3,7 @@
 #include "bitsize_traits.hpp"
 #include "Constraint.hpp"
 #include "VectorConstraint.hpp"
-#include "ExpressionSize.hpp"
+#include "ExpressionTraits.hpp"
 
 #include <boost/proto/core.hpp>
 #include <boost/proto/debug.hpp>
