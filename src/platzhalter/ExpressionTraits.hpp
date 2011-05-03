@@ -10,6 +10,7 @@
 #include <boost/mpl/min_max.hpp>
 #include <boost/mpl/less.hpp>
 #include <boost/mpl/greater.hpp>
+#include <boost/type_traits/is_signed.hpp>
 
 namespace platzhalter {
   namespace proto = boost::proto;
@@ -85,6 +86,38 @@ namespace platzhalter {
   ,  FixSecondLarger
   ,  proto::nary_expr<proto::_, proto::vararg<FixWidth> >
   >{};
+
+/***************************************************************************/
+/*********** Sign of the expression ****************************************/
+/***************************************************************************/
+
+  struct FixedUnsigned
+  : proto::or_<
+      proto::nary_expr< proto::tag::less_equal, proto::vararg< proto::_> >
+    , proto::nary_expr< proto::tag::less, proto::vararg< proto::_> >
+    , proto::nary_expr< proto::tag::greater, proto::vararg< proto::_> >
+    , proto::nary_expr< proto::tag::greater_equal, proto::vararg< proto::_> >
+    , proto::nary_expr< proto::tag::equal_to, proto::vararg< proto::_> >
+    , proto::nary_expr< proto::tag::not_equal_to, proto::vararg< proto::_> >
+  > {};
+  
+  struct IsSigned
+  : proto::or_<
+      proto::and_< 
+        proto::terminal<proto::_> 
+      , proto::if_< boost::is_signed< proto::_value > () >
+      >
+    , proto::and_< 
+        proto::not_< FixedUnsigned >
+
+      , proto::when< proto::binary_expr<proto::_, proto::_, proto::_> 
+      , proto::or_< 
+          IsSigned( proto::_left )
+        , IsSigned( proto::_right )
+        >
+      >
+    >
+  > {};
 
 } /* platzhalter */
 

@@ -151,33 +151,69 @@ namespace platzhalter {
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::less_equal, Expr1 const & e1, Expr2 const &  e2) {
-      return evaluate( solver, qf_bv::bvule(
-          proto::eval( e1, ctx() )
-        , proto::eval( e2, ctx() )
-      ));
+      if( proto::matches< Expr1, IsSigned >::value 
+       || proto::matches< Expr2, IsSigned >::value )
+       {
+        return evaluate( solver, qf_bv::bvsle(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      } else {
+        return evaluate( solver, qf_bv::bvule(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      }
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::less, Expr1 const & e1, Expr2 const &  e2) {
-      return evaluate( solver, qf_bv::bvult(
-          proto::eval( e1, ctx() )
-        , proto::eval( e2, ctx() )
-      ));
+      if( proto::matches< Expr1, IsSigned >::value 
+       || proto::matches< Expr2, IsSigned >::value )
+       {
+        return evaluate( solver, qf_bv::bvslt(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      } else {
+        return evaluate( solver, qf_bv::bvult(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      }
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::greater, Expr1 const & e1, Expr2 const &  e2) {
-      return evaluate( solver, qf_bv::bvugt(
-          proto::eval( e1, ctx() )
-        , proto::eval( e2, ctx() )
-      ));
+      if( proto::matches< Expr1, IsSigned >::value 
+       || proto::matches< Expr2, IsSigned >::value )
+       {
+        return evaluate( solver, qf_bv::bvsgt(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      } else {
+        return evaluate( solver, qf_bv::bvugt(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      }
     }
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::greater_equal, Expr1 const & e1, Expr2 const &  e2) {
-      return evaluate( solver, qf_bv::bvuge(
-          proto::eval( e1, ctx() )
-        , proto::eval( e2, ctx() )
-      ));
+      if( proto::matches< Expr1, IsSigned >::value 
+       || proto::matches< Expr2, IsSigned >::value )
+       {
+        return evaluate( solver, qf_bv::bvsge(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      } else {
+        return evaluate( solver, qf_bv::bvuge(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      }
     }
 
     template< typename Expr1, typename Expr2>
