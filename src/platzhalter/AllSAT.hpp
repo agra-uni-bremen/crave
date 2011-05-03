@@ -19,11 +19,57 @@ namespace platzhalter {
   struct AllSAT : public metaSMT_Context_base<AllSAT>
   {
     AllSAT(std::string const & solvername) 
-    : metaSMT_Context_base<AllSAT>(solvername), is_solved(false)
+    : metaSMT_Context_base<AllSAT>(solvername), is_solved(false), sol_limit(50)
     { }
 
     typedef metaSMT_Context_base<AllSAT> Super;
 
+    // BEGIN functions that modify the constraints
+    template<typename Expr>
+    void assertion (Expr e) {
+      Super::assertion(e);
+      reset();
+    }
+
+    template<typename Expr>
+    void assertion (std::string constraint_name, Expr e) {
+      Super::assertion(constraint_name, e);
+      reset();
+    }
+
+    void enable_constraint(std::string constraint_name) {
+      Super::enable_constraint(constraint_name);
+      reset();
+    }
+
+    void disable_constraint(std::string constraint_name) {
+      Super::disable_constraint(constraint_name);
+      reset();
+    }
+
+    template<typename Expr>
+    void soft_assertion (Expr e) {
+      Super::soft_assertion(e);
+      reset();
+    }
+
+    template<typename T>
+    void vec_assign (vecVar & vv, T & val) {
+      Super::vec_assign(vv, val);
+      reset();
+    }
+
+    void vec_free (vecVar & vv) {
+      Super::vec_free(vv);
+      reset();
+    }
+
+    template<typename T>
+    void vec_unique (vecVar & vv, __rand_vec<T> & rv) {
+      Super::vec_unique(vv, rv);
+      reset();
+    }
+    // END functions that modify the constraints
 
     typedef std::map<qf_bv::bitvector, metaSMT::result_wrapper, bitvector_less> solution_t;
     typedef std::vector< solution_t > all_solutions_t;
@@ -115,7 +161,13 @@ namespace platzhalter {
       RNG() :_state(0) {}
     } rng;
 
+    void reset() {
+      is_solved = false;
+      all_solutions.clear();
+    }
+
     bool is_solved;
+    unsigned sol_limit;
     all_solutions_t all_solutions;
     all_solutions_t::iterator current;
   };
