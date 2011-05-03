@@ -2,7 +2,7 @@
 #include <boost/mpl/times.hpp>
 #include <boost/mpl/int.hpp>
 #include <boost/mpl/sizeof.hpp>
-#include <boost/type_traits/is_integral.hpp>
+#include <boost/type_traits/is_signed.hpp>
 #include <boost/utility/enable_if.hpp>
 
 namespace platzhalter {
@@ -29,5 +29,18 @@ namespace platzhalter {
   struct bitsize_traits< read_ref_tag<T> > : public bitsize_traits<T> {};
 
 } // namespace platzhalter
+
+namespace boost {
+  template<typename T>
+  struct is_signed< platzhalter::randv<T> > : public is_signed<T> {};
+  template<typename T>
+  struct is_signed< platzhalter::Variable<T> > : public is_signed<T> {};
+  template<typename T>
+  struct is_signed< platzhalter::var_tag<T> > : public is_signed<T> {};
+  template<typename T>
+  struct is_signed< platzhalter::write_ref_tag<T> > : public is_signed<T> {};
+  template<typename T>
+  struct is_signed< platzhalter::read_ref_tag<T> > : public is_signed<T> {};
+}
 
 //  vim: ft=cpp:ts=2:sw=2:expandtab
