@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE( less )
   Variable<unsigned> a;
 
   Generator<> gen;  
-  gen(a < 256);
+  gen(a < 256u);
 
   std::set<unsigned> generated;
   while (gen.next()) {
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE( less_equal )
   Variable<unsigned> a;
 
   Generator<> gen;  
-  gen(a <= 256);
+  gen(a <= 256u);
 
   std::set<unsigned> generated;
   while (gen.next()) {
@@ -137,9 +137,9 @@ BOOST_AUTO_TEST_CASE( divide )
 
   Generator<> gen;
   gen
-    ( b != (unsigned char)  0 )
-    ( a  < (unsigned char) 16 )
-    ( b  < (unsigned char) 16 )
+    ( b != (unsigned char)  0u )
+    ( a  < (unsigned char) 16u )
+    ( b  < (unsigned char) 16u )
     ( q == a/b )
     ( r == a%b )
   ;
@@ -160,8 +160,8 @@ BOOST_AUTO_TEST_CASE ( shiftleft )
 
   Generator<> gen;
   gen
-    ( a <  256 )
-    ( b <  (unsigned) (sizeof(unsigned)*8) )
+    ( a <  256u )
+    ( b <  (unsigned) (sizeof(unsigned)*8u) )
     ( c == (a << b) )
   ;
 
@@ -324,13 +324,13 @@ BOOST_AUTO_TEST_CASE( alu_enum )
 
   Generator<> gen;  
   gen
-    ( a < 16)
-    ( b < 16)
-    (op < 4 )  // 4 opcodes
-    (op != 0 || a + b < 16 )  // no add overflow
-    (op != 1 || a > b      )  // no sub underflow
-    (op != 2 || a * b < 16 )  // no m overflow
-    (op != 3 || b != 0     )  // div valid
+    ( a < 16u)
+    ( b < 16u)
+    (op < 4u )  // 4 opcodes
+    (op != 0u || a + b < 16u )  // no add overflow
+    (op != 1u || a > b      )  // no sub underflow
+    (op != 2u || a * b < 16u )  // no m overflow
+    (op != 3u || b != 0u     )  // div valid
   ;
 
   unsigned count=0;
@@ -358,21 +358,38 @@ BOOST_AUTO_TEST_CASE( pythagoras )
   BOOST_CHECK_EQUAL( av*av + bv*bv, cv*cv);
 }
 
-BOOST_AUTO_TEST_CASE ( signed_int_t )
+BOOST_AUTO_TEST_CASE ( negative_var )
 {
   randv<int> a(NULL);
   randv<int> b(NULL);
 
   Generator<> gen;
   gen
-    ( a() + b() >= 120 )
+    ( a() + b() <= 120 )
+    ( a() > 120  )
   ;
 
-  gen.next();
+  gen();
 
   std::cout << format("result: a=%d, b=%d\n") % a % b;
 
-  BOOST_CHECK(a + b >= 120);
+  BOOST_CHECK(a + b <= 120);
+}
+
+BOOST_AUTO_TEST_CASE ( signed_less_zero )
+{
+  randv<int> a(NULL);
+
+  Generator<> gen;
+  gen
+    ( a() < 0 )
+  ;
+
+  gen();
+
+  std::cout << format("result: a=%d\n") % a;
+
+  BOOST_CHECK(a < 0);
 }
 
 
