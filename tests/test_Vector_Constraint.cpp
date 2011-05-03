@@ -77,21 +77,22 @@ BOOST_AUTO_TEST_CASE ( default_size_test )
 
 struct Item3 : public rand_obj {
   Item3() : v(this) {
-    constraint(v().size() == 1000);
-    constraint.foreach(v, _i, v()[_i] < 1000);
+    constraint(v().size() == 100);
+    constraint.foreach(v, _i, v()[_i] < 100);
+    constraint.foreach(v, _i, v()[_i] >= 0);
     constraint.unique(v);
   }
 
-  rand_vec<unsigned int> v;
+  rand_vec<int> v;
 };
 
 BOOST_AUTO_TEST_CASE ( unique_test_1 )
 {
   Item3 it;
   it.next();
-  BOOST_REQUIRE(it.v.size() == 1000);
+  BOOST_REQUIRE(it.v.size() == 100);
   for (uint i = 0; i < it.v.size(); i++) {
-    BOOST_REQUIRE(it.v[i] < 1000);
+    BOOST_REQUIRE(0 <= it.v[i] && it.v[i] < 100);
     for (uint j = 0; j < i; j++) 
       BOOST_REQUIRE(it.v[i] != it.v[j]);
   }
@@ -102,10 +103,19 @@ BOOST_AUTO_TEST_CASE ( unique_test_2 )
   rand_vec<unsigned int> v(NULL);
   Generator<> gen;
   gen(v().size() == 11);
-  gen.foreach(v, _i, v()[_i] < 10);  
+  gen.foreach(v, _i, v()[_i] < 10u);  
 
   gen.unique(v);
   BOOST_REQUIRE(!gen.next());
+
+/*
+  gen.next();
+  std::cout << "AAAAA  ";
+  for (uint i = 0; i < v.size(); i++) {
+    std::cout << v[i] << " ";
+  }
+  std::cout << std::endl;
+*/
 
   gen.non_unique(v);
   BOOST_REQUIRE(gen.next());
@@ -120,8 +130,8 @@ BOOST_AUTO_TEST_CASE ( unique_test_2 )
 struct Item4 : public rand_obj {
   Item4() : v(this) {
     constraint(v().size() == 10);
-    constraint.foreach("c1", v, _i, v()[_i] <= 100);
-    constraint.foreach("c2", v, _i, v()[_i] > 100);
+    constraint.foreach("c1", v, _i, v()[_i] <= 100u);
+    constraint.foreach("c2", v, _i, v()[_i] > 100u);
   }
 
   rand_vec<unsigned int> v;
