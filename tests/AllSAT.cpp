@@ -19,10 +19,10 @@ struct Context_Fixture {
   {
   }
   protected:
-  Generator<AllSAT> gen;
+  Generator<AllSAT<> > gen;
 };
 
-class sif_seq_item : public rand_obj_of<AllSAT> {
+class sif_seq_item : public rand_obj_of<AllSAT<> > {
 public:
     sif_seq_item() : 
         tx_enable_parity(this),
@@ -69,6 +69,21 @@ BOOST_AUTO_TEST_CASE ( randv10k )
     std::cout << it << std::endl;
     BOOST_REQUIRE( !it.tx_odd_parity ||  it.tx_enable_parity );
     //BOOST_REQUIRE( !it.rx_odd_parity ||  it.rx_enable_parity );
+  }
+}
+
+BOOST_AUTO_TEST_CASE ( t1 )
+{
+  randv<uint> v(0);
+  Generator< AllSAT<30> > gen;
+  gen(v() <= 10u);
+
+  std::vector<uint> vec;
+  for (uint i = 0; i <= 10; i++) {
+    BOOST_REQUIRE(gen.next());
+    for (uint j = 0; j < vec.size(); j++)
+      BOOST_REQUIRE(vec[j] != v);      
+    vec.push_back(v);
   }
 }
 
