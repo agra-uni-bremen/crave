@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE ( randv10k )
 
   for (int i=0;i<10000; i++) {
     BOOST_REQUIRE(it.next());
-    std::cout << it << std::endl;
+//    std::cout << it << std::endl;
     BOOST_REQUIRE( !it.tx_odd_parity ||  it.tx_enable_parity );
     //BOOST_REQUIRE( !it.rx_odd_parity ||  it.rx_enable_parity );
   }
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE ( t1 )
 {
   randv<uint> v(0);
   Generator< AllSAT<30> > gen;
-  gen(v() <= 10u);
+  gen(v() <= 10);
 
   std::vector<uint> vec;
   for (uint i = 0; i <= 10; i++) {

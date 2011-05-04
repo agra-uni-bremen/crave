@@ -102,18 +102,21 @@ namespace platzhalter {
   > {};
   
   struct IsSigned
-  : proto::or_<
-      proto::and_< 
-        proto::terminal<proto::_> 
-      , proto::if_< boost::is_signed< proto::_value > () >
-      >
-    , proto::and_< 
-        proto::not_< FixedUnsigned >
-
-      , proto::when< proto::binary_expr<proto::_, proto::_, proto::_> 
-      , proto::or_< 
-          IsSigned( proto::_left )
-        , IsSigned( proto::_right )
+  : proto::and_<
+      proto::not_< FixedUnsigned >
+    , proto::or_ <
+        proto::and_< 
+          proto::terminal<proto::_> 
+        , proto::if_< boost::is_signed< proto::_value > () >
+        >
+      , proto::subscript< IsSigned, proto::_ > 
+      , proto::and_< 
+          proto::not_< proto::subscript<proto::_, proto::_ > >
+        , proto::when< proto::binary_expr<proto::_, proto::_, proto::_>         
+        , proto::or_< 
+            IsSigned( proto::_left )
+          , IsSigned( proto::_right )
+          >
         >
       >
     >

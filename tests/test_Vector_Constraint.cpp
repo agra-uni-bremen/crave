@@ -108,15 +108,6 @@ BOOST_AUTO_TEST_CASE ( unique_test_2 )
   gen.unique(v);
   BOOST_REQUIRE(!gen.next());
 
-/*
-  gen.next();
-  std::cout << "AAAAA  ";
-  for (uint i = 0; i < v.size(); i++) {
-    std::cout << v[i] << " ";
-  }
-  std::cout << std::endl;
-*/
-
   gen.non_unique(v);
   BOOST_REQUIRE(gen.next());
   BOOST_REQUIRE(v.size() == 11);
@@ -200,7 +191,6 @@ BOOST_AUTO_TEST_CASE ( soft_vec_constraint )
   std::cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << std::endl;
   BOOST_REQUIRE(v[0] == v[1] && v[1] == v[2] && v[2] == v[3] && v[0] % 13 == 3);  
 }
-
 
 BOOST_AUTO_TEST_SUITE_END() // Context
 

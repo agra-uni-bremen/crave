@@ -41,6 +41,8 @@ namespace boost {
   struct is_signed< platzhalter::write_ref_tag<T> > : public is_signed<T> {};
   template<typename T>
   struct is_signed< platzhalter::read_ref_tag<T> > : public is_signed<T> {};
+  template<typename T>
+  struct is_signed< platzhalter::vector_tag<T> > : public is_signed<T> {};
 }
 
 //  vim: ft=cpp:ts=2:sw=2:expandtab
