@@ -237,7 +237,7 @@ struct Item1 : public rand_obj {
     return true;
   }
 
-  randv<int> x;
+  randv<unsigned> x;
   int pivot;
 };
 
@@ -245,7 +245,7 @@ BOOST_AUTO_TEST_CASE ( binary_search_test )
 {
   Item1 it;
   it.next();
-  BOOST_REQUIRE(it.x == 5);
+  BOOST_REQUIRE_EQUAL(it.x, 5);
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Context
