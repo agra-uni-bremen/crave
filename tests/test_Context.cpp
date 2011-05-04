@@ -27,7 +27,7 @@ BOOST_FIXTURE_TEST_SUITE(Context_t, Context_Fixture )
 
 BOOST_AUTO_TEST_CASE ( multiple_solver_instances )
 {
-  Generator<> gen1, gen2;
+  Generator<Context> gen1, gen2;
   Variable<int> r1, r2;
   gen1(r1 < 6);
   gen2(r2 < 6);
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE ( multiple_solver_instances )
 BOOST_AUTO_TEST_CASE( constants )
 {
   Variable<unsigned> x;
-  Generator<> gen( x == 135421 );
+  Generator<Context> gen( x == 135421 );
   gen();
   BOOST_CHECK_EQUAL( gen[x], 135421 );
 }
@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE( boolean )
 {
   Variable<bool> b;
 
-  Generator<> gen;  
+  Generator<Context> gen;  
   gen(b == b)(); // create a new assignment
 
   bool b1 = gen[b];
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE( less )
 {
   Variable<unsigned> a;
 
-  Generator<> gen;  
+  Generator<Context> gen;  
   gen(a < 256u);
 
   std::set<unsigned> generated;
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE( less_equal )
 {
   Variable<unsigned> a;
 
-  Generator<> gen;  
+  Generator<Context> gen;  
   gen(a <= 256u);
 
   std::set<unsigned> generated;
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE( greater )
 {
   Variable<unsigned> a;
 
-  Generator<> gen;  
+  Generator<Context> gen;  
   gen(a > (std::numeric_limits<unsigned>::max()-256) );
 
   std::set<unsigned> generated;
@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE( greater_equal )
 {
   Variable<unsigned> a;
 
-  Generator<> gen;  
+  Generator<Context> gen;  
   gen(a >= (std::numeric_limits<unsigned>::max()-256) );
 
   std::set<unsigned> generated;
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE( divide )
   Variable<unsigned char> q;
   Variable<unsigned char> r;
 
-  Generator<> gen;
+  Generator<Context> gen;
   gen
     ( b != (unsigned char)  0u )
     ( a  < (unsigned char) 16u )
@@ -145,10 +145,11 @@ BOOST_AUTO_TEST_CASE( divide )
   ;
 
   while( gen.next() ) {
-    gen( a != gen[a] || b != gen[b] );
-    //printf("result: a=%d, b=%d, q=%d, r=%d\n", gen[a], gen[b], gen[q], gen[r]);
     BOOST_CHECK_EQUAL( gen[a]/gen[b], gen[q] );
     BOOST_CHECK_EQUAL( gen[a]%gen[b], gen[r] );
+
+    gen( a != gen[a] || b != gen[b] );
+    //printf("result: a=%d, b=%d, q=%d, r=%d\n", gen[a], gen[b], gen[q], gen[r]);
   }
 }
 
@@ -158,7 +159,7 @@ BOOST_AUTO_TEST_CASE ( shiftleft )
   Variable<unsigned> b;
   Variable<unsigned> c;
 
-  Generator<> gen;
+  Generator<Context> gen;
   gen
     ( a <  256u )
     ( b <  (unsigned) (sizeof(unsigned)*8u) )
@@ -170,21 +171,20 @@ BOOST_AUTO_TEST_CASE ( shiftleft )
     unsigned bv = gen[b];
     unsigned r  = av << bv;
 
+    BOOST_REQUIRE_EQUAL( r, gen[c] );
+
     gen( a != gen[a] || b != gen[b] );
     //std::cout << format("result: a=%d, b=%d, r=%d,  c=%d\n") % gen[a]% gen[b] %r % gen[c];
-    BOOST_REQUIRE_EQUAL( r, gen[c] );
   }
 }
 
-/**
- * temporaly fix a variable to a certain value using the assign operator
- **/
+// temporaly fix a variable to a certain value using the assign operator
 BOOST_AUTO_TEST_CASE ( fix_variable )
 {
   Variable<unsigned> a;
   Variable<unsigned> b;
 
-  Generator<> gen (a < b);
+  Generator<Context> gen (a < b);
   gen ( b = 7 ) ;
 
   unsigned c = 0;
@@ -211,7 +211,7 @@ BOOST_AUTO_TEST_CASE ( by_reference )
   unsigned b=0;
   Variable<unsigned> a;
 
-  Generator<> gen (a == reference(b) );
+  Generator<Context> gen (a == reference(b) );
 
   while( gen.next() ) {
     unsigned av = gen[a];
@@ -221,16 +221,14 @@ BOOST_AUTO_TEST_CASE ( by_reference )
   }
 }
 
-/**
- * temporaly fix a variable to a certain value using the assign operator
- **/
+// temporaly fix a variable to a certain value using the assign operator
 BOOST_AUTO_TEST_CASE ( named_reference )
 {
   unsigned bv=0;
   Variable<unsigned> a, c;
   ReadReference<unsigned> b(bv);
 
-  Generator<> gen (a == b);
+  Generator<Context> gen (a == b);
   gen(c != b);
 
   while( gen.next() ) {
@@ -245,7 +243,7 @@ BOOST_AUTO_TEST_CASE ( named_reference )
 
 BOOST_AUTO_TEST_CASE ( soft_constraint_t )
 {
-  Generator<> gen;
+  Generator<Context> gen;
   Variable<int> r;
   gen( r<6 );
   soft(gen)( r == 2 );
@@ -260,7 +258,7 @@ BOOST_AUTO_TEST_CASE ( soft_constraint_t )
 
 BOOST_AUTO_TEST_CASE ( randv_test )
 {
-  Generator<> gen;
+  Generator<Context> gen;
   randv<int> a(NULL);
   randv<int> b(NULL);
   std::cout << "init: a = " <<  a << ", b = " << b << std::endl;
@@ -279,7 +277,7 @@ BOOST_AUTO_TEST_CASE ( randv_test )
 
 BOOST_AUTO_TEST_CASE ( randv_var_ref_mixed_test )
 {
-  Generator<> gen;
+  Generator<Context> gen;
   randv<int> a(0);
   Variable<int> b;
   gen
@@ -301,7 +299,7 @@ BOOST_AUTO_TEST_CASE( alu )
   Variable<unsigned> a;
   Variable<unsigned> b;
 
-  Generator<> gen;  
+  Generator<Context> gen;  
   gen
     ( a < 16)
     ( b < 16)
@@ -322,7 +320,7 @@ BOOST_AUTO_TEST_CASE( alu_enum )
   Variable<unsigned> a;
   Variable<unsigned> b;
 
-  Generator<> gen;  
+  Generator<Context> gen;  
   gen
     ( a < 16u)
     ( b < 16u)
@@ -348,7 +346,7 @@ BOOST_AUTO_TEST_CASE( pythagoras )
   Variable<unsigned long long> b;
   Variable<unsigned long long> c;
 
-  Generator<> gen;  
+  Generator<Context> gen;  
   gen(a*a + b*b == c*c)(); // create a new assignment
 
   unsigned long long av = gen[a];
@@ -363,7 +361,7 @@ BOOST_AUTO_TEST_CASE ( negative_var )
   randv<int> a(NULL);
   randv<int> b(NULL);
 
-  Generator<> gen;
+  Generator<Context> gen;
   gen
     ( a() + b() <= 120 )
     ( a() > 120  )
@@ -380,7 +378,7 @@ BOOST_AUTO_TEST_CASE ( signed_less_zero )
 {
   randv<int> a(NULL);
 
-  Generator<> gen;
+  Generator<Context> gen;
   gen
     ( a() < 0 )
   ;
@@ -414,7 +412,7 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width )
   //boost::proto::display_expr( b()+a() >= 120);
   //boost::proto::display_expr( FixWidth()(b()+a() >= 120));
 
-  Generator<> gen;
+  Generator<Context> gen;
   gen
     (  a() + b() >= 120 )
   ;
@@ -425,7 +423,6 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width )
 
   BOOST_CHECK(a + b >= 120);
 }
-
 
 BOOST_AUTO_TEST_SUITE_END() // Context
 

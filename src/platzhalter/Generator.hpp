@@ -11,11 +11,13 @@
 #include <stdexcept>
 
 namespace platzhalter {
+  
+  typedef AllSAT<50> DefaultContext;
 
-  template<typename ContextT=Context>
+  template<typename ContextT=DefaultContext>
   struct Generator;
 
-  template< typename T=Context>
+  template< typename T=DefaultContext>
   struct Soft_Generator {
     Soft_Generator(Generator<T> & gen) : gen(gen) {}
 

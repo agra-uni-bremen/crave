@@ -92,7 +92,37 @@ namespace platzhalter {
         block = evaluate(solver, preds::Or( block, preds::nequal( p.first
             , qf_bv::bvbin(p.second))));
       }
-      metaSMT::assertion( solver, block);
+      metaSMT::assumption( solver, block);
+    }
+
+    bool solve_all(bool soft) {
+      using namespace boost::phoenix;
+      using namespace boost::phoenix::arg_names;
+      // gather all solutions
+      while (true) {
+        solution_t solution;
+
+        pre_solve();
+        if (soft) assumption(solver,_soft);
+
+        for (uint i = 0; i < all_solutions.size(); i++)
+           block_solution(all_solutions[i]);
+
+        if (!metaSMT::solve(solver)) break;
+
+        std::for_each(_variables.begin(), _variables.end(),
+          bind(&AllSAT_base::store_solution, this, ref(solution), arg1)
+        );
+
+        std::for_each(_vector_variables.begin(), _vector_variables.end(),
+          bind(&AllSAT_base::store_vector_solution, this, ref(solution), arg1)
+        );
+
+        all_solutions.push_back(solution);
+
+        if (all_solutions.size() == sol_limit) break;
+      }
+      return all_solutions.size() > 0;
     }
 
     bool do_solve()  {
@@ -104,32 +134,14 @@ namespace platzhalter {
           current=all_solutions.begin();
         }
       } else {
-        using namespace boost::phoenix;
-        using namespace boost::phoenix::arg_names;
-        // gather all solutions
-        solution_t solution;
-        while( Super::do_solve() ) {
-          is_solved = true;
-
-          std::for_each(_variables.begin(), _variables.end(),
-            bind(&AllSAT_base::store_solution, this, ref(solution), arg1)
-          );
-
-          std::for_each(_vector_variables.begin(), _vector_variables.end(),
-            bind(&AllSAT_base::store_vector_solution, this, ref(solution), arg1)
-          );
-
-          all_solutions.push_back(solution);
-          block_solution(solution);
-          solution.clear();
-
-          if (all_solutions.size() == sol_limit) break;
-        }
+        is_solved = solve_all(true);
+        // if soft constraint satisfiable
+        if (!is_solved ) is_solved = solve_all(false);
       
-        std::cout << "AllSAT found " << all_solutions.size() << " solution(s)" << std::endl;
-
+//        std::cout << "AllSAT found " << all_solutions.size() << " solution(s)" << std::endl;
         std::random_shuffle(all_solutions.begin(), all_solutions.end(), rng);
         current=all_solutions.begin();
+
       }
       return is_solved;
     }
@@ -164,7 +176,7 @@ namespace platzhalter {
       if ( ite != _vector_variables.end() ) {
         assert ( current != all_solutions.end() );
         solution_t::const_iterator sit = current->find(ite->second);
-        assert( sit != current->end() && "ERROR: not assignment for variable" );
+        assert( sit != current->end() && "ERROR: no assignment for variable" );
         v = sit->second;
         return true;
       }
@@ -182,8 +194,11 @@ namespace platzhalter {
     } rng;
 
     void reset() {
-      is_solved = false;
-      all_solutions.clear();
+      if (is_solved) {
+//        std::cout << "AllSAT reset" << std::endl;
+        is_solved = false;
+        all_solutions.clear();
+      }
     }
 
     bool is_solved;

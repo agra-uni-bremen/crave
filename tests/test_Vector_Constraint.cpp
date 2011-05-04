@@ -71,8 +71,11 @@ BOOST_AUTO_TEST_CASE ( default_size_test )
   Item2 it;
   it.next();
   BOOST_REQUIRE(5 <= it.v.size() && it.v.size() <= 10);
-  for (uint i = 0; i < it.v.size(); i++)
+  for (uint i = 0; i < it.v.size(); i++) {
+    std::cout << it.v[i] << " ";
     BOOST_REQUIRE(100 <= it.v[i] && it.v[i] <= 200);
+  }
+  std::cout << std::endl;
 }
 
 struct Item3 : public rand_obj {
@@ -103,7 +106,7 @@ BOOST_AUTO_TEST_CASE ( unique_test_2 )
   rand_vec<unsigned int> v(NULL);
   Generator<> gen;
   gen(v().size() == 11);
-  gen.foreach(v, _i, v()[_i] < 10u);  
+  gen.foreach(v, _i, v()[_i] < 10);  
 
   gen.unique(v);
   BOOST_REQUIRE(!gen.next());
@@ -121,8 +124,8 @@ BOOST_AUTO_TEST_CASE ( unique_test_2 )
 struct Item4 : public rand_obj {
   Item4() : v(this) {
     constraint(v().size() == 10);
-    constraint.foreach("c1", v, _i, v()[_i] <= 100u);
-    constraint.foreach("c2", v, _i, v()[_i] > 100u);
+    constraint.foreach("c1", v, _i, v()[_i] <= 100);
+    constraint.foreach("c2", v, _i, v()[_i] > 100);
   }
 
   rand_vec<unsigned int> v;
@@ -184,12 +187,16 @@ BOOST_AUTO_TEST_CASE ( soft_vec_constraint )
   Generator<> gen1;
   gen1(v().size() == 4);
   gen1.foreach(v, _i, v()[_i] >= v()[_i - 1]);  
+  gen1.foreach(v, _i, v()[_i] <= 1000);  
   gen1.soft_foreach(v, _i, v()[_i] <= v()[_i - 1]);  
   gen1.soft_foreach(v, _i, IMPL(_i == 0, v()[_i] % 13 == 3));  
   BOOST_REQUIRE(gen1.next());
-  BOOST_REQUIRE(v.size() == 4);  
-  std::cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << std::endl;
-  BOOST_REQUIRE(v[0] == v[1] && v[1] == v[2] && v[2] == v[3] && v[0] % 13 == 3);  
+  for (int i = 0; i < 10; i++) {
+    BOOST_REQUIRE(v.size() == 4);  
+    std::cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << std::endl;
+    BOOST_REQUIRE(v[0] == v[1] && v[1] == v[2] && v[2] == v[3] && v[0] % 13 == 3);  
+    if (!gen1.next()) break;
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Context

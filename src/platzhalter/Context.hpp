@@ -592,9 +592,9 @@ namespace platzhalter {
       //metaSMT::MetaSolver* _solver;
       //metaSMT::QF_BV*      _logic;
       SolverType solver;
+      result_type          _soft;
 
     private:
-      result_type          _soft;
       std::map<std::string, result_type> _constraint_name_variables;
       std::set<std::string> _disabled_constraint_names;
       std::map<unsigned, boost::function0<result_type> > _lazy;
