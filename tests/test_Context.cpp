@@ -153,6 +153,33 @@ BOOST_AUTO_TEST_CASE( divide )
   }
 }
 
+BOOST_AUTO_TEST_CASE( mult_mod ) 
+{
+  randv<int> a(0);
+  randv<int> b(0);
+
+  Generator<Context> gen;
+  gen
+    ( -3 <= a() && a() <= 3 )
+    ( -3 <= b() && b() <= 3 )
+    ( a() * b() % 6 == 0)
+  ;
+  
+  int cnt = 0;  
+  for (int i = -3; i <= 3; i++)
+    for (int j = -3; j <= 3; j++)
+      if (i * j % 6 == 0) cnt++;
+
+  int cnt1 = 0;
+  while( gen.next() ) {
+    cnt1++;
+    BOOST_REQUIRE_EQUAL(a * b % 6, 0);
+    gen( a() != a || b() != b );
+  }
+
+  BOOST_REQUIRE_EQUAL(cnt, cnt1);
+}
+
 BOOST_AUTO_TEST_CASE ( shiftleft )
 {
   Variable<unsigned> a;
@@ -391,7 +418,7 @@ BOOST_AUTO_TEST_CASE ( signed_less_zero )
 }
 
 
-BOOST_AUTO_TEST_CASE ( mixed_bv_width )
+BOOST_AUTO_TEST_CASE ( mixed_bv_width_1 )
 {
   randv<unsigned long> a(NULL);
   randv<unsigned short> b(NULL);
@@ -422,6 +449,76 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width )
   std::cout << format("result: a=%d, b=%d\n") % a % b;
 
   BOOST_CHECK(a + b >= 120);
+}
+
+BOOST_AUTO_TEST_CASE ( mixed_bv_width_2 )
+{
+  randv<char> a(NULL);
+  Generator<Context > gen;
+  gen( a() < 10 );
+
+  std::set<char> generated;
+  while (gen.next()) {
+    generated.insert(a);
+    gen( a() != a );
+  }
+
+  BOOST_CHECK_EQUAL( generated.size(), 138);
+}
+
+BOOST_AUTO_TEST_CASE ( mixed_bv_width_3 )
+{
+  randv<short> a(NULL);
+  Generator<Context > gen;
+  gen( a() <  10 );
+  gen( a() > -10 );
+
+  std::set<short> generated;
+  while (gen.next()) {
+    generated.insert(a);
+    gen( a() != a );
+  }
+
+  BOOST_CHECK_EQUAL( generated.size(), 19);
+}
+
+BOOST_AUTO_TEST_CASE ( mixed_bv_width_4 )
+{
+  randv<int> a(NULL);
+  Generator<Context > gen;
+  gen( a() < (char) 10 );
+  gen( a() > (short) -10 );
+
+  std::set<int> generated;
+  while (gen.next()) {
+    generated.insert(a);
+    gen( a() != a );
+  }
+
+  BOOST_CHECK_EQUAL( generated.size(), 19);
+}
+
+BOOST_AUTO_TEST_CASE ( mixed_bv_width_5 )
+{
+  randv<short> a(NULL);
+  randv<char> b(NULL);
+  Generator<Context > gen;
+  gen( -3 <= a() && a() <= 3 );
+  gen( -3 <= b() && b() <= 3 );
+  gen( (-2 <= a() + b()) && (a() + b() <= 2) );
+
+  int cnt = 0;
+  while (gen.next()) {
+    cnt++;
+    gen( (a() != a) || (b() != b) );
+  }
+
+  int cnt1 = 0;
+  for (short i = -3; i <= 3; i++)
+    for (char j = -3; j <= 3; j++)
+      if ((-2 <= i + j) && (i + j <= 2)) cnt1++;
+
+  BOOST_CHECK_EQUAL( cnt, cnt1);
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Context
