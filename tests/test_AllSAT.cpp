@@ -59,7 +59,6 @@ BOOST_AUTO_TEST_CASE ( gen10k )
   }
 }
 
-
 BOOST_AUTO_TEST_CASE ( randv10k )
 {
   sif_seq_item it;
@@ -90,7 +89,7 @@ BOOST_AUTO_TEST_CASE ( t1 )
 BOOST_AUTO_TEST_CASE( constants )
 {
   Variable<unsigned> x;
-  Generator<AllSAT<20> > gen( x == 135421 );
+  Generator<AllSAT<10> > gen( x == 135421 );
   gen();
   BOOST_CHECK_EQUAL( gen[x], 135421 );
 }
@@ -99,7 +98,7 @@ BOOST_AUTO_TEST_CASE( boolean )
 {
   Variable<bool> b;
 
-  Generator<AllSAT<20> > gen;  
+  Generator<AllSAT<10> > gen;  
   gen(b == b)(); // create a new assignment
 
   bool b1 = gen[b];
@@ -115,7 +114,7 @@ BOOST_AUTO_TEST_CASE( less )
 {
   Variable<unsigned> a;
 
-  Generator<AllSAT<20> > gen;  
+  Generator<AllSAT<10> > gen;  
   gen(a < 256u);
 
   std::set<unsigned> generated;
@@ -132,7 +131,7 @@ BOOST_AUTO_TEST_CASE( less_equal )
 {
   Variable<unsigned> a;
 
-  Generator<AllSAT<20> > gen;  
+  Generator<AllSAT<10> > gen;  
   gen(a <= 256u);
 
   std::set<unsigned> generated;
@@ -149,7 +148,7 @@ BOOST_AUTO_TEST_CASE( greater )
 {
   Variable<unsigned> a;
 
-  Generator<AllSAT<20> > gen;  
+  Generator<AllSAT<10> > gen;  
   gen(a > (std::numeric_limits<unsigned>::max()-256) );
 
   std::set<unsigned> generated;
@@ -166,7 +165,7 @@ BOOST_AUTO_TEST_CASE( greater_equal )
 {
   Variable<unsigned> a;
 
-  Generator<AllSAT<20> > gen;  
+  Generator<AllSAT<10> > gen;  
   gen(a >= (std::numeric_limits<unsigned>::max()-256) );
 
   std::set<unsigned> generated;
@@ -186,7 +185,7 @@ BOOST_AUTO_TEST_CASE( divide )
   Variable<unsigned char> q;
   Variable<unsigned char> r;
 
-  Generator<AllSAT<20> > gen;
+  Generator<AllSAT<10> > gen;
   gen
     ( b != (unsigned char)  0u )
     ( a  < (unsigned char) 16u )
@@ -210,7 +209,7 @@ BOOST_AUTO_TEST_CASE ( fix_variable )
   Variable<unsigned> a;
   Variable<unsigned> b;
 
-  Generator<AllSAT<20> > gen (a < b);
+  Generator<AllSAT<10> > gen (a < b);
   gen ( b = 7 ) ;
 
   unsigned c = 0;
@@ -232,9 +231,44 @@ BOOST_AUTO_TEST_CASE ( fix_variable )
   gen();
 }
 
+BOOST_AUTO_TEST_CASE ( by_reference )
+{
+  unsigned b=0;
+  Variable<unsigned> a;
+
+  Generator<AllSAT<15> > gen (a == reference(b) );
+
+  while( gen.next() ) {
+    unsigned av = gen[a];
+    BOOST_REQUIRE_EQUAL( av, b);
+    ++b;
+    if (b > 10) break;
+  }
+}
+
+// temporaly fix a variable to a certain value using the assign operator
+BOOST_AUTO_TEST_CASE ( named_reference )
+{
+  unsigned bv=0;
+  Variable<unsigned> a, c;
+  ReadReference<unsigned> b(bv);
+
+  Generator<AllSAT<15> > gen (a == b);
+  gen(c != b);
+
+  while( gen.next() ) {
+    unsigned av = gen[a];
+    unsigned cv = gen[c];
+    BOOST_REQUIRE_EQUAL( av, bv);
+    BOOST_REQUIRE_NE   ( cv, bv);
+    ++bv;
+    if (bv > 10) break;
+  }
+}
+
 BOOST_AUTO_TEST_CASE ( soft_constraint_t )
 {
-  Generator<AllSAT<20> > gen;
+  Generator<AllSAT<10> > gen;
   Variable<int> r;
   gen( r<6 );
   soft(gen)( r == 2 );
@@ -253,7 +287,7 @@ BOOST_AUTO_TEST_CASE( alu )
   Variable<unsigned> a;
   Variable<unsigned> b;
 
-  Generator<AllSAT<20> > gen;  
+  Generator<AllSAT<10> > gen;  
   gen
     ( a < 16)
     ( b < 16)
@@ -274,7 +308,7 @@ BOOST_AUTO_TEST_CASE( alu_enum )
   Variable<unsigned> a;
   Variable<unsigned> b;
 
-  Generator<AllSAT<20> > gen;  
+  Generator<AllSAT<10> > gen;  
   gen
     ( a < 16u)
     ( b < 16u)
@@ -300,7 +334,7 @@ BOOST_AUTO_TEST_CASE( pythagoras )
   Variable<unsigned long long> b;
   Variable<unsigned long long> c;
 
-  Generator<AllSAT<20> > gen;  
+  Generator<AllSAT<5> > gen;  
   gen(a*a + b*b == c*c)(); // create a new assignment
 
   unsigned long long av = gen[a];
@@ -315,7 +349,7 @@ BOOST_AUTO_TEST_CASE ( negative_var )
   randv<int> a(NULL);
   randv<int> b(NULL);
 
-  Generator<AllSAT<20> > gen;
+  Generator<AllSAT<10> > gen;
   gen
     ( a() + b() <= 120 )
     ( a() > 120  )
@@ -332,7 +366,7 @@ BOOST_AUTO_TEST_CASE ( signed_less_zero )
 {
   randv<int> a(NULL);
 
-  Generator<AllSAT<20> > gen;
+  Generator<AllSAT<10> > gen;
   gen
     ( a() < 0 )
   ;

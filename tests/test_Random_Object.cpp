@@ -248,6 +248,36 @@ BOOST_AUTO_TEST_CASE ( binary_search_test )
   BOOST_REQUIRE_EQUAL(it.x, 5);
 }
 
+struct Item2 : public rand_obj {
+  Item2() : address(this), data(this) {
+    constraint(address() % 4 == 0);
+    constraint(address() <= 1000u);
+    constraint(data().size() == 4);
+    constraint.foreach(data, _i, -50 <= data()[_i] && data()[_i] <= 50);
+    constraint.foreach(data, _i, data()[_i - 1] <= data()[_i]);
+  }
+
+  randv<unsigned> address;
+  rand_vec<int> data;
+};
+
+BOOST_AUTO_TEST_CASE ( t6 )
+{
+  Item2 it;
+  for (int i = 0; i < 20; i++) {
+    BOOST_REQUIRE(it.next());
+    BOOST_REQUIRE(it.data.size() == 4);
+    std::cout << "@" << it.address << ": " << it.data[0] << " " << it.data[1] << " " << it.data[2] << " " << it.data[3] << std::endl;
+    BOOST_REQUIRE(it.address % 4 == 0);
+    BOOST_REQUIRE(it.address <= 1000);
+    for (uint i = 0; i < it.data.size(); i++) {
+      BOOST_REQUIRE(-50 <= it.data[i] && it.data[i] <= 50);
+      if (i > 0) BOOST_REQUIRE(it.data[i - 1] <= it.data[i]);
+    }
+  }
+}
+
+
 BOOST_AUTO_TEST_SUITE_END() // Context
 
 //  vim: ft=cpp:ts=2:sw=2:expandtab

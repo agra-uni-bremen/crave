@@ -24,8 +24,8 @@ link_libraries (${PROJECT_NAME}_boost_test crub)
 add_executable (Syntax test_Syntax.cpp )
 add_all_tests(Syntax test_Syntax.cpp )
 
-add_executable (AllSAT AllSAT.cpp )
-add_all_tests(AllSAT AllSAT.cpp )
+add_executable (AllSAT test_AllSAT.cpp )
+add_all_tests(AllSAT test_AllSAT.cpp )
 
 add_executable (Context test_Context.cpp )
 add_all_tests(Context test_Context.cpp )

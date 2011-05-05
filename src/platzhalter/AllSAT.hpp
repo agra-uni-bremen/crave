@@ -10,6 +10,33 @@
 
 namespace platzhalter {
 
+  struct DetectReadRef : proto::callable_context< DetectReadRef, proto::null_context > {
+    DetectReadRef() : readRefFound(false) {}
+    typedef void result_type;
+    template<typename value_type>
+    result_type operator() (proto::tag::terminal, read_ref_tag<value_type> const & ) {
+      readRefFound = true;
+    }
+    bool readRefFound;
+  };  
+
+  struct readRefExists {
+    template<typename Expr>
+    readRefExists(Expr expr) { proto::eval(expr, drr); }
+    operator bool() const { return drr.readRefFound; }
+    DetectReadRef drr;
+  };
+
+/*
+  struct ReadRefExists
+  : proto::or_ <
+      proto::terminal<read_ref_tag<proto::_> > 
+    , proto::binary_expr<proto::_, ReadRefExists(proto::_), proto::_>
+    , proto::binary_expr<proto::_, proto::_, ReadRefExists(proto::_) >
+    , proto::unary_expr<proto::_, ReadRefExists(proto::_) >    
+    > {};
+*/
+
   struct bitvector_less {
     bool operator() (qf_bv::bitvector const & a, qf_bv::bitvector const & b) {
       return boost::proto::value(a).id < boost::proto::value(b).id;
@@ -19,7 +46,7 @@ namespace platzhalter {
   struct AllSAT_base : public metaSMT_Context_base<AllSAT_base>
   {
     AllSAT_base(std::string const & solvername, unsigned _sol_limit) 
-    : metaSMT_Context_base<AllSAT_base>(solvername), is_solved(false), sol_limit(_sol_limit)
+    : metaSMT_Context_base<AllSAT_base>(solvername), is_solved(false), read_ref_found(false), sol_limit(_sol_limit)
     { }
 
     typedef metaSMT_Context_base<AllSAT_base> Super;
@@ -27,12 +54,14 @@ namespace platzhalter {
     // BEGIN functions that modify the constraints
     template<typename Expr>
     void assertion (Expr e) {
+      read_ref_found |= readRefExists(e);
       Super::assertion(e);
       reset();
     }
 
     template<typename Expr>
     void assertion (std::string constraint_name, Expr e) {
+      read_ref_found |= readRefExists(e);
       Super::assertion(constraint_name, e);
       reset();
     }
@@ -49,6 +78,7 @@ namespace platzhalter {
 
     template<typename Expr>
     void soft_assertion (Expr e) {
+      read_ref_found |= readRefExists(e);
       Super::soft_assertion(e);
       reset();
     }
@@ -126,6 +156,8 @@ namespace platzhalter {
     }
 
     bool do_solve()  {
+      // always reset if read references exist in the constraints
+      if(read_ref_found) reset();
       if(is_solved) {
         // use next shuffled solution
         ++current;
@@ -201,6 +233,7 @@ namespace platzhalter {
       }
     }
 
+    bool read_ref_found; 
     bool is_solved;
     unsigned sol_limit;
     all_solutions_t all_solutions;
