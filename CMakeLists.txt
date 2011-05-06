@@ -1,9 +1,8 @@
 project ( platzhalter )
-cmake_minimum_required(VERSION 2.6.4)
+cmake_minimum_required(VERSION 2.8)
 
 set(${PROJECT_NAME}_CONFIG_DIR "share/${PROJECT_NAME}" CACHE PATH 
   "where to install CMake and Make Config files")
-
 
 find_package ( Boost REQUIRED )
 find_package ( metaSMT REQUIRED )
@@ -14,7 +13,7 @@ include_directories( ${metaSMT_INCLUDE_DIR} )
 add_subdirectory ( src/platzhalter )
 
 enable_testing ()
-set(${PROJECT_NAME}_LIBS ${CMAKE_INSTALL_PREFIX}/lib/libcrub.a ${metaSMT_LIBRARIES} )
+set(${PROJECT_NAME}_LIBS ${CMAKE_INSTALL_PREFIX}/lib/lib${PROJECT_NAME}.a ${metaSMT_LIBRARIES} )
 set(${PROJECT_NAME}_INCLUDE ${CMAKE_INSTALL_PREFIX}/include ${metaSMT_INCLUDE_DIR} )
 
 ## create metaSMT CMake config file
@@ -36,7 +35,7 @@ ${PROJECT_NAME}_LIBRARIES := ${${PROJECT_NAME}_MLIBS}
 string(REPLACE ";" " " ${PROJECT_NAME}_MLIBS "${${PROJECT_NAME}_LIBS}")
 file(WRITE ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pc
 "Name: ${PROJECT_NAME}
-Description: SMT Solver library
+Description: Constraint Solver library
 Cflags: ${${PROJECT_NAME}_MINCLUDE}
 Libs: ${${PROJECT_NAME}_MLIBS} 
 ")
