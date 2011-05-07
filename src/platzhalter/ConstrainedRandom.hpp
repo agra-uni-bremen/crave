@@ -142,6 +142,7 @@ class randv<typename> : public randv_prim_base<typename>, public randomize_base<
   _INTEGER_TYPE(int)
   _INTEGER_TYPE(unsigned int)
   _INTEGER_TYPE(char)
+  _INTEGER_TYPE(signed char)
   _INTEGER_TYPE(unsigned char)
   _INTEGER_TYPE(short)
   _INTEGER_TYPE(unsigned short)

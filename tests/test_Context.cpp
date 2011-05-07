@@ -453,11 +453,11 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_1 )
 
 BOOST_AUTO_TEST_CASE ( mixed_bv_width_2 )
 {
-  randv<char> a(NULL);
+  randv<signed char> a(NULL);
   Generator<Context > gen;
   gen( a() < 10 );
 
-  std::set<char> generated;
+  std::set<signed char> generated;
   while (gen.next()) {
     generated.insert(a);
     gen( a() != a );
@@ -486,7 +486,7 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_4 )
 {
   randv<int> a(NULL);
   Generator<Context > gen;
-  gen( a() < (char) 10 );
+  gen( a() < (signed char) 10 );
   gen( a() > (short) -10 );
 
   std::set<int> generated;
@@ -501,7 +501,7 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_4 )
 BOOST_AUTO_TEST_CASE ( mixed_bv_width_5 )
 {
   randv<short> a(NULL);
-  randv<char> b(NULL);
+  randv<signed char> b(NULL);
   Generator<Context > gen;
   gen( -3 <= a() && a() <= 3 );
   gen( -3 <= b() && b() <= 3 );
@@ -515,7 +515,7 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_5 )
 
   int cnt1 = 0;
   for (short i = -3; i <= 3; i++)
-    for (char j = -3; j <= 3; j++)
+    for (signed char j = -3; j <= 3; j++)
       if ((-2 <= i + j) && (i + j <= 2)) cnt1++;
 
   BOOST_CHECK_EQUAL( cnt, cnt1);

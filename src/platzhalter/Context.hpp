@@ -261,6 +261,7 @@ namespace platzhalter {
       }
     }
 
+
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::logical_and, Expr1 const & e1, Expr2 const &  e2) {
       return evaluate( solver, preds::And(
@@ -300,18 +301,46 @@ namespace platzhalter {
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::modulus, Expr1 const & e1, Expr2 const &  e2) {
-      return evaluate( solver, qf_bv::bvurem(
-          proto::eval( e1, ctx() )
-        , proto::eval( e2, ctx() )
-      ));
+	  // assume e2 >= 0
+      bool sign1 = proto::matches< Expr1, IsSigned >::value;
+      if( sign1 ) {
+        return evaluate( solver, qf_bv::bvsrem(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      } else {
+        return evaluate( solver, qf_bv::bvurem(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      } 
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::divides, Expr1 const & e1, Expr2 const &  e2) {
-      return evaluate( solver, qf_bv::bvudiv(
-          proto::eval( e1, ctx() )
-        , proto::eval( e2, ctx() )
-      ));
+      bool sign1 = proto::matches< Expr1, IsSigned >::value;
+      bool sign2 = proto::matches< Expr2, IsSigned >::value;
+      if( sign1 && sign2 ) {
+        return evaluate( solver, qf_bv::bvsdiv(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      } else if ( !sign1 && !sign2 ) {
+        return evaluate( solver, qf_bv::bvudiv(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      } else if ( sign1 ) {
+        return evaluate( solver, qf_bv::bvsdiv(
+            qf_bv::sign_extend(1, proto::eval( e1, ctx() ))
+          , qf_bv::zero_extend(1, proto::eval( e2, ctx() ))
+        ));
+      } else {
+        return evaluate( solver, qf_bv::bvsdiv(
+            qf_bv::zero_extend(1, proto::eval( e1, ctx() ))
+          , qf_bv::sign_extend(1, proto::eval( e2, ctx() ))
+        ));
+      }
     }
 
     template< typename Expr1, typename Expr2>
@@ -333,10 +362,17 @@ namespace platzhalter {
 
     template< typename Integral, typename Expr>
     result_type operator() (extend_tag, Integral const & by_width, Expr const &  e) {
-      return evaluate( solver, 
-        qf_bv::zero_extend( proto::value(by_width).value,
-          proto::eval( e, ctx() )
-      ));
+      bool sign = proto::matches< Expr, IsSigned >::value;
+      if (sign)
+        return evaluate( solver, 
+          qf_bv::sign_extend( proto::value(by_width).value,
+            proto::eval( e, ctx() )
+        ));
+      else
+        return evaluate( solver, 
+          qf_bv::zero_extend( proto::value(by_width).value,
+            proto::eval( e, ctx() )
+        ));
     }
 
     template< typename Expr1, typename Expr2>
@@ -372,8 +408,10 @@ namespace platzhalter {
       : _i (i), solver(solver), _var(var)
       {}
       result_type operator() () {
-        return evaluate( solver, preds::equal(_var, 
-                  qf_bv::bvuint(_i, bitsize_traits<Integer>::value))); 
+        if (boost::is_signed<Integer>::value) 
+          return evaluate( solver, preds::equal(_var, qf_bv::bvsint(_i, bitsize_traits<Integer>::value) )); 
+        else    
+          return evaluate( solver, preds::equal(_var, qf_bv::bvuint(_i, bitsize_traits<Integer>::value) )); 
       }
       Integer const & _i;
       SolverType & solver;
@@ -399,9 +437,10 @@ namespace platzhalter {
 
     template< typename Integer>
     result_type operator() (proto::tag::terminal, Integer const & i) {
-      unsigned width=bitsize_traits<Integer>::value;
-//      std::cout << "creating int " << i << ", width= " << width << std::endl;
-      return evaluate( solver, qf_bv::bvuint(i,width) );
+      if (boost::is_signed<Integer>::value) 
+        return evaluate( solver, qf_bv::bvsint(i, bitsize_traits<Integer>::value) );
+      else
+        return evaluate( solver, qf_bv::bvuint(i, bitsize_traits<Integer>::value) );
     }
 
     template< typename Expr1, typename Expr2>
@@ -569,8 +608,12 @@ namespace platzhalter {
       {}
       result_type operator() () {
         result_type ret = evaluate( solver, preds::True);
-        for (uint i = 0; i < _rv.size(); i++)
-          ret = evaluate( solver, preds::And(ret, evaluate( solver, preds::nequal(_var, qf_bv::bvuint(_rv[i], bitsize_traits<T>::value))))); 
+        for (uint i = 0; i < _rv.size(); i++) {
+          if (boost::is_signed<T>::value) 
+            ret = evaluate( solver, preds::And(ret, evaluate( solver, preds::nequal(_var, qf_bv::bvsint(_rv[i], bitsize_traits<T>::value) )))); 
+          else
+            ret = evaluate( solver, preds::And(ret, evaluate( solver, preds::nequal(_var, qf_bv::bvuint(_rv[i], bitsize_traits<T>::value) )))); 
+        }
         return ret;
       }
       __rand_vec<T> & _rv;
