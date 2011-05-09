@@ -66,18 +66,18 @@ class TypeInfo<typename> \
   typedef std::map<int, __rand_vec_base*> RandVecMap;
   extern RandVecMap __rand_vec_map;
 
-  template<typename T>
-  class __rand_vec : public __rand_vec_base
+  template<typename T1, typename T2>
+  class __rand_vec_base1 : public __rand_vec_base
   {
     public:
-      __rand_vec() { __rand_vec_map[sym_vec.id()] = this; }
-      const Vector<T>& operator()() const { return sym_vec; }
+      __rand_vec_base1() { __rand_vec_map[sym_vec.id()] = this; }
+      const Vector<T1>& operator()() const { return sym_vec; }
 
-      CppType element_type() { return TypeInfo<T>(); }
+      CppType element_type() { return TypeInfo<T1>(); }
 
       int size() const { return real_vec.size(); }
-      const T& operator[](const int& idx) const { return real_vec[idx]; } 
-      void push_back(const T& x) { real_vec.push_back(x); }
+      T1& operator[](const int& idx) { return (T1&) real_vec[idx]; } 
+      void push_back(const T1& x) { real_vec.push_back(x); }
       void clear() { real_vec.clear(); }
 
       void print() {
@@ -88,9 +88,15 @@ class TypeInfo<typename> \
       }
 
     protected:
-      Vector<T> sym_vec;
-      std::vector<T> real_vec;
+      Vector<T1> sym_vec;
+      std::vector<T2> real_vec;
   };
+
+  template<typename T>
+  class __rand_vec : public __rand_vec_base1<T, T> { };
+
+  template<>
+  class __rand_vec<bool> : public __rand_vec_base1<bool, char> { };
 
   struct vecIdx {
     int val;

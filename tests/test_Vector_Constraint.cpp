@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE ( fibo_test )
   BOOST_REQUIRE(30 <= it.v.size() && it.v.size() <= 50);
   BOOST_REQUIRE(it.v[0] == 0);
   BOOST_REQUIRE(it.v[1] == 1);
-  for (uint i = 2; i < it.v.size(); i++)
+  for (uint i = 2; i < it.v.size(); i++) 
     BOOST_REQUIRE(it.v[i] == it.v[i - 1] + it.v[i - 2]);
 }
 
@@ -270,6 +270,19 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_4 )
     else
       BOOST_REQUIRE(a[i] * a[i - 1] % 6 == 0);
   }
+}
+
+BOOST_AUTO_TEST_CASE ( bool_rand_vec )
+{
+  rand_vec<bool> a(NULL);
+  Generator<Context> gen;
+  gen(a().size() == 10);
+  gen.foreach(a, _i, a()[_i] != a()[_i - 1]);
+
+  BOOST_REQUIRE(gen.next());
+  BOOST_REQUIRE(a.size() == 10);
+  for (uint i = 1; i < a.size(); i++) 
+    BOOST_REQUIRE(a[i] != a[i - 1]);
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Context

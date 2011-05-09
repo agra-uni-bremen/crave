@@ -208,7 +208,7 @@ namespace platzhalter {
       for (typename std::map<int, ContextT*>::iterator ite = vecCtx.begin(); ite != vecCtx.end(); ++ite) {
         __rand_vec_base* rvb = __rand_vec_map[ite->first];
         switch (rvb->element_type()){
-//          case BOOL: _GEN_VEC(bool); break;
+          case BOOL: _GEN_VEC(bool); break;
           case INT: _GEN_VEC(int); break;
           case UINT: _GEN_VEC(unsigned int); break;
           case CHAR: _GEN_VEC(char); break;
