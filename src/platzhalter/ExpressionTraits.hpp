@@ -16,9 +16,29 @@ namespace platzhalter {
   namespace proto = boost::proto;
   namespace mpl = boost::mpl;
 
+  struct BooleanResult
+  : proto::or_<
+      // comparison
+      proto::or_< 
+        proto::nary_expr< proto::tag::less_equal, proto::vararg< proto::_> >
+      , proto::nary_expr< proto::tag::less, proto::vararg< proto::_> >
+      , proto::nary_expr< proto::tag::greater, proto::vararg< proto::_> >
+      , proto::nary_expr< proto::tag::greater_equal, proto::vararg< proto::_> >
+      , proto::nary_expr< proto::tag::equal_to, proto::vararg< proto::_> >
+      , proto::nary_expr< proto::tag::not_equal_to, proto::vararg< proto::_> >
+      >
+      // logic      
+    , proto::or_<
+        proto::nary_expr< proto::tag::logical_and, proto::vararg< proto::_> >
+      , proto::nary_expr< proto::tag::logical_or, proto::vararg< proto::_> >
+      , proto::nary_expr< proto::tag::logical_not, proto::vararg< proto::_> >
+      >
+  > {};
+
   struct ExpressionSize
   : proto::or_<
     proto::when<proto::terminal<proto::_>, bitsize_traits<proto::_value>() >
+  , proto::when<BooleanResult, boost::mpl::int_<1>() >
   , proto::when<
       proto::nary_expr<proto::_, proto::vararg<proto::_> >
     , proto::fold<proto::_, boost::mpl::int_<0>(), boost::mpl::max<ExpressionSize, proto::_state>()>

@@ -521,6 +521,33 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_5 )
   BOOST_CHECK_EQUAL( cnt, cnt1);
 }
 
+BOOST_AUTO_TEST_CASE( mixed_bv_width_6 ) 
+{
+  randv<short> a(0);
+  randv<signed char> b(0);
+
+  Generator<Context> gen;
+  gen
+    ( -3 <= a() && a() <= 3 )
+    ( -3 <= b() && b() <= 3 )
+    ( a() * b() % 6 == 0)
+  ;
+  
+  int cnt = 0;  
+  for (int i = -3; i <= 3; i++)
+    for (int j = -3; j <= 3; j++)
+      if (i * j % 6 == 0) cnt++;
+
+  int cnt1 = 0;
+  while( gen.next() ) {
+    cnt1++;
+    BOOST_REQUIRE_EQUAL(a * b % 6, 0);
+    gen( a() != a || b() != b );
+  }
+
+  BOOST_REQUIRE_EQUAL(cnt, cnt1);
+}
+
 BOOST_AUTO_TEST_SUITE_END() // Context
 
 bitsize_traits<long> _instanciate1;
