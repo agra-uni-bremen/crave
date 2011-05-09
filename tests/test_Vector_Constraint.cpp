@@ -14,6 +14,14 @@ using namespace platzhalter;
 #define ref(x) reference(x)
 #define IMPL(a, b) !(a) || (b)
 
+template<typename T>
+bool check_unique(rand_vec<T>& v) {
+  for (uint i = 0; i < v.size(); i++)
+    for (uint j = 0; j < i; j++)
+      if (v[i] == v[j]) return false;
+  return true;
+}
+
 struct Context_Fixture {};
 
 BOOST_FIXTURE_TEST_SUITE(Vector_Constraint_t, Context_Fixture )
@@ -197,6 +205,50 @@ BOOST_AUTO_TEST_CASE ( soft_vec_constraint )
     BOOST_REQUIRE(v[0] == v[1] && v[1] == v[2] && v[2] == v[3] && v[0] % 13 == 3);  
     if (!gen1.next()) break;
   }
+}
+
+BOOST_AUTO_TEST_CASE ( mixed_bv_width_2 )
+{
+  rand_vec<signed char> a(NULL);
+  DefaultGenerator gen;
+  gen(a().size() == 138);
+  gen.foreach(a, _i, a()[_i] < 10 );
+  gen.unique(a);
+
+  BOOST_REQUIRE(gen.next());
+  for (uint i = 0; i < a.size(); i++)
+    BOOST_REQUIRE(a[i] < 10);
+  BOOST_REQUIRE(check_unique(a));
+}
+
+BOOST_AUTO_TEST_CASE ( mixed_bv_width_3 )
+{
+  rand_vec<short> a(NULL);
+  DefaultGenerator gen;
+  gen(a().size() == 19);
+  gen.foreach(a, _i, a()[_i] < 10);
+  gen.foreach(a, _i, a()[_i] > -10 );
+  gen.unique(a);
+
+  BOOST_REQUIRE(gen.next());  
+  for (uint i = 0; i < a.size(); i++)
+    BOOST_REQUIRE(-10 < a[i] && a[i] < 10);
+  BOOST_REQUIRE(check_unique(a));
+}
+
+BOOST_AUTO_TEST_CASE ( mixed_bv_width_4 )
+{
+  rand_vec<int> a(NULL);
+  DefaultGenerator gen;
+  gen(a().size() == 19);
+  gen.foreach(a, _i, a()[_i] < (signed char) 10);
+  gen.foreach(a, _i, a()[_i] > (short) -10 );
+  gen.unique(a);
+
+  BOOST_REQUIRE(gen.next());  
+  for (uint i = 0; i < a.size(); i++)
+    BOOST_REQUIRE(-10 < a[i] && a[i] < 10);
+  BOOST_REQUIRE(check_unique(a));
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Context

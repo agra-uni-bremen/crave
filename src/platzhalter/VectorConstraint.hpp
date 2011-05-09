@@ -16,6 +16,7 @@ namespace platzhalter {
     , INT
     , UINT 
     , CHAR
+    , SCHAR
     , UCHAR
     , SHORT
     , USHORT
@@ -43,6 +44,7 @@ class TypeInfo<typename> \
   _DEF_TYPE(int, INT)
   _DEF_TYPE(unsigned int, UINT)
   _DEF_TYPE(char, CHAR)
+  _DEF_TYPE(signed char, SCHAR)
   _DEF_TYPE(unsigned char, UCHAR)
   _DEF_TYPE(short, SHORT)
   _DEF_TYPE(unsigned short, USHORT)

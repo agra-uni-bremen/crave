@@ -17,6 +17,8 @@ namespace platzhalter {
   template<typename ContextT=DefaultContext>
   struct Generator;
 
+  typedef Generator<> DefaultGenerator;
+
   template< typename T=DefaultContext>
   struct Soft_Generator {
     Soft_Generator(Generator<T> & gen) : gen(gen) {}
@@ -210,6 +212,7 @@ namespace platzhalter {
           case INT: _GEN_VEC(int); break;
           case UINT: _GEN_VEC(unsigned int); break;
           case CHAR: _GEN_VEC(char); break;
+          case SCHAR: _GEN_VEC(signed char); break;
           case UCHAR: _GEN_VEC(unsigned char); break;
           case SHORT: _GEN_VEC(short); break;
           case USHORT: _GEN_VEC(unsigned short); break;
