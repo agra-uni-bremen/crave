@@ -207,12 +207,12 @@ BOOST_AUTO_TEST_CASE ( soft_vec_constraint )
   }
 }
 
-BOOST_AUTO_TEST_CASE ( mixed_bv_width_2 )
+BOOST_AUTO_TEST_CASE ( mixed_bv_width_1 )
 {
   rand_vec<signed char> a(NULL);
   DefaultGenerator gen;
   gen(a().size() == 138);
-  gen.foreach(a, _i, a()[_i] < 10 );
+  gen.foreach(a, _i, a()[_i] < (short) 10 );
   gen.unique(a);
 
   BOOST_REQUIRE(gen.next());
@@ -221,7 +221,7 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_2 )
   BOOST_REQUIRE(check_unique(a));
 }
 
-BOOST_AUTO_TEST_CASE ( mixed_bv_width_3 )
+BOOST_AUTO_TEST_CASE ( mixed_bv_width_2 )
 {
   rand_vec<short> a(NULL);
   DefaultGenerator gen;
@@ -236,7 +236,7 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_3 )
   BOOST_REQUIRE(check_unique(a));
 }
 
-BOOST_AUTO_TEST_CASE ( mixed_bv_width_4 )
+BOOST_AUTO_TEST_CASE ( mixed_bv_width_3 )
 {
   rand_vec<int> a(NULL);
   DefaultGenerator gen;
@@ -249,6 +249,27 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_4 )
   for (uint i = 0; i < a.size(); i++)
     BOOST_REQUIRE(-10 < a[i] && a[i] < 10);
   BOOST_REQUIRE(check_unique(a));
+}
+
+BOOST_AUTO_TEST_CASE ( mixed_bv_width_4 )
+{
+  rand_vec<short> a(NULL);
+  DefaultGenerator gen;
+  gen(a().size() == 10);
+  gen.foreach(a, _i, -3 <= a()[_i] && a()[_i] <= 3);
+  gen.foreach(a, _i, a()[_i] != 0);
+  gen.foreach(a, _i, a()[_i] * a()[_i - 1] % 6 == 0);
+  gen.foreach(a, _i, _i != 0 || a()[_i] % 2 == 0 );
+
+  BOOST_REQUIRE(gen.next());
+  for (uint i = 0; i < a.size(); i++) {
+    BOOST_REQUIRE(-3 <= a[i] && a[i] <= 3);
+    BOOST_REQUIRE(a[i] != 0);
+    if (i == 0)
+      BOOST_REQUIRE(a[i] % 2 == 0);
+    else
+      BOOST_REQUIRE(a[i] * a[i - 1] % 6 == 0);
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Context

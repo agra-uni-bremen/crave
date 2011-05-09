@@ -39,6 +39,7 @@ namespace platzhalter {
   : proto::or_<
     proto::when<proto::terminal<proto::_>, bitsize_traits<proto::_value>() >
   , proto::when<BooleanResult, boost::mpl::int_<1>() >
+  , proto::when<proto::subscript< proto::_, proto::_ >, ExpressionSize(proto::_left) >
   , proto::when<
       proto::nary_expr<proto::_, proto::vararg<proto::_> >
     , proto::fold<proto::_, boost::mpl::int_<0>(), boost::mpl::max<ExpressionSize, proto::_state>()>
@@ -102,6 +103,7 @@ namespace platzhalter {
   struct FixWidth 
   : proto::or_<
      proto::terminal<proto::_>
+  ,  proto::subscript<proto::_, proto::_>
   ,  FixFirstLarger
   ,  FixSecondLarger
   ,  proto::nary_expr<proto::_, proto::vararg<FixWidth> >

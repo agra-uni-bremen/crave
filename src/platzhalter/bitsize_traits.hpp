@@ -27,7 +27,8 @@ namespace platzhalter {
   struct bitsize_traits< write_ref_tag<T> > : public bitsize_traits<T> {};
   template<typename T>
   struct bitsize_traits< read_ref_tag<T> > : public bitsize_traits<T> {};
-
+  template<typename T>
+  struct bitsize_traits< vector_tag<T> > : public bitsize_traits<T> {};
 } // namespace platzhalter
 
 namespace boost {
