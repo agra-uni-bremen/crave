@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_CASE ( soft_vec_constraint )
 BOOST_AUTO_TEST_CASE ( mixed_bv_width_1 )
 {
   rand_vec<signed char> a(NULL);
-  DefaultGenerator gen;
+  Generator<Context> gen;
   gen(a().size() == 138);
   gen.foreach(a, _i, a()[_i] < (short) 10 );
   gen.unique(a);
