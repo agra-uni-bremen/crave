@@ -80,6 +80,38 @@ BOOST_AUTO_TEST_CASE( t2 )
   BOOST_CHECK_THROW ( Item1 it, std::runtime_error );
 }
 
+class ItemPythagoras : public rand_obj {
+public:
+  ItemPythagoras() : rand_obj(), a(this), b(this), c(this) {
+    constraint("pythagoras", a() * a() + b() * b() == c() * c());
+    //constraint("div-zero", a() > 0 && b() > 0);
+    constraint(a() > 0);
+    constraint(b() > 0);
+  }
+  randv<unsigned char> a;
+  randv<unsigned char> b;
+  randv<unsigned char> c;
+
+  friend ostream& operator<<(ostream& os, const ItemPythagoras& it) { 
+    os << it.a << " " << it.b << " " << it.c; 
+    return os; 
+  }
+};
+
+BOOST_AUTO_TEST_CASE( Pythagoras )
+{
+  ItemPythagoras it;
+
+  BOOST_REQUIRE(!it.next());
+
+  it.disable_constraint("pythagoras");
+  BOOST_REQUIRE(it.next());
+  std::cout << it << std::endl;
+
+  it.enable_constraint("pythagoras");
+  BOOST_REQUIRE(it.next());
+  std::cout << it << std::endl;
+}
 
 BOOST_AUTO_TEST_SUITE_END() // Context
 
