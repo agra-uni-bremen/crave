@@ -605,7 +605,9 @@ namespace platzhalter {
     template<typename T>
     T read ( Variable<T> const & v) {
       T ret;
-      assert( read(ret, v.id()) );
+      bool success = false;
+      success = read(ret, v.id());
+      assert( success );
       return ret;
     }
 
