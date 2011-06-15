@@ -16,58 +16,6 @@ struct Context_Fixture {};
 
 BOOST_FIXTURE_TEST_SUITE(Random_Object_t, Context_Fixture )
 
-class Constraint_base : public Generator<> {
-  public:
-    Constraint_base() 
-      : Generator<>()
-      , constraint(*this)
-      , soft_constraint( constraint )
-    {}
-
-  protected:
-    Generator<> & constraint;
-    Soft_Generator<> soft_constraint;
-};
-
-class Constraint1 : public Constraint_base {
-  public:
-    Variable<unsigned> x;
-    
-    Constraint1 () {
-      constraint( x<10 );
-    }
-};
-
-class Constraint2 : public Constraint1 {
-  public:
-    Constraint2 () {
-      constraint( x>6 );
-    }
-};
-
-BOOST_AUTO_TEST_CASE( t1 )
-{
-  Constraint2 c2;
-
-  c2();
-  unsigned r = c2[c2.x];
-  BOOST_REQUIRE_LT( r, 10);
-  BOOST_REQUIRE_GT( r,  6);
-
-  c2( c2.x != r )();
-  r = c2[c2.x];
-  BOOST_REQUIRE_LT( r, 10);
-  BOOST_REQUIRE_GT( r,  6);
-
-  c2( c2.x != r )();
-  r = c2[c2.x];
-  BOOST_REQUIRE_LT( r, 10);
-  BOOST_REQUIRE_GT( r,  6);
-
-  c2( c2.x != r );
-  BOOST_REQUIRE( ! c2.next() );
-}
-
 class item : public rand_obj {
 public:
   item(rand_obj* parent) : rand_obj(parent), a(this), b(this), c(this) {
@@ -277,6 +225,57 @@ BOOST_AUTO_TEST_CASE ( t6 )
   }
 }
 
+class Constraint_base : public Generator<> {
+  public:
+    Constraint_base() 
+      : Generator<>()
+      , constraint(*this)
+      , soft_constraint( constraint )
+    {}
+
+  protected:
+    Generator<> & constraint;
+    Soft_Generator<> soft_constraint;
+};
+
+class Constraint1 : public Constraint_base {
+  public:
+    Variable<unsigned> x;
+    
+    Constraint1 () {
+      constraint( x<10 );
+    }
+};
+
+class Constraint2 : public Constraint1 {
+  public:
+    Constraint2 () {
+      constraint( x>6 );
+    }
+};
+
+BOOST_AUTO_TEST_CASE( t1 )
+{
+  Constraint2 c2;
+
+  c2();
+  unsigned r = c2[c2.x];
+  BOOST_REQUIRE_LT( r, 10);
+  BOOST_REQUIRE_GT( r,  6);
+
+  c2( c2.x != r )();
+  r = c2[c2.x];
+  BOOST_REQUIRE_LT( r, 10);
+  BOOST_REQUIRE_GT( r,  6);
+
+  c2( c2.x != r )();
+  r = c2[c2.x];
+  BOOST_REQUIRE_LT( r, 10);
+  BOOST_REQUIRE_GT( r,  6);
+
+  c2( c2.x != r );
+  BOOST_REQUIRE( ! c2.next() );
+}
 
 BOOST_AUTO_TEST_SUITE_END() // Context
 

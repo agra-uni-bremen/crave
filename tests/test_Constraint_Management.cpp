@@ -22,9 +22,9 @@ public:
   Item() : rand_obj(), a(this), b(this) {
     constraint("sum", a() + b() == 4);
     constraint("product", a() * b() == 4);
-    constraint(a() < 10u);
-    constraint(b() < 10u);
-    constraint("x", a() != 2u);
+    constraint(a() < 10);
+    constraint(b() < 10);
+    constraint("x", a() != 2);
   }
   randv<uint> a;
   randv<uint> b;
@@ -39,10 +39,7 @@ BOOST_AUTO_TEST_CASE( t1 )
 {
   Item it;
 
-//  BOOST_REQUIRE(!it.next());
-  it.next();
-  std::cout << it << std::endl;
-
+  BOOST_REQUIRE(!it.next());
 
   it.disable_constraint("sum");
   BOOST_REQUIRE(it.next());

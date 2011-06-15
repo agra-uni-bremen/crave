@@ -76,24 +76,73 @@ namespace platzhalter {
   extern boost::mt19937 rng;
 
   template<typename T>
+  struct weighted_range
+  {  
+    weighted_range(T l, T r, unsigned long long w) : left(l), right(r), weight(w), accumWeight(0) { }
+    weighted_range(T l, T r) : left(l), right(r), weight(1LLU + r - l), accumWeight(0) { }
+
+    bool operator <(const weighted_range<T>& other) const {
+      if (left < other.left) return true;
+      if (left > other.left) return false;
+      if (right < other.right) return true;
+      return false;
+    }
+
+    bool overlap(const weighted_range<T>& other) const {
+      if (left < other.left) return right >= other.left;
+      if (left > other.left) return left <= other.right;
+      return false;
+    }
+
+    T left;
+    T right;
+    unsigned long long weight;         
+    unsigned long long accumWeight;
+  };
+
+  template<typename T>
   class randomize_base
   {
     public:
-      void range(T _min, T _max) { min = _min; max = _max; dist = new boost::uniform_int<T>(min, max); }
+      void resetDistribution() { ranges.clear(); }
+      void addWeightedRange(T l, T r, unsigned long long w) { addRange(weighted_range<T>(l, r, w)); }
+      void addRange(T l, T r) { addRange(weighted_range<T>(l, r)); }
+      void range(T l, T r) { resetDistribution(); addRange(weighted_range<T>(l, r)); }
 
     protected:
-      randomize_base() { range(std::numeric_limits<T>::min(), std::numeric_limits<T>::max()); }
-      T min;
-      T max;
-      boost::uniform_int<T>* dist;
+      randomize_base() { }     
+
+      T nextValue() { 
+        if (ranges.empty()) 
+          return boost::uniform_int<T>(std::numeric_limits<T>::min(), std::numeric_limits<T>::max())(rng);
+        weighted_range<T> selected = ranges.back();
+        if (ranges.size() > 1) {
+          unsigned long long r = boost::uniform_int<unsigned long long>(0, selected.accumWeight - 1)(rng);
+          for (uint i = 0; i < ranges.size(); i++)
+            if (r < ranges[i].accumWeight) {
+              selected = ranges[i];
+              break;
+            }
+        }
+        return boost::uniform_int<T>(selected.left, selected.right)(rng);        
+      }
+
+      void addRange(weighted_range<T> wr) {
+        for (uint i = 0; i < ranges.size(); i++)
+          if (ranges[i].overlap(wr)) throw std::runtime_error("Overlapping range exists.");
+        wr.accumWeight = (ranges.empty() ? 0 : ranges.back().accumWeight) + wr.weight;
+        ranges.push_back(wr);
+      }
+
+      std::vector< weighted_range<T> > ranges;
   };
 
   template<>
   class randomize_base<bool>
   {
     protected:
-      randomize_base() : dist(new boost::uniform_int<char>(0, 1)) { }
-      boost::uniform_int<char> *dist;
+      randomize_base() { }
+      bool nextValue() { return boost::uniform_int<char>(0, 1)(rng); }
   };
 
 #define _COMMON_INTERFACE(Typename) \
@@ -102,7 +151,7 @@ public: \
   randv(rand_obj_of<context>* parent) : randv_prim_base<Typename>(parent) { } \
   randv(rand_obj* parent) : randv_prim_base<Typename>(parent) { } \
   randv(const randv& other) : randv_prim_base<Typename>(other) { } \
-  bool next() { value = (*dist)(rng); return true; } \
+  bool next() { value = nextValue(); return true; } \
   randv<Typename>& operator=(const randv<Typename>& i) { value = i.value; return *this; } \
   randv<Typename>& operator=(Typename i) { value = i; return *this; } \
 

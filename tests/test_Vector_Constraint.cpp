@@ -12,7 +12,7 @@ using boost::format;
 using namespace platzhalter;
 
 #define ref(x) reference(x)
-#define IMPL(a, b) !(a) || (b)
+#define IF_THEN(a, b) !(a) || (b)
 
 template<typename T>
 bool check_unique(rand_vec<T>& v) {
@@ -30,7 +30,7 @@ struct Item : public rand_obj {
   Item() : v(this) {
     constraint(30 <= v().size() && v().size() <= 50);
     constraint.foreach(v, _i, v()[_i] == v()[_i - 1] + v()[_i - 2]);
-    constraint.foreach(v, _i, IMPL(_i <= 1, v()[_i] == _i ) );
+    constraint.foreach(v, _i, IF_THEN(_i <= 1, v()[_i] == _i ) );
   }
 
   rand_vec<unsigned int> v;
@@ -162,9 +162,9 @@ BOOST_AUTO_TEST_CASE ( constraint_management_test )
 struct Item5 : public rand_obj {
   Item5() : v(this) {
     constraint(v().size() == 50);
-    constraint.foreach(v, _i, IMPL(_i < 25, v()[_i] == _i));
-    constraint.foreach(v, _i, IMPL(_i == 25, v()[_i] == 0));
-    constraint.foreach(v, _i, IMPL(_i > 25, v()[_i] + _i == 200));
+    constraint.foreach(v, _i, IF_THEN(_i < 25, v()[_i] == _i));
+    constraint.foreach(v, _i, IF_THEN(_i == 25, v()[_i] == 0));
+    constraint.foreach(v, _i, IF_THEN(_i > 25, v()[_i] + _i == 200));
   }
 
   rand_vec<unsigned int> v;
@@ -197,7 +197,7 @@ BOOST_AUTO_TEST_CASE ( soft_vec_constraint )
   gen1.foreach(v, _i, v()[_i] >= v()[_i - 1]);  
   gen1.foreach(v, _i, v()[_i] <= 1000);  
   gen1.soft_foreach(v, _i, v()[_i] <= v()[_i - 1]);  
-  gen1.soft_foreach(v, _i, IMPL(_i == 0, v()[_i] % 13 == 3));  
+  gen1.soft_foreach(v, _i, IF_THEN(_i == 0, v()[_i] % 13 == 3));  
   BOOST_REQUIRE(gen1.next());
   for (int i = 0; i < 10; i++) {
     BOOST_REQUIRE(v.size() == 4);  
