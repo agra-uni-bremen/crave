@@ -543,23 +543,71 @@ namespace platzhalter {
 
     bool do_solve () {
       pre_solve();
+      const unsigned limit = 5;
       assumption(solver,_soft);
-      // if soft constraint satisfiable
+           // if soft constraint satisfiable
       if ( metaSMT::solve(solver) ) {
-         return true;
+ 	  for(unsigned i = 0; i < limit  ; ++i) {
+             pre_solve();
+             assumption(solver,_soft);
+	     assign_random_bits();
+  	     if( metaSMT::solve(solver)) {
+	       return true;
+	     }
+	  } //end for
+
+          pre_solve();
+          assumption(solver,_soft);
+	  return metaSMT::solve(solver);
       }
-      else {
-        // if not satisfiable
-        pre_solve();
-        bool ret =  metaSMT::solve(solver) ;
-        return ret;
+      // soft constraints not satisfiable
+      pre_solve();
+      if( metaSMT::solve(solver) ) {
+        for(unsigned i = 0; i < limit ; ++i) {
+	     pre_solve();
+	     assign_random_bits(); 
+  	     if( metaSMT::solve(solver)) {
+	        return true;
+	     }
+	}
+          pre_solve();
+	  return metaSMT::solve(solver);
+     }
+     return false;
+   }
+    void assign_random_bits() {
+      std::vector <result_type> bits;
+
+      typedef std::pair<int,qf_bv::bitvector> var_pair;
+      BOOST_FOREACH( var_pair const & p, _variables ) {
+        if ( _lazy.find(p.first) == _lazy.end() ) {
+
+          for(unsigned i=0; i < proto::value(p.second).width; ++i) {
+            result_type tmp = evaluate(solver, qf_bv::extract(i,i, p.second));
+            bits.push_back(tmp);
+          }
+
+        }
       }
+ 
+      std::random_shuffle(bits.begin(),bits.end());
+      int len = rand()%bits.size();
+      
+      for(unsigned i = 0; i < len ; ++i) {
+       metaSMT::assumption(solver, preds::equal(bits[i], qf_bv::bvuint(rand()%2,1)));
+      }
+      // zufällige anzahl zuweisen
+      //for( selected_bit_aus_bitvects) {
+      //  assumption( equal(bit, zufallsbit);
+      //}
     }
 
     template<typename T>
     T read ( Variable<T> const & v) {
       T ret;
-      assert( read(ret, v.id()) );
+      bool success = false;
+      success = read(ret, v.id());
+      assert( success );
       return ret;
     }
 
