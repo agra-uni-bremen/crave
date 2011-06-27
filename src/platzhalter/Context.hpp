@@ -11,11 +11,8 @@
 #include <boost/proto/context/null.hpp>
 #include <boost/function.hpp>
 
-//#include <MetaSolver.hpp>
-//#include <logic/QF_BV.hpp>
-//#include <tools/Convert_QF_BV.hpp>
 #include <metaSMT/DirectSolver_Context.hpp>
-#include <metaSMT/backend/SWORD_Context.hpp>
+#include <metaSMT/backend/SWORD_Backend.hpp>
 #include <metaSMT/frontend/QF_BV.hpp>
 
 #include <map>
@@ -77,7 +74,7 @@ namespace platzhalter {
   struct metaSMT_Context_base
     : proto::callable_context< metaSMT_Context_base<derived_context>, proto::null_context >
   {
-    metaSMT_Context_base(std::string const & solvername) 
+    metaSMT_Context_base() 
     : solver()
     , _soft( evaluate(solver, preds::True) )
     {}
@@ -85,7 +82,12 @@ namespace platzhalter {
     ~metaSMT_Context_base() {
     }
 
-    typedef metaSMT::DirectSolver_Context< metaSMT::solver::SWORD_Context > SolverType;
+    private:
+    metaSMT_Context_base(metaSMT_Context_base const & );
+
+    public:
+
+    typedef metaSMT::DirectSolver_Context< metaSMT::solver::SWORD_Backend > SolverType;
     typedef SolverType::result_type result_type;
 
 
@@ -695,14 +697,12 @@ namespace platzhalter {
   }; // metaSMT_Context
 
   struct metaSMT_Context : metaSMT_Context_base<metaSMT_Context> {
-    metaSMT_Context(std::string const & solvername) 
-    : metaSMT_Context_base<metaSMT_Context>(solvername)
+    metaSMT_Context() 
+    : metaSMT_Context_base<metaSMT_Context>()
     { }
   };
 
   typedef metaSMT_Context Context;
-
-  Context get_context(std::string const & solvername="");
 
 } // namespace platzhalter
 //  vim: ft=cpp:ts=2:sw=2:expandtab

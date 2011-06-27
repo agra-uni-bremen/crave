@@ -45,8 +45,8 @@ namespace platzhalter {
 
   struct AllSAT_base : public metaSMT_Context_base<AllSAT_base>
   {
-    AllSAT_base(std::string const & solvername, unsigned _sol_limit) 
-    : metaSMT_Context_base<AllSAT_base>(solvername), is_solved(false), read_ref_found(false), sol_limit(_sol_limit)
+    AllSAT_base(unsigned _sol_limit) 
+    : metaSMT_Context_base<AllSAT_base>(), is_solved(false), read_ref_found(false), sol_limit(_sol_limit)
     { }
 
     typedef metaSMT_Context_base<AllSAT_base> Super;
@@ -242,7 +242,7 @@ namespace platzhalter {
   
   template<unsigned N = 0>
   struct AllSAT : public AllSAT_base {
-    AllSAT(std::string const & solvername) : AllSAT_base(solvername, N) { }
+    AllSAT() : AllSAT_base(N) { }
   };
 
 } /* platzhalter */

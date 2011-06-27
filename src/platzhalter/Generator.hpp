@@ -34,12 +34,12 @@ namespace platzhalter {
   struct Generator {
 
     Generator() 
-    : ctx(default_solver())
+    : ctx()
     {};
 
     template<typename Expr>
     Generator(Expr expr)
-    : ctx(default_solver())
+    : ctx()
     {
       (*this)(expr);
     }
@@ -103,7 +103,7 @@ namespace platzhalter {
     Generator<ContextT> & foreach(const __rand_vec<value_type> & v, const IndexVariable & i, Expr e) {
       assert(i.id() == _i.id());
       if ( vecCtx.find(v().id()) == vecCtx.end() ) {
-        vecCtx.insert( std::make_pair(v().id(), new ContextT(default_solver()) ) );
+        vecCtx.insert( std::make_pair(v().id(), new ContextT() ) );
       }
       vecCtx[v().id()]->assertion( FixWidth()(e) );
       return *this;
@@ -113,7 +113,7 @@ namespace platzhalter {
     Generator<ContextT> & soft_foreach(const __rand_vec<value_type> & v, const IndexVariable & i, Expr e) {
       assert(i.id() == _i.id());
       if ( vecCtx.find(v().id()) == vecCtx.end() ) {
-        vecCtx.insert( std::make_pair(v().id(), new ContextT(default_solver()) ) );
+        vecCtx.insert( std::make_pair(v().id(), new ContextT() ) );
       }
       vecCtx[v().id()]->soft_assertion( FixWidth()(e) );
       return *this;
@@ -123,7 +123,7 @@ namespace platzhalter {
     Generator<ContextT> & foreach(std::string constraint_name, const __rand_vec<value_type> & v, const IndexVariable & i, Expr e) {
       assert(i.id() == _i.id());
       if ( vecCtx.find(v().id()) == vecCtx.end() ) {
-        vecCtx.insert( std::make_pair(v().id(), new ContextT(default_solver()) ) );
+        vecCtx.insert( std::make_pair(v().id(), new ContextT() ) );
       }
       addCstrToCtx(constraint_name, vecCtx[v().id()]);
       vecCtx[v().id()]->assertion(constraint_name, FixWidth()(e) );
@@ -136,7 +136,7 @@ namespace platzhalter {
     template<typename value_type>
     Generator<ContextT> & unique(const __rand_vec<value_type> & v) {
       if ( vecCtx.find(v().id()) == vecCtx.end() ) {
-        vecCtx.insert( std::make_pair(v().id(), new ContextT(default_solver()) ) );
+        vecCtx.insert( std::make_pair(v().id(), new ContextT() ) );
       }
       uniqueVecSet.insert(v().id());
       return *this;

@@ -16,7 +16,6 @@ using boost::format;
 
 struct Context_Fixture {
   Context_Fixture ()
-  : ctx(get_context())
   {
   }
   protected:
