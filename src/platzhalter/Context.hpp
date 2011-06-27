@@ -593,15 +593,14 @@ namespace platzhalter {
       }
  
       std::random_shuffle(bits.begin(),bits.end());
-      int len = rand()%bits.size();
+      int len = 0;
+      if (bits.size() > 0) {
+        rand()%bits.size();
+      }
       
       for(unsigned i = 0; i < len ; ++i) {
        metaSMT::assumption(solver, preds::equal(bits[i], qf_bv::bvuint(rand()%2,1)));
       }
-      // zufällige anzahl zuweisen
-      //for( selected_bit_aus_bitvects) {
-      //  assumption( equal(bit, zufallsbit);
-      //}
     }
 
     template<typename T>
