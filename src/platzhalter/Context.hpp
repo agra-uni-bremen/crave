@@ -5,6 +5,7 @@
 #include "VectorConstraint.hpp"
 #include "ExpressionTraits.hpp"
 
+#include <boost/foreach.hpp>
 #include <boost/proto/core.hpp>
 #include <boost/proto/debug.hpp>
 #include <boost/proto/context/callable.hpp>
