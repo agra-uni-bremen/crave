@@ -1,4 +1,6 @@
+if ( NOT TIMEOUT )
 set(TIMEOUT 5)
+endif()
 include_directories (../src)
 
 find_program(AWK awk)
