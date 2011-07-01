@@ -1,13 +1,14 @@
 #pragma once
 
-#include <limits>
+#include "Constraint.hpp"
+#include "Generator.hpp"
 
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/mersenne_twister.hpp>
 
-#include "Constraint.hpp"
-#include "Context.hpp"
+#include <limits>
+#include <vector>
 
 namespace platzhalter {
 
@@ -20,83 +21,156 @@ namespace platzhalter {
       virtual bool next() = 0;
   };
 
-  class rand_obj : public rand_base
+  template<typename context_type=Context>
+  class rand_obj_of : public rand_base
   {
     public:
-      rand_obj(rand_obj* parent) { if (parent != 0) parent->addChild(this); }
+      template<typename context>
+      rand_obj_of(rand_obj_of<context>* parent = 0) { if (parent != 0) parent->addChild(this); }
       bool next() {
         for (uint i = 0; i < children.size(); i++) 
           if (!children[i]->next()) return false; 
         if (!constraint.next()) return false;
         return true;
       }
-      bool enable_constraint_group(std::string group) { return constraint.enable_group(group); }
-      bool disable_constraint_group(std::string group) { return constraint.disable_group(group); }
+      bool enable_constraint(std::string name) { return constraint.enable_constraint(name); }
+      bool disable_constraint(std::string name) { return constraint.disable_constraint(name); }
       void addChild(rand_base* rb) { children.push_back(rb); }
 
     protected:
+      rand_obj_of() { }
       std::vector<rand_base*> children;
-      Generator<> constraint;
+    
+    public:
+      Generator<context_type> constraint;
+  };
+
+  class rand_obj : public rand_obj_of<> 
+  {
+    public:
+      template<typename context>
+      rand_obj(rand_obj_of<context>* parent) 
+      : rand_obj_of<>(parent)
+      { }
+    protected:
+      rand_obj() { }
   };
 
   template<typename T>
   class randv_prim_base : public rand_base
   {
+    public:
+      operator T() const { return value; }
+      friend ostream& operator<<(ostream& os, const randv_prim_base<T>& e) { os << e.value; return os; }
+      WriteReference<T>& operator()() { return var; }
+      CppType type() { return UNSUPPORTED; }
+
     protected:
-      randv_prim_base(rand_obj* parent) : var(value) { if (parent != 0) parent->addChild(this); }
+      template<typename context>
+      randv_prim_base(rand_obj_of<context>* parent) : var(value) { if (parent != 0) parent->addChild(this); }
+      randv_prim_base(const randv_prim_base& other) : var(value), value(other.value) { }
       T value;
       WriteReference<T> var;
   };
 
-  boost::mt19937 rng;
+  extern boost::mt19937 rng;
+
+  template<typename T>
+  struct weighted_range
+  {  
+    weighted_range(T l, T r, unsigned long long w) : left(l), right(r), weight(w), accumWeight(0) { }
+    weighted_range(T l, T r) : left(l), right(r), weight(1LLU + r - l), accumWeight(0) { }
+
+    bool operator <(const weighted_range<T>& other) const {
+      if (left < other.left) return true;
+      if (left > other.left) return false;
+      if (right < other.right) return true;
+      return false;
+    }
+
+    bool overlap(const weighted_range<T>& other) const {
+      if (left < other.left) return right >= other.left;
+      if (left > other.left) return left <= other.right;
+      return false;
+    }
+
+    T left;
+    T right;
+    unsigned long long weight;         
+    unsigned long long accumWeight;
+  };
 
   template<typename T>
   class randomize_base
   {
     public:
-      void range(T _min, T _max) { min = _min; max = _max; dist = new boost::uniform_int<T>(min, max); }
+      void resetDistribution() { ranges.clear(); }
+      void addWeightedRange(T l, T r, unsigned long long w) { addRange(weighted_range<T>(l, r, w)); }
+      void addRange(T l, T r) { addRange(weighted_range<T>(l, r)); }
+      void range(T l, T r) { resetDistribution(); addRange(weighted_range<T>(l, r)); }
 
     protected:
-      randomize_base() { range(std::numeric_limits<T>::min(), std::numeric_limits<T>::max()); }
-      T min;
-      T max;
-      boost::uniform_int<T>* dist;
+      randomize_base() { }     
+
+      T nextValue() { 
+        if (ranges.empty()) 
+          return boost::uniform_int<T>(std::numeric_limits<T>::min(), std::numeric_limits<T>::max())(rng);
+        weighted_range<T> selected = ranges.back();
+        if (ranges.size() > 1) {
+          unsigned long long r = boost::uniform_int<unsigned long long>(0, selected.accumWeight - 1)(rng);
+          for (uint i = 0; i < ranges.size(); i++)
+            if (r < ranges[i].accumWeight) {
+              selected = ranges[i];
+              break;
+            }
+        }
+        return boost::uniform_int<T>(selected.left, selected.right)(rng);        
+      }
+
+      void addRange(weighted_range<T> wr) {
+        for (uint i = 0; i < ranges.size(); i++)
+          if (ranges[i].overlap(wr)) throw std::runtime_error("Overlapping range exists.");
+        wr.accumWeight = (ranges.empty() ? 0 : ranges.back().accumWeight) + wr.weight;
+        ranges.push_back(wr);
+      }
+
+      std::vector< weighted_range<T> > ranges;
   };
 
   template<>
   class randomize_base<bool>
   {
     protected:
-      randomize_base() : dist(new boost::uniform_int<char>(0, 1)) { }
-      boost::uniform_int<char> *dist;
+      randomize_base() { }
+      bool nextValue() { return boost::uniform_int<char>(0, 1)(rng); }
   };
 
-#define _COMMON_INTERFACE(typename) \
+#define _COMMON_INTERFACE(Typename) \
 public: \
-  randv(rand_obj* parent) : randv_prim_base<typename>(parent) { } \
-  randv<typename>& operator=(const randv<typename>& i) { value = i.value; return *this; } \
-  randv<typename>& operator=(typename i) { value = i; return *this; } \
-  operator typename() const { return value; } \
-  friend ostream& operator<<(ostream& os, const randv<typename>& e) { os << e.value; return os; } \
-  WriteReference<typename>& operator()() { return var; } \
-  bool next() { value = (*dist)(rng); return true; }
+  template<typename context> \
+  randv(rand_obj_of<context>* parent) : randv_prim_base<Typename>(parent) { } \
+  randv(rand_obj* parent) : randv_prim_base<Typename>(parent) { } \
+  randv(const randv& other) : randv_prim_base<Typename>(other) { } \
+  bool next() { value = nextValue(); return true; } \
+  randv<Typename>& operator=(const randv<Typename>& i) { value = i.value; return *this; } \
+  randv<Typename>& operator=(Typename i) { value = i; return *this; } \
 
-#define _INTEGER_INTERFACE(typename) \
+#define _INTEGER_INTERFACE(Typename) \
 public: \
-  randv<typename>& operator++() { ++value;  return *this; } \
-  typename operator++(int) { typename tmp = value; ++value; return tmp; } \
-  randv<typename>& operator--() { --value;  return *this; } \
-  typename operator--(int) { typename tmp = value; --value; return tmp; } \
-  randv<typename>& operator+=(typename i) { value += i;  return *this; } \
-  randv<typename>& operator-=(typename i) { value -= i;  return *this; } \
-  randv<typename>& operator*=(typename i) { value *= i;  return *this; } \
-  randv<typename>& operator/=(typename i) { value /= i;  return *this; } \
-  randv<typename>& operator%=(typename i) { value %= i;  return *this; } \
-  randv<typename>& operator&=(typename i) { value &= i;  return *this; } \
-  randv<typename>& operator|=(typename i) { value |= i;  return *this; } \
-  randv<typename>& operator^=(typename i) { value ^= i;  return *this; } \
-  randv<typename>& operator<<=(typename i) { value <<= i;  return *this; } \
-  randv<typename>& operator>>=(typename i) { value >>= i;  return *this; } \
+  randv<Typename>& operator++() { ++value;  return *this; } \
+  Typename operator++(int) { Typename tmp = value; ++value; return tmp; } \
+  randv<Typename>& operator--() { --value;  return *this; } \
+  Typename operator--(int) { Typename tmp = value; --value; return tmp; } \
+  randv<Typename>& operator+=(Typename i) { value += i;  return *this; } \
+  randv<Typename>& operator-=(Typename i) { value -= i;  return *this; } \
+  randv<Typename>& operator*=(Typename i) { value *= i;  return *this; } \
+  randv<Typename>& operator/=(Typename i) { value /= i;  return *this; } \
+  randv<Typename>& operator%=(Typename i) { value %= i;  return *this; } \
+  randv<Typename>& operator&=(Typename i) { value &= i;  return *this; } \
+  randv<Typename>& operator|=(Typename i) { value |= i;  return *this; } \
+  randv<Typename>& operator^=(Typename i) { value ^= i;  return *this; } \
+  randv<Typename>& operator<<=(Typename i) { value <<= i;  return *this; } \
+  randv<Typename>& operator>>=(Typename i) { value >>= i;  return *this; } \
 
 // bool
   template<>
@@ -117,6 +191,7 @@ class randv<typename> : public randv_prim_base<typename>, public randomize_base<
   _INTEGER_TYPE(int)
   _INTEGER_TYPE(unsigned int)
   _INTEGER_TYPE(char)
+  _INTEGER_TYPE(signed char)
   _INTEGER_TYPE(unsigned char)
   _INTEGER_TYPE(short)
   _INTEGER_TYPE(unsigned short)
@@ -124,6 +199,32 @@ class randv<typename> : public randv_prim_base<typename>, public randomize_base<
   _INTEGER_TYPE(unsigned long)
   _INTEGER_TYPE(long long)
   _INTEGER_TYPE(unsigned long long)
+
+#undef _COMMON_INTERFACE
+#undef _INTEGER_INTERFACE
+#undef _INTEGER_TYPE
+
+  template<typename T>
+  class rand_vec : public __rand_vec<T>, public rand_base
+  {  
+    public:
+      template<typename context>
+      rand_vec(rand_obj_of<context>* parent) : __rand_vec<T>() { if (parent != 0) parent->addChild(this); }
+      rand_vec(rand_obj* parent) : __rand_vec<T>() { if (parent != 0) parent->addChild(this); }
+
+      bool next() { 
+        static randv<unsigned> default_size(NULL);
+        default_size.range(5, 10);
+        default_size.next();        
+        static randv<T> r(NULL);
+        for (uint i = 0; i < default_size; i++) {
+            r.next();
+            push_back(r);
+        }
+        return true; 
+      }
+            
+  };
 
 } // namespace platzhalter
 

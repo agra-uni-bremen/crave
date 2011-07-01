@@ -1,16 +1,20 @@
 #pragma once
 
 #include "bitsize_traits.hpp"
+#include "Constraint.hpp"
+#include "VectorConstraint.hpp"
+#include "ExpressionTraits.hpp"
 
+#include <boost/foreach.hpp>
 #include <boost/proto/core.hpp>
 #include <boost/proto/debug.hpp>
 #include <boost/proto/context/callable.hpp>
 #include <boost/proto/context/null.hpp>
 #include <boost/function.hpp>
 
-#include <MetaSolver.hpp>
-#include <logic/QF_BV.hpp>
-#include <tools/Convert_QF_BV.hpp>
+#include <metaSMT/DirectSolver_Context.hpp>
+#include <metaSMT/backend/SWORD_Backend.hpp>
+#include <metaSMT/frontend/QF_BV.hpp>
 
 #include <map>
 #include <set>
@@ -19,66 +23,114 @@
 #include <sstream>
 #include <stdexcept>
 
+namespace preds = metaSMT::logic;
+namespace qf_bv = metaSMT::logic::QF_BV;
+
+using metaSMT::assumption;
+using metaSMT::evaluate;
+using metaSMT::solve;
+
+
 namespace platzhalter {
+
+  std::string default_solver();
+
   namespace proto = boost::proto;
 
-  struct metaSMT_Context
-    : proto::callable_context< metaSMT_Context, proto::null_context >
-  {
+  struct vectorSubscript_Context
+    : proto::callable_context< vectorSubscript_Context, proto::null_context > {
 
-//    metaSMT_Context(std::string const & solvername="SolverBoolector") 
-    metaSMT_Context(std::string const & solvername="SolverSWORD") 
-    : _solver(new metaSMT::MetaSolver())
-    , _logic(_solver->logic<metaSMT::QF_BV>(solvername))
-    , _soft(_logic->bit1())
-    {}
+    vectorSubscript_Context() {}
 
-    ~metaSMT_Context() {
-      delete _solver;
+    typedef vecIdx result_type;
+
+    template< typename Expr1, typename Expr2>
+    result_type operator() (proto::tag::minus, Expr1 const & e1, Expr2 const &  e2) {
+      return proto::eval( e1, *this ) - proto::eval( e2, *this );
     }
 
-    typedef metaSMT::Expression result_type;
+    template< typename Expr1, typename Expr2>
+    result_type operator() (proto::tag::plus, Expr1 const & e1, Expr2 const &  e2) {
+      return proto::eval( e1, *this ) + proto::eval( e2, *this );
+    }
+
+    template<typename value_type>
+    result_type operator() (proto::tag::terminal, Variable<value_type> const & tag ) {
+      return vecIdx(0, proto::value(tag).id);
+    }
+
+    template<typename value_type>
+    result_type operator() (proto::tag::terminal, var_tag<value_type> const & tag ) {
+      return vecIdx(0, tag.id);
+    }
+
+    template< typename Integer>
+    result_type operator() (proto::tag::terminal, Integer const & i) {
+      return vecIdx(i, 0);
+    }
+
+  };  
+
+  template< typename derived_context >
+  struct metaSMT_Context_base
+    : proto::callable_context< metaSMT_Context_base<derived_context>, proto::null_context >
+  {
+    metaSMT_Context_base() 
+    : solver()
+    , _soft( evaluate(solver, preds::True) )
+    {}
+
+    ~metaSMT_Context_base() {
+    }
+
+    private:
+    metaSMT_Context_base(metaSMT_Context_base const & );
+
+    public:
+
+    typedef metaSMT::DirectSolver_Context< metaSMT::solver::SWORD_Backend > SolverType;
+    typedef SolverType::result_type result_type;
 
 
     template<typename value_type>
     result_type operator() (proto::tag::terminal, var_tag<value_type> const & tag ) {
-      std::map<int, result_type>::const_iterator ite
+      std::map<int, qf_bv::bitvector>::const_iterator ite
         = _variables.find(tag.id);
       if ( ite != _variables.end() ) {
-        return ite->second;
+          return evaluate(solver, ite->second);
       } else {
         std::ostringstream buf;
         buf << "var_" << tag.id;
-        unsigned width=bitsize_traits<value_type>::nbits;
+        unsigned width=bitsize_traits<value_type>::value;
         //std::cout << "creating " << buf.str() << ", width= " << width << std::endl;
-        result_type var = _logic->bitvec(buf.str(), width);
-        _variables.insert( std::make_pair(tag.id, var) );
-        return var;
+        qf_bv::bitvector bv = qf_bv::new_bitvector(width);  
+        _variables.insert( std::make_pair(tag.id, bv) );
+        return evaluate(solver, bv);
       }
     }
 
     template<typename value_type>
-    struct writeReference{
-      writeReference(value_type & i, metaSMT_Context & ctx, unsigned id) 
+    struct writeReference {
+      writeReference(value_type & i, derived_context & ctx, unsigned id) 
       : _i (i), _ctx(ctx), _id(id)
       {}
       void operator() () {
         _ctx.read(_i, _id);
       }
       value_type & _i;
-      metaSMT_Context & _ctx;
+      derived_context & _ctx;
       unsigned _id;
     };
 
     template<typename value_type>
     result_type operator() (proto::tag::terminal t, write_ref_tag<value_type> const & ref ) {
-      std::map<int, result_type>::const_iterator ite
+      std::map<int, qf_bv::bitvector>::const_iterator ite
         = _variables.find(ref.id);
       if ( ite != _variables.end() ) {
-        return ite->second;
+        return evaluate(solver, ite->second);
       } else {
-        result_type var = (*this)(t, static_cast<var_tag<value_type> >(ref));
-        boost::function0<void> f = writeReference<value_type>(ref.ref, *this, ref.id);
+        result_type var = (ctx())(t, static_cast<var_tag<value_type> >(ref));
+        boost::function0<void> f = writeReference<value_type>(ref.ref, ctx(), ref.id);
         _post_hook.push_back(f);
         return var;
       }
@@ -86,133 +138,265 @@ namespace platzhalter {
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::equal_to, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->equal(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
-      );
+      return evaluate(solver, preds::equal(
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
+      ));
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::not_equal_to, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->nequal(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
-      );
+      return evaluate(solver, preds::nequal(
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
+      ));
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::less_equal, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvule(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
-      );
+      bool sign1 = proto::matches< Expr1, IsSigned >::value;
+      bool sign2 = proto::matches< Expr2, IsSigned >::value;
+
+      if( sign1 && sign2 ) {
+        return evaluate( solver, qf_bv::bvsle(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      } else if ( !sign1 && !sign2 ) {
+        return evaluate( solver, qf_bv::bvule(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      } else if ( sign1 ) {
+        return evaluate( solver, qf_bv::bvsle(
+            qf_bv::sign_extend(1, proto::eval( e1, ctx() ))
+          , qf_bv::zero_extend(1, proto::eval( e2, ctx() ))
+        ));
+      } else {
+        return evaluate( solver, qf_bv::bvsle(
+            qf_bv::zero_extend(1, proto::eval( e1, ctx() ))
+          , qf_bv::sign_extend(1, proto::eval( e2, ctx() ))
+        ));
+      }
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::less, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvult(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
-      );
+      bool sign1 = proto::matches< Expr1, IsSigned >::value;
+      bool sign2 = proto::matches< Expr2, IsSigned >::value;
+
+      if( sign1 && sign2 ) {
+        return evaluate( solver, qf_bv::bvslt(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      } else if ( !sign1 && !sign2 ) {
+        return evaluate( solver, qf_bv::bvult(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      } else if ( sign1 ) {
+        return evaluate( solver, qf_bv::bvslt(
+            qf_bv::sign_extend(1, proto::eval( e1, ctx() ))
+          , qf_bv::zero_extend(1, proto::eval( e2, ctx() ))
+        ));
+      } else {
+        return evaluate( solver, qf_bv::bvslt(
+            qf_bv::zero_extend(1, proto::eval( e1, ctx() ))
+          , qf_bv::sign_extend(1, proto::eval( e2, ctx() ))
+        ));
+      }
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::greater, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvugt(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
-      );
-    }
-    template< typename Expr1, typename Expr2>
-    result_type operator() (proto::tag::greater_equal, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvuge(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
-      );
+      bool sign1 = proto::matches< Expr1, IsSigned >::value;
+      bool sign2 = proto::matches< Expr2, IsSigned >::value;
+
+      if( sign1 && sign2 ) {
+        return evaluate( solver, qf_bv::bvsgt(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      } else if ( !sign1 && !sign2 ) {
+        return evaluate( solver, qf_bv::bvugt(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      } else if ( sign1 ) {
+        return evaluate( solver, qf_bv::bvsgt(
+            qf_bv::sign_extend(1, proto::eval( e1, ctx() ))
+          , qf_bv::zero_extend(1, proto::eval( e2, ctx() ))
+        ));
+      } else {
+        return evaluate( solver, qf_bv::bvsgt(
+            qf_bv::zero_extend(1, proto::eval( e1, ctx() ))
+          , qf_bv::sign_extend(1, proto::eval( e2, ctx() ))
+        ));
+      }
     }
 
     template< typename Expr1, typename Expr2>
+    result_type operator() (proto::tag::greater_equal, Expr1 const & e1, Expr2 const &  e2) {
+      bool sign1 = proto::matches< Expr1, IsSigned >::value;
+      bool sign2 = proto::matches< Expr2, IsSigned >::value;
+
+      if( sign1 && sign2 ) {
+        return evaluate( solver, qf_bv::bvsge(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      } else if ( !sign1 && !sign2 ) {
+        return evaluate( solver, qf_bv::bvuge(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      } else if ( sign1 ) {
+        return evaluate( solver, qf_bv::bvsge(
+            qf_bv::sign_extend(1, proto::eval( e1, ctx() ))
+          , qf_bv::zero_extend(1, proto::eval( e2, ctx() ))
+        ));
+      } else {
+        return evaluate( solver, qf_bv::bvsge(
+            qf_bv::zero_extend(1, proto::eval( e1, ctx() ))
+          , qf_bv::sign_extend(1, proto::eval( e2, ctx() ))
+        ));
+      }
+    }
+
+
+    template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::logical_and, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvand(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
-      );
+      return evaluate( solver, preds::And(
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
+      ));
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::logical_or, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvor(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
-      );
+      return evaluate( solver, preds::Or(
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
+      ));
+    }
+
+    template< typename Expr>
+    result_type operator() (proto::tag::logical_not, Expr const & e) {
+      return evaluate( solver, preds::Not( proto::eval( e, ctx() ) ) );
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::plus, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvadd(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
-      );
+      return evaluate( solver, qf_bv::bvadd(
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
+      ));
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::minus, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvsub(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
-      );
+      return evaluate( solver, qf_bv::bvsub(
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
+      ));
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::modulus, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvurem(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
-      );
+	  // assume e2 >= 0
+      bool sign1 = proto::matches< Expr1, IsSigned >::value;
+      if( sign1 ) {
+        return evaluate( solver, qf_bv::bvsrem(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      } else {
+        return evaluate( solver, qf_bv::bvurem(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      } 
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::divides, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvudiv(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
-      );
+      bool sign1 = proto::matches< Expr1, IsSigned >::value;
+      bool sign2 = proto::matches< Expr2, IsSigned >::value;
+      if( sign1 && sign2 ) {
+        return evaluate( solver, qf_bv::bvsdiv(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      } else if ( !sign1 && !sign2 ) {
+        return evaluate( solver, qf_bv::bvudiv(
+            proto::eval( e1, ctx() )
+          , proto::eval( e2, ctx() )
+        ));
+      } else if ( sign1 ) {
+        return evaluate( solver, qf_bv::bvsdiv(
+            qf_bv::sign_extend(1, proto::eval( e1, ctx() ))
+          , qf_bv::zero_extend(1, proto::eval( e2, ctx() ))
+        ));
+      } else {
+        return evaluate( solver, qf_bv::bvsdiv(
+            qf_bv::zero_extend(1, proto::eval( e1, ctx() ))
+          , qf_bv::sign_extend(1, proto::eval( e2, ctx() ))
+        ));
+      }
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::shift_left, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvshl(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
-      );
+      return evaluate( solver, qf_bv::bvshl(
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
+      ));
     }
 
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::multiplies, Expr1 const & e1, Expr2 const &  e2) {
-      return _logic->bvmul(
-          proto::eval( e1, *this )
-        , proto::eval( e2, *this )
-      );
+      return evaluate( solver, qf_bv::bvmul(
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
+      ));
+    }
+
+    template< typename Integral, typename Expr>
+    result_type operator() (extend_tag, Integral const & by_width, Expr const &  e) {
+      bool sign = proto::matches< Expr, IsSigned >::value;
+      if (sign)
+        return evaluate( solver, 
+          qf_bv::sign_extend( proto::value(by_width).value,
+            proto::eval( e, ctx() )
+        ));
+      else
+        return evaluate( solver, 
+          qf_bv::zero_extend( proto::value(by_width).value,
+            proto::eval( e, ctx() )
+        ));
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::assign, Expr1 const & e1, Expr2 const &  e2) {
       //std::cout << "eval assign" << std::endl;
       result_type expr1, expr2;
-      expr1 = proto::eval( e1, *this );
-      expr2 = proto::eval( e2, *this );
+      expr1 = proto::eval( e1, ctx() );
+      expr2 = proto::eval( e2, ctx() );
 
-      boost::function0<result_type> f = getID( _logic->equal(expr1, expr2) );
+      boost::function0<result_type> f = getID( evaluate(solver, 
+          preds::equal(expr1, expr2)) );
       _lazy[proto::value(e1).id] = f;
       
-      return _logic->bit1();
+    
+      return evaluate( solver, preds::True);
     }
 
     result_type operator() (proto::tag::terminal t, randomize_tag const & tag )
     {
       _lazy.erase(tag.id);
-      return _logic->bit1();
+      return evaluate( solver, preds::True);
     }
 
     struct getID {
@@ -223,28 +407,31 @@ namespace platzhalter {
 
     template<typename Integer>
     struct getLazyReference{
-      getLazyReference(Integer const & i, metaSMT::QF_BV* logic, result_type var) 
-      : _i (i), _logic(logic), _var(var)
+      getLazyReference(Integer const & i, SolverType & solver, result_type var) 
+      : _i (i), solver(solver), _var(var)
       {}
       result_type operator() () {
-        return _logic->equal(_var, _logic->bvuint(_i, bitsize_traits<Integer>::nbits) );
+        if (boost::is_signed<Integer>::value) 
+          return evaluate( solver, preds::equal(_var, qf_bv::bvsint(_i, bitsize_traits<Integer>::value) )); 
+        else    
+          return evaluate( solver, preds::equal(_var, qf_bv::bvuint(_i, bitsize_traits<Integer>::value) )); 
       }
       Integer const & _i;
-      metaSMT::QF_BV* _logic;
+      SolverType & solver;
       result_type _var;
     };
 
     template< typename Integer>
     result_type operator() (proto::tag::terminal t, read_ref_tag<Integer> const & ref) {
-      unsigned width=bitsize_traits<Integer>::nbits;
+      unsigned width=bitsize_traits<Integer>::value;
 
-      std::map<int, result_type>::const_iterator ite
+      std::map<int, qf_bv::bitvector>::const_iterator ite
         = _variables.find(ref.id);
       if ( ite != _variables.end() ) {
-        return ite->second;
+        return evaluate(solver, ite->second);
       } else {
-        result_type var = (*this)(t, static_cast<var_tag<Integer> >(ref));
-        boost::function0<result_type> f = getLazyReference<Integer>(ref.ref, _logic, var);
+        result_type var = (ctx())(t, static_cast<var_tag<Integer> >(ref));
+        boost::function0<result_type> f = getLazyReference<Integer>(ref.ref, solver, var);
         _lazy[ref.id] = f;
 
         return var;
@@ -253,66 +440,97 @@ namespace platzhalter {
 
     template< typename Integer>
     result_type operator() (proto::tag::terminal, Integer const & i) {
-      unsigned width=bitsize_traits<Integer>::nbits;
-//      std::cout << "creating int " << i << ", width= " << width << std::endl;
-      return _logic->bvuint(i, width);
+      if (boost::is_signed<Integer>::value) 
+        return evaluate( solver, qf_bv::bvsint(i, bitsize_traits<Integer>::value) );
+      else
+        return evaluate( solver, qf_bv::bvuint(i, bitsize_traits<Integer>::value) );
+    }
+
+    template< typename Expr1, typename Expr2>
+    result_type operator() (proto::tag::subscript, Expr1 const & e1, Expr2 const &  e2) {
+      // e1 should be a terminal vector_tag
+      BOOST_STATIC_ASSERT((
+        boost::is_same<
+          typename proto::tag_of<Expr1>::type, 
+          proto::tag::terminal
+        >::value
+      ));
+
+      vectorSubscript_Context vsctx;
+      vecVar vv(proto::value(e1).id, proto::eval(e2, vsctx)); 
+
+      std::map<vecVar, qf_bv::bitvector>::const_iterator ite = _vector_variables.find(vv);
+      if ( ite != _vector_variables.end() ) {
+        return evaluate(solver, ite->second);
+      } else {
+        std::ostringstream buf;
+        buf << vv;
+        typedef typename proto::result_of::value<Expr1>::type value_type;
+        unsigned width=bitsize_traits<value_type >::value;
+
+        qf_bv::bitvector bv = qf_bv::new_bitvector(width);
+        _vector_variables.insert( std::make_pair(vv, bv) );
+        return evaluate(solver, bv);
+      }
     }
 
     template<typename Expr>
     void assertion (Expr e) {
-      check(e);
-      _solver->addAssertion( proto::eval(e, *this) );
+      //check(e);
+      metaSMT::assertion(solver, proto::eval(e, ctx()) );
     }
 
     template<typename Expr>
-    void assertion (std::string group, Expr e) {
-      check(e);
+    void assertion (std::string constraint_name, Expr e) {
+      //check(e);
 
       result_type var;
-      if (_group_variables.find(group) != _group_variables.end() ) 
-        var = _group_variables[group];
-      else {
-        var = _logic->bitvec(group, 1);
-        _group_variables.insert( std::make_pair(group, var) );
-      }
+      assert (_constraint_name_variables.find(constraint_name) == _constraint_name_variables.end() ); 
 
-      _solver->addAssertion( _logic->implies( var, proto::eval(e, *this) ) );
+      var = evaluate(solver, preds::new_variable());
+      _constraint_name_variables.insert( std::make_pair(constraint_name, var) );
+      metaSMT::assertion(solver, preds::implies( var, proto::eval(e, ctx()) ) );
     }
 
-    bool enable_group(std::string group) {
-      if (_group_variables.find(group) == _group_variables.end()) return false;
-      _disabled_groups.erase(group);
-      return true;
+    void enable_constraint(std::string constraint_name) {
+      assert (_constraint_name_variables.find(constraint_name) != _constraint_name_variables.end());
+      _disabled_constraint_names.erase(constraint_name);
     }
 
-    bool disable_group(std::string group) {
-      if (_group_variables.find(group) == _group_variables.end()) return false;
-      _disabled_groups.insert(group);
-      return true;
+    void disable_constraint(std::string constraint_name) {
+      assert (_constraint_name_variables.find(constraint_name) != _constraint_name_variables.end());
+      _disabled_constraint_names.insert(constraint_name);
     }
 
     template<typename Expr>
     void soft_assertion (Expr e) {
-      check(e);
-      _soft = _logic->bvand(_soft, proto::eval(e, *this) );
+      //check(e);
+      _soft = evaluate( solver, preds::And(_soft, proto::eval( e, ctx())));
     }
 
     void pre_solve() {       
       for (
         std::map<std::string, result_type >::const_iterator 
-        ite = _group_variables.begin();
-        ite != _group_variables.end(); ++ite) {
-        if (_disabled_groups.find(ite->first) == _disabled_groups.end())
-          _solver->addAssumption( _logic->equal(ite->second, _logic->bit1()) );
+        ite = _constraint_name_variables.begin();
+        ite != _constraint_name_variables.end(); ++ite) {
+        if (_disabled_constraint_names.find(ite->first) == _disabled_constraint_names.end())
+          assumption(solver, ite->second);
         else
-          _solver->addAssumption( _logic->equal(ite->second, _logic->bit0()) );
+          assumption(solver, preds::Not(ite->second));
       }
 
       for (
         std::map<unsigned, boost::function0<result_type> > ::const_iterator 
         ite = _lazy.begin();
         ite != _lazy.end(); ++ite) {
-        _solver->addAssumption( (ite->second)() );
+        assumption(solver, (ite->second)() );
+      }
+
+      for (
+        std::map<vecVar, boost::function0<result_type> > ::const_iterator 
+        ite = _lazy_vec.begin();
+        ite != _lazy_vec.end(); ++ite) {
+        assumption(solver, (ite->second)() );
       }
     }
 
@@ -320,151 +538,172 @@ namespace platzhalter {
       if (sat) for (uint i = 0; i < _post_hook.size(); i++) _post_hook[i]();
     }
 
-    bool solve (bool soft=true) {
+    bool solve () {
+      bool const ret = ctx().do_solve();
+      post_solve(ret );
+      return ret;
+    }
+
+    bool do_solve () {
       pre_solve();
-      _solver->addAssumption(_soft);
-      // if soft constraint satisfiable
-      if ( _solver->solve() ) {
-         post_solve(true);
-         return true;
+      const unsigned limit = 5;
+      assumption(solver,_soft);
+           // if soft constraint satisfiable
+      if ( metaSMT::solve(solver) ) {
+ 	  for(unsigned i = 0; i < limit  ; ++i) {
+             pre_solve();
+             assumption(solver,_soft);
+	     assign_random_bits();
+  	     if( metaSMT::solve(solver)) {
+	       return true;
+	     }
+	  } //end for
+
+          pre_solve();
+          assumption(solver,_soft);
+	  return metaSMT::solve(solver);
       }
-      else {
-        // if not satisfiable
-        pre_solve();
-        bool ret = _solver->solve( );
-        post_solve(ret);
-        return ret;
+      // soft constraints not satisfiable
+      pre_solve();
+      if( metaSMT::solve(solver) ) {
+        for(unsigned i = 0; i < limit ; ++i) {
+	     pre_solve();
+	     assign_random_bits(); 
+  	     if( metaSMT::solve(solver)) {
+	        return true;
+	     }
+	}
+          pre_solve();
+	  return metaSMT::solve(solver);
+     }
+     return false;
+   }
+    void assign_random_bits() {
+      std::vector <result_type> bits;
+
+      typedef std::pair<int,qf_bv::bitvector> var_pair;
+      BOOST_FOREACH( var_pair const & p, _variables ) {
+        if ( _lazy.find(p.first) == _lazy.end() ) {
+
+          for(unsigned i=0; i < proto::value(p.second).width; ++i) {
+            result_type tmp = evaluate(solver, qf_bv::extract(i,i, p.second));
+            bits.push_back(tmp);
+          }
+
+        }
+      }
+ 
+      std::random_shuffle(bits.begin(),bits.end());
+      int len = 0;
+      if (bits.size() > 0) {
+        rand()%bits.size();
+      }
+      
+      for(unsigned i = 0; i < len ; ++i) {
+       metaSMT::assumption(solver, preds::equal(bits[i], qf_bv::bvuint(rand()%2,1)));
       }
     }
 
     template<typename T>
     T read ( Variable<T> const & v) {
       T ret;
-      read(ret, v.id());
+      bool success = false;
+      success = read(ret, v.id());
+      assert( success );
       return ret;
     }
 
     template<typename T>
-    void read ( T & v, unsigned id) {
-      std::map<int, result_type>::const_iterator ite
+    bool read ( T & v, unsigned id) {
+      std::map<int, qf_bv::bitvector>::const_iterator ite
         = _variables.find(id);
-      assert ( ite != _variables.end() );
-      std::string solution = _solver->readAssignment(ite->second);
-      v = metaSMT::bits2Cu(solution);
+      if ( ite != _variables.end() ) {
+        v = read_value(solver, ite->second);
+        return true;
+      }
+      return false;
     }
 
-    private:
-      metaSMT::MetaSolver* _solver;
-      metaSMT::QF_BV*      _logic;
+    template<typename T>
+    bool read ( T & v, vecVar & vv) {
+      std::map<vecVar, qf_bv::bitvector>::const_iterator ite
+        = _vector_variables.find(vv);
+      if ( ite != _vector_variables.end() ) {
+        v = read_value(solver, ite->second);
+        return true;
+      }
+      return false;
+    }
+
+    void dump_vec_var_list(std::vector<vecVar>& v) {
+      for (std::map<vecVar, qf_bv::bitvector>::const_iterator ite = _vector_variables.begin(); ite != _vector_variables.end(); ++ite) {
+          v.push_back(ite->first);
+      }
+    }
+
+    template<typename T>
+    void vec_assign (vecVar & vv, T & val) {
+      boost::function0<result_type> f = getLazyReference<T>(val, solver, evaluate(solver, _vector_variables[vv]) );
+      _lazy_vec[vv] = f;
+    }
+
+    void vec_free (vecVar & vv) {
+      _lazy_vec.erase(vv);
+    }
+
+    template<typename T>
+    struct makeUnique {
+      makeUnique(__rand_vec<T> & rv, SolverType & solver, result_type var) 
+      : _rv(rv), solver(solver), _var(var)
+      {}
+      result_type operator() () {
+        result_type ret = evaluate( solver, preds::True);
+        for (uint i = 0; i < _rv.size(); i++) {
+          if (boost::is_signed<T>::value) 
+            ret = evaluate( solver, preds::And(ret, evaluate( solver, preds::nequal(_var, qf_bv::bvsint(_rv[i], bitsize_traits<T>::value) )))); 
+          else
+            ret = evaluate( solver, preds::And(ret, evaluate( solver, preds::nequal(_var, qf_bv::bvuint(_rv[i], bitsize_traits<T>::value) )))); 
+        }
+        return ret;
+      }
+      __rand_vec<T> & _rv;
+      SolverType & solver;
+      result_type _var;
+    };
+
+    template<typename T>
+    void vec_unique (vecVar & vv, __rand_vec<T> & rv) {
+      boost::function0<result_type> f = makeUnique<T>(rv, solver, evaluate(solver, _vector_variables[vv]) );
+      _lazy_vec[vv] = f;        
+    }
+
+    protected:
+      inline derived_context & ctx() {  return  static_cast<derived_context&>(*this); }
+
+      std::map<int, qf_bv::bitvector> _variables;
+      std::map<vecVar, qf_bv::bitvector> _vector_variables;
+      //metaSMT::MetaSolver* _solver;
+      //metaSMT::QF_BV*      _logic;
+      SolverType solver;
       result_type          _soft;
-      std::map<int, result_type> _variables;
-      std::map<std::string, result_type> _group_variables;
-      std::set<std::string> _disabled_groups;
+
+    private:
+      std::map<std::string, result_type> _constraint_name_variables;
+      std::set<std::string> _disabled_constraint_names;
       std::map<unsigned, boost::function0<result_type> > _lazy;
+      std::map<vecVar, boost::function0<result_type> > _lazy_vec;
       std::vector<boost::function0<void> > _post_hook;
 
   }; // metaSMT_Context
 
+  struct metaSMT_Context : metaSMT_Context_base<metaSMT_Context> {
+    metaSMT_Context() 
+    : metaSMT_Context_base<metaSMT_Context>()
+    { }
+  };
+
   typedef metaSMT_Context Context;
-
-  Context get_context(std::string const & solvername="") {
-    return metaSMT_Context(solvername);
-  }
-
-  template<typename ContextT=Context>
-  struct Generator;
-
-  template< typename T=Context>
-  struct Soft_Generator {
-    Soft_Generator(Generator<T> & gen) : gen(gen) {}
-
-    template< typename Expr >
-    Soft_Generator<T> & operator() (Expr e);
-    Generator<T> & gen;
-  };
-
-  struct Soft;
-
-  template<typename ContextT>
-  struct Generator {
-
-    Generator() {};
-
-    template<typename Expr>
-    Generator(Expr expr)
-    {
-      (*this)(expr);
-    }
-
-    template<typename Expr>
-    Generator<ContextT> & operator() (Expr expr)
-    {
-//      display_expr(expr);
-      ctx.assertion(expr);
-      return *this;
-    }
-
-    template<typename Expr>
-    Generator<ContextT> & operator() (std::string group, Expr expr)
-    {
-      ctx.assertion(group, expr);
-      return *this;
-    }
-
-    bool enable_group(std::string group) { return ctx.enable_group(group); }
-    bool disable_group(std::string group) { return ctx.disable_group(group); }
-
-    /**
-     * generate a new assignment
-     **/
-    Generator<ContextT> & operator() () {
-      if(! next() )
-        throw std::runtime_error("Generator constraint unsatisfiable.");
-      return *this;
-    }
-
-    template<typename Expr>
-    Generator<ContextT> & soft( Expr e) {
-      ctx.soft_assertion( e );
-    }
-
-    /**
-     * generate soft constraints
-     **/
-    Soft_Generator<ContextT> operator() ( Soft const & ) {
-      return Soft_Generator<ContextT> (*this);
-    }
-
-    bool next() {
-      return ctx.solve();
-    }
-
-    /**
-     * read variable "var"
-     **/
-    template<typename T>
-    T operator[] (Variable<T> const & var) { return ctx.read(var); };
-
-    private:
-      ContextT ctx;
-  };
-
-  template< typename T >
-  template< typename Expr >
-  Soft_Generator<T> &
-  Soft_Generator<T>::operator() (Expr e) {
-    gen.soft(e);
-    return *this;
-  }
-
-  struct Soft {
-    template< typename T >
-    Soft_Generator<T> operator() (Generator<T> & gen) const {
-      return Soft_Generator<T>( gen );
-    }
-  };
-
-  const Soft soft = {};
 
 } // namespace platzhalter
 //  vim: ft=cpp:ts=2:sw=2:expandtab
+

@@ -1,8 +1,7 @@
 #define BOOST_TEST_MODULE SystemC_Data
 #include <boost/test/unit_test.hpp>
 
-#include <platzhalter/Constraint.hpp>
-#include <platzhalter/Context.hpp>
+#include <platzhalter/ConstrainedRandom.hpp>
 #include <platzhalter/SystemC.hpp>
 
 #include <systemc.h>

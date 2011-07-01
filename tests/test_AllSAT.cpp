@@ -1,8 +1,8 @@
-#define BOOST_TEST_MODULE Context_t
+#define BOOST_TEST_MODULE allsat
 #include <boost/test/unit_test.hpp>
 
 #include <platzhalter/ConstrainedRandom.hpp>
-#include <platzhalter/ExpressionTraits.hpp>
+#include <platzhalter/AllSAT.hpp>
 
 #include <boost/format.hpp>
 
@@ -19,26 +19,77 @@ struct Context_Fixture {
   {
   }
   protected:
-    Context ctx;
+  Generator<AllSAT<> > gen;
 };
 
-BOOST_FIXTURE_TEST_SUITE(Context_t, Context_Fixture )
+class sif_seq_item : public rand_obj_of<AllSAT<> > {
+public:
+    sif_seq_item() : 
+        tx_enable_parity(this),
+        tx_odd_parity(this),
+        dummy()
+    {
+      constraint( !tx_odd_parity() || tx_enable_parity());
+    }
 
-BOOST_AUTO_TEST_CASE ( multiple_solver_instances )
+    friend ostream& operator<<(ostream& os, const sif_seq_item& ssi) {
+        os << "CHECK: tx_odd_parity / enable  = " << ssi.tx_odd_parity
+           << " " << ssi.tx_enable_parity << std::endl; 
+        assert( !ssi.tx_odd_parity || ssi.tx_enable_parity ); 
+
+        os << "EndConstraint" << std::endl; 
+        return os; 
+    }
+
+    randv<bool> tx_enable_parity;
+    randv<bool> tx_odd_parity;
+    int dummy;
+};
+
+BOOST_FIXTURE_TEST_SUITE(allsat, Context_Fixture )
+
+BOOST_AUTO_TEST_CASE ( gen10k )
 {
-  Generator<Context> gen1, gen2;
-  Variable<int> r1, r2;
-  gen1(r1 < 6);
-  gen2(r2 < 6);
-  gen1.next();
-  gen2.next();
-  
+  Variable<bool> r1, r2;
+  gen( !r1 || r2);
+
+  for (int i=0;i<10000; i++) {
+    gen();
+    BOOST_REQUIRE( !gen[r1] || gen[r2] );
+  }
+}
+
+BOOST_AUTO_TEST_CASE ( randv10k )
+{
+  sif_seq_item it;
+
+  for (int i=0;i<10000; i++) {
+    BOOST_REQUIRE(it.next());
+//    std::cout << it << std::endl;
+    BOOST_REQUIRE( !it.tx_odd_parity ||  it.tx_enable_parity );
+    //BOOST_REQUIRE( !it.rx_odd_parity ||  it.rx_enable_parity );
+  }
+}
+
+BOOST_AUTO_TEST_CASE ( t1 )
+{
+  randv<uint> v(0);
+  Generator< AllSAT<30> > gen;
+  gen(v() <= 10);
+
+  std::vector<uint> vec;
+  for (uint i = 0; i <= 10; i++) {
+    BOOST_REQUIRE(gen.next());
+    for (uint j = 0; j < vec.size(); j++)
+      BOOST_REQUIRE(vec[j] != v);      
+    vec.push_back(v);
+  }
 }
 
 BOOST_AUTO_TEST_CASE( constants )
 {
   Variable<unsigned> x;
-  Generator<Context> gen( x == 135421 );
+  Generator<AllSAT<10> > gen( x == 135421 );
   gen();
   BOOST_CHECK_EQUAL( gen[x], 135421 );
 }
@@ -47,7 +98,7 @@ BOOST_AUTO_TEST_CASE( boolean )
 {
   Variable<bool> b;
 
-  Generator<Context> gen;  
+  Generator<AllSAT<10> > gen;  
   gen(b == b)(); // create a new assignment
 
   bool b1 = gen[b];
@@ -63,7 +114,7 @@ BOOST_AUTO_TEST_CASE( less )
 {
   Variable<unsigned> a;
 
-  Generator<Context> gen;  
+  Generator<AllSAT<10> > gen;  
   gen(a < 256u);
 
   std::set<unsigned> generated;
@@ -80,7 +131,7 @@ BOOST_AUTO_TEST_CASE( less_equal )
 {
   Variable<unsigned> a;
 
-  Generator<Context> gen;  
+  Generator<AllSAT<10> > gen;  
   gen(a <= 256u);
 
   std::set<unsigned> generated;
@@ -97,7 +148,7 @@ BOOST_AUTO_TEST_CASE( greater )
 {
   Variable<unsigned> a;
 
-  Generator<Context> gen;  
+  Generator<AllSAT<10> > gen;  
   gen(a > (std::numeric_limits<unsigned>::max()-256) );
 
   std::set<unsigned> generated;
@@ -114,7 +165,7 @@ BOOST_AUTO_TEST_CASE( greater_equal )
 {
   Variable<unsigned> a;
 
-  Generator<Context> gen;  
+  Generator<AllSAT<10> > gen;  
   gen(a >= (std::numeric_limits<unsigned>::max()-256) );
 
   std::set<unsigned> generated;
@@ -134,7 +185,7 @@ BOOST_AUTO_TEST_CASE( divide )
   Variable<unsigned char> q;
   Variable<unsigned char> r;
 
-  Generator<Context> gen;
+  Generator<AllSAT<10> > gen;
   gen
     ( b != (unsigned char)  0u )
     ( a  < (unsigned char) 16u )
@@ -152,65 +203,13 @@ BOOST_AUTO_TEST_CASE( divide )
   }
 }
 
-BOOST_AUTO_TEST_CASE( mult_mod ) 
-{
-  randv<int> a(0);
-  randv<int> b(0);
-
-  Generator<Context> gen;
-  gen
-    ( -3 <= a() && a() <= 3 )
-    ( -3 <= b() && b() <= 3 )
-    ( a() * b() % 6 == 0)
-  ;
-  
-  int cnt = 0;  
-  for (int i = -3; i <= 3; i++)
-    for (int j = -3; j <= 3; j++)
-      if (i * j % 6 == 0) cnt++;
-
-  int cnt1 = 0;
-  while( gen.next() ) {
-    cnt1++;
-    BOOST_REQUIRE_EQUAL(a * b % 6, 0);
-    gen( a() != a || b() != b );
-  }
-
-  BOOST_REQUIRE_EQUAL(cnt, cnt1);
-}
-
-BOOST_AUTO_TEST_CASE ( shiftleft )
-{
-  Variable<unsigned> a;
-  Variable<unsigned> b;
-  Variable<unsigned> c;
-
-  Generator<Context> gen;
-  gen
-    ( a <  256u )
-    ( b <  (unsigned) (sizeof(unsigned)*8u) )
-    ( c == (a << b) )
-  ;
-
-  while( gen.next() ) {
-    unsigned av = gen[a];
-    unsigned bv = gen[b];
-    unsigned r  = av << bv;
-
-    BOOST_REQUIRE_EQUAL( r, gen[c] );
-
-    gen( a != gen[a] || b != gen[b] );
-    //std::cout << format("result: a=%d, b=%d, r=%d,  c=%d\n") % gen[a]% gen[b] %r % gen[c];
-  }
-}
-
 // temporaly fix a variable to a certain value using the assign operator
 BOOST_AUTO_TEST_CASE ( fix_variable )
 {
   Variable<unsigned> a;
   Variable<unsigned> b;
 
-  Generator<Context> gen (a < b);
+  Generator<AllSAT<10> > gen (a < b);
   gen ( b = 7 ) ;
 
   unsigned c = 0;
@@ -237,7 +236,7 @@ BOOST_AUTO_TEST_CASE ( by_reference )
   unsigned b=0;
   Variable<unsigned> a;
 
-  Generator<Context> gen (a == reference(b) );
+  Generator<AllSAT<15> > gen (a == reference(b) );
 
   while( gen.next() ) {
     unsigned av = gen[a];
@@ -254,7 +253,7 @@ BOOST_AUTO_TEST_CASE ( named_reference )
   Variable<unsigned> a, c;
   ReadReference<unsigned> b(bv);
 
-  Generator<Context> gen (a == b);
+  Generator<AllSAT<15> > gen (a == b);
   gen(c != b);
 
   while( gen.next() ) {
@@ -269,7 +268,7 @@ BOOST_AUTO_TEST_CASE ( named_reference )
 
 BOOST_AUTO_TEST_CASE ( soft_constraint_t )
 {
-  Generator<Context> gen;
+  Generator<AllSAT<10> > gen;
   Variable<int> r;
   gen( r<6 );
   soft(gen)( r == 2 );
@@ -282,50 +281,13 @@ BOOST_AUTO_TEST_CASE ( soft_constraint_t )
   BOOST_REQUIRE( gen.next() );
 }
 
-BOOST_AUTO_TEST_CASE ( randv_test )
-{
-  Generator<Context> gen;
-  randv<int> a(NULL);
-  randv<int> b(NULL);
-  std::cout << "init: a = " <<  a << ", b = " << b << std::endl;
-  gen
-    (4 <= a() && a() <= 6)
-    (9 <= a() + b() && a() + b() <= 11)
-    (b() % 2 == 0);
-  unsigned count=0;
-  while( gen.next() ) {
-    ++count;
-    std::cout << "result: a = " <<  a << ", b = " << b << std::endl;
-    gen(a() != a || b() != b);
-  }
-  BOOST_CHECK_EQUAL(count, 4);
-}
-
-BOOST_AUTO_TEST_CASE ( randv_var_ref_mixed_test )
-{
-  Generator<Context> gen;
-  randv<int> a(0);
-  Variable<int> b;
-  gen
-    (4 <= a() && a() <= 6)
-    (9 <= a() + b && a() + b <= 11)
-    (b % 2 == 0);
-  unsigned count=0;
-  while( gen.next()) {
-    ++count;
-    std::cout << "result: a = " <<  a << ", b = " << gen[b] << std::endl;
-    gen(a() != a || b != gen[b]);
-  }
-  BOOST_CHECK_EQUAL(count, 4);
-}
-
 BOOST_AUTO_TEST_CASE( alu )
 {
   Variable<unsigned> op;
   Variable<unsigned> a;
   Variable<unsigned> b;
 
-  Generator<Context> gen;  
+  Generator<AllSAT<10> > gen;  
   gen
     ( a < 16)
     ( b < 16)
@@ -346,7 +308,7 @@ BOOST_AUTO_TEST_CASE( alu_enum )
   Variable<unsigned> a;
   Variable<unsigned> b;
 
-  Generator<Context> gen;  
+  Generator<AllSAT<10> > gen;  
   gen
     ( a < 16u)
     ( b < 16u)
@@ -372,7 +334,7 @@ BOOST_AUTO_TEST_CASE( pythagoras )
   Variable<unsigned long long> b;
   Variable<unsigned long long> c;
 
-  Generator<Context> gen;  
+  Generator<AllSAT<5> > gen;  
   gen(a*a + b*b == c*c)(); // create a new assignment
 
   unsigned long long av = gen[a];
@@ -387,7 +349,7 @@ BOOST_AUTO_TEST_CASE ( negative_var )
   randv<int> a(NULL);
   randv<int> b(NULL);
 
-  Generator<Context> gen;
+  Generator<AllSAT<10> > gen;
   gen
     ( a() + b() <= 120 )
     ( a() > 120  )
@@ -404,7 +366,7 @@ BOOST_AUTO_TEST_CASE ( signed_less_zero )
 {
   randv<int> a(NULL);
 
-  Generator<Context> gen;
+  Generator<AllSAT<10> > gen;
   gen
     ( a() < 0 )
   ;
@@ -417,139 +379,6 @@ BOOST_AUTO_TEST_CASE ( signed_less_zero )
 }
 
 
-BOOST_AUTO_TEST_CASE ( mixed_bv_width_1 )
-{
-  randv<unsigned long> a(NULL);
-  randv<unsigned short> b(NULL);
-
-
-  ExpressionSize es;
-
-  BOOST_CHECK_EQUAL( es(a()).value, sizeof(long)*8);
-  BOOST_CHECK_EQUAL( es(b()).value, sizeof(short)*8);
-  BOOST_CHECK_EQUAL( es (a()+b()).value, std::max( sizeof(short), sizeof(long))*8 );
-
-  //boost::proto::display_expr( b()+a());
-  //boost::proto::display_expr( FixWidth()( b()+a() ));
-
-  //boost::proto::display_expr( a()+b());
-  //boost::proto::display_expr( FixWidth()( a()+b() ));
-
-  //boost::proto::display_expr( b()+a() >= 120);
-  //boost::proto::display_expr( FixWidth()(b()+a() >= 120));
-
-  Generator<Context> gen;
-  gen
-    (  a() + b() >= 120 )
-  ;
-
-  gen.next();
-
-  std::cout << format("result: a=%d, b=%d\n") % a % b;
-
-  BOOST_CHECK(a + b >= 120);
-}
-
-BOOST_AUTO_TEST_CASE ( mixed_bv_width_2 )
-{
-  randv<signed char> a(NULL);
-  Generator<Context > gen;
-  gen( a() < 10 );
-
-  std::set<signed char> generated;
-  while (gen.next()) {
-    generated.insert(a);
-    gen( a() != a );
-  }
-
-  BOOST_CHECK_EQUAL( generated.size(), 138);
-}
-
-BOOST_AUTO_TEST_CASE ( mixed_bv_width_3 )
-{
-  randv<short> a(NULL);
-  Generator<Context > gen;
-  gen( a() <  10 );
-  gen( a() > -10 );
-
-  std::set<short> generated;
-  while (gen.next()) {
-    generated.insert(a);
-    gen( a() != a );
-  }
-
-  BOOST_CHECK_EQUAL( generated.size(), 19);
-}
-
-BOOST_AUTO_TEST_CASE ( mixed_bv_width_4 )
-{
-  randv<int> a(NULL);
-  Generator<Context > gen;
-  gen( a() < (signed char) 10 );
-  gen( a() > (short) -10 );
-
-  std::set<int> generated;
-  while (gen.next()) {
-    generated.insert(a);
-    gen( a() != a );
-  }
-
-  BOOST_CHECK_EQUAL( generated.size(), 19);
-}
-
-BOOST_AUTO_TEST_CASE ( mixed_bv_width_5 )
-{
-  randv<short> a(NULL);
-  randv<signed char> b(NULL);
-  Generator<Context > gen;
-  gen( -3 <= a() && a() <= 3 );
-  gen( -3 <= b() && b() <= 3 );
-  gen( (-2 <= a() + b()) && (a() + b() <= 2) );
-
-  int cnt = 0;
-  while (gen.next()) {
-    cnt++;
-    gen( (a() != a) || (b() != b) );
-  }
-
-  int cnt1 = 0;
-  for (short i = -3; i <= 3; i++)
-    for (signed char j = -3; j <= 3; j++)
-      if ((-2 <= i + j) && (i + j <= 2)) cnt1++;
-
-  BOOST_CHECK_EQUAL( cnt, cnt1);
-}
-
-BOOST_AUTO_TEST_CASE( mixed_bv_width_6 ) 
-{
-  randv<short> a(0);
-  randv<signed char> b(0);
-
-  Generator<Context> gen;
-  gen
-    ( -3 <= a() && a() <= 3 )
-    ( -3 <= b() && b() <= 3 )
-    ( a() * b() % 6 == 0)
-  ;
-  
-  int cnt = 0;  
-  for (int i = -3; i <= 3; i++)
-    for (int j = -3; j <= 3; j++)
-      if (i * j % 6 == 0) cnt++;
-
-  int cnt1 = 0;
-  while( gen.next() ) {
-    cnt1++;
-    BOOST_REQUIRE_EQUAL(a * b % 6, 0);
-    gen( a() != a || b() != b );
-  }
-
-  BOOST_REQUIRE_EQUAL(cnt, cnt1);
-}
-
 BOOST_AUTO_TEST_SUITE_END() // Context
-
-bitsize_traits<long> _instanciate1;
-bitsize_traits<short> _instanciate2;
 
 //  vim: ft=cpp:ts=2:sw=2:expandtab
