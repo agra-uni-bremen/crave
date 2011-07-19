@@ -10,6 +10,8 @@
 
 namespace crave {
 
+  extern boost::mt19937 rng;
+
   struct DetectReadRef : proto::callable_context< DetectReadRef, proto::null_context > {
     DetectReadRef() : readRefFound(false) {}
     typedef void result_type;
@@ -216,13 +218,10 @@ namespace crave {
     }
 
     struct RNG {
-      boost::mt19937 _state;
       unsigned operator()(unsigned i) {
             boost::uniform_int<> rng(0, i - 1);
-            return rng(_state);
+            return rng(crave::rng);
         }
-      //RNG() :_state(time(NULL)) {}
-      RNG() :_state(0) {}
     } rng;
 
     void reset() {

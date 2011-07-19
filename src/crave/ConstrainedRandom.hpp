@@ -75,6 +75,8 @@ namespace crave {
 
   extern boost::mt19937 rng;
 
+  void set_global_seed(unsigned int s);
+
   template<typename T>
   struct weighted_range
   {  
