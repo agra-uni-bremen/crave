@@ -8,7 +8,7 @@
 #include <boost/random/uniform_int.hpp>
 #include <boost/foreach.hpp>
 
-namespace platzhalter {
+namespace crave {
 
   struct DetectReadRef : proto::callable_context< DetectReadRef, proto::null_context > {
     DetectReadRef() : readRefFound(false) {}
@@ -245,7 +245,7 @@ namespace platzhalter {
     AllSAT() : AllSAT_base(N) { }
   };
 
-} /* platzhalter */
+} /* crave */
 
 
 // vim: tabstop=2 shiftwidth=2 expandtab

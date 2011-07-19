@@ -1,8 +1,8 @@
 #define BOOST_TEST_MODULE allsat
 #include <boost/test/unit_test.hpp>
 
-#include <platzhalter/ConstrainedRandom.hpp>
-#include <platzhalter/AllSAT.hpp>
+#include <crave/ConstrainedRandom.hpp>
+#include <crave/AllSAT.hpp>
 
 #include <boost/format.hpp>
 
@@ -10,7 +10,7 @@
 #include <iostream>
 
 //using namespace std;
-using namespace platzhalter;
+using namespace crave;
 
 using boost::format;
 

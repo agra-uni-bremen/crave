@@ -1,10 +1,10 @@
 #define BOOST_TEST_MODULE Syntax
 #include <boost/test/unit_test.hpp>
 
-#include <platzhalter/ConstrainedRandom.hpp>
+#include <crave/ConstrainedRandom.hpp>
 
 //using namespace std;
-using namespace platzhalter;
+using namespace crave;
 
 class Syntax_Fixture {
   protected:

@@ -10,7 +10,7 @@
 #include <limits>
 #include <vector>
 
-namespace platzhalter {
+namespace crave {
 
   class rand_base
   {
@@ -226,5 +226,5 @@ class randv<typename> : public randv_prim_base<typename>, public randomize_base<
             
   };
 
-} // namespace platzhalter
+} // namespace crave
 

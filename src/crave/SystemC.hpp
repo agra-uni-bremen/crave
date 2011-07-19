@@ -6,7 +6,7 @@
 
 #include "bitsize_traits.hpp"
 
-namespace platzhalter {
+namespace crave {
 
   template<unsigned N>
   struct bitsize_traits< sc_dt::sc_uint<N> > {
@@ -23,6 +23,6 @@ namespace platzhalter {
     static const unsigned nbits = N;
   };
 
-} // namespace platzhalter
+} // namespace crave
 
 //  vim: ft=cpp:ts=2:sw=2:expandtab

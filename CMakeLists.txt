@@ -1,4 +1,4 @@
-project ( platzhalter )
+project ( crave )
 cmake_minimum_required(VERSION 2.8)
 
 set(${PROJECT_NAME}_CONFIG_DIR "share/${PROJECT_NAME}" CACHE PATH 
@@ -34,7 +34,7 @@ find_package ( SystemC )
 
 include_directories( ${metaSMT_INCLUDE_DIR} )
 
-add_subdirectory ( src/platzhalter )
+add_subdirectory ( src/crave )
 
 enable_testing ()
 set(${PROJECT_NAME}_LIBS ${CMAKE_INSTALL_PREFIX}/lib/lib${PROJECT_NAME}.a ${metaSMT_LIBRARIES} )

@@ -1,8 +1,8 @@
 #define BOOST_TEST_MODULE SystemC_Data
 #include <boost/test/unit_test.hpp>
 
-#include <platzhalter/ConstrainedRandom.hpp>
-#include <platzhalter/SystemC.hpp>
+#include <crave/ConstrainedRandom.hpp>
+#include <crave/SystemC.hpp>
 
 #include <systemc.h>
 
@@ -13,7 +13,7 @@ using boost::format;
 int sc_main( int argc, char** argv) { return 1; }
 
 //using namespace std;
-using namespace platzhalter;
+using namespace crave;
 
 class SystemC_Data_Fixture {
   protected:

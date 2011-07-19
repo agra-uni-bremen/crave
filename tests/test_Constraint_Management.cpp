@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE Constraint_Management_t
 #include <boost/test/unit_test.hpp>
 
-#include <platzhalter/ConstrainedRandom.hpp>
+#include <crave/ConstrainedRandom.hpp>
 
 #include <boost/format.hpp>
 
@@ -9,7 +9,7 @@
 #include <iostream>
 
 using boost::format;
-using namespace platzhalter;
+using namespace crave;
 
 #define ref(x) reference(x)
 

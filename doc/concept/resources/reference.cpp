@@ -1,12 +1,12 @@
-#include <platzhalter/Constraint.hpp>
-#include <platzhalter/Context.hpp>
+#include <crave/Constraint.hpp>
+#include <crave/Context.hpp>
 #include <stdio.h>
 void reference()
 {
   // test
   for (unsigned i = 0; i <= 100; ++i) {
   	
-  using namespace platzhalter;
+  using namespace crave;
   unsigned lower=0, upper=100, pivot;
 
   Variable<unsigned> X;

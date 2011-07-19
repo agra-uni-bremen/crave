@@ -2,7 +2,7 @@
 
 #include "ConstrainedRandom.hpp"
 
-namespace platzhalter {
+namespace crave {
 
   int new_var_id() { static int _ID=0; return ++_ID;}
 
@@ -11,6 +11,6 @@ namespace platzhalter {
 
   RandVecMap __rand_vec_map;
 
-} // namespace platzhalter
+} // namespace crave
 
 // vim: tabstop=2 shiftwidth=2 expandtab

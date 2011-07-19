@@ -1,9 +1,9 @@
-#include <platzhalter/Constraint.hpp>
-#include <platzhalter/Context.hpp>
+#include <crave/Constraint.hpp>
+#include <crave/Context.hpp>
 #include <stdio.h>
 void in_place()
 {
-  using namespace platzhalter;
+  using namespace crave;
   Variable<unsigned> a, b, c;
   Generator<> gen;
 

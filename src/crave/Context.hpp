@@ -31,7 +31,7 @@ using metaSMT::evaluate;
 using metaSMT::solve;
 
 
-namespace platzhalter {
+namespace crave {
 
   std::string default_solver();
 
@@ -704,6 +704,6 @@ namespace platzhalter {
 
   typedef metaSMT_Context Context;
 
-} // namespace platzhalter
+} // namespace crave
 //  vim: ft=cpp:ts=2:sw=2:expandtab
 

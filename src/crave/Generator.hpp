@@ -10,7 +10,7 @@
 #include <sstream>
 #include <stdexcept>
 
-namespace platzhalter {
+namespace crave {
   
   typedef AllSAT<50> DefaultContext;
 
@@ -260,6 +260,6 @@ namespace platzhalter {
 
   const Soft soft = {};
 
-} // namespace platzhalter
+} // namespace crave
 //  vim: ft=cpp:ts=2:sw=2:expandtab
 

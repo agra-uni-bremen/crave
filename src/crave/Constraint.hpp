@@ -5,7 +5,7 @@
 
 using std::ostream;
 
-namespace platzhalter {
+namespace crave {
   namespace proto = boost::proto;
 
   struct Constraint_Domain;
@@ -223,7 +223,7 @@ namespace platzhalter {
         return proto::make_expr< proto::tag::terminal, Constraint_Domain >( read_ref_tag<T>( new_var_id(), ref )) ;
       } 
 
-} // namespace platzhalter
+} // namespace crave
 
 //  vim: ft=cpp:ts=2:sw=2:expandtab
 

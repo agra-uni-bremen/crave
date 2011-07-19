@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE Random_Object_t
 #include <boost/test/unit_test.hpp>
 
-#include <platzhalter/ConstrainedRandom.hpp>
+#include <crave/ConstrainedRandom.hpp>
 
 #include <boost/format.hpp>
 
@@ -10,7 +10,7 @@
 
 //using namespace std;
 using boost::format;
-using namespace platzhalter;
+using namespace crave;
 
 struct Context_Fixture {};
 

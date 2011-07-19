@@ -12,7 +12,7 @@
 #include <boost/mpl/greater.hpp>
 #include <boost/type_traits/is_signed.hpp>
 
-namespace platzhalter {
+namespace crave {
   namespace proto = boost::proto;
   namespace mpl = boost::mpl;
 
@@ -144,6 +144,6 @@ namespace platzhalter {
     >
   > {};
 
-} /* platzhalter */
+} /* crave */
 
 // vim: tabstop=2 shiftwidth=2 expandtab
