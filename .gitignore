@@ -1,4 +1,14 @@
 *~
 build*
+*.aux
+*.bbl
+*.blg
+*.d
+*.log
+*.nav
+*.out
+*.pdf
+*.snm
 *.swp
-
+*.toc
+*.vrb
