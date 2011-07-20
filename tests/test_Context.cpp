@@ -192,7 +192,8 @@ BOOST_AUTO_TEST_CASE ( shiftleft )
     ( c == (a << b) )
   ;
 
-  while( gen.next() ) {
+  int count = 0;
+  while( gen.next() && ++count < 1000) {
     unsigned av = gen[a];
     unsigned bv = gen[b];
     unsigned r  = av << bv;
@@ -200,7 +201,6 @@ BOOST_AUTO_TEST_CASE ( shiftleft )
     BOOST_REQUIRE_EQUAL( r, gen[c] );
 
     gen( a != gen[a] || b != gen[b] );
-    //std::cout << format("result: a=%d, b=%d, r=%d,  c=%d\n") % gen[a]% gen[b] %r % gen[c];
   }
 }
 
