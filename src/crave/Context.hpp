@@ -11,6 +11,8 @@
 #include <boost/proto/context/callable.hpp>
 #include <boost/proto/context/null.hpp>
 #include <boost/function.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int.hpp>
 
 #include <metaSMT/DirectSolver_Context.hpp>
 #include <metaSMT/backend/SWORD_Backend.hpp>
@@ -32,6 +34,8 @@ using metaSMT::solve;
 
 
 namespace crave {
+
+  extern boost::mt19937 rng;
 
   std::string default_solver();
 
@@ -594,13 +598,9 @@ namespace crave {
       }
  
       std::random_shuffle(bits.begin(),bits.end());
-      int len = 0;
-      if (bits.size() > 0) {
-        rand()%bits.size();
-      }
-      
-      for(unsigned i = 0; i < len ; ++i) {
-       metaSMT::assumption(solver, preds::equal(bits[i], qf_bv::bvuint(rand()%2,1)));
+      int len = bits.size() > 0 ? boost::uniform_int<int>(0, bits.size() - 1)(rng) : 0;     
+      for(int i = 0; i < len ; ++i) {
+       metaSMT::assumption(solver, preds::equal(bits[i], qf_bv::bvuint(boost::uniform_int<int>(0, 1)(rng), 1)));
       }
     }
 
