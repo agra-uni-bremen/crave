@@ -4,11 +4,27 @@
 #include <boost/mpl/sizeof.hpp>
 #include <boost/type_traits/is_signed.hpp>
 #include <boost/utility/enable_if.hpp>
+#include <boost/static_assert.hpp>
 
 namespace crave {
 
+  template<typename T> struct randv;
+  template<typename T> struct Variable;
+  template<typename T> struct WriteReference;
+  template<typename T> struct var_tag;
+  template<typename T> struct write_ref_tag;
+  template<typename T> struct read_ref_tag;
+  template<typename T> struct vector_tag;
+
+  template <typename T, typename Enable = void>
+  struct bitsize_traits : boost::mpl::int_<0> {
+    BOOST_STATIC_ASSERT(sizeof(T)==0);
+  };
+
   template <typename Integer>
-  struct bitsize_traits
+  struct bitsize_traits<Integer
+    , typename boost::enable_if< boost::is_integral<Integer> >::type
+  >
   : boost::mpl::times< 
       boost::mpl::sizeof_<Integer>
     , boost::mpl::int_<8>
@@ -22,6 +38,8 @@ namespace crave {
   template<typename T>
   struct bitsize_traits< Variable<T> > : public bitsize_traits<T> {};
   template<typename T>
+  struct bitsize_traits< WriteReference<T> > : public bitsize_traits<T> {};
+  template<typename T>
   struct bitsize_traits< var_tag<T> > : public bitsize_traits<T> {};
   template<typename T>
   struct bitsize_traits< write_ref_tag<T> > : public bitsize_traits<T> {};
@@ -29,6 +47,12 @@ namespace crave {
   struct bitsize_traits< read_ref_tag<T> > : public bitsize_traits<T> {};
   template<typename T>
   struct bitsize_traits< vector_tag<T> > : public bitsize_traits<T> {};
+
+
+  template <typename T> struct is_crave_variable: boost::mpl::false_ {};
+  template <typename T> struct is_crave_variable< randv<T> >: boost::mpl::true_ {};
+  template <typename T> struct is_crave_variable< write_ref_tag<T> >: boost::mpl::true_ {};
+
 } // namespace crave
 
 namespace boost {
