@@ -196,7 +196,8 @@ namespace crave {
         assert ( current != all_solutions.end() );
         solution_t::const_iterator sit = current->find(ite->second);
         assert( sit != current->end() && "ERROR: no assignment for variable" );
-        v = sit->second;
+        AssignResult<T> assign;
+        assign(v, sit->second);
         return true;
       }
       return false;
@@ -211,7 +212,8 @@ namespace crave {
         assert ( current != all_solutions.end() );
         solution_t::const_iterator sit = current->find(ite->second);
         assert( sit != current->end() && "ERROR: no assignment for variable" );
-        v = sit->second;
+        AssignResult<T> assign;
+        assign(v, sit->second);
         return true;
       }
       return false;
