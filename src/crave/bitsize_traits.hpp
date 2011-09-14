@@ -48,6 +48,8 @@ namespace crave {
   template<typename T>
   struct bitsize_traits< vector_tag<T> > : public bitsize_traits<T> {};
 
+  template<typename Integral, Integral I>
+  struct bitsize_traits< boost::mpl::integral_c<Integral, I> > : public bitsize_traits<Integral> {};
 
   template <typename T> struct is_crave_variable: boost::mpl::false_ {};
   template <typename T> struct is_crave_variable< randv<T> >: boost::mpl::true_ {};
