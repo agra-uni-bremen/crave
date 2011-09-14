@@ -36,7 +36,8 @@ using metaSMT::solve;
 namespace crave {
 
   extern boost::mt19937 rng;
-
+  extern boost::function0<bool> random_bit;
+  
   std::string default_solver();
 
   namespace proto = boost::proto;

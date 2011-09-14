@@ -12,6 +12,19 @@ namespace crave {
 
   RandVecMap __rand_vec_map;
 
+  struct random_bit_gen {
+    random_bit_gen() : rnd(0, 1) {}
+
+    bool operator() () {
+      return rnd(rng);
+    }
+
+    boost::uniform_int<unsigned short> rnd;
+  };
+
+  boost::function0<bool> random_bit = random_bit_gen();
+
+
 } // namespace crave
 
 // vim: tabstop=2 shiftwidth=2 expandtab
