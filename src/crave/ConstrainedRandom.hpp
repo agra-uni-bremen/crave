@@ -147,6 +147,36 @@ namespace crave {
       bool nextValue() { return boost::uniform_int<char>(0, 1)(rng); }
   };
 
+  template<typename T>
+  class randv : public randv_prim_base<T>, public randomize_base<T>
+  {
+  public:
+    template<typename context>
+    randv(rand_obj_of<context>* parent) : randv_prim_base<T>(parent) { }
+    randv(rand_obj* parent) : randv_prim_base<T>(parent) { }
+    randv(const randv& other) : randv_prim_base<T>(other) { }
+    bool next() { return true; }
+    //bool next() { value = nextValue(); return true; }
+    //randv<T>& operator=(const randv<T>& i) { value = i.value; return *this; }
+    //randv<T>& operator=(T i) { value = i; return *this; }
+  
+  public:
+    //randv<T>& operator++()     { ++value;  return *this; }
+    //T         operator++(int)  { T tmp = value; ++value; return tmp; }
+    //randv<T>& operator--()     { --value;  return *this; }
+    //T         operator--(int)  { T tmp = value; --value; return tmp; }
+    //randv<T>& operator+=(T i)  { value += i;  return *this; }
+    //randv<T>& operator-=(T i)  { value -= i;  return *this; }
+    //randv<T>& operator*=(T i)  { value *= i;  return *this; }
+    //randv<T>& operator/=(T i)  { value /= i;  return *this; }
+    //randv<T>& operator%=(T i)  { value %= i;  return *this; }
+    //randv<T>& operator&=(T i)  { value &= i;  return *this; }
+    //randv<T>& operator|=(T i)  { value |= i;  return *this; }
+    //randv<T>& operator^=(T i)  { value ^= i;  return *this; }
+    //randv<T>& operator<<=(T i) { value <<= i;  return *this; }
+    //randv<T>& operator>>=(T i) { value >>= i;  return *this; }
+  };
+
 #define _COMMON_INTERFACE(Typename) \
 public: \
   template<typename context> \
