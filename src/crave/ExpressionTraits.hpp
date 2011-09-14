@@ -144,6 +144,19 @@ namespace crave {
     >
   > {};
 
+/***************************************************************************/
+/*********** Store the result in a variable ********************************/
+/***************************************************************************/
+
+  template <typename T>
+  struct AssignResult {
+    template <typename ResultWrapper>
+    void operator() (T & target , ResultWrapper const & result) const
+    {
+      target = result;
+    }
+  };
+
 } /* crave */
 
 // vim: tabstop=2 shiftwidth=2 expandtab

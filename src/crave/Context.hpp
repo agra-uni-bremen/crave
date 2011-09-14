@@ -619,7 +619,8 @@ namespace crave {
       std::map<int, qf_bv::bitvector>::const_iterator ite
         = _variables.find(id);
       if ( ite != _variables.end() ) {
-        v = read_value(solver, ite->second);
+        AssignResult<T> assign;
+        assign(v, read_value(solver, ite->second).randX(random_bit));
         return true;
       }
       return false;
@@ -630,7 +631,8 @@ namespace crave {
       std::map<vecVar, qf_bv::bitvector>::const_iterator ite
         = _vector_variables.find(vv);
       if ( ite != _vector_variables.end() ) {
-        v = read_value(solver, ite->second);
+        AssignResult<T> assign;
+        assign(v, read_value(solver, ite->second).randX(random_bit));
         return true;
       }
       return false;
