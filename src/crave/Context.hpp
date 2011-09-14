@@ -584,6 +584,7 @@ namespace crave {
      return false;
    }
     void assign_random_bits() {
+      return;
       std::vector <result_type> bits;
 
       typedef std::pair<int,qf_bv::bitvector> var_pair;
