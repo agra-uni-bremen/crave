@@ -14,7 +14,6 @@
 
 namespace crave {
   namespace proto = boost::proto;
-  namespace mpl = boost::mpl;
 
   struct BooleanResult
   : proto::or_<
@@ -52,7 +51,7 @@ namespace crave {
 
   template<typename LEFT, typename RIGHT>
   struct Minus  {
-    typedef mpl::minus< 
+    typedef boost::mpl::minus< 
             ExpressionSize(LEFT)
           , ExpressionSize(RIGHT) > type;
   };
@@ -72,7 +71,7 @@ namespace crave {
   struct FixFirstLarger 
   : proto::and_<
     proto::binary_expr<proto::_, proto::_, proto::_>
-  , proto::if_< mpl::less< ExpressionSize( proto::_left),  ExpressionSize( proto::_right) >() > 
+  , proto::if_< boost::mpl::less< ExpressionSize( proto::_left),  ExpressionSize( proto::_right) >() > 
   // transform to:
   , proto::when<proto::_, proto::binary_expr< 
       proto::tag_of< proto::_expr >(),
@@ -88,7 +87,7 @@ namespace crave {
   struct FixSecondLarger 
   : proto::and_<
     proto::binary_expr<proto::_, proto::_, proto::_>
-  , proto::if_< mpl::greater< ExpressionSize( proto::_left),  ExpressionSize( proto::_right) >() > 
+  , proto::if_< boost::mpl::greater< ExpressionSize( proto::_left),  ExpressionSize( proto::_right) >() > 
   // transform to:
   , proto::when<proto::_, proto::binary_expr< 
       proto::tag_of< proto::_expr >(),
