@@ -34,7 +34,7 @@ find_package ( SystemC )
 
 include_directories( ${metaSMT_INCLUDE_DIR} )
 
-add_subdirectory ( src/crave )
+add_subdirectory(src)
 
 enable_testing ()
 set(${PROJECT_NAME}_LIBS ${CMAKE_INSTALL_PREFIX}/lib/lib${PROJECT_NAME}.a ${metaSMT_LIBRARIES} )

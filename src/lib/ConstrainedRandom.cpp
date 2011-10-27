@@ -1,6 +1,6 @@
 #include <ctime>
 
-#include "ConstrainedRandom.hpp"
+#include "../crave/ConstrainedRandom.hpp"
 
 namespace crave {
 
