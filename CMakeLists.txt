@@ -29,7 +29,10 @@ SET( CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING
   FORCE )
 
 find_package ( Boost REQUIRED COMPONENTS thread)
+
 find_package ( metaSMT REQUIRED )
+add_definitions( ${metaSMT_CXXFLAGS} )
+
 find_package ( SystemC )
 
 include_directories( ${metaSMT_INCLUDE_DIR} )
