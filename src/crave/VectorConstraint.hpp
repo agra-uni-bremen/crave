@@ -60,7 +60,7 @@ class TypeInfo<typename> \
 
   class __rand_vec_base {
     public:
-      virtual CppType element_type() { }
+      virtual CppType element_type() { return UNSUPPORTED; }
   };
 
   typedef std::map<int, __rand_vec_base*> RandVecMap;
@@ -75,7 +75,7 @@ class TypeInfo<typename> \
 
       CppType element_type() { return TypeInfo<T1>(); }
 
-      int size() const { return real_vec.size(); }
+      typename std::vector<T2>::size_type size() const { return real_vec.size(); }
       T1& operator[](const int& idx) const { return (T1&) real_vec[idx]; } 
       void push_back(const T1& x) { real_vec.push_back(x); }
       void clear() { real_vec.clear(); }

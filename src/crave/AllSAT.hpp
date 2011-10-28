@@ -48,7 +48,10 @@ namespace crave {
   struct AllSAT_base : public metaSMT_Context_base<AllSAT_base>
   {
     AllSAT_base(unsigned _sol_limit) 
-    : metaSMT_Context_base<AllSAT_base>(), is_solved(false), read_ref_found(false), sol_limit(_sol_limit)
+    : metaSMT_Context_base<AllSAT_base>()
+    , read_ref_found(false)
+    , is_solved(false)
+    , sol_limit(_sol_limit)
     { }
 
     typedef metaSMT_Context_base<AllSAT_base> Super;

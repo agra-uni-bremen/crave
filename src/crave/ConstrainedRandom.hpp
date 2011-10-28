@@ -69,8 +69,8 @@ namespace crave {
       template<typename context>
       randv_prim_base(rand_obj_of<context>* parent) : var(value) { if (parent != 0) parent->addChild(this); }
       randv_prim_base(const randv_prim_base& other) : var(value), value(other.value) { }
-      T value;
       WriteReference<T> var;
+      T value;
   };
 
   extern boost::mt19937 rng;

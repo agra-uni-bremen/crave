@@ -183,7 +183,7 @@ namespace crave {
         // substitute the known values
         for (unsigned int j = 0; j < vvv.size(); j++) {
           int idx = i + vvv[j].index.val;
-          if (0 <= idx && idx < i) {
+          if (0 <= idx && idx < (int)i) {
             rvctx->vec_assign( vvv[j], rv[idx] );
           }
         }

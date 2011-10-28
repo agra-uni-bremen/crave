@@ -445,8 +445,6 @@ namespace crave {
 
     template< typename Integer>
     result_type operator() (proto::tag::terminal t, read_ref_tag<Integer> const & ref) {
-      unsigned width=bitsize_traits<Integer>::value;
-
       std::map<int, qf_bv::bitvector>::const_iterator ite
         = _variables.find(ref.id);
       if ( ite != _variables.end() ) {
