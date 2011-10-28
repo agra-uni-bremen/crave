@@ -36,6 +36,7 @@ add_definitions( ${metaSMT_CXXFLAGS} )
 find_package ( SystemC )
 
 include_directories( ${metaSMT_INCLUDE_DIR} )
+include_directories( ${Boost_INCLUDE_DIRS} )
 
 add_subdirectory(src)
 
