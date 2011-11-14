@@ -15,13 +15,11 @@
 #include <boost/random/uniform_int.hpp>
 
 #include <metaSMT/DirectSolver_Context.hpp>
+#include <metaSMT/Priority_Context.hpp>
+#include <metaSMT/UnpackFuture_Context.hpp>
 #include <metaSMT/BitBlast.hpp>
-#include <metaSMT/backend/SAT_Clause.hpp>
-#include <metaSMT/backend/MiniSAT.hpp>
-//#include <metaSMT/Priority_Context.hpp>
-//#include <metaSMT/UnpackFuture_Context.hpp>
-//#include <metaSMT/backend/SWORD_Backend.hpp>
-//#include <metaSMT/backend/CUDD_Distributed.hpp>
+#include <metaSMT/backend/SWORD_Backend.hpp>
+#include <metaSMT/backend/CUDD_Distributed.hpp>
 #include <metaSMT/frontend/QF_BV.hpp>
 
 #include <map>
@@ -99,24 +97,19 @@ namespace crave {
 
     public:
 
-    //typedef metaSMT::DirectSolver_Context <
-    //  metaSMT::UnpackFuture_Context <
-    //  metaSMT::BitBlast <
-    //  metaSMT::solver::CUDD_Distributed
-    //  > >
-    //> SolverType1;
-    //typedef metaSMT::DirectSolver_Context <
-    //  metaSMT::UnpackFuture_Context <
-    //  metaSMT::solver::SWORD_Backend
-    //  >
-    //> SolverType2;
-
-    //typedef metaSMT::Priority_Context< SolverType1, SolverType2 > SolverType;
-    
     typedef metaSMT::DirectSolver_Context <
-      metaSMT::BitBlast < metaSMT::SAT_Clause<
-        metaSMT::solver::MiniSAT
-     > > > SolverType;
+      metaSMT::UnpackFuture_Context <
+      metaSMT::BitBlast <
+      metaSMT::solver::CUDD_Distributed
+      > >
+    > SolverType1;
+    typedef metaSMT::DirectSolver_Context <
+      metaSMT::UnpackFuture_Context <
+      metaSMT::solver::SWORD_Backend
+      >
+    > SolverType2;
+
+    typedef metaSMT::Priority_Context< SolverType1, SolverType2 > SolverType;
 
     typedef SolverType::result_type result_type;
 
