@@ -45,18 +45,26 @@ BOOST_AUTO_TEST_CASE( sc_uint_t )
   Variable< sc_uint<w> > i,j,k;
 
   Generator<> gen( i != j  && i+j == k);
-  gen();
 
-  sc_uint<w> iv = gen[i];
-  sc_uint<w> jv = gen[j];
-  sc_uint<w> kv = gen[k];
+  unsigned count = 0;
 
-  sc_uint<w> rv = iv+jv;
+  while(gen.next()) {
+    ++count;
+    sc_uint<w> iv = gen[i];
+    sc_uint<w> jv = gen[j];
+    sc_uint<w> kv = gen[k];
 
   //std::cout << format("iv: %d, jv: %d, kv: %d\n") %iv%jv%kv;
+    sc_uint<w> rv = iv+jv;
 
-  BOOST_CHECK_NE(iv, jv);
-  BOOST_CHECK_EQUAL(rv, kv);
+
+    BOOST_REQUIRE_NE(iv, jv);
+    BOOST_REQUIRE_EQUAL(rv, kv);
+
+    gen( i != iv || j != jv || k != kv);
+  }
+
+  BOOST_REQUIRE_EQUAL( count, 240);
 }
 
 BOOST_AUTO_TEST_CASE( sc_int_t )
