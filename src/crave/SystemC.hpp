@@ -27,25 +27,30 @@ namespace crave {
   template<typename T> struct AssignResult;
   extern boost::function0<bool> random_bit;
 
-  inline std::string replace_x(std::string s)
+  template<typename T>
+  inline void _AssignSCDT(T & value, std::string const & s)
   {
+    std::string::const_reverse_iterator it = s.rbegin();
     for (unsigned i = 0; i < s.size(); i++) {
-      switch (s[i]) {
+      switch (*it) {
         case '0':
+          value[i] = false;
+          break;
         case '1':
+          value[i] = true;
           break;
         default:
-          s[i] = random_bit() ? '1':'0';
+          value[i] = random_bit();
       }
+      ++it;
     }
-    return s;
   }
 
   template <int N>
   struct AssignResult<sc_dt::sc_uint<N> > {
     void operator() (sc_dt::sc_uint<N> & value, std::string const & s) 
     {
-      value = replace_x(s).c_str();
+      _AssignSCDT(value, s);
     }
   };
 
@@ -54,7 +59,7 @@ namespace crave {
   struct AssignResult<sc_dt::sc_int<N> > {
     void operator() (sc_dt::sc_int<N> & value, std::string const & s) 
     {
-      value = replace_x(s).c_str();
+      _AssignSCDT(value, s);
     }
   };
 
@@ -62,7 +67,7 @@ namespace crave {
   struct AssignResult<sc_dt::sc_bv<N> > {
     void operator() (sc_dt::sc_bv<N> & value, std::string const & s) 
     {
-      value = replace_x(s).c_str();
+      _AssignSCDT(value, s);
     }
   };
 
