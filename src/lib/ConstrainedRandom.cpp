@@ -10,6 +10,8 @@ namespace crave {
 
   void set_global_seed(unsigned int s) { rng.seed(s); };
 
+  IndexVariable _i;
+
   RandVecMap __rand_vec_map;
 
   struct random_bit_gen {

@@ -56,7 +56,7 @@ class TypeInfo<typename> \
 #undef  _DEF_TYPE
 
   typedef Variable<unsigned int> IndexVariable;
-  static const IndexVariable _i;
+  extern IndexVariable _i;
 
   class __rand_vec_base {
     public:
