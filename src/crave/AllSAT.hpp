@@ -146,11 +146,11 @@ namespace crave {
         if (!metaSMT::solve(solver)) break;
 
         std::for_each(_variables.begin(), _variables.end(),
-          bind(&AllSAT_base::store_solution, this, ref(solution), arg1)
+          bind(&AllSAT_base::store_solution, this, ref(solution), boost::phoenix::arg_names::arg1)
         );
 
         std::for_each(_vector_variables.begin(), _vector_variables.end(),
-          bind(&AllSAT_base::store_vector_solution, this, ref(solution), arg1)
+          bind(&AllSAT_base::store_vector_solution, this, ref(solution), boost::phoenix::arg_names::arg1)
         );
 
         all_solutions.push_back(solution);
