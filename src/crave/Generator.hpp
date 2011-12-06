@@ -29,7 +29,6 @@ namespace crave {
   };
 
   struct Soft;
-
   template<typename ContextT>
   struct Generator {
 
@@ -57,7 +56,13 @@ namespace crave {
     {
       addCstrToCtx(constraint_name, &ctx);
       ctx.assertion(constraint_name, FixWidth()(expr) );
+    //  std::vector<std::vector<std::string> > r = ctx.analyse_contradiction();
       return *this;
+    }
+
+    std::vector<std::vector<std::string> > analyse_contradiction()
+    {
+	return ctx.analyse_contradiction();
     }
 
     void addCstrToCtx(std::string constraint_name, ContextT* context) {

@@ -21,6 +21,7 @@
 #include <metaSMT/backend/SWORD_Backend.hpp>
 #include <metaSMT/backend/CUDD_Distributed.hpp>
 #include <metaSMT/frontend/QF_BV.hpp>
+#include <metaSMT/support/contradiction_analysis.hpp>
 
 #include <map>
 #include <set>
@@ -598,6 +599,38 @@ namespace crave {
      }
      return false;
    }
+
+
+    std::vector<std::vector<std::string> > analyse_contradiction() {
+      std::map<unsigned, result_type> s;
+      std::vector<std::vector<std::string> > vvec_str;
+      typedef std::pair<std::string, result_type> Si_Pair;
+      std::vector<std::string> out;
+      std::vector<std::vector<unsigned> > results;
+
+      BOOST_FOREACH(Si_Pair si, _constraint_name_variables)
+      {
+        s.insert( std::make_pair(s.size(), si.second) );
+        out.push_back(si.first);
+      } 
+
+
+      results = analyze_conflicts(solver, s, metaSMT::evaluate(solver,preds::True), results);
+
+      BOOST_FOREACH(std::vector<unsigned> result, results)
+      {
+        std::vector<std::string> vec_str;
+        BOOST_FOREACH(unsigned i, result)
+        {
+          vec_str.push_back(out[i]);
+        }
+        vvec_str.push_back(vec_str);
+      }
+
+      return vvec_str;
+    }
+     
+     
     void assign_random_bits() {
       return;
       std::vector <result_type> bits;
