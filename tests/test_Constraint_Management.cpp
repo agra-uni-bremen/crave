@@ -1,19 +1,65 @@
 #define BOOST_TEST_MODULE Constraint_Management_t
 #include <boost/test/unit_test.hpp>
-
+#include <string>
 #include <crave/ConstrainedRandom.hpp>
-
+#include <crave/Generator.hpp>
 #include <boost/format.hpp>
 
+#include <boost/assign/list_of.hpp>
 #include <set>
 #include <iostream>
 
+
 using boost::format;
 using namespace crave;
+using boost::assign::list_of;
 
 #define ref(x) reference(x)
 
 struct Context_Fixture {};
+
+void print_vec (std::ostream & out, std::vector<std::string> const & v)
+{
+ out <<"( ";
+ BOOST_FOREACH(std::string u, v)  {
+   out << u << ' ';
+ }
+ out <<')';
+}
+
+
+void print_vec_vec (std::ostream & out, std::vector<std::vector<std::string> > const & v)
+{
+ out <<"( ";
+ BOOST_FOREACH(std::vector<std::string> const & u, v)  {
+   print_vec(out, u  );
+   out << ' ';
+ }
+ out <<')';
+}
+
+bool cmp_vec(std::vector<std::string> const &a, std::vector<std::string> const &b)
+{
+    if(a.size() == b.size())
+    {
+        for(unsigned i = 0; i < a.size(); i++)
+	{
+          if(a[i].compare(b[i]) != 0)
+	  {
+             return a[i].compare(b[i]) < 0;
+	  }
+        }
+    }
+}
+//sortieren
+void sort_results( std::vector<std::vector<string> > &results )
+{
+	for(unsigned i = 0; i < results.size();i++)
+	{
+	  sort(results[i].begin(), results[i].end());
+	}
+	  sort(results.begin(), results.end(), cmp_vec);
+}
 
 BOOST_FIXTURE_TEST_SUITE(Constraint_Management_t, Context_Fixture )
 
@@ -160,7 +206,142 @@ BOOST_AUTO_TEST_CASE( PacketHierConstraint )
 
   }
 }
+BOOST_AUTO_TEST_CASE(no_conflict)
+{
+  randv<unsigned short> a(0);
+  randv<unsigned short> b(0);
+  randv<unsigned short> c(0);
+  Generator<Context> gen;
+  gen
+    ("a", a() != b() )
+    ("b", b() != c() )
+  ;
+ 
+ BOOST_REQUIRE(gen.next());
+ std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
+ BOOST_REQUIRE_EQUAL(result.size(), 0);
+}
 
+BOOST_AUTO_TEST_CASE(one_conflict1)
+{
+  randv<bool> a(0);
+  randv<bool> b(0);
+  randv<bool> c(0);
+  Generator<Context> gen;
+  gen
+    ("a", a() != b() )
+    ("b", b() != c() )
+    ("c", a() != c() )
+  ;
+ 
+ BOOST_REQUIRE(!gen.next());
+// gen.analyse_contradiction();
+ std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
+ print_vec_vec(std::cout, result);
+ std::cout << std::endl;
+ //sort_results(result);
+
+ BOOST_REQUIRE_EQUAL(result.size(), 1);
+ std::vector<std::string> expected = list_of ("a")("b")("c");
+ BOOST_REQUIRE_EQUAL_COLLECTIONS( result[0].begin(), result[0].end(), expected.begin(), expected.end());
+
+}
+
+BOOST_AUTO_TEST_CASE(one_conflict2)
+{
+  randv<unsigned short> a(0);
+  randv<unsigned short> b(0);
+  Generator<Context> gen;
+  gen
+    ("a", a() == 3 )
+    ("b", a() > 4  )
+    ("c", b() == 0 )
+ ;
+ 
+ BOOST_REQUIRE(!gen.next());
+ //gen.analyse_contradiction();
+ std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
+
+ print_vec_vec(std::cout, result);
+ std::cout << std::endl;
+ //sort_results(result);
+
+ BOOST_REQUIRE_EQUAL(result.size(), 1);
+ std::vector<std::string> expected = list_of ("a")("b");
+ BOOST_REQUIRE_EQUAL_COLLECTIONS( result[0].begin(), result[0].end(), expected.begin(), expected.end());
+
+}
+
+BOOST_AUTO_TEST_CASE(two_conflicts1)
+{
+  randv<unsigned short> a(0);
+  randv<unsigned short> b(0);
+  randv<unsigned short> c(0);
+  Generator<Context> gen;
+  gen
+    ("a", a() == 1 )
+    ("b", a()  > 5 )
+    ("c", b() == 0 )
+    ("d", c() == b() && c() != 0 )
+ ;
+ 
+ BOOST_REQUIRE(!gen.next());
+ //gen.analyse_contradiction();
+ std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
+ print_vec_vec(std::cout, result);
+ std::cout << std::endl;
+ //sort_results(result);
+
+ std::vector<std::string> expected;
+ expected = list_of ("a")("b");
+ BOOST_REQUIRE_EQUAL_COLLECTIONS( result[0].begin(), result[0].end(), expected.begin(), expected.end());
+  expected = list_of ("c")("d");
+ BOOST_REQUIRE_EQUAL_COLLECTIONS( result[1].begin(), result[1].end(), expected.begin(), expected.end());
+
+
+ BOOST_REQUIRE_EQUAL(result.size(), 2);
+ BOOST_REQUIRE_EQUAL(result[0].size(), 2);
+ BOOST_REQUIRE_EQUAL(result[1].size(), 2);
+}
+
+BOOST_AUTO_TEST_CASE(two_conflicts2)
+{
+  randv<bool> a(0);
+  randv<bool> b(0);
+  randv<bool> c(0);
+  randv<unsigned short> d(0);
+  randv<unsigned short> e(0);
+
+  Generator<Context> gen;
+  gen
+    ("a", a() != b() )
+    ("b", b() != c() )
+    ("c", a() != c() )
+    ("d", d() == 0 )
+    ("e", e() == d() && e() != 0 )
+ ;
+ 
+ BOOST_REQUIRE(!gen.next());
+ //gen.analyse_contradiction();
+ std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
+ print_vec_vec(std::cout, result);
+ std::cout << std::endl;
+sort_results(result);
+  print_vec_vec(std::cout, result);
+
+ std::cout << std::endl;
+
+ std::vector<std::string> expected;
+ expected = list_of ("d")("e");
+ BOOST_REQUIRE_EQUAL_COLLECTIONS( result[0].begin(), result[0].end(), expected.begin(), expected.end());
+  expected = list_of ("a")("b")("c");
+ BOOST_REQUIRE_EQUAL_COLLECTIONS( result[1].begin(), result[1].end(), expected.begin(), expected.end());
+
+
+ BOOST_REQUIRE_EQUAL(result.size(), 2);
+ BOOST_REQUIRE_EQUAL(result[0].size(), 2);
+ BOOST_REQUIRE_EQUAL(result[1].size(), 3);
+}
 
 BOOST_AUTO_TEST_SUITE_END() // Context
 
