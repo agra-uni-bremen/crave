@@ -523,6 +523,11 @@ namespace crave {
       _disabled_constraint_names.insert(constraint_name);
     }
 
+    bool is_constraint_enabled(std::string constraint_name) {
+      assert (_constraint_name_variables.find(constraint_name) != _constraint_name_variables.end());
+      return _disabled_constraint_names.find(constraint_name) == _disabled_constraint_names.end();
+    }
+
     template<typename Expr>
     void soft_assertion (Expr e) {
       //check(e);

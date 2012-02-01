@@ -35,6 +35,7 @@ namespace crave {
       }
       bool enable_constraint(std::string name) { return constraint.enable_constraint(name); }
       bool disable_constraint(std::string name) { return constraint.disable_constraint(name); }
+      bool is_constraint_enabled(std::string name) { return constraint.is_constraint_enabled(name); }
       void addChild(rand_base* rb) { children.push_back(rb); }
 
     protected:

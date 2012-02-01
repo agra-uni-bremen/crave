@@ -86,6 +86,12 @@ namespace crave {
       return true;    
     }
 
+    bool is_constraint_enabled(std::string constraint_name) { 
+      typename std::map<std::string, ContextT*>::iterator ite = ctxOfCstr.find(constraint_name);
+      assert(ite != ctxOfCstr.end());
+      return ite->second->is_constraint_enabled(constraint_name);
+    }
+
     /**
      * generate a new assignment
      **/
