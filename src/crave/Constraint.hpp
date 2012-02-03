@@ -79,6 +79,8 @@ namespace crave {
   struct randomize_tag { unsigned id; };
   const randomize_tag randomize = { 0 };
 
+  struct operator_inside {};
+
   template <typename OUT, typename value_type>
   OUT & operator<< (OUT & out, var_tag<value_type> const & tag) {
     out << "var<" << tag.id << ">" ;
@@ -107,6 +109,11 @@ namespace crave {
   OUT & operator<< (OUT & out, randomize_tag const & tag ) {
     out << "randomize_tag <" << tag.id << ">"  ;
     return out;
+  }
+  
+  template <typename OUT>
+  OUT & operator<< (OUT & out, operator_inside const & tag ) {
+    return out << "inside"  ;
   }
  
   int new_var_id();
@@ -222,7 +229,10 @@ namespace crave {
       {
         return proto::make_expr< proto::tag::terminal, Constraint_Domain >( read_ref_tag<T>( new_var_id(), ref )) ;
       } 
+  
 
+
+  boost::proto::terminal<operator_inside>::type const inside = {};
 } // namespace crave
 
 //  vim: ft=cpp:ts=2:sw=2:expandtab

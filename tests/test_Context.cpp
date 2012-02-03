@@ -547,6 +547,48 @@ BOOST_AUTO_TEST_CASE( mixed_bv_width_6 )
   BOOST_REQUIRE_EQUAL(cnt, cnt1);
 }
 
+BOOST_AUTO_TEST_CASE ( element_inside_set )
+{
+  std::set<unsigned> s;
+  s.insert(1);
+  s.insert(7);
+  s.insert(9);
+
+  randv<unsigned> x(0);
+
+  boost::proto::display_expr ( inside(x(),s) );
+
+  Generator<Context> gen;
+  gen ( inside(x(),s) );
+
+  BOOST_REQUIRE(gen.next());
+  BOOST_REQUIRE(s.find(x) != s.end());
+
+  unsigned first = x;
+  gen (x() != first);
+  
+
+  BOOST_REQUIRE(gen.next());
+  BOOST_REQUIRE(s.find(x) != s.end());
+
+  unsigned second = x;
+  BOOST_REQUIRE_NE(first, second);
+  gen (x() != second);
+  
+
+  BOOST_REQUIRE(gen.next());
+  BOOST_REQUIRE(s.find(x) != s.end());
+
+  unsigned third = x;
+  BOOST_REQUIRE_NE(third, second);
+  BOOST_REQUIRE_NE(first, third);
+  gen (x() != third);
+
+
+  BOOST_REQUIRE(!gen.next());
+
+}
+
 BOOST_AUTO_TEST_SUITE_END() // Context
 
 bitsize_traits<long> _instanciate1;

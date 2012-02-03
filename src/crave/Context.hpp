@@ -467,6 +467,20 @@ namespace crave {
         return evaluate( solver, qf_bv::bvuint(i, bitsize_traits<Integer>::value) );
     }
 
+    template< typename Tag, typename Value, typename CollectionTerm>
+    result_type operator() (proto::tag::function, Tag const & tag, Value const & value, CollectionTerm const & c) {
+      
+      	typedef typename proto::result_of::value< CollectionTerm >::type  Collection;
+      	
+	result_type ret = evaluate( solver, False);
+        BOOST_FOREACH(typename Collection::value_type const & i, boost::proto::value(c))
+        {
+   	 ret = evaluate( solver, preds::Or( ret, proto::eval( value == i, ctx() ) ) );
+        } 
+	return ret;
+    }
+
+
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::subscript, Expr1 const & e1, Expr2 const &  e2) {
       // e1 should be a terminal vector_tag
