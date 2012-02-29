@@ -80,6 +80,7 @@ namespace crave {
   const randomize_tag randomize = { 0 };
 
   struct operator_inside {};
+  struct operator_dist {};
 
   template <typename OUT, typename value_type>
   OUT & operator<< (OUT & out, var_tag<value_type> const & tag) {
@@ -115,7 +116,12 @@ namespace crave {
   OUT & operator<< (OUT & out, operator_inside const & tag ) {
     return out << "inside"  ;
   }
- 
+
+  template <typename OUT>
+  OUT & operator<< (OUT & out, operator_dist const & tag ) {
+    return out << "dist"  ;
+  }
+
   int new_var_id();
 
   template<typename value_type_>
@@ -233,6 +239,7 @@ namespace crave {
 
 
   boost::proto::terminal<operator_inside>::type const inside = {};
+  boost::proto::terminal<operator_dist>::type const dist = {};
 } // namespace crave
 
 //  vim: ft=cpp:ts=2:sw=2:expandtab

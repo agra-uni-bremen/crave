@@ -13,7 +13,7 @@
 #include <boost/function.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int.hpp>
-
+#include <boost/random/uniform_01.hpp>
 #include <metaSMT/DirectSolver_Context.hpp>
 #include <metaSMT/Priority_Context.hpp>
 #include <metaSMT/UnpackFuture_Context.hpp>
@@ -110,7 +110,8 @@ namespace crave {
       >
     > SolverType2;
 
-    typedef metaSMT::Priority_Context< SolverType1, SolverType2 > SolverType;
+    //typedef metaSMT::Priority_Context< SolverType1, SolverType2 > SolverType;
+    typedef  SolverType1 SolverType;
 
     typedef SolverType::result_type result_type;
 
@@ -467,19 +468,71 @@ namespace crave {
         return evaluate( solver, qf_bv::bvuint(i, bitsize_traits<Integer>::value) );
     }
 
-    template< typename Tag, typename Value, typename CollectionTerm>
-    result_type operator() (proto::tag::function, Tag const & tag, Value const & value, CollectionTerm const & c) {
-      
+    template< typename Value, typename CollectionTerm>
+    result_type operator() (proto::tag::function,
+       boost::proto::terminal<operator_inside>::type const & tag,
+	Value const & value, CollectionTerm const & c)
+    {
       	typedef typename proto::result_of::value< CollectionTerm >::type  Collection;
-      	
 	result_type ret = evaluate( solver, False);
-        BOOST_FOREACH(typename Collection::value_type const & i, boost::proto::value(c))
+        BOOST_FOREACH(typename boost::range_value<Collection>::type const & i, boost::proto::value(c))
         {
    	 ret = evaluate( solver, preds::Or( ret, proto::eval( value == i, ctx() ) ) );
         } 
 	return ret;
     }
 
+    struct getDistReference{
+      getDistReference( SolverType & solver, result_type var, double probability) 
+      :  solver(solver), _var(var), _probability(probability)
+      {}
+      result_type operator() () {
+        bool result = boost::uniform_01<double>()(rng) <= _probability;
+      	return evaluate( solver, preds::equal(_var, qf_bv::bvuint(result, 1)) );
+      }
+      SolverType & solver;
+      result_type _var;
+      double _probability;
+    };
+
+    template<typename Var, typename Value>
+    result_type
+    operator() (proto::tag::function,
+       boost::proto::terminal<operator_dist>::type const & tag,
+        Var const & var_term, Value const & probability) {
+	
+	//qf_bv::bitvector bv = qf_bv::new_bitvector(1);
+//	_variables.insert(std::make_pair(boost::proto::value(var_term).id, proto::eval(var_term,ctx())));
+	result_type res = boost::proto::eval(var_term, ctx());
+	double prob = boost::proto::value(probability);
+	boost::function0<result_type> f =  getDistReference(solver, res, prob);
+	//   std::cout << boost::proto::value(var_term).id << std::endl;
+        _lazy[boost::proto::value(var_term).id] = f;
+
+           return evaluate(solver, preds::True);
+	   //res;
+	   //proto::eval(var_term,ctx()));     	 
+    	  //return proto::eval(bv, ctx());
+    }
+
+    template<typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+    result_type
+    operator() (Arg1 a1, Arg2 a2, Arg3 a3, Arg4 a4) 
+    {
+        std::cout << "DEBUG: \n";
+	//std::cout << "    "<< typeid(a1).name() << "\n";
+	std::cout << "    "<< typeid(a2).name() << "\n";
+	//std::cout << "    "<< typeid(a3).name() << "\n";
+	//std::cout << "    "<< typeid(a4).name() << "\n";
+
+        typedef Constraint<boost::proto::terminal<operator_dist>::proto_grammar > Tag; 
+	Tag tag;
+	std::cout << "tag: " << typeid(tag).name() << "\n";
+	std::cout << "same: " << boost::is_same<Tag, Arg2>::value << "\n";
+      
+	 return evaluate( solver, False);
+    	 //return proto::eval( value, ctx() );
+    }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::subscript, Expr1 const & e1, Expr2 const &  e2) {
