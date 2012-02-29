@@ -208,7 +208,7 @@ namespace crave {
       > ::type
     operator= ( randomize_tag const & e ) const {
       const randomize_tag tag = { id() };
-      return proto::make_expr< proto::tag::terminal > ( tag );
+      return proto::make_expr< proto::tag::terminal, Constraint_Domain > ( tag );
     }
   };
 
