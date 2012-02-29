@@ -362,6 +362,42 @@ sort_results(result);
  BOOST_REQUIRE_EQUAL(result[1].size(), 3);
 }
 
+BOOST_AUTO_TEST_CASE(two_conflicts3)
+{
+  randv<unsigned short> a(0);
+  randv<unsigned short> b(0);
+  randv<unsigned short> c(0);
+  randv<unsigned short> d(0);
+  Generator<Context> gen;
+  gen
+    ("c1", a() == 2 )
+    ("c2", a()  > 5 )
+    ("c3", b() == d()*2 )
+    ("c4", c() % a() == 1 )
+    ("c5", c() == b() )
+ ;
+
+ BOOST_REQUIRE(!gen.next());
+ std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
+
+ print_vec_vec(std::cout, result);
+ std::cout << std::endl;
+
+ sort_results(result);
+
+ BOOST_REQUIRE_EQUAL(result.size(), 2);
+ BOOST_REQUIRE_EQUAL(result[0].size(), 2);
+ BOOST_REQUIRE_EQUAL(result[1].size(), 4);
+
+ std::vector<std::string> expected;
+ expected = list_of ("c1")("c2");
+ BOOST_REQUIRE_EQUAL_COLLECTIONS( result[0].begin(), result[0].end(), expected.begin(), expected.end());
+  expected = list_of ("c1")("c3")("c4")("c5");
+ BOOST_REQUIRE_EQUAL_COLLECTIONS( result[1].begin(), result[1].end(), expected.begin(), expected.end());
+
+
+}
+
 BOOST_AUTO_TEST_SUITE_END() // Context
 
 //  vim: ft=cpp:ts=2:sw=2:expandtab
