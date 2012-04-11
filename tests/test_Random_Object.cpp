@@ -14,7 +14,40 @@ using namespace crave;
 
 struct Context_Fixture {};
 
+enum color_enum {
+	RED,
+	GREEN,
+	BLUE
+};
+CRAVE_ENUM(color_enum, 3, RED, GREEN, BLUE);
+
 BOOST_FIXTURE_TEST_SUITE(Random_Object_t, Context_Fixture )
+
+class my_rand_obj : public rand_obj {
+public:
+	randv<color_enum> color; 
+	randv<int> x; 
+
+	my_rand_obj(rand_obj* parent = 0) : rand_obj(parent), color(this), x(this) {
+    constraint(color() == x());
+	}
+};
+
+BOOST_AUTO_TEST_CASE( t_rand_enum )
+{
+  my_rand_obj obj(0);
+  for (int i = 0; i < 20; i++) {
+    BOOST_REQUIRE(obj.next());
+    std::cout << obj.color << " " << obj.x << std::endl;
+    BOOST_REQUIRE(obj.color == RED || obj.color == GREEN || obj.color == BLUE);
+    BOOST_REQUIRE(obj.color == obj.x);      
+  }
+}
+
+BOOST_AUTO_TEST_CASE( t_rand_enum_standalone )
+{
+  BOOST_CHECK_THROW ( randv<color_enum> color(0), std::runtime_error );  
+}
 
 class item : public rand_obj {
 public:

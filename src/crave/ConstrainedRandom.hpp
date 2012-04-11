@@ -9,6 +9,7 @@
 
 #include <limits>
 #include <vector>
+#include <cstdarg>
 
 namespace crave {
 
@@ -260,4 +261,24 @@ class randv<typename> : public randv_prim_base<typename>, public randomize_base<
   };
 
 } // namespace crave
+
+#define CRAVE_ENUM(name, count, ...) \
+namespace crave { \
+  template<> \
+  struct randv<name> : randv<int> { \
+    randv(rand_obj* parent) : randv<int>(parent) { \
+      if (parent == 0) throw std::runtime_error("randv<enum> must be owned by an instance of rand_obj."); \
+      init_enum_values(parent, count, __VA_ARGS__); \
+    } \
+    void init_enum_values(rand_obj* parent, int c, ...) { \
+      va_list values; \
+      va_start(values, c); \
+      parent->constraint.new_disjunction(); \
+      for (int i = 0; i < c; ++i) \
+        parent->constraint.add_to_disjunction(var == va_arg(values, int)); \
+      parent->constraint.end_disjunction(); \
+      va_end(values); \
+    } \
+  }; \
+} \
 

@@ -51,6 +51,12 @@ namespace crave {
   template<typename Integral, Integral I>
   struct bitsize_traits< boost::mpl::integral_c<Integral, I> > : public bitsize_traits<Integral> {};
 
+  template <typename Enum>
+  struct bitsize_traits<Enum
+    , typename boost::enable_if< boost::is_enum<Enum> >::type
+  >
+  : boost::mpl::sizeof_<int>::type {};
+
   template <typename T> struct is_crave_variable: boost::mpl::false_ {};
   template <typename T> struct is_crave_variable< randv<T> >: boost::mpl::true_ {};
   template <typename T> struct is_crave_variable< write_ref_tag<T> >: boost::mpl::true_ {};

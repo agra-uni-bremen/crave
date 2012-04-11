@@ -247,6 +247,11 @@ namespace crave {
       return ctx.read(var); 
     };
 
+    void new_disjunction() { ctx.new_disjunction(); }
+    void end_disjunction() { ctx.end_disjunction(); }  
+    template<typename Expr>
+    void add_to_disjunction (Expr expr) { ctx.add_to_disjunction( FixWidth()(expr) ); }
+
     private:
       ContextT ctx;
       std::map<int, ContextT*> vecCtx;

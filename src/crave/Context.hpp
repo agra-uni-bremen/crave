@@ -801,6 +801,11 @@ namespace crave {
       _lazy_vec[vv] = f;        
     }
 
+    void new_disjunction() { _disjunction = evaluate(solver, preds::False); }
+    void end_disjunction() { metaSMT::assertion(solver, _disjunction ); }
+    template<typename Expr>
+    void add_to_disjunction (Expr expr) { _disjunction = evaluate( solver, preds::Or(_disjunction, proto::eval( expr, ctx() ) ) ); }
+
     protected:
       inline derived_context & ctx() {  return  static_cast<derived_context&>(*this); }
 
@@ -810,6 +815,7 @@ namespace crave {
       //metaSMT::QF_BV*      _logic;
       SolverType solver;
       result_type          _soft;
+      result_type          _disjunction;
 
     private:
       std::map<std::string, result_type> _constraint_name_variables;
