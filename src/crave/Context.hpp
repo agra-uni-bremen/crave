@@ -110,8 +110,8 @@ namespace crave {
       >
     > SolverType2;
 
-    //typedef metaSMT::Priority_Context< SolverType1, SolverType2 > SolverType;
-    typedef  SolverType1 SolverType;
+    typedef metaSMT::Priority_Context< SolverType1, SolverType2 > SolverType;
+    //typedef  SolverType1 SolverType; // BDD Only
 
     typedef SolverType::result_type result_type;
 
