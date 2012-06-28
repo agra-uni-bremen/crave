@@ -55,7 +55,7 @@ namespace crave {
   struct bitsize_traits<Enum
     , typename boost::enable_if< boost::is_enum<Enum> >::type
   >
-  : boost::mpl::sizeof_<int>::type {};
+  : bitsize_traits<int>::type {};
 
   template <typename T> struct is_crave_variable: boost::mpl::false_ {};
   template <typename T> struct is_crave_variable< randv<T> >: boost::mpl::true_ {};
