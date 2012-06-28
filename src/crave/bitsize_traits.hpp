@@ -8,7 +8,7 @@
 
 namespace crave {
 
-  template<typename T> struct randv;
+  template<typename T> class randv;
   template<typename T> struct Variable;
   template<typename T> struct WriteReference;
   template<typename T> struct var_tag;
