@@ -21,6 +21,27 @@ enum color_enum {
 };
 CRAVE_ENUM(color_enum, 3, RED, GREEN, BLUE);
 
+enum football_enum {
+	GK,		// Goalkeeper
+	SW,		// Sweeper
+	LWB,	// Left-Wing-Back
+	LB,		// Left-Back
+	LCB,	// Left-Centre-Back
+	RCB,	// Right-Centre-Back
+	RB,		// Right-Back
+	RWB,	// Right-Wing-Back
+	DM,		// Defensive Midfielder
+	LM,		// Left Wide Midfielder
+	CM,		// Centre Midfielder
+	RM,		// Right Wide Midfielder
+	AM,		// Attacking Midfielder
+	LW,		// Left Winger (Striker)
+	SS,		// Secondary Striker
+	RW,		// Right Winger
+	CF		// Centre Striker
+};
+CRAVE_ENUM(football_enum, 17, GK, SW, LWB, LB, LCB, RCB, RB, RWB, DM, LM, CM, RM, AM, LW, SS, RW, CF);
+
 BOOST_FIXTURE_TEST_SUITE(Random_Object_t, Context_Fixture )
 
 class my_rand_obj : public rand_obj {
@@ -47,6 +68,43 @@ BOOST_AUTO_TEST_CASE( t_rand_enum )
 BOOST_AUTO_TEST_CASE( t_rand_enum_standalone )
 {
   BOOST_CHECK_THROW ( randv<color_enum> color(0), std::runtime_error );  
+}
+
+class tall_rand_enum_obj : public rand_obj {
+public:
+	randv<football_enum> player;
+
+	tall_rand_enum_obj(rand_obj* parent = 0) : rand_obj(parent), player(this) {
+    constraint(player() == GK && player() != CF);
+	}
+};
+
+class tall_rand_enum_obj_gt : public rand_obj {
+public:
+	randv<football_enum> player;
+
+	tall_rand_enum_obj_gt(rand_obj* parent = 0) : rand_obj(parent), player(this) {
+    constraint(player() > AM);
+	}
+};
+
+BOOST_AUTO_TEST_CASE( enum_no_overflow )
+{
+	tall_rand_enum_obj obj(0);
+  BOOST_REQUIRE(obj.next());
+
+  BOOST_REQUIRE_EQUAL(obj.player, GK);
+}
+
+BOOST_AUTO_TEST_CASE( enum_gt )
+{
+  tall_rand_enum_obj_gt obj(0);
+
+	for (int i = 0; i<100; ++i) {
+    BOOST_REQUIRE(obj.next());
+    BOOST_REQUIRE_GT(obj.player, AM);
+    BOOST_REQUIRE(obj.player == LW || obj.player == SS || obj.player == RW || obj.player == CF );
+	}
 }
 
 class item : public rand_obj {
