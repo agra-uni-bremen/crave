@@ -15,6 +15,12 @@
 namespace crave {
   namespace proto = boost::proto;
 
+  struct extend_tag {};
+  template<typename Stream>
+  Stream & operator<< ( Stream & out, extend_tag const&) {
+    return out << "extend_tag";
+  }
+
   struct BooleanResult
   : proto::or_<
       // comparison
@@ -46,7 +52,6 @@ namespace crave {
   , proto::when<proto::_, boost::mpl::int_<0>() >
   > {};
 
-  struct extend_tag {};
   struct FixWidth;
 
   template<typename LEFT, typename RIGHT>
