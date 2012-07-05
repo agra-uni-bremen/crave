@@ -45,6 +45,9 @@ namespace crave {
     proto::when<proto::terminal<proto::_>, bitsize_traits<proto::_value>() >
   , proto::when<BooleanResult, boost::mpl::int_<1>() >
   , proto::when<proto::subscript< proto::_, proto::_ >, ExpressionSize(proto::_left) >
+  , proto::when<proto::binary_expr< extend_tag,  proto::_, proto::_ >,
+      boost::mpl::int_<0>()
+    >
   , proto::when<
       proto::nary_expr<proto::_, proto::vararg<proto::_> >
     , proto::fold<proto::_, boost::mpl::int_<0>(), boost::mpl::max<ExpressionSize, proto::_state>()>
