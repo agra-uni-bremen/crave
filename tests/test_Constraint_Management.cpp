@@ -40,17 +40,19 @@ void print_vec_vec (std::ostream & out, std::vector<std::vector<std::string> > c
 
 bool cmp_vec(std::vector<std::string> const &a, std::vector<std::string> const &b)
 {
-    if(a.size() == b.size())
+  if(a.size() == b.size())
+  {
+    for(unsigned i = 0; i < a.size(); i++)
     {
-        for(unsigned i = 0; i < a.size(); i++)
-	{
-          if(a[i].compare(b[i]) != 0)
-	  {
-             return a[i].compare(b[i]) < 0;
-	  }
-        }
+      if(a[i].compare(b[i]) != 0)
+      {
+        return a[i].compare(b[i]) < 0;
+      }
     }
+  }
+  return a.size() < b.size();
 }
+
 //sortieren
 void sort_results( std::vector<std::vector<string> > &results )
 {
