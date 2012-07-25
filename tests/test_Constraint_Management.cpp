@@ -340,28 +340,27 @@ BOOST_AUTO_TEST_CASE(two_conflicts2)
     ("c", a() != c() )
     ("d", d() == 0 )
     ("e", e() == d() && e() != 0 )
- ;
- 
- BOOST_REQUIRE(!gen.next());
- //gen.analyse_contradiction();
- std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
- print_vec_vec(std::cout, result);
- std::cout << std::endl;
-sort_results(result);
+    ;
+
+  BOOST_REQUIRE(!gen.next());
+  //gen.analyse_contradiction();
+  std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
+
+  sort_results(result);
+
   print_vec_vec(std::cout, result);
+  std::cout << std::endl;
 
- std::cout << std::endl;
-
- std::vector<std::string> expected;
- expected = list_of ("d")("e");
- BOOST_REQUIRE_EQUAL_COLLECTIONS( result[0].begin(), result[0].end(), expected.begin(), expected.end());
+  std::vector<std::string> expected;
+  expected = list_of ("d")("e");
+  BOOST_REQUIRE_EQUAL_COLLECTIONS( result[0].begin(), result[0].end(), expected.begin(), expected.end());
   expected = list_of ("a")("b")("c");
- BOOST_REQUIRE_EQUAL_COLLECTIONS( result[1].begin(), result[1].end(), expected.begin(), expected.end());
+  BOOST_REQUIRE_EQUAL_COLLECTIONS( result[1].begin(), result[1].end(), expected.begin(), expected.end());
 
 
- BOOST_REQUIRE_EQUAL(result.size(), 2);
- BOOST_REQUIRE_EQUAL(result[0].size(), 2);
- BOOST_REQUIRE_EQUAL(result[1].size(), 3);
+  BOOST_REQUIRE_EQUAL(result.size(), 2);
+  BOOST_REQUIRE_EQUAL(result[0].size(), 2);
+  BOOST_REQUIRE_EQUAL(result[1].size(), 3);
 }
 
 BOOST_AUTO_TEST_CASE(two_conflicts3)
