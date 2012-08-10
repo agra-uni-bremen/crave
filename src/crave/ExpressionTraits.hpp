@@ -15,6 +15,12 @@
 namespace crave {
   namespace proto = boost::proto;
 
+  struct extend_tag {};
+  template<typename Stream>
+  Stream & operator<< ( Stream & out, extend_tag const&) {
+    return out << "extend_tag";
+  }
+
   struct BooleanResult
   : proto::or_<
       // comparison
@@ -39,6 +45,9 @@ namespace crave {
     proto::when<proto::terminal<proto::_>, bitsize_traits<proto::_value>() >
   , proto::when<BooleanResult, boost::mpl::int_<1>() >
   , proto::when<proto::subscript< proto::_, proto::_ >, ExpressionSize(proto::_left) >
+  , proto::when<proto::binary_expr< extend_tag,  proto::_, proto::_ >,
+      boost::mpl::int_<0>()
+    >
   , proto::when<
       proto::nary_expr<proto::_, proto::vararg<proto::_> >
     , proto::fold<proto::_, boost::mpl::int_<0>(), boost::mpl::max<ExpressionSize, proto::_state>()>
@@ -46,7 +55,6 @@ namespace crave {
   , proto::when<proto::_, boost::mpl::int_<0>() >
   > {};
 
-  struct extend_tag {};
   struct FixWidth;
 
   template<typename LEFT, typename RIGHT>

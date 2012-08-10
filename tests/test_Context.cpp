@@ -416,18 +416,42 @@ BOOST_AUTO_TEST_CASE ( signed_less_zero )
   BOOST_CHECK(a < 0);
 }
 
+BOOST_AUTO_TEST_CASE( expressionSize ) {
+  Variable<unsigned long>  a;
+  Variable<unsigned short> b;
+  Variable<short>          c;
+  Variable<unsigned char>  d;
+  ExpressionSize es;
+  FixWidth fw;
+
+  BOOST_CHECK_EQUAL( es(a).value, sizeof(long)*8);
+  BOOST_CHECK_EQUAL( es(b).value, sizeof(short)*8);
+  BOOST_CHECK_EQUAL( es (a+b).value, std::max( sizeof(short), sizeof(long))*8 );
+  BOOST_CHECK_EQUAL( es (c+d).value, std::max( sizeof(short), sizeof(unsigned char))*8 );
+
+  BOOST_AUTO ( fixed_expr1, fw(c+d));
+  boost::proto::display_expr( fixed_expr1 );
+
+  BOOST_CHECK_EQUAL(
+      es ( fixed_expr1 ).value,
+      std::max( sizeof(short), sizeof(unsigned char))*8
+      );
+
+  BOOST_AUTO ( fixed_expr1, fw(c+d));
+  boost::proto::display_expr( fixed_expr1 );
+
+  BOOST_CHECK_EQUAL(
+      es ( fixed_expr1 ).value,
+      std::max( sizeof(short), sizeof(unsigned char))*8
+      );
+}
+
 
 BOOST_AUTO_TEST_CASE ( mixed_bv_width_1 )
 {
   randv<unsigned long> a(NULL);
   randv<unsigned short> b(NULL);
 
-
-  ExpressionSize es;
-
-  BOOST_CHECK_EQUAL( es(a()).value, sizeof(long)*8);
-  BOOST_CHECK_EQUAL( es(b()).value, sizeof(short)*8);
-  BOOST_CHECK_EQUAL( es (a()+b()).value, std::max( sizeof(short), sizeof(long))*8 );
 
   //boost::proto::display_expr( b()+a());
   //boost::proto::display_expr( FixWidth()( b()+a() ));
