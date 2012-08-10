@@ -429,19 +429,19 @@ BOOST_AUTO_TEST_CASE( expressionSize ) {
   BOOST_CHECK_EQUAL( es (a+b).value, std::max( sizeof(short), sizeof(long))*8 );
   BOOST_CHECK_EQUAL( es (c+d).value, std::max( sizeof(short), sizeof(unsigned char))*8 );
 
-  BOOST_AUTO ( fixed_expr1, fw(c+d));
+  BOOST_AUTO ( fixed_expr1, fw(a+b));
   boost::proto::display_expr( fixed_expr1 );
 
   BOOST_CHECK_EQUAL(
       es ( fixed_expr1 ).value,
-      std::max( sizeof(short), sizeof(unsigned char))*8
+      std::max( sizeof(unsigned long), sizeof(unsigned short))*8
       );
 
-  BOOST_AUTO ( fixed_expr1, fw(c+d));
-  boost::proto::display_expr( fixed_expr1 );
+  BOOST_AUTO ( fixed_expr2, fw(c+d));
+  boost::proto::display_expr( fixed_expr2 );
 
   BOOST_CHECK_EQUAL(
-      es ( fixed_expr1 ).value,
+      es ( fixed_expr2 ).value,
       std::max( sizeof(short), sizeof(unsigned char))*8
       );
 }
