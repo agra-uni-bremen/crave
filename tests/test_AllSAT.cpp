@@ -29,7 +29,7 @@ public:
         tx_odd_parity(this),
         dummy()
     {
-      constraint( !tx_odd_parity() || tx_enable_parity());
+      constraint( tx_odd_parity() == false || tx_enable_parity() == true);
     }
 
     friend ostream& operator<<(ostream& os, const sif_seq_item& ssi) {
@@ -51,7 +51,7 @@ BOOST_FIXTURE_TEST_SUITE(allsat, Context_Fixture )
 BOOST_AUTO_TEST_CASE ( gen10k )
 {
   Variable<bool> r1, r2;
-  gen( !r1 || r2);
+  gen( r1 == false || r2 == true);
 
   for (int i=0;i<10000; i++) {
     gen();
