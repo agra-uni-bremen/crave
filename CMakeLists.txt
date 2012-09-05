@@ -28,7 +28,7 @@ SET( CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING
   "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel Profiling."
   FORCE )
 
-set(Boost_ADDITIONAL_VERSIONS "1.46.1")
+set(Boost_ADDITIONAL_VERSIONS "1.50.0")
 find_package ( Boost REQUIRED COMPONENTS thread)
 
 find_package ( metaSMT REQUIRED )
