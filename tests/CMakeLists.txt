@@ -20,8 +20,10 @@ function (add_all_tests prog cfile)
   endforeach(test)
 endfunction(add_all_tests)
 
+find_library(PTHREAD pthread)
+
 add_library (${PROJECT_NAME}_boost_test ${STATIC_OR_SHARED} boost_test.cpp)
-link_libraries (${PROJECT_NAME}_boost_test ${PROJECT_NAME} ${Boost_THREAD_LIBRARY})
+link_libraries (${PROJECT_NAME}_boost_test ${PROJECT_NAME} ${Boost_THREAD_LIBRARY} ${PTHREAD} )
 
 add_executable (Syntax test_Syntax.cpp )
 add_all_tests(Syntax test_Syntax.cpp )
