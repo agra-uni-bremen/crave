@@ -92,6 +92,10 @@ namespace crave {
       return ite->second->is_constraint_enabled(constraint_name);
     }
 
+    void add_pre_hook(boost::function0<bool> f) {
+      ctx.add_pre_hook(f);
+    }
+
     /**
      * generate a new assignment
      **/
@@ -211,6 +215,8 @@ namespace crave {
 
       return true;
     }
+
+    uint runs = 0;
 
 #define _GEN_VEC(typename) if (!gen_vector(static_cast<__rand_vec<typename>* > (rvb), ite->second)) return false
     bool next() {

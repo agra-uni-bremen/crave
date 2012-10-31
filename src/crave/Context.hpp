@@ -601,15 +601,20 @@ namespace crave {
       _soft = evaluate( solver, preds::And(_soft, proto::eval( e, ctx())));
     }
 
-    void pre_solve() {       
+    void add_pre_hook(boost::function0<bool> f) {
+      _pre_hook.push_back(f);
+    }
+
+    void pre_solve() {
+
+      for (uint i = 0; i < _pre_hook.size(); ++i) _pre_hook[i]();
+
       for (
         std::map<std::string, result_type >::const_iterator 
         ite = _constraint_name_variables.begin();
         ite != _constraint_name_variables.end(); ++ite) {
         if (_disabled_constraint_names.find(ite->first) == _disabled_constraint_names.end())
           assumption(solver, ite->second);
-        else
-          assumption(solver, preds::Not(ite->second));
       }
 
       for (
@@ -822,6 +827,7 @@ namespace crave {
       std::set<std::string> _disabled_constraint_names;
       std::map<unsigned, boost::function0<result_type> > _lazy;
       std::map<vecVar, boost::function0<result_type> > _lazy_vec;
+      std::vector<boost::function0<bool> > _pre_hook;
       std::vector<boost::function0<void> > _post_hook;
 
   }; // metaSMT_Context
