@@ -605,9 +605,9 @@ namespace crave {
       _pre_hook.push_back(f);
     }
 
-    void pre_solve() {
+    bool pre_solve() {
 
-      for (uint i = 0; i < _pre_hook.size(); ++i) _pre_hook[i]();
+      for (uint i = 0; i < _pre_hook.size(); ++i) if(!_pre_hook[i]()) return false;
 
       for (
         std::map<std::string, result_type >::const_iterator 
@@ -630,6 +630,8 @@ namespace crave {
         ite != _lazy_vec.end(); ++ite) {
         assumption(solver, (ite->second)() );
       }
+
+      return true;
     }
 
     void post_solve(bool sat) {
@@ -643,38 +645,31 @@ namespace crave {
     }
 
     bool do_solve () {
-      pre_solve();
       const unsigned limit = 5;
-      assumption(solver,_soft);
-           // if soft constraint satisfiable
-      if ( metaSMT::solve(solver) ) {
- 	  for(unsigned i = 0; i < limit  ; ++i) {
-             pre_solve();
-             assumption(solver,_soft);
-	     assign_random_bits();
-  	     if( metaSMT::solve(solver)) {
-	       return true;
-	     }
-	  } //end for
+      // first run is for check if soft constrains are satisfiable
+      // second run will be executed if softconstrains aren't satisfiable
+      for ( unsigned run = 0; run < 2; ++run ) {
 
-          pre_solve();
-          assumption(solver,_soft);
-	  return metaSMT::solve(solver);
+        if ( !pre_solve() ) return false;
+        if ( run == 0 ) assumption(solver, _soft);
+
+        if ( metaSMT::solve(solver) ) {
+          for ( unsigned i = 0; i < limit; ++i ) {
+
+            if ( !pre_solve() ) return false;
+            if ( run == 0 ) assumption(solver, _soft);
+            assign_random_bits();
+
+            if ( metaSMT::solve(solver) ) return true;
+
+          }  // end for
+
+          if ( !pre_solve() ) return false;
+          if ( run == 0 ) assumption(solver, _soft);
+          return metaSMT::solve(solver);
+        }
       }
-      // soft constraints not satisfiable
-      pre_solve();
-      if( metaSMT::solve(solver) ) {
-        for(unsigned i = 0; i < limit ; ++i) {
-	     pre_solve();
-	     assign_random_bits(); 
-  	     if( metaSMT::solve(solver)) {
-	        return true;
-	     }
-	}
-          pre_solve();
-	  return metaSMT::solve(solver);
-     }
-     return false;
+      return false;
    }
 
 
