@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE ( multiple_solver_instances )
   gen2(r2 < 6);
   gen1.next();
   gen2.next();
-  
+
 }
 
 BOOST_AUTO_TEST_CASE( constants )
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE( boolean )
 {
   Variable<bool> b;
 
-  Generator<Context> gen;  
+  Generator<Context> gen;
   gen(b == b)(); // create a new assignment
 
   bool b1 = gen[b];
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE( less )
 {
   Variable<unsigned> a;
 
-  Generator<Context> gen;  
+  Generator<Context> gen;
   gen(a < 256u);
 
   std::set<unsigned> generated;
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE( less_equal )
 {
   Variable<unsigned> a;
 
-  Generator<Context> gen;  
+  Generator<Context> gen;
   gen(a <= 256u);
 
   std::set<unsigned> generated;
@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE( greater )
 {
   Variable<unsigned> a;
 
-  Generator<Context> gen;  
+  Generator<Context> gen;
   gen(a > (std::numeric_limits<unsigned>::max()-256) );
 
   std::set<unsigned> generated;
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE( greater_equal )
 {
   Variable<unsigned> a;
 
-  Generator<Context> gen;  
+  Generator<Context> gen;
   gen(a >= (std::numeric_limits<unsigned>::max()-256) );
 
   std::set<unsigned> generated;
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE( greater_equal )
   BOOST_CHECK_EQUAL( generated.size(), 257);
 }
 
-BOOST_AUTO_TEST_CASE( divide ) 
+BOOST_AUTO_TEST_CASE( divide )
 {
   Variable<unsigned char> a;
   Variable<unsigned char> b;
@@ -152,7 +152,7 @@ BOOST_AUTO_TEST_CASE( divide )
   }
 }
 
-BOOST_AUTO_TEST_CASE( mult_mod ) 
+BOOST_AUTO_TEST_CASE( mult_mod )
 {
   randv<int> a(0);
   randv<int> b(0);
@@ -163,8 +163,8 @@ BOOST_AUTO_TEST_CASE( mult_mod )
     ( -3 <= b() && b() <= 3 )
     ( a() * b() % 6 == 0)
   ;
-  
-  int cnt = 0;  
+
+  int cnt = 0;
   for (int i = -3; i <= 3; i++)
     for (int j = -3; j <= 3; j++)
       if (i * j % 6 == 0) cnt++;
@@ -273,7 +273,7 @@ BOOST_AUTO_TEST_CASE ( soft_constraint_t )
   Variable<int> r;
   gen( r<6 );
   soft(gen)( r == 2 );
-  
+
   BOOST_REQUIRE( gen.next() );
   BOOST_REQUIRE_EQUAL(gen[r], 2);
 
@@ -325,7 +325,7 @@ BOOST_AUTO_TEST_CASE( alu )
   Variable<unsigned> a;
   Variable<unsigned> b;
 
-  Generator<Context> gen;  
+  Generator<Context> gen;
   gen
     ( a < 16)
     ( b < 16)
@@ -346,7 +346,7 @@ BOOST_AUTO_TEST_CASE( alu_enum )
   Variable<unsigned> a;
   Variable<unsigned> b;
 
-  Generator<Context> gen;  
+  Generator<Context> gen;
   gen
     ( a < 16u)
     ( b < 16u)
@@ -372,7 +372,7 @@ BOOST_AUTO_TEST_CASE( pythagoras )
   Variable<unsigned long long> b;
   Variable<unsigned long long> c;
 
-  Generator<Context> gen;  
+  Generator<Context> gen;
   gen(a*a + b*b == c*c)(); // create a new assignment
 
   unsigned long long av = gen[a];
@@ -544,7 +544,7 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_5 )
   BOOST_CHECK_EQUAL( cnt, cnt1);
 }
 
-BOOST_AUTO_TEST_CASE( mixed_bv_width_6 ) 
+BOOST_AUTO_TEST_CASE( mixed_bv_width_6 )
 {
   randv<short> a(0);
   randv<signed char> b(0);
@@ -555,8 +555,8 @@ BOOST_AUTO_TEST_CASE( mixed_bv_width_6 )
     ( -3 <= b() && b() <= 3 )
     ( a() * b() % 6 == 0)
   ;
-  
-  int cnt = 0;  
+
+  int cnt = 0;
   for (int i = -3; i <= 3; i++)
     for (int j = -3; j <= 3; j++)
       if (i * j % 6 == 0) cnt++;
@@ -588,7 +588,7 @@ BOOST_AUTO_TEST_CASE ( element_inside_set )
 
   unsigned first = x;
   gen (x() != first);
-  
+
 
   BOOST_REQUIRE(gen.next());
   BOOST_REQUIRE(s.find(x) != s.end());
@@ -596,7 +596,7 @@ BOOST_AUTO_TEST_CASE ( element_inside_set )
   unsigned second = x;
   BOOST_REQUIRE_NE(first, second);
   gen (x() != second);
-  
+
 
   BOOST_REQUIRE(gen.next());
   BOOST_REQUIRE(s.find(x) != s.end());
@@ -626,10 +626,10 @@ BOOST_AUTO_TEST_CASE ( element_inside_vec )
 
   BOOST_REQUIRE(gen.next());
   BOOST_REQUIRE( find(v.begin(), v.end(), x) != v.end());
-  
+
   unsigned first = x;
   gen (x() != first);
-  
+
 
   BOOST_REQUIRE(gen.next());
   BOOST_REQUIRE(find(v.begin(), v.end(), x) != v.end());
@@ -637,7 +637,7 @@ BOOST_AUTO_TEST_CASE ( element_inside_vec )
   unsigned second = x;
   BOOST_REQUIRE_NE(first, second);
   gen (x() != second);
-  
+
 
   BOOST_REQUIRE(gen.next());
   BOOST_REQUIRE( find(v.begin(), v.end(), x) != v.end());
@@ -658,8 +658,8 @@ BOOST_AUTO_TEST_CASE ( element_inside_array )
   a[0] = 1;
   a[1] = 7;
   a[2] = 9;
-  
-   
+
+
   randv<unsigned> x(0);
   //unsigned y = a.begin();
   Generator<Context> gen;
@@ -670,7 +670,7 @@ BOOST_AUTO_TEST_CASE ( element_inside_array )
 
   unsigned first = x;
   gen (x() != first);
-  
+
 
   BOOST_REQUIRE(gen.next());
   //BOOST_REQUIRE( find(a.begin(), a.end(), x) != a.end());
@@ -678,7 +678,7 @@ BOOST_AUTO_TEST_CASE ( element_inside_array )
   unsigned second = x;
   BOOST_REQUIRE_NE(first, second);
   gen (x() != second);
-  
+
 
   BOOST_REQUIRE(gen.next());
   //BOOST_REQUIRE( find(a.begin(), a.end(), x) != a.end());
@@ -704,13 +704,13 @@ BOOST_AUTO_TEST_CASE ( element_inside_list )
 
   Generator<Context> gen;
   gen ( inside(x(),l) );
-  
+
   BOOST_REQUIRE(gen.next());
   BOOST_REQUIRE( find(l.begin(), l.end(), x) != l.end());
 
   unsigned first = x;
   gen (x() != first);
-  
+
 
   BOOST_REQUIRE(gen.next());
   BOOST_REQUIRE( find(l.begin(), l.end(), x) != l.end());
@@ -718,11 +718,11 @@ BOOST_AUTO_TEST_CASE ( element_inside_list )
   unsigned second = x;
   BOOST_REQUIRE_NE(first, second);
   gen (x() != second);
-  
+
 
   BOOST_REQUIRE(gen.next());
   BOOST_REQUIRE( find(l.begin(), l.end(), x) != l.end());
-  
+
   unsigned third = x;
   BOOST_REQUIRE_NE(third, second);
   BOOST_REQUIRE_NE(first, third);
@@ -736,13 +736,13 @@ BOOST_AUTO_TEST_CASE ( element_inside_list )
 //BOOST_AUTO_TEST_CASE (boolean_variables)
 //{
 //  randv<bool> a(0);
-//  
+//
 //  Generator<Context> gen;
 //  gen ( a() ); // a() is a bitvector of size 1, not a boolean
 //
 //  BOOST_REQUIRE(gen.next());
 //  BOOST_REQUIRE(a);
-//  
+//
 //}
 
 BOOST_AUTO_TEST_CASE (dist_of_boolean25)
@@ -753,14 +753,14 @@ BOOST_AUTO_TEST_CASE (dist_of_boolean25)
   Generator<Context> gen;
   gen ( dist(a(), 0.25) );
   for (unsigned i = 0; i < 1000; i++) {
-  	BOOST_REQUIRE( gen.next() );
- 	if (a) {
- 		++counter;
- 	} else {
-		--counter;
-	}
+    BOOST_REQUIRE( gen.next() );
+    if (a) {
+      ++counter;
+    } else {
+      --counter;
+    }
   }
- 
+
   BOOST_REQUIRE_LT( counter,-425 );
   BOOST_REQUIRE_GT( counter,-575 );
 }
@@ -773,14 +773,14 @@ BOOST_AUTO_TEST_CASE ( dist_of_boolean50 )
   Generator<Context> gen;
   gen ( dist(a(),0.5) );
   for (unsigned i = 0; i < 1000; i++) {
-  	BOOST_REQUIRE( gen.next() );
- 	if (a) {
- 		++counter;
- 	} else {
-		--counter;
-	}
+    BOOST_REQUIRE( gen.next() );
+    if (a) {
+      ++counter;
+    } else {
+      --counter;
+    }
   }
- 
+
   BOOST_REQUIRE_LT( counter, 75 );
   BOOST_REQUIRE_GT( counter,-75 );
 }
@@ -793,14 +793,14 @@ BOOST_AUTO_TEST_CASE (dist_of_boolean75)
   Generator<Context> gen;
   gen ( dist(a(),0.75) );
   for (unsigned i = 0; i < 1000; i++) {
-  	BOOST_REQUIRE( gen.next() );
- 	if (a) {
- 		++counter;
- 	} else {
-		--counter;
-	}
+    BOOST_REQUIRE( gen.next() );
+    if (a) {
+      ++counter;
+    } else {
+      --counter;
+    }
   }
- 
+
   BOOST_REQUIRE_LT( counter, 575 );
   BOOST_REQUIRE_GT( counter, 425 );
 }

@@ -20,7 +20,7 @@ namespace crave {
       readRefFound = true;
     }
     bool readRefFound;
-  };  
+  };
 
   struct readRefExists {
     template<typename Expr>
@@ -32,10 +32,10 @@ namespace crave {
 /*
   struct ReadRefExists
   : proto::or_ <
-      proto::terminal<read_ref_tag<proto::_> > 
+      proto::terminal<read_ref_tag<proto::_> >
     , proto::binary_expr<proto::_, ReadRefExists(proto::_), proto::_>
     , proto::binary_expr<proto::_, proto::_, ReadRefExists(proto::_) >
-    , proto::unary_expr<proto::_, ReadRefExists(proto::_) >    
+    , proto::unary_expr<proto::_, ReadRefExists(proto::_) >
     > {};
 */
 
@@ -47,7 +47,7 @@ namespace crave {
 
   struct AllSAT_base : public metaSMT_Context_base<AllSAT_base>
   {
-    AllSAT_base(unsigned _sol_limit) 
+    AllSAT_base(unsigned _sol_limit)
     : metaSMT_Context_base<AllSAT_base>()
     , read_ref_found(false)
     , is_solved(false)
@@ -122,7 +122,7 @@ namespace crave {
       using namespace boost::phoenix::arg_names;
 
       result_type block = evaluate(solver, preds::False);
-      
+
       BOOST_FOREACH( solution_t::value_type p, solution) {
         block = evaluate(solver, preds::Or( block, preds::nequal( p.first
             , qf_bv::bvbin(p.second))));
@@ -174,7 +174,7 @@ namespace crave {
         is_solved = solve_all(true);
         // if soft constraint satisfiable
         if (!is_solved ) is_solved = solve_all(false);
-      
+
 //        std::cout << "AllSAT found " << all_solutions.size() << " solution(s)" << std::endl;
         std::random_shuffle(all_solutions.begin(), all_solutions.end(), rng);
         current=all_solutions.begin();
@@ -182,7 +182,7 @@ namespace crave {
       }
       return is_solved;
     }
-    
+
     template<typename T>
     T read ( Variable<T> const & v) {
       T ret;
@@ -237,13 +237,13 @@ namespace crave {
       }
     }
 
-    bool read_ref_found; 
+    bool read_ref_found;
     bool is_solved;
     unsigned sol_limit;
     all_solutions_t all_solutions;
     all_solutions_t::iterator current;
   };
-  
+
   template<unsigned N = 0>
   struct AllSAT : public AllSAT_base {
     AllSAT() : AllSAT_base(N) { }

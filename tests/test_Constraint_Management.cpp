@@ -56,11 +56,11 @@ bool cmp_vec(std::vector<std::string> const &a, std::vector<std::string> const &
 //sortieren
 void sort_results( std::vector<std::vector<string> > &results )
 {
-	for(unsigned i = 0; i < results.size();i++)
-	{
-	  sort(results[i].begin(), results[i].end());
-	}
-	  sort(results.begin(), results.end(), cmp_vec);
+  for(unsigned i = 0; i < results.size();i++)
+  {
+    sort(results[i].begin(), results[i].end());
+  }
+  sort(results.begin(), results.end(), cmp_vec);
 }
 
 BOOST_FIXTURE_TEST_SUITE(Constraint_Management_t, Context_Fixture )
@@ -77,9 +77,9 @@ public:
   randv<uint> a;
   randv<uint> b;
 
-  friend ostream& operator<<(ostream& os, const Item& it) { 
-    os << it.a << " " << it.b; 
-    return os; 
+  friend ostream& operator<<(ostream& os, const Item& it) {
+    os << it.a << " " << it.b;
+    return os;
   }
 };
 
@@ -156,9 +156,9 @@ public:
   randv<unsigned char> b;
   randv<unsigned char> c;
 
-  friend ostream& operator<<(ostream& os, const ItemPythagoras& it) { 
-    os << it.a << " " << it.b << " " << it.c; 
-    return os; 
+  friend ostream& operator<<(ostream& os, const ItemPythagoras& it) {
+    os << it.a << " " << it.b << " " << it.c;
+    return os;
   }
 };
 
@@ -179,43 +179,43 @@ BOOST_AUTO_TEST_CASE( Pythagoras )
 
 class ItemPacketBaseConstraint : public rand_obj {
 public:
-	ItemPacketBaseConstraint() : rand_obj(), msg_length(this), src_addr(this), dest_addr(this), msg(this) {
-	constraint(msg_length() < 80);
-	constraint(msg_length() > 2);
-	constraint(src_addr() != dest_addr());
-	constraint(msg().size() == msg_length());
-	
+  ItemPacketBaseConstraint() : rand_obj(), msg_length(this), src_addr(this), dest_addr(this), msg(this) {
+  constraint(msg_length() < 80);
+  constraint(msg_length() > 2);
+  constraint(src_addr() != dest_addr());
+  constraint(msg().size() == msg_length());
 
-	constraint.foreach(msg, _i, msg()[_i] >= ' ' && msg()[_i] <= 'z');
-	
-	}
-	randv<uint> src_addr;
-	randv<uint> dest_addr;
-	randv<unsigned short> msg_length;
-	rand_vec<char> msg;
+
+  constraint.foreach(msg, _i, msg()[_i] >= ' ' && msg()[_i] <= 'z');
+
+  }
+  randv<uint> src_addr;
+  randv<uint> dest_addr;
+  randv<unsigned short> msg_length;
+  rand_vec<char> msg;
 };
 
 
 class ItemPacketHierConstraint : public ItemPacketBaseConstraint {
-public:	
-	ItemPacketHierConstraint() : ItemPacketBaseConstraint(), dest_min(this), dest_max(this) {
-	constraint( (dest_addr() > dest_min() ) && (dest_addr() < dest_max()) );
-	constraint( 
-		  ( (src_addr() > (dest_addr() + 0x100000))  &&
-		    (src_addr() < (dest_addr() + 0x200000)) ) ||
-		  ( (src_addr() < (dest_addr() - 0x10000 )) ) &&
-		    (src_addr() > (dest_addr() - 0xfffff ))  );
-	}
-	randv<uint>dest_min;
-	randv<uint>dest_max;
+public:
+  ItemPacketHierConstraint() : ItemPacketBaseConstraint(), dest_min(this), dest_max(this) {
+  constraint( (dest_addr() > dest_min() ) && (dest_addr() < dest_max()) );
+  constraint(
+    ( (src_addr() > (dest_addr() + 0x100000))  &&
+    (src_addr() < (dest_addr() + 0x200000)) ) ||
+    ( (src_addr() < (dest_addr() - 0x10000 )) ) &&
+    (src_addr() > (dest_addr() - 0xfffff ))  );
+  }
+  randv<uint>dest_min;
+  randv<uint>dest_max;
 
-	friend ostream& operator<<(ostream& os, ItemPacketHierConstraint& it) { 
-    		os << it.src_addr << " " << it.dest_addr << " " << it.msg_length << " \n";
-		for(unsigned i =0; i < it.msg.size(); ++i) {
-			os << it.msg[i];
-		}
-    		return os; 
-	}
+  friend ostream& operator<<(ostream& os, ItemPacketHierConstraint& it) {
+    os << it.src_addr << " " << it.dest_addr << " " << it.msg_length << " \n";
+    for(unsigned i = 0; i < it.msg.size(); ++i) {
+      os << it.msg[i];
+    }
+    return os;
+  }
 };
 
 BOOST_AUTO_TEST_CASE( PacketHierConstraint )
@@ -237,7 +237,7 @@ BOOST_AUTO_TEST_CASE(no_conflict)
     ("a", a() != b() )
     ("b", b() != c() )
   ;
- 
+
  BOOST_REQUIRE(gen.next());
  std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
  BOOST_REQUIRE_EQUAL(result.size(), 0);
@@ -254,7 +254,7 @@ BOOST_AUTO_TEST_CASE(one_conflict1)
     ("b", b() != c() )
     ("c", a() != c() )
   ;
- 
+
  BOOST_REQUIRE(!gen.next());
 // gen.analyse_contradiction();
  std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
@@ -278,7 +278,7 @@ BOOST_AUTO_TEST_CASE(one_conflict2)
     ("b", a() > 4  )
     ("c", b() == 0 )
  ;
- 
+
  BOOST_REQUIRE(!gen.next());
  //gen.analyse_contradiction();
  std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
@@ -305,7 +305,7 @@ BOOST_AUTO_TEST_CASE(two_conflicts1)
     ("c", b() == 0 )
     ("d", c() == b() && c() != 0 )
  ;
- 
+
  BOOST_REQUIRE(!gen.next());
  //gen.analyse_contradiction();
  std::vector<std::vector<std::string> > result = gen.analyse_contradiction();

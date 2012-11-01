@@ -24,7 +24,7 @@ namespace crave {
   struct BooleanResult
   : proto::or_<
       // comparison
-      proto::or_< 
+      proto::or_<
         proto::nary_expr< proto::tag::less_equal, proto::vararg< proto::_> >
       , proto::nary_expr< proto::tag::less, proto::vararg< proto::_> >
       , proto::nary_expr< proto::tag::greater, proto::vararg< proto::_> >
@@ -32,7 +32,7 @@ namespace crave {
       , proto::nary_expr< proto::tag::equal_to, proto::vararg< proto::_> >
       , proto::nary_expr< proto::tag::not_equal_to, proto::vararg< proto::_> >
       >
-      // logic      
+      // logic
     , proto::or_<
         proto::nary_expr< proto::tag::logical_and, proto::vararg< proto::_> >
       , proto::nary_expr< proto::tag::logical_or, proto::vararg< proto::_> >
@@ -59,29 +59,29 @@ namespace crave {
 
   template<typename LEFT, typename RIGHT>
   struct Minus  {
-    typedef boost::mpl::minus< 
+    typedef boost::mpl::minus<
             ExpressionSize(LEFT)
           , ExpressionSize(RIGHT) > type;
   };
 
-  struct InjectExtend_ 
+  struct InjectExtend_
   : proto::when< proto::_, proto::binary_expr<extend_tag,
-      proto::terminal< Minus< proto::_state, proto::_expr >::type () 
+      proto::terminal< Minus< proto::_state, proto::_expr >::type ()
           > (Minus< proto::_state, proto::_expr >::type () )
-      ,  proto::_expr 
-      >( 
-         proto::terminal< Minus< proto::_state, proto::_expr >::type () 
+      ,  proto::_expr
+      >(
+         proto::terminal< Minus< proto::_state, proto::_expr >::type ()
             > ( Minus< proto::_state, proto::_expr >::type () )
-      ,  proto::_expr 
+      ,  proto::_expr
       )>
   {};
 
-  struct FixFirstLarger 
+  struct FixFirstLarger
   : proto::and_<
     proto::binary_expr<proto::_, proto::_, proto::_>
-  , proto::if_< boost::mpl::less< ExpressionSize( proto::_left),  ExpressionSize( proto::_right) >() > 
+  , proto::if_< boost::mpl::less< ExpressionSize( proto::_left),  ExpressionSize( proto::_right) >() >
   // transform to:
-  , proto::when<proto::_, proto::binary_expr< 
+  , proto::when<proto::_, proto::binary_expr<
       proto::tag_of< proto::_expr >(),
       InjectExtend_( FixWidth(proto::_left), proto::_right),
       FixWidth(proto::_right)
@@ -92,12 +92,12 @@ namespace crave {
   >{};
 
 
-  struct FixSecondLarger 
+  struct FixSecondLarger
   : proto::and_<
     proto::binary_expr<proto::_, proto::_, proto::_>
-  , proto::if_< boost::mpl::greater< ExpressionSize( proto::_left),  ExpressionSize( proto::_right) >() > 
+  , proto::if_< boost::mpl::greater< ExpressionSize( proto::_left),  ExpressionSize( proto::_right) >() >
   // transform to:
-  , proto::when<proto::_, proto::binary_expr< 
+  , proto::when<proto::_, proto::binary_expr<
       proto::tag_of< proto::_expr >(),
       FixWidth(proto::_left),
       InjectExtend_( FixWidth(proto::_right), proto::_left)
@@ -107,7 +107,7 @@ namespace crave {
     ) >
   >{};
 
-  struct FixWidth 
+  struct FixWidth
   : proto::or_<
      proto::terminal<proto::_>
   ,  proto::subscript<proto::_, proto::_>
@@ -129,20 +129,20 @@ namespace crave {
     , proto::nary_expr< proto::tag::equal_to, proto::vararg< proto::_> >
     , proto::nary_expr< proto::tag::not_equal_to, proto::vararg< proto::_> >
   > {};
-  
+
   struct IsSigned
   : proto::and_<
       proto::not_< FixedUnsigned >
     , proto::or_ <
-        proto::and_< 
-          proto::terminal<proto::_> 
+        proto::and_<
+          proto::terminal<proto::_>
         , proto::if_< boost::is_signed< proto::_value > () >
         >
-      , proto::subscript< IsSigned, proto::_ > 
-      , proto::and_< 
+      , proto::subscript< IsSigned, proto::_ >
+      , proto::and_<
           proto::not_< proto::subscript<proto::_, proto::_ > >
-        , proto::when< proto::binary_expr<proto::_, proto::_, proto::_>         
-        , proto::or_< 
+        , proto::when< proto::binary_expr<proto::_, proto::_, proto::_>
+        , proto::or_<
             IsSigned( proto::_left )
           , IsSigned( proto::_right )
           >

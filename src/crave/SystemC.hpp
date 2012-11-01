@@ -13,12 +13,12 @@ namespace crave {
   template <int N> struct is_sysc_dt< sc_dt::sc_bv<N> >: boost::mpl::true_ {};
   template <int N> struct is_sysc_dt< sc_dt::sc_int<N> >: boost::mpl::true_ {};
   template <int N> struct is_sysc_dt< sc_dt::sc_uint<N> >: boost::mpl::true_ {};
-  
+
   template <class SCDT> struct sc_dt_width {};
   template <template<int> class SCDT, int N> struct sc_dt_width< SCDT<N> > : boost::mpl::int_<N> {};
 
   template<typename T>
-  struct bitsize_traits< T, typename boost::enable_if< is_sysc_dt<T> >::type > 
+  struct bitsize_traits< T, typename boost::enable_if< is_sysc_dt<T> >::type >
   : sc_dt_width<T>
   {};
 
@@ -48,7 +48,7 @@ namespace crave {
 
   template <int N>
   struct AssignResult<sc_dt::sc_uint<N> > {
-    void operator() (sc_dt::sc_uint<N> & value, std::string const & s) 
+    void operator() (sc_dt::sc_uint<N> & value, std::string const & s)
     {
       _AssignSCDT(value, s);
     }
@@ -57,7 +57,7 @@ namespace crave {
 
   template <int N>
   struct AssignResult<sc_dt::sc_int<N> > {
-    void operator() (sc_dt::sc_int<N> & value, std::string const & s) 
+    void operator() (sc_dt::sc_int<N> & value, std::string const & s)
     {
       _AssignSCDT(value, s);
     }
@@ -65,7 +65,7 @@ namespace crave {
 
   template <int N>
   struct AssignResult<sc_dt::sc_bv<N> > {
-    void operator() (sc_dt::sc_bv<N> & value, std::string const & s) 
+    void operator() (sc_dt::sc_bv<N> & value, std::string const & s)
     {
       _AssignSCDT(value, s);
     }

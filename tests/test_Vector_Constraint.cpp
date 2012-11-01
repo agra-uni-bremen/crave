@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE ( fibo_test )
   BOOST_REQUIRE(30 <= it.v.size() && it.v.size() <= 50);
   BOOST_REQUIRE(it.v[0] == 0);
   BOOST_REQUIRE(it.v[1] == 1);
-  for (uint i = 2; i < it.v.size(); i++) 
+  for (uint i = 2; i < it.v.size(); i++)
     BOOST_REQUIRE(it.v[i] == it.v[i - 1] + it.v[i - 2]);
 }
 
@@ -104,7 +104,7 @@ BOOST_AUTO_TEST_CASE ( unique_test_1 )
   BOOST_REQUIRE(it.v.size() == 100);
   for (uint i = 0; i < it.v.size(); i++) {
     BOOST_REQUIRE(0 <= it.v[i] && it.v[i] < 100);
-    for (uint j = 0; j < i; j++) 
+    for (uint j = 0; j < i; j++)
       BOOST_REQUIRE(it.v[i] != it.v[j]);
   }
 }
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE ( unique_test_2 )
   rand_vec<unsigned int> v(NULL);
   Generator<> gen;
   gen(v().size() == 11);
-  gen.foreach(v, _i, v()[_i] < 10);  
+  gen.foreach(v, _i, v()[_i] < 10);
 
   gen.unique(v);
   BOOST_REQUIRE(!gen.next());
@@ -188,21 +188,21 @@ BOOST_AUTO_TEST_CASE ( soft_vec_constraint )
 
   Generator<> gen;
   gen(v().size() == 10);
-  gen.foreach(v, _i, v()[_i] >= v()[_i - 1]);  
-  gen.soft_foreach(v, _i, v()[_i] < v()[_i - 1]);  
+  gen.foreach(v, _i, v()[_i] >= v()[_i - 1]);
+  gen.soft_foreach(v, _i, v()[_i] < v()[_i - 1]);
   BOOST_REQUIRE(gen.next());
 
   Generator<> gen1;
   gen1(v().size() == 4);
-  gen1.foreach(v, _i, v()[_i] >= v()[_i - 1]);  
-  gen1.foreach(v, _i, v()[_i] <= 1000);  
-  gen1.soft_foreach(v, _i, v()[_i] <= v()[_i - 1]);  
-  gen1.soft_foreach(v, _i, IF_THEN(_i == 0, v()[_i] % 13 == 3));  
+  gen1.foreach(v, _i, v()[_i] >= v()[_i - 1]);
+  gen1.foreach(v, _i, v()[_i] <= 1000);
+  gen1.soft_foreach(v, _i, v()[_i] <= v()[_i - 1]);
+  gen1.soft_foreach(v, _i, IF_THEN(_i == 0, v()[_i] % 13 == 3));
   BOOST_REQUIRE(gen1.next());
   for (int i = 0; i < 10; i++) {
-    BOOST_REQUIRE(v.size() == 4);  
+    BOOST_REQUIRE(v.size() == 4);
     std::cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << std::endl;
-    BOOST_REQUIRE(v[0] == v[1] && v[1] == v[2] && v[2] == v[3] && v[0] % 13 == 3);  
+    BOOST_REQUIRE(v[0] == v[1] && v[1] == v[2] && v[2] == v[3] && v[0] % 13 == 3);
     if (!gen1.next()) break;
   }
 }
@@ -230,7 +230,7 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_2 )
   gen.foreach(a, _i, a()[_i] > -10 );
   gen.unique(a);
 
-  BOOST_REQUIRE(gen.next());  
+  BOOST_REQUIRE(gen.next());
   for (uint i = 0; i < a.size(); i++)
     BOOST_REQUIRE(-10 < a[i] && a[i] < 10);
   BOOST_REQUIRE(check_unique(a));
@@ -245,7 +245,7 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_3 )
   gen.foreach(a, _i, a()[_i] > (short) -10 );
   gen.unique(a);
 
-  BOOST_REQUIRE(gen.next());  
+  BOOST_REQUIRE(gen.next());
   for (uint i = 0; i < a.size(); i++)
     BOOST_REQUIRE(-10 < a[i] && a[i] < 10);
   BOOST_REQUIRE(check_unique(a));
@@ -281,7 +281,7 @@ BOOST_AUTO_TEST_CASE ( bool_rand_vec )
 
   BOOST_REQUIRE(gen.next());
   BOOST_REQUIRE(a.size() == 10);
-  for (uint i = 1; i < a.size(); i++) 
+  for (uint i = 1; i < a.size(); i++)
     BOOST_REQUIRE(a[i] != a[i - 1]);
 }
 

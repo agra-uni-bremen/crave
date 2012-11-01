@@ -42,7 +42,7 @@ namespace crave {
 
   extern boost::mt19937 rng;
   extern boost::function0<bool> random_bit;
-  
+
   std::string default_solver();
 
   namespace proto = boost::proto;
@@ -79,13 +79,13 @@ namespace crave {
       return vecIdx(i, 0);
     }
 
-  };  
+  };
 
   template< typename derived_context >
   struct metaSMT_Context_base
     : proto::callable_context< metaSMT_Context_base<derived_context>, proto::null_context >
   {
-    metaSMT_Context_base() 
+    metaSMT_Context_base()
     : solver()
     , _soft( evaluate(solver, preds::True) )
     {}
@@ -127,7 +127,7 @@ namespace crave {
         buf << "var_" << tag.id;
         unsigned width=bitsize_traits<value_type>::value;
         //std::cout << "creating " << buf.str() << ", width= " << width << std::endl;
-        qf_bv::bitvector bv = qf_bv::new_bitvector(width);  
+        qf_bv::bitvector bv = qf_bv::new_bitvector(width);
         _variables.insert( std::make_pair(tag.id, bv) );
         return evaluate(solver, bv);
       }
@@ -135,7 +135,7 @@ namespace crave {
 
     template<typename value_type>
     struct writeReference {
-      writeReference(value_type & i, derived_context & ctx, unsigned id) 
+      writeReference(value_type & i, derived_context & ctx, unsigned id)
       : _i (i), _ctx(ctx), _id(id)
       {}
       void operator() () {
@@ -328,7 +328,7 @@ namespace crave {
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::modulus, Expr1 const & e1, Expr2 const &  e2) {
-	  // assume e2 >= 0
+    // assume e2 >= 0
       bool sign1 = proto::matches< Expr1, IsSigned >::value;
       if( sign1 ) {
         return evaluate( solver, qf_bv::bvsrem(
@@ -340,7 +340,7 @@ namespace crave {
             proto::eval( e1, ctx() )
           , proto::eval( e2, ctx() )
         ));
-      } 
+      }
     }
 
     template< typename Expr1, typename Expr2>
@@ -391,12 +391,12 @@ namespace crave {
     result_type operator() (extend_tag, Integral const & by_width, Expr const &  e) {
       bool sign = proto::matches< Expr, IsSigned >::value;
       if (sign)
-        return evaluate( solver, 
+        return evaluate( solver,
           qf_bv::sign_extend( proto::value(by_width).value,
             proto::eval( e, ctx() )
         ));
       else
-        return evaluate( solver, 
+        return evaluate( solver,
           qf_bv::zero_extend( proto::value(by_width).value,
             proto::eval( e, ctx() )
         ));
@@ -409,11 +409,11 @@ namespace crave {
       expr1 = proto::eval( e1, ctx() );
       expr2 = proto::eval( e2, ctx() );
 
-      boost::function0<result_type> f = getID( evaluate(solver, 
+      boost::function0<result_type> f = getID( evaluate(solver,
           preds::equal(expr1, expr2)) );
       _lazy[proto::value(e1).id] = f;
-      
-    
+
+
       return evaluate( solver, preds::True);
     }
 
@@ -431,14 +431,14 @@ namespace crave {
 
     template<typename Integer>
     struct getLazyReference{
-      getLazyReference(Integer const & i, SolverType & solver, result_type var) 
+      getLazyReference(Integer const & i, SolverType & solver, result_type var)
       : _i (i), solver(solver), _var(var)
       {}
       result_type operator() () {
-        if (boost::is_signed<Integer>::value) 
-          return evaluate( solver, preds::equal(_var, qf_bv::bvsint(_i, bitsize_traits<Integer>::value) )); 
-        else    
-          return evaluate( solver, preds::equal(_var, qf_bv::bvuint(_i, bitsize_traits<Integer>::value) )); 
+        if (boost::is_signed<Integer>::value)
+          return evaluate( solver, preds::equal(_var, qf_bv::bvsint(_i, bitsize_traits<Integer>::value) ));
+        else
+          return evaluate( solver, preds::equal(_var, qf_bv::bvuint(_i, bitsize_traits<Integer>::value) ));
       }
       Integer const & _i;
       SolverType & solver;
@@ -462,7 +462,7 @@ namespace crave {
 
     template< typename Integer>
     result_type operator() (proto::tag::terminal, Integer const & i) {
-      if (boost::is_signed<Integer>::value) 
+      if (boost::is_signed<Integer>::value)
         return evaluate( solver, qf_bv::bvsint(i, bitsize_traits<Integer>::value) );
       else
         return evaluate( solver, qf_bv::bvuint(i, bitsize_traits<Integer>::value) );
@@ -478,12 +478,12 @@ namespace crave {
         BOOST_FOREACH(typename boost::range_value<Collection>::type const & i, boost::proto::value(c))
         {
    	 ret = evaluate( solver, preds::Or( ret, proto::eval( value == i, ctx() ) ) );
-        } 
+        }
 	return ret;
     }
 
     struct getDistReference{
-      getDistReference( SolverType & solver, result_type var, double probability) 
+      getDistReference( SolverType & solver, result_type var, double probability)
       :  solver(solver), _var(var), _probability(probability)
       {}
       result_type operator() () {
@@ -500,7 +500,7 @@ namespace crave {
     operator() (proto::tag::function,
        boost::proto::terminal<operator_dist>::type const & tag,
         Var const & var_term, Value const & probability) {
-	
+
 	//qf_bv::bitvector bv = qf_bv::new_bitvector(1);
 //	_variables.insert(std::make_pair(boost::proto::value(var_term).id, proto::eval(var_term,ctx())));
 	result_type res = boost::proto::eval(var_term, ctx());
@@ -511,13 +511,13 @@ namespace crave {
 
            return evaluate(solver, preds::True);
 	   //res;
-	   //proto::eval(var_term,ctx()));     	 
+	   //proto::eval(var_term,ctx()));
     	  //return proto::eval(bv, ctx());
     }
 
     template<typename Arg1, typename Arg2, typename Arg3, typename Arg4>
     result_type
-    operator() (Arg1 a1, Arg2 a2, Arg3 a3, Arg4 a4) 
+    operator() (Arg1 a1, Arg2 a2, Arg3 a3, Arg4 a4)
     {
         std::cout << "DEBUG: \n";
 	//std::cout << "    "<< typeid(a1).name() << "\n";
@@ -525,11 +525,11 @@ namespace crave {
 	//std::cout << "    "<< typeid(a3).name() << "\n";
 	//std::cout << "    "<< typeid(a4).name() << "\n";
 
-        typedef Constraint<boost::proto::terminal<operator_dist>::proto_grammar > Tag; 
+        typedef Constraint<boost::proto::terminal<operator_dist>::proto_grammar > Tag;
 	Tag tag;
 	std::cout << "tag: " << typeid(tag).name() << "\n";
 	std::cout << "same: " << boost::is_same<Tag, Arg2>::value << "\n";
-      
+
 	 return evaluate( solver, False);
     	 //return proto::eval( value, ctx() );
     }
@@ -539,13 +539,13 @@ namespace crave {
       // e1 should be a terminal vector_tag
       BOOST_STATIC_ASSERT((
         boost::is_same<
-          typename proto::tag_of<Expr1>::type, 
+          typename proto::tag_of<Expr1>::type,
           proto::tag::terminal
         >::value
       ));
 
       vectorSubscript_Context vsctx;
-      vecVar vv(proto::value(e1).id, proto::eval(e2, vsctx)); 
+      vecVar vv(proto::value(e1).id, proto::eval(e2, vsctx));
 
       std::map<vecVar, qf_bv::bitvector>::const_iterator ite = _vector_variables.find(vv);
       if ( ite != _vector_variables.end() ) {
@@ -573,7 +573,7 @@ namespace crave {
       //check(e);
 
       result_type var;
-      assert (_constraint_name_variables.find(constraint_name) == _constraint_name_variables.end() ); 
+      assert (_constraint_name_variables.find(constraint_name) == _constraint_name_variables.end() );
 
       var = evaluate(solver, preds::new_variable());
       _constraint_name_variables.insert( std::make_pair(constraint_name, var) );
@@ -610,7 +610,7 @@ namespace crave {
       for (uint i = 0; i < _pre_hook.size(); ++i) if(!_pre_hook[i]()) return false;
 
       for (
-        std::map<std::string, result_type >::const_iterator 
+        std::map<std::string, result_type >::const_iterator
         ite = _constraint_name_variables.begin();
         ite != _constraint_name_variables.end(); ++ite) {
         if (_disabled_constraint_names.find(ite->first) == _disabled_constraint_names.end())
@@ -618,14 +618,14 @@ namespace crave {
       }
 
       for (
-        std::map<unsigned, boost::function0<result_type> > ::const_iterator 
+        std::map<unsigned, boost::function0<result_type> > ::const_iterator
         ite = _lazy.begin();
         ite != _lazy.end(); ++ite) {
         assumption(solver, (ite->second)() );
       }
 
       for (
-        std::map<vecVar, boost::function0<result_type> > ::const_iterator 
+        std::map<vecVar, boost::function0<result_type> > ::const_iterator
         ite = _lazy_vec.begin();
         ite != _lazy_vec.end(); ++ite) {
         assumption(solver, (ite->second)() );
@@ -684,7 +684,7 @@ namespace crave {
       {
         s.insert( std::make_pair(s.size(), si.second) );
         out.push_back(si.first);
-      } 
+      }
 
 
       results = analyze_conflicts(solver, s, metaSMT::evaluate(solver,preds::True), results);
@@ -701,8 +701,8 @@ namespace crave {
 
       return vvec_str;
     }
-     
-     
+
+
     void assign_random_bits() {
       return;
       std::vector <result_type> bits;
@@ -718,9 +718,9 @@ namespace crave {
 
         }
       }
- 
+
       std::random_shuffle(bits.begin(),bits.end());
-      int len = bits.size() > 0 ? boost::uniform_int<int>(0, bits.size() - 1)(rng) : 0;     
+      int len = bits.size() > 0 ? boost::uniform_int<int>(0, bits.size() - 1)(rng) : 0;
       for(int i = 0; i < len ; ++i) {
        metaSMT::assumption(solver, preds::equal(bits[i], qf_bv::bvuint(boost::uniform_int<int>(0, 1)(rng), 1)));
       }
@@ -777,16 +777,16 @@ namespace crave {
 
     template<typename T>
     struct makeUnique {
-      makeUnique(__rand_vec<T> & rv, SolverType & solver, result_type var) 
+      makeUnique(__rand_vec<T> & rv, SolverType & solver, result_type var)
       : _rv(rv), solver(solver), _var(var)
       {}
       result_type operator() () {
         result_type ret = evaluate( solver, preds::True);
         for (uint i = 0; i < _rv.size(); i++) {
-          if (boost::is_signed<T>::value) 
-            ret = evaluate( solver, preds::And(ret, evaluate( solver, preds::nequal(_var, qf_bv::bvsint(_rv[i], bitsize_traits<T>::value) )))); 
+          if (boost::is_signed<T>::value)
+            ret = evaluate( solver, preds::And(ret, evaluate( solver, preds::nequal(_var, qf_bv::bvsint(_rv[i], bitsize_traits<T>::value) ))));
           else
-            ret = evaluate( solver, preds::And(ret, evaluate( solver, preds::nequal(_var, qf_bv::bvuint(_rv[i], bitsize_traits<T>::value) )))); 
+            ret = evaluate( solver, preds::And(ret, evaluate( solver, preds::nequal(_var, qf_bv::bvuint(_rv[i], bitsize_traits<T>::value) ))));
         }
         return ret;
       }
@@ -798,7 +798,7 @@ namespace crave {
     template<typename T>
     void vec_unique (vecVar & vv, __rand_vec<T> & rv) {
       boost::function0<result_type> f = makeUnique<T>(rv, solver, evaluate(solver, _vector_variables[vv]) );
-      _lazy_vec[vv] = f;        
+      _lazy_vec[vv] = f;
     }
 
     void new_disjunction() { _disjunction = evaluate(solver, preds::False); }
@@ -828,7 +828,7 @@ namespace crave {
   }; // metaSMT_Context
 
   struct metaSMT_Context : metaSMT_Context_base<metaSMT_Context> {
-    metaSMT_Context() 
+    metaSMT_Context()
     : metaSMT_Context_base<metaSMT_Context>()
     { }
   };

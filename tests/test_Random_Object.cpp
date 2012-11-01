@@ -15,30 +15,30 @@ using namespace crave;
 struct Context_Fixture {};
 
 enum color_enum {
-	RED,
-	GREEN,
-	BLUE
+  RED,
+  GREEN,
+  BLUE
 };
 CRAVE_ENUM(color_enum, 3, RED, GREEN, BLUE);
 
 enum football_enum {
-	GK,		// Goalkeeper
-	SW,		// Sweeper
-	LWB,	// Left-Wing-Back
-	LB,		// Left-Back
-	LCB,	// Left-Centre-Back
-	RCB,	// Right-Centre-Back
-	RB,		// Right-Back
-	RWB,	// Right-Wing-Back
-	DM,		// Defensive Midfielder
-	LM,		// Left Wide Midfielder
-	CM,		// Centre Midfielder
-	RM,		// Right Wide Midfielder
-	AM,		// Attacking Midfielder
-	LW,		// Left Winger (Striker)
-	SS,		// Secondary Striker
-	RW,		// Right Winger
-	CF		// Centre Striker
+  GK,  // Goalkeeper
+  SW,  // Sweeper
+  LWB, // Left-Wing-Back
+  LB,  // Left-Back
+  LCB, // Left-Centre-Back
+  RCB, // Right-Centre-Back
+  RB,  // Right-Back
+  RWB, // Right-Wing-Back
+  DM,  // Defensive Midfielder
+  LM,  // Left Wide Midfielder
+  CM,  // Centre Midfielder
+  RM,  // Right Wide Midfielder
+  AM,  // Attacking Midfielder
+  LW,  // Left Winger (Striker)
+  SS,  // Secondary Striker
+  RW,  // Right Winger
+  CF   // Centre Striker
 };
 CRAVE_ENUM(football_enum, 17, GK, SW, LWB, LB, LCB, RCB, RB, RWB, DM, LM, CM, RM, AM, LW, SS, RW, CF);
 
@@ -46,12 +46,12 @@ BOOST_FIXTURE_TEST_SUITE(Random_Object_t, Context_Fixture )
 
 class my_rand_obj : public rand_obj {
 public:
-	randv<color_enum> color; 
-	randv<int> x; 
+  randv<color_enum> color;
+  randv<int> x;
 
-	my_rand_obj(rand_obj* parent = 0) : rand_obj(parent), color(this), x(this) {
+  my_rand_obj(rand_obj* parent = 0) : rand_obj(parent), color(this), x(this) {
     constraint(color() == x());
-	}
+  }
 };
 
 BOOST_AUTO_TEST_CASE( t_rand_enum )
@@ -61,36 +61,36 @@ BOOST_AUTO_TEST_CASE( t_rand_enum )
     BOOST_REQUIRE(obj.next());
     std::cout << obj.color << " " << obj.x << std::endl;
     BOOST_REQUIRE(obj.color == RED || obj.color == GREEN || obj.color == BLUE);
-    BOOST_REQUIRE(obj.color == obj.x);      
+    BOOST_REQUIRE(obj.color == obj.x);
   }
 }
 
 BOOST_AUTO_TEST_CASE( t_rand_enum_standalone )
 {
-  BOOST_CHECK_THROW ( randv<color_enum> color(0), std::runtime_error );  
+  BOOST_CHECK_THROW ( randv<color_enum> color(0), std::runtime_error );
 }
 
 class tall_rand_enum_obj : public rand_obj {
 public:
-	randv<football_enum> player;
+  randv<football_enum> player;
 
-	tall_rand_enum_obj(rand_obj* parent = 0) : rand_obj(parent), player(this) {
+  tall_rand_enum_obj(rand_obj* parent = 0) : rand_obj(parent), player(this) {
     constraint(player() == GK && player() != CF);
-	}
+  }
 };
 
 class tall_rand_enum_obj_gt : public rand_obj {
 public:
-	randv<football_enum> player;
+  randv<football_enum> player;
 
-	tall_rand_enum_obj_gt(rand_obj* parent = 0) : rand_obj(parent), player(this) {
+  tall_rand_enum_obj_gt(rand_obj* parent = 0) : rand_obj(parent), player(this) {
     constraint(player() > AM);
-	}
+  }
 };
 
 BOOST_AUTO_TEST_CASE( enum_no_overflow )
 {
-	tall_rand_enum_obj obj(0);
+  tall_rand_enum_obj obj(0);
   BOOST_REQUIRE(obj.next());
 
   BOOST_REQUIRE_EQUAL(obj.player, GK);
@@ -100,11 +100,11 @@ BOOST_AUTO_TEST_CASE( enum_gt )
 {
   tall_rand_enum_obj_gt obj(0);
 
-	for (int i = 0; i<100; ++i) {
+  for (int i = 0; i<100; ++i) {
     BOOST_REQUIRE(obj.next());
     BOOST_REQUIRE_GT(obj.player, AM);
     BOOST_REQUIRE(obj.player == LW || obj.player == SS || obj.player == RW || obj.player == CF );
-	}
+  }
 }
 
 class item : public rand_obj {
@@ -164,11 +164,11 @@ BOOST_AUTO_TEST_CASE( t4 )
 
 class obj : public rand_obj {
 public:
-  obj(rand_obj* parent) : rand_obj(parent), a(this), b(this), c(this), d(this), e(this), f(this) { 
+  obj(rand_obj* parent) : rand_obj(parent), a(this), b(this), c(this), d(this), e(this), f(this) {
     a.range(-20, -10);
     b.range(10, 20);
     c.range(-20, -10);
-    d.range(10, 20);    
+    d.range(10, 20);
     e.range('a', 'z');
     f.range('A', 'Z');
   }
@@ -179,15 +179,15 @@ public:
   randv<char> e;
   randv<unsigned char> f;
 
-  friend ostream& operator<<(ostream& os, const obj& o) { 
-    os << "(" << o.a << " " << o.b << " " << o.c << " "  << o.d << " "  << o.e << " "  << o.f << ")"; 
-    return os; 
+  friend ostream& operator<<(ostream& os, const obj& o) {
+    os << "(" << o.a << " " << o.b << " " << o.c << " "  << o.d << " "  << o.e << " "  << o.f << ")";
+    return os;
   }
 };
 
 class obj1 : public obj {
 public:
-  obj1(rand_obj* parent) : obj(parent) { 
+  obj1(rand_obj* parent) : obj(parent) {
     e.range('A', 'Z');
     f.range('a', 'z');
   }
@@ -195,7 +195,7 @@ public:
 
 class obj2 : public rand_obj {
 public:
-  obj2(rand_obj* parent) : rand_obj(parent), g(this), h(this), i(this), j(this), k(this), l(this) { 
+  obj2(rand_obj* parent) : rand_obj(parent), g(this), h(this), i(this), j(this), k(this), l(this) {
     g.range(-20, -10);
     h.range(10, 20);
     i.range(-20, -10);
@@ -208,9 +208,9 @@ public:
   randv<bool> k;
   obj1 l;
 
-  friend ostream& operator<<(ostream& os, const obj2& o1) { 
-    os << o1.l << " " << o1.g << " " << o1.h << " "  << o1.i << " "  << o1.j << " "  << o1.k; 
-    return os; 
+  friend ostream& operator<<(ostream& os, const obj2& o1) {
+    os << o1.l << " " << o1.g << " " << o1.h << " "  << o1.i << " "  << o1.j << " "  << o1.k;
+    return os;
   }
 };
 
@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE( t5 )
     BOOST_REQUIRE(10 <= it2.l.d && it2.l.d <= 20);
     BOOST_REQUIRE('a' <= it2.l.f && it2.l.f <= 'z');
     BOOST_REQUIRE('A' <= it2.l.e && it2.l.e <= 'Z');
-  }  
+  }
 }
 
 #define ref(x) reference(x)
@@ -318,7 +318,7 @@ BOOST_AUTO_TEST_CASE ( t6 )
 
 class Constraint_base : public Generator<> {
   public:
-    Constraint_base() 
+    Constraint_base()
       : Generator<>()
       , constraint(*this)
       , soft_constraint( constraint )
@@ -332,7 +332,7 @@ class Constraint_base : public Generator<> {
 class Constraint1 : public Constraint_base {
   public:
     Variable<unsigned> x;
-    
+
     Constraint1 () {
       constraint( x<10 );
     }

@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE ( randv_dist_t1 )
   }
   int min = s[0], max = s[0];
   for (int i = 1; i <= 200; i++)
-    if (s.find(i) != s.end()) { 
+    if (s.find(i) != s.end()) {
       if (s[i] < min) min = s[i];
       if (s[i] > max) max = s[i];
     }

@@ -24,7 +24,7 @@ struct Context_Fixture {
 
 class sif_seq_item : public rand_obj_of<AllSAT<> > {
 public:
-    sif_seq_item() : 
+    sif_seq_item() :
         tx_enable_parity(this),
         tx_odd_parity(this),
         dummy()
@@ -34,11 +34,11 @@ public:
 
     friend ostream& operator<<(ostream& os, const sif_seq_item& ssi) {
         os << "CHECK: tx_odd_parity / enable  = " << ssi.tx_odd_parity
-           << " " << ssi.tx_enable_parity << std::endl; 
-        assert( !ssi.tx_odd_parity || ssi.tx_enable_parity ); 
+           << " " << ssi.tx_enable_parity << std::endl;
+        assert( !ssi.tx_odd_parity || ssi.tx_enable_parity );
 
-        os << "EndConstraint" << std::endl; 
-        return os; 
+        os << "EndConstraint" << std::endl;
+        return os;
     }
 
     randv<bool> tx_enable_parity;
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE ( t1 )
   for (uint i = 0; i <= 10; i++) {
     BOOST_REQUIRE(gen.next());
     for (uint j = 0; j < vec.size(); j++)
-      BOOST_REQUIRE(vec[j] != v);      
+      BOOST_REQUIRE(vec[j] != v);
     vec.push_back(v);
   }
 }
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE( boolean )
 {
   Variable<bool> b;
 
-  Generator<AllSAT<10> > gen;  
+  Generator<AllSAT<10> > gen;
   gen(b == b)(); // create a new assignment
 
   bool b1 = gen[b];
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE( less )
 {
   Variable<unsigned> a;
 
-  Generator<AllSAT<10> > gen;  
+  Generator<AllSAT<10> > gen;
   gen(a < 256u);
 
   std::set<unsigned> generated;
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE( less_equal )
 {
   Variable<unsigned> a;
 
-  Generator<AllSAT<10> > gen;  
+  Generator<AllSAT<10> > gen;
   gen(a <= 256u);
 
   std::set<unsigned> generated;
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE( greater )
 {
   Variable<unsigned> a;
 
-  Generator<AllSAT<10> > gen;  
+  Generator<AllSAT<10> > gen;
   gen(a > (std::numeric_limits<unsigned>::max()-256) );
 
   std::set<unsigned> generated;
@@ -165,7 +165,7 @@ BOOST_AUTO_TEST_CASE( greater_equal )
 {
   Variable<unsigned> a;
 
-  Generator<AllSAT<10> > gen;  
+  Generator<AllSAT<10> > gen;
   gen(a >= (std::numeric_limits<unsigned>::max()-256) );
 
   std::set<unsigned> generated;
@@ -178,7 +178,7 @@ BOOST_AUTO_TEST_CASE( greater_equal )
   BOOST_CHECK_EQUAL( generated.size(), 257);
 }
 
-BOOST_AUTO_TEST_CASE( divide ) 
+BOOST_AUTO_TEST_CASE( divide )
 {
   Variable<unsigned char> a;
   Variable<unsigned char> b;
@@ -272,7 +272,7 @@ BOOST_AUTO_TEST_CASE ( soft_constraint_t )
   Variable<int> r;
   gen( r<6 );
   soft(gen)( r == 2 );
-  
+
   BOOST_REQUIRE( gen.next() );
   BOOST_REQUIRE_EQUAL(gen[r], 2);
 
@@ -287,7 +287,7 @@ BOOST_AUTO_TEST_CASE( alu )
   Variable<unsigned> a;
   Variable<unsigned> b;
 
-  Generator<AllSAT<10> > gen;  
+  Generator<AllSAT<10> > gen;
   gen
     ( a < 16)
     ( b < 16)
@@ -308,7 +308,7 @@ BOOST_AUTO_TEST_CASE( alu_enum )
   Variable<unsigned> a;
   Variable<unsigned> b;
 
-  Generator<AllSAT<10> > gen;  
+  Generator<AllSAT<10> > gen;
   gen
     ( a < 16u)
     ( b < 16u)
@@ -334,7 +334,7 @@ BOOST_AUTO_TEST_CASE( pythagoras )
   Variable<unsigned long long> b;
   Variable<unsigned long long> c;
 
-  Generator<AllSAT<5> > gen;  
+  Generator<AllSAT<5> > gen;
   gen(a*a + b*b == c*c)(); // create a new assignment
 
   unsigned long long av = gen[a];

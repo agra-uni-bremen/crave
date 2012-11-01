@@ -35,23 +35,23 @@ namespace crave {
       bool disable_constraint(std::string name) { return constraint.disable_constraint(name); }
       bool is_constraint_enabled(std::string name) { return constraint.is_constraint_enabled(name); }
       void addChild(rand_base* rb) {
-	children.push_back(rb);
-	constraint.add_pre_hook(boost::bind<bool>(&rand_base::next, rb));
+        children.push_back(rb);
+        constraint.add_pre_hook(boost::bind<bool>(&rand_base::next, rb));
       }
 
     protected:
       rand_obj_of() { }
       std::vector<rand_base*> children;
-    
+
     public:
       Generator<context_type> constraint;
   };
 
-  class rand_obj : public rand_obj_of<> 
+  class rand_obj : public rand_obj_of<>
   {
     public:
       template<typename context>
-      rand_obj(rand_obj_of<context>* parent) 
+      rand_obj(rand_obj_of<context>* parent)
       : rand_obj_of<>(parent)
       { }
     protected:
@@ -81,7 +81,7 @@ namespace crave {
 
   template<typename T>
   struct weighted_range
-  {  
+  {
     weighted_range(T l, T r, unsigned long long w) : left(l), right(r), weight(w), accumWeight(0) { }
     weighted_range(T l, T r) : left(l), right(r), weight(1LLU + r - l), accumWeight(0) { }
 
@@ -100,7 +100,7 @@ namespace crave {
 
     T left;
     T right;
-    unsigned long long weight;         
+    unsigned long long weight;
     unsigned long long accumWeight;
   };
 
@@ -114,10 +114,10 @@ namespace crave {
       void range(T l, T r) { resetDistribution(); addRange(weighted_range<T>(l, r)); }
 
     protected:
-      randomize_base() { }     
+      randomize_base() { }
 
-      T nextValue() { 
-        if (ranges.empty()) 
+      T nextValue() {
+        if (ranges.empty())
           return boost::uniform_int<T>(std::numeric_limits<T>::min(), std::numeric_limits<T>::max())(rng);
         weighted_range<T> selected = ranges.back();
         if (ranges.size() > 1) {
@@ -128,7 +128,7 @@ namespace crave {
               break;
             }
         }
-        return boost::uniform_int<T>(selected.left, selected.right)(rng);        
+        return boost::uniform_int<T>(selected.left, selected.right)(rng);
       }
 
       void addRange(weighted_range<T> wr) {
@@ -161,7 +161,7 @@ namespace crave {
     //bool next() { value = nextValue(); return true; }
     //randv<T>& operator=(const randv<T>& i) { value = i.value; return *this; }
     //randv<T>& operator=(T i) { value = i; return *this; }
-  
+
   public:
     //randv<T>& operator++()     { ++value;  return *this; }
     //T         operator++(int)  { T tmp = value; ++value; return tmp; }
@@ -240,24 +240,24 @@ class randv<typename> : public randv_prim_base<typename>, public randomize_base<
 
   template<typename T>
   class rand_vec : public __rand_vec<T>, public rand_base
-  {  
+  {
     public:
       template<typename context>
       rand_vec(rand_obj_of<context>* parent) : __rand_vec<T>() { if (parent != 0) parent->addChild(this); }
       rand_vec(rand_obj* parent) : __rand_vec<T>() { if (parent != 0) parent->addChild(this); }
 
-      bool next() { 
+      bool next() {
         static randv<unsigned> default_size(NULL);
         default_size.range(5, 10);
-        default_size.next();        
+        default_size.next();
         static randv<T> r(NULL);
         for (uint i = 0; i < default_size; i++) {
             r.next();
             this->push_back(r);
         }
-        return true; 
+        return true;
       }
-            
+
   };
 
 } // namespace crave

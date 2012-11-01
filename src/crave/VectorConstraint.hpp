@@ -10,11 +10,11 @@
 
 namespace crave {
 
-  enum CppType { 
+  enum CppType {
       UNSUPPORTED
     , BOOL
     , INT
-    , UINT 
+    , UINT
     , CHAR
     , SCHAR
     , UCHAR
@@ -29,7 +29,7 @@ namespace crave {
   template<typename T>
   class TypeInfo {
     public:
-      operator CppType() const { return UNSUPPORTED; }  
+      operator CppType() const { return UNSUPPORTED; }
   };
 
 #define _DEF_TYPE(typename, cpptype) \
@@ -76,13 +76,13 @@ class TypeInfo<typename> \
       CppType element_type() { return TypeInfo<T1>(); }
 
       typename std::vector<T2>::size_type size() const { return real_vec.size(); }
-      T1& operator[](const int& idx) const { return (T1&) real_vec[idx]; } 
+      T1& operator[](const int& idx) const { return (T1&) real_vec[idx]; }
       void push_back(const T1& x) { real_vec.push_back(x); }
       void clear() { real_vec.clear(); }
 
       void print() {
         std::cout << "vector " << sym_vec.id() << ": ";
-        for (uint i = 0; i < real_vec.size(); i++)    
+        for (uint i = 0; i < real_vec.size(); i++)
           std::cout << real_vec[i] << ", ";
         std::cout << std::endl;
       }
@@ -100,21 +100,21 @@ class TypeInfo<typename> \
 
   struct vecIdx {
     int val;
-    int bound; // 0 = free 
+    int bound; // 0 = free
 
     vecIdx(int v, int b) : val(v), bound(b) { }
 
-    bool operator<(const vecIdx& other) const { 
+    bool operator<(const vecIdx& other) const {
       if (val != other.val) return val < other.val;
       return bound < other.bound;
     }
 
-    vecIdx operator+(const vecIdx& other) const { 
+    vecIdx operator+(const vecIdx& other) const {
       assert(bound == 0 || other.bound == 0);
       return vecIdx(val + other.val, bound + other.bound);
     }
 
-    vecIdx operator-(const vecIdx& other) const { 
+    vecIdx operator-(const vecIdx& other) const {
       assert(other.bound == 0 || other.bound == bound);
       return vecIdx(val - other.val, bound - other.bound);
     }
@@ -136,7 +136,7 @@ class TypeInfo<typename> \
     vecVar(int id) : vecId(id), index(0, 0) { }
     vecVar(int id, vecIdx idx) : vecId(id), index(idx.val, idx.bound) { }
 
-    bool operator<(const vecVar& other) const { 
+    bool operator<(const vecVar& other) const {
       if (vecId != other.vecId) return vecId < other.vecId;
       return index < other.index;
     }

@@ -11,7 +11,7 @@
 #include <stdexcept>
 
 namespace crave {
-  
+
   typedef AllSAT<50> DefaultContext;
 
   template<typename ContextT=DefaultContext>
@@ -32,7 +32,7 @@ namespace crave {
   template<typename ContextT>
   struct Generator {
 
-    Generator() 
+    Generator()
     : ctx()
     {};
 
@@ -62,7 +62,7 @@ namespace crave {
 
     std::vector<std::vector<std::string> > analyse_contradiction()
     {
-	return ctx.analyse_contradiction();
+      return ctx.analyse_contradiction();
     }
 
     void addCstrToCtx(std::string constraint_name, ContextT* context) {
@@ -72,21 +72,21 @@ namespace crave {
       ctxOfCstr[constraint_name] = context;
     }
 
-    bool enable_constraint(std::string constraint_name) { 
+    bool enable_constraint(std::string constraint_name) {
       typename std::map<std::string, ContextT*>::iterator ite = ctxOfCstr.find(constraint_name);
       if (ite == ctxOfCstr.end()) return false;
       ite->second->enable_constraint(constraint_name);
-      return true;    
+      return true;
     }
 
-    bool disable_constraint(std::string constraint_name) { 
+    bool disable_constraint(std::string constraint_name) {
       typename std::map<std::string, ContextT*>::iterator ite = ctxOfCstr.find(constraint_name);
       if (ite == ctxOfCstr.end()) return false;
       ite->second->disable_constraint(constraint_name);
-      return true;    
+      return true;
     }
 
-    bool is_constraint_enabled(std::string constraint_name) { 
+    bool is_constraint_enabled(std::string constraint_name) {
       typename std::map<std::string, ContextT*>::iterator ite = ctxOfCstr.find(constraint_name);
       assert(ite != ctxOfCstr.end());
       return ite->second->is_constraint_enabled(constraint_name);
@@ -170,15 +170,15 @@ namespace crave {
       return Soft_Generator<ContextT> (*this);
     }
 
-    template<typename T> 
+    template<typename T>
     bool gen_vector(__rand_vec<T>* rvp, ContextT* rvctx) {
       __rand_vec<T>& rv = *rvp;
       std::cout << "generate vector " << rv().id() << std::endl;
       unsigned int size = rv.size();
       if (!ctx.read(size, rv().size().id())) {
         std::cout << "size not specified, use current" << std::endl;
-      } 
-      std::cout << "size = " << size << std::endl;  
+      }
+      std::cout << "size = " << size << std::endl;
 
       std::vector<vecVar> vvv;
       rvctx->dump_vec_var_list(vvv);
@@ -205,8 +205,8 @@ namespace crave {
         rvctx->assertion(_i = i);
 
         // unique
-        if (uniqueVecSet.find(rv().id()) != uniqueVecSet.end()) rvctx->vec_unique(vvv[_i_idx], rv);      
-        // solve 
+        if (uniqueVecSet.find(rv().id()) != uniqueVecSet.end()) rvctx->vec_unique(vvv[_i_idx], rv);
+        // solve
         if (!rvctx->solve()) return false;
         T tmp;
         rvctx->read(tmp, vvv[_i_idx]);
@@ -215,8 +215,6 @@ namespace crave {
 
       return true;
     }
-
-    uint runs = 0;
 
 #define _GEN_VEC(typename) if (!gen_vector(static_cast<__rand_vec<typename>* > (rvb), ite->second)) return false
     bool next() {
@@ -238,7 +236,7 @@ namespace crave {
           case LLONG: _GEN_VEC(long long); break;
           case ULLONG: _GEN_VEC(unsigned long long); break;
           default:
-            assert(false && "not supported yet"); 
+            assert(false && "not supported yet");
         }
       }
       return true;
@@ -249,12 +247,12 @@ namespace crave {
      * read variable "var"
      **/
     template<typename T>
-    T operator[] (Variable<T> const & var) { 
-      return ctx.read(var); 
+    T operator[] (Variable<T> const & var) {
+      return ctx.read(var);
     };
 
     void new_disjunction() { ctx.new_disjunction(); }
-    void end_disjunction() { ctx.end_disjunction(); }  
+    void end_disjunction() { ctx.end_disjunction(); }
     template<typename Expr>
     void add_to_disjunction (Expr expr) { ctx.add_to_disjunction( FixWidth()(expr) ); }
 

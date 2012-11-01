@@ -25,7 +25,7 @@ namespace crave {
   struct bitsize_traits<Integer
     , typename boost::enable_if< boost::is_integral<Integer> >::type
   >
-  : boost::mpl::times< 
+  : boost::mpl::times<
       boost::mpl::sizeof_<Integer>
     , boost::mpl::int_<8>
   >::type {};
