@@ -251,6 +251,7 @@ class randv<typename> : public randv_prim_base<typename>, public randomize_base<
         default_size.range(5, 10);
         default_size.next();
         static randv<T> r(NULL);
+        this->clear();
         for (uint i = 0; i < default_size; i++) {
             r.next();
             this->push_back(r);
