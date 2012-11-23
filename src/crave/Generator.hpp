@@ -173,12 +173,12 @@ namespace crave {
     template<typename T>
     bool gen_vector(__rand_vec<T>* rvp, ContextT* rvctx) {
       __rand_vec<T>& rv = *rvp;
-      std::cout << "generate vector " << rv().id() << std::endl;
+      //std::cout << "generate vector " << rv().id() << std::endl;
       unsigned int size = rv.size();
       if (!ctx.read(size, rv().size().id())) {
-        std::cout << "size not specified, use current" << std::endl;
+        //std::cout << "size not specified, use current" << std::endl;
       }
-      std::cout << "size = " << size << std::endl;
+      //std::cout << "size = " << size << std::endl;
 
       std::vector<vecVar> vvv;
       rvctx->dump_vec_var_list(vvv);
