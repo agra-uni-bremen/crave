@@ -237,6 +237,7 @@ namespace crave {
           case ULLONG: _GEN_VEC(unsigned long long); break;
           default:
             assert(false && "not supported yet");
+            return false; // unknown vectors can not be generated
         }
       }
       return true;
