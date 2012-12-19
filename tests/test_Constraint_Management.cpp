@@ -1,12 +1,15 @@
 #define BOOST_TEST_MODULE Constraint_Management_t
 #include <boost/test/unit_test.hpp>
-#include <string>
+
 #include <crave/ConstrainedRandom.hpp>
 #include <crave/Generator.hpp>
-#include <boost/format.hpp>
 
+#include <boost/format.hpp>
+#include <boost/foreach.hpp>
 #include <boost/assign/list_of.hpp>
+
 #include <set>
+#include <string>
 #include <iostream>
 
 
@@ -54,7 +57,7 @@ bool cmp_vec(std::vector<std::string> const &a, std::vector<std::string> const &
 }
 
 //sortieren
-void sort_results( std::vector<std::vector<string> > &results )
+void sort_results( std::vector<std::vector<std::string> > &results )
 {
   for(unsigned i = 0; i < results.size();i++)
   {
@@ -232,7 +235,7 @@ BOOST_AUTO_TEST_CASE(no_conflict)
   randv<unsigned short> a(0);
   randv<unsigned short> b(0);
   randv<unsigned short> c(0);
-  Generator<Context> gen;
+  Generator gen;
   gen
     ("a", a() != b() )
     ("b", b() != c() )
@@ -248,7 +251,7 @@ BOOST_AUTO_TEST_CASE(one_conflict1)
   randv<bool> a(0);
   randv<bool> b(0);
   randv<bool> c(0);
-  Generator<Context> gen;
+  Generator gen;
   gen
     ("a", a() != b() )
     ("b", b() != c() )
@@ -272,7 +275,7 @@ BOOST_AUTO_TEST_CASE(one_conflict2)
 {
   randv<unsigned short> a(0);
   randv<unsigned short> b(0);
-  Generator<Context> gen;
+  Generator gen;
   gen
     ("a", a() == 3 )
     ("b", a() > 4  )
@@ -298,7 +301,7 @@ BOOST_AUTO_TEST_CASE(two_conflicts1)
   randv<unsigned short> a(0);
   randv<unsigned short> b(0);
   randv<unsigned short> c(0);
-  Generator<Context> gen;
+  Generator gen;
   gen
     ("a", a() == 1 )
     ("b", a()  > 5 )
@@ -333,7 +336,7 @@ BOOST_AUTO_TEST_CASE(two_conflicts2)
   randv<unsigned short> d(0);
   randv<unsigned short> e(0);
 
-  Generator<Context> gen;
+  Generator gen;
   gen
     ("a", a() != b() )
     ("b", b() != c() )
@@ -369,7 +372,7 @@ BOOST_AUTO_TEST_CASE(two_conflicts3)
   randv<unsigned short> b(0);
   randv<unsigned short> c(0);
   randv<unsigned short> d(0);
-  Generator<Context> gen;
+  Generator gen;
   gen
     ("c1", a() == 2 )
     ("c2", a()  > 5 )

@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE ( unique_test_1 )
 BOOST_AUTO_TEST_CASE ( unique_test_2 )
 {
   rand_vec<unsigned int> v(NULL);
-  Generator<> gen;
+  Generator gen;
   gen(v().size() == 11);
   gen.foreach(v, _i, v()[_i] < 10);
 
@@ -186,13 +186,13 @@ BOOST_AUTO_TEST_CASE ( soft_vec_constraint )
 {
   rand_vec<unsigned int> v(NULL);
 
-  Generator<> gen;
+  Generator gen;
   gen(v().size() == 10);
   gen.foreach(v, _i, v()[_i] >= v()[_i - 1]);
   gen.soft_foreach(v, _i, v()[_i] < v()[_i - 1]);
   BOOST_REQUIRE(gen.next());
 
-  Generator<> gen1;
+  Generator gen1;
   gen1(v().size() == 4);
   gen1.foreach(v, _i, v()[_i] >= v()[_i - 1]);
   gen1.foreach(v, _i, v()[_i] <= 1000);
@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_CASE ( soft_vec_constraint )
 BOOST_AUTO_TEST_CASE ( mixed_bv_width_1 )
 {
   rand_vec<signed char> a(NULL);
-  Generator<Context> gen;
+  Generator gen;
   gen(a().size() == 138);
   gen.foreach(a, _i, a()[_i] < (short) 10 );
   gen.unique(a);
@@ -275,7 +275,7 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_4 )
 BOOST_AUTO_TEST_CASE ( bool_rand_vec )
 {
   rand_vec<bool> a(NULL);
-  Generator<Context> gen;
+  Generator gen;
   gen(a().size() == 10);
   gen.foreach(a, _i, a()[_i] != a()[_i - 1]);
 

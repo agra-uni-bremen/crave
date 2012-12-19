@@ -316,17 +316,17 @@ BOOST_AUTO_TEST_CASE ( t6 )
   }
 }
 
-class Constraint_base : public Generator<> {
+class Constraint_base : public Generator {
   public:
     Constraint_base()
-      : Generator<>()
+      : Generator()
       , constraint(*this)
       , soft_constraint( constraint )
     {}
 
   protected:
-    Generator<> & constraint;
-    Soft_Generator<> soft_constraint;
+    Generator & constraint;
+    Soft_Generator soft_constraint;
 };
 
 class Constraint1 : public Constraint_base {

@@ -28,9 +28,6 @@ link_libraries (${PROJECT_NAME}_boost_test ${PROJECT_NAME} ${Boost_THREAD_LIBRAR
 add_executable (Syntax test_Syntax.cpp )
 add_all_tests(Syntax test_Syntax.cpp )
 
-add_executable (AllSAT test_AllSAT.cpp )
-add_all_tests(AllSAT test_AllSAT.cpp )
-
 add_executable (Context test_Context.cpp )
 add_all_tests(Context test_Context.cpp )
 

@@ -6,6 +6,8 @@
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/mersenne_twister.hpp>
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
 
 #include <limits>
 #include <vector>
@@ -44,7 +46,7 @@ namespace crave {
       std::vector<rand_base*> children;
 
     public:
-      Generator<context_type> constraint;
+      Generator constraint;
   };
 
   class rand_obj : public rand_obj_of<>
