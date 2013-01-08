@@ -1,4 +1,4 @@
-add_library (crave ConstrainedRandom.cpp)
+add_library (crave ConstrainedRandom.cpp expression/NodeVisitor.cpp)
 target_link_libraries (crave
   metaSMT
   ${Boost_SYSTEM_LIBRARY}

@@ -1,7 +1,10 @@
 #pragma once
 
 #include "Context.hpp"
+#include "expression/NodeVisitor.hpp"
+#include "expression/Node.hpp"
 
+#include <boost/foreach.hpp>
 #include <boost/function.hpp>
 
 #include <map>
@@ -41,8 +44,7 @@ namespace crave {
     template<typename Expr>
     Generator & operator() (Expr expr)
     {
-//      display_expr(expr);
-      // FIXME: ctx.assertion( FixWidth()(expr) );
+      ast.push_back( boost::proto::eval( expr, ctx ) );
       return *this;
     }
 
@@ -171,11 +173,21 @@ namespace crave {
     template<typename Expr>
     void add_to_disjunction (Expr expr) { /* FIXME: new backend for enums */ }
 
+    std::ostream& get_ast( std::ostream& os )
+    {
+      os << "digraph AST {" << std::endl;
+      ToDotVisitor visitor( os );
+      BOOST_FOREACH ( boost::intrusive_ptr<Node> n, ast ) n->visit( visitor );
+      os << "}" << std::endl;
+      return os;
+    }
+
     private:
       Context ctx;
-      std::map<int, Context*> vecCtx;
-      std::map<std::string, Context*> ctxOfCstr;
-      std::set<int> uniqueVecSet;
+      std::vector<boost::intrusive_ptr<Node> > ast;
+//      std::map<int, Context*> vecCtx;
+//      std::map<std::string, Context*> ctxOfCstr;
+//      std::set<int> uniqueVecSet;
   };
 
   template< typename Expr >
