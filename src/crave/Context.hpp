@@ -35,7 +35,7 @@ namespace crave {
       else
       {
         unsigned width = bitsize_traits<value_type>::value;
-        bool sign = true;//proto::matches< value_type, IsSigned >::value;
+        bool sign = boost::is_signed<value_type>::value;
         result_type var = new VariableExpr( tag.id, width, sign );
         _variables.insert( std::make_pair( tag.id, var ) );
         return var;
@@ -187,8 +187,8 @@ namespace crave {
     template< typename Integer>
     result_type operator() (proto::tag::terminal, Integer const & i)
     {
-      unsigned width = 32;//bitsize_traits<Integer>::value;
-      bool sign = true;//proto::matches< Integer, IsSigned >::value;
+      unsigned width = bitsize_traits<Integer>::value;
+      bool sign = boost::is_signed<Integer>::value;
       return new Constant( i, width, sign );
     }
 
