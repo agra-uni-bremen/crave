@@ -12,7 +12,7 @@ namespace crave {
 
 class Node;
 
-typedef boost::intrusive_ptr<Node> result_type;
+typedef boost::intrusive_ptr<Node> result_type; // TODO: rename to NodePtr
 
 class Node {
 protected:
