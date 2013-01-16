@@ -6,11 +6,10 @@ namespace crave {
 
 bool ToDotVisitor::visitNode(Node const &n)
 {
-  Node* ptr = const_cast<Node*>(&n);
-  if (nodes_.find(ptr) == nodes_.end()) {
-    nodes_.insert(ptr);
+  if (nodes_.find(&n) == nodes_.end()) {
+    nodes_.insert(&n);
 
-    out_ << "\t" << reinterpret_cast<long>(ptr);
+    out_ << "\t" << reinterpret_cast<long>(&n);
 
     return true;
   }

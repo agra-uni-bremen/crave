@@ -51,7 +51,7 @@ public:
 
 private:
   std::ostream& out_;
-  std::set<Node*> nodes_;
+  std::set<Node const*> nodes_;
 };
 
 } //end namespace crave
