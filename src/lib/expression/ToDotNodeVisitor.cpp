@@ -1,7 +1,6 @@
 #include <boost/foreach.hpp>
 
-#include "../../crave/expression/Node.hpp"
-#include "../../crave/expression/NodeVisitor.hpp"
+#include "../../crave/expression/ToDotNodeVisitor.hpp"
 
 namespace crave {
 
@@ -86,7 +85,11 @@ void ToDotVisitor::visitConstant(Constant const &c)
 {
   if ( visitNode(c) )
   {
-    out_ << " [label=\"constant: " << c.value();
+    out_ << " [label=\"constant: ";
+    if (c.sign())
+      out_ << static_cast<long>(c.value());
+    else
+      out_ << c.value();
     visitTerminal(c);
     out_ << "\"]\n";
   }
@@ -146,6 +149,28 @@ void ToDotVisitor::visitInside(Inside const &o)
     out_ << "}\"]" << std::endl;
   }
   visitUnaryExpr(o);
+}
+
+void ToDotVisitor::visitLogicalAndOpr(LogicalAndOpr const &o)
+{
+  if ( visitNode(o) )
+  {
+    out_ << " [label=\"";
+    visitBinaryOpr(o);
+    out_ << ": and (&&)\"]" << std::endl;
+  }
+  visitBinaryExpr(o);
+}
+
+void ToDotVisitor::visitLogicalOrOpr(LogicalOrOpr const &o)
+{
+  if ( visitNode(o) )
+  {
+    out_ << " [label=\"";
+    visitBinaryOpr(o);
+    out_ << ": or (||)\"]" << std::endl;
+  }
+  visitBinaryExpr(o);
 }
 
 void ToDotVisitor::visitAndOpr(AndOpr const &o)
