@@ -27,8 +27,8 @@ namespace crave {
     template<typename value_type>
     result_type operator() (proto::tag::terminal, var_tag<value_type> const & tag )
     {
-      std::map<int, result_type>::const_iterator ite = _variables.find(tag.id);
-      if ( ite != _variables.end() )
+      std::map<int, result_type>::const_iterator ite = variables_.find(tag.id);
+      if ( ite != variables_.end() )
       {
         return ite->second;
       }
@@ -37,7 +37,7 @@ namespace crave {
         unsigned width = bitsize_traits<value_type>::value;
         bool sign = boost::is_signed<value_type>::value;
         result_type var = new VariableExpr( tag.id, width, sign );
-        _variables.insert( std::make_pair( tag.id, var ) );
+        variables_.insert( std::make_pair( tag.id, var ) );
         return var;
       }
     }
@@ -45,14 +45,18 @@ namespace crave {
     template<typename value_type>
     result_type operator() (proto::tag::terminal t, write_ref_tag<value_type> const & ref )
     {
-      std::map<int, result_type>::const_iterator ite = _variables.find(ref.id);
-      if ( ite != _variables.end() )
+      std::map<int, result_type>::const_iterator ite = variables_.find(ref.id);
+      if ( ite != variables_.end() )
       {
         return ite->second;
       }
       else
       {
         result_type var = (*this)(t, static_cast<var_tag<value_type> >(ref));
+
+        variables_.insert( std::make_pair( ref.id, var ) );
+        write_references_.push_back( var );
+
         // FIXME: implement ne way to handle write references
         // boost::function0<void> f = writeReference<value_type>(ref.ref, *this, ref.id);
         // _post_hook.push_back(f);
@@ -93,17 +97,42 @@ namespace crave {
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::logical_and, Expr1 const & e1, Expr2 const &  e2) {
-      return new AndOpr( proto::eval( e1, *this ), proto::eval( e2, *this ) );
+      return new LogicalAndOpr( proto::eval( e1, *this ), proto::eval( e2, *this ) );
     }
 
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::logical_or, Expr1 const & e1, Expr2 const &  e2) {
+      return new LogicalOrOpr( proto::eval( e1, *this ), proto::eval( e2, *this ) );
+    }
+
+    template< typename Expr1, typename Expr2>
+    result_type operator() (proto::tag::bitwise_and, Expr1 const & e1, Expr2 const &  e2) {
+      return new AndOpr( proto::eval( e1, *this ), proto::eval( e2, *this ) );
+    }
+
+    template< typename Expr1, typename Expr2>
+    result_type operator() (proto::tag::bitwise_or, Expr1 const & e1, Expr2 const &  e2) {
       return new OrOpr( proto::eval( e1, *this ), proto::eval( e2, *this ) );
+    }
+
+    template< typename Expr1, typename Expr2>
+    result_type operator() (proto::tag::bitwise_xor, Expr1 const & e1, Expr2 const &  e2) {
+      return new XorOpr( proto::eval( e1, *this ), proto::eval( e2, *this ) );
+    }
+
+    template< typename Expr>
+    result_type operator() (proto::tag::negate, Expr const & e) {
+      return new NegOpr( proto::eval( e, *this ) );
+    }
+
+    template< typename Expr>
+    result_type operator() (proto::tag::complement, Expr const & e) {
+      return new ComplementOpr( proto::eval( e, *this ) );
     }
 
     template< typename Expr>
     result_type operator() (proto::tag::logical_not, Expr const & e) {
-      return new NotOpr( proto::eval( e, *this ) );;
+      return new NotOpr( proto::eval( e, *this ) );
     }
 
     template< typename Expr1, typename Expr2>
@@ -129,6 +158,11 @@ namespace crave {
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::shift_left, Expr1 const & e1, Expr2 const &  e2) {
       return new ShiftLeftOpr( proto::eval( e1, *this ), proto::eval( e2, *this ) );
+    }
+
+    template< typename Expr1, typename Expr2>
+    result_type operator() (proto::tag::shift_right, Expr1 const & e1, Expr2 const &  e2) {
+      return new ShiftRightOpr( proto::eval( e1, *this ), proto::eval( e2, *this ) );
     }
 
 
@@ -171,11 +205,15 @@ namespace crave {
     template< typename Integer>
     result_type operator() (proto::tag::terminal t, read_ref_tag<Integer> const & ref)
     {
-      std::map<int, result_type>::const_iterator ite = _variables.find(ref.id);
-      if ( ite != _variables.end() ) {
+      std::map<int, result_type>::const_iterator ite = variables_.find(ref.id);
+      if ( ite != variables_.end() ) {
         return ite->second;
       } else {
         result_type var = (*this)(t, static_cast<var_tag<Integer> >(ref));
+
+        variables_.insert( std::make_pair( ref.id, var ) );
+        read_references_.push_back( var );
+
         // FIXME: implement new way to handle references //
         //boost::function0<result_type> f = getLazyReference<Integer>(ref.ref, solver, var);
         //_lazy[ref.id] = f;
@@ -198,7 +236,7 @@ namespace crave {
 	  Value const & value, CollectionTerm const & c)
     {
       // FIXME: needed collection for inside
-      return new Inside( value );
+//      return new Inside( value, c.front(), c.end() );
     }
 
     template<typename Var, typename Value>
@@ -206,7 +244,7 @@ namespace crave {
         boost::proto::terminal<operator_dist>::type const & tag,
         Var const & var_term, Value const & probability)
     {
-      // FIXME: implement new way to specify distrubutions //
+      // FIXME: implement new way to specify distributions //
     }
 
     template< typename Expr1, typename Expr2>
@@ -222,7 +260,9 @@ namespace crave {
     }
 
     private:
-      std::map<int, result_type> _variables; // result_type = expression* / variable_expression*
+      std::map<int, result_type> variables_; // result_type = expression* / variable_expression*
+      std::vector<boost::intrusive_ptr<Node> > read_references_;
+      std::vector<boost::intrusive_ptr<Node> > write_references_;
   }; // Context
 
 } // namespace crave

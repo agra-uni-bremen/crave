@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Context.hpp"
-#include "expression/NodeVisitor.hpp"
+#include "expression/ToDotNodeVisitor.hpp"
 #include "expression/Node.hpp"
 
 #include <boost/foreach.hpp>
@@ -44,7 +44,7 @@ namespace crave {
     template<typename Expr>
     Generator & operator() (Expr expr)
     {
-      ast.push_back( boost::proto::eval( expr, ctx ) );
+      constraints_.push_back( boost::proto::eval( expr, ctx ) );
       return *this;
     }
 
@@ -166,7 +166,7 @@ namespace crave {
     T operator[] (Variable<T> const & var) {
       // FIXME: new backend for solving
       //return ctx.read(var);
-    };
+    }
 
     void new_disjunction() { /* FIXME: new backend for enums */ }
     void end_disjunction() { /* FIXME: new backend for enums */ }
@@ -177,14 +177,14 @@ namespace crave {
     {
       os << "digraph AST {" << std::endl;
       ToDotVisitor visitor( os );
-      BOOST_FOREACH ( boost::intrusive_ptr<Node> n, ast ) n->visit( visitor );
+      BOOST_FOREACH ( boost::intrusive_ptr<Node> n, constraints_ ) n->visit( visitor );
       os << "}" << std::endl;
       return os;
     }
 
     private:
       Context ctx;
-      std::vector<boost::intrusive_ptr<Node> > ast;
+      std::vector<boost::intrusive_ptr<Node> > constraints_;
 //      std::map<int, Context*> vecCtx;
 //      std::map<std::string, Context*> ctxOfCstr;
 //      std::set<int> uniqueVecSet;

@@ -70,6 +70,8 @@ public:
 
   void visit( NodeVisitor& v ) { v.visitConstant(*this); }
 
+  operator unsigned long() const { return value_; }
+
   unsigned long value() const { return value_; }
 private:
   unsigned long value_;
@@ -133,9 +135,9 @@ public:
 
   void visit( NodeVisitor& v ) { v.visitInside(*this); }
 
-  std::set<unsigned long> const & collection() const { return collection_; };
+  std::set<Constant> const & collection() const { return collection_; };
 private:
-  std::set<unsigned long> collection_;
+  std::set<Constant> collection_;
 };
 
 class BinaryExpression : public Node {
@@ -171,6 +173,21 @@ public:
   OrOpr( result_type lhs, result_type rhs ) : BinaryOperator(lhs, rhs) { }
 
   void visit( NodeVisitor& v ) { v.visitOrOpr(*this); }
+};
+
+
+class LogicalAndOpr : public BinaryOperator {
+public:
+  LogicalAndOpr( result_type lhs, result_type rhs ) : BinaryOperator(lhs, rhs) { }
+
+  void visit( NodeVisitor& v ) { v.visitLogicalAndOpr(*this); }
+};
+
+class LogicalOrOpr : public BinaryOperator {
+public:
+  LogicalOrOpr( result_type lhs, result_type rhs ) : BinaryOperator(lhs, rhs) { }
+
+  void visit( NodeVisitor& v ) { v.visitLogicalOrOpr(*this); }
 };
 
 class XorOpr : public BinaryOperator {

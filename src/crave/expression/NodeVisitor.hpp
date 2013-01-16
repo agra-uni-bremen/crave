@@ -22,6 +22,8 @@ class BinaryExpression;
 class BinaryOperator;
 class AndOpr;
 class OrOpr;
+class LogicalAndOpr;
+class LogicalOrOpr;
 class XorOpr;
 class EqualOpr;
 class NotEqualOpr;
@@ -64,6 +66,8 @@ public:
   virtual void visitInside( Inside const & ) = 0;
   virtual void visitAndOpr( AndOpr const & ) = 0;
   virtual void visitOrOpr( OrOpr const & ) = 0;
+  virtual void visitLogicalAndOpr( LogicalAndOpr const & ) = 0;
+  virtual void visitLogicalOrOpr( LogicalOrOpr const & ) = 0;
   virtual void visitXorOpr( XorOpr const & ) = 0;
   virtual void visitEqualOpr( EqualOpr const & ) = 0;
   virtual void visitNotEqualOpr( NotEqualOpr const & ) = 0;
