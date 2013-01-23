@@ -12,7 +12,7 @@ namespace crave {
 
 class Node;
 
-typedef boost::intrusive_ptr<Node> result_type; // TODO: rename to NodePtr
+typedef boost::intrusive_ptr<Node> NodePtr;
 
 class Node {
 protected:
@@ -90,7 +90,7 @@ private:
 
 class UnaryExpression : public Node {
 protected:
-  UnaryExpression(result_type c) : Node(), child_(c) { }
+  UnaryExpression(NodePtr c) : Node(), child_(c) { }
 
 public:
   virtual void visit( NodeVisitor& v ) { v.visitUnaryExpr(*this); }
@@ -102,7 +102,7 @@ private:
 
 class UnaryOperator : public UnaryExpression {
 protected:
-  UnaryOperator( result_type c ) : UnaryExpression(c) { }
+  UnaryOperator( NodePtr c ) : UnaryExpression(c) { }
 
 public:
   virtual void visit( NodeVisitor& v ) { v.visitUnaryOpr(*this); }
@@ -110,28 +110,28 @@ public:
 
 class NotOpr : public UnaryOperator {
 public:
-  NotOpr( result_type c ) : UnaryOperator(c) { };
+  NotOpr( NodePtr c ) : UnaryOperator(c) { };
 
   void visit( NodeVisitor& v ) { v.visitNotOpr(*this); }
 };
 
 class NegOpr : public UnaryOperator {
 public:
-  NegOpr( result_type c ) : UnaryOperator(c) { };
+  NegOpr( NodePtr c ) : UnaryOperator(c) { };
 
   void visit( NodeVisitor& v ) { v.visitNegOpr(*this); }
 };
 
 class ComplementOpr : public UnaryOperator {
 public:
-  ComplementOpr( result_type c ) : UnaryOperator(c) { };
+  ComplementOpr( NodePtr c ) : UnaryOperator(c) { };
 
   void visit( NodeVisitor& v ) { v.visitComplementOpr(*this); }
 };
 
 class Inside : public UnaryExpression {
 public:
-  Inside( result_type c ) : UnaryExpression(c), collection_() { }
+  Inside( NodePtr v, std::set<Constant> const &c ) : UnaryExpression(v), collection_(c) { }
 
   void visit( NodeVisitor& v ) { v.visitInside(*this); }
 
@@ -142,7 +142,7 @@ private:
 
 class BinaryExpression : public Node {
 protected:
-  BinaryExpression(result_type lhs, result_type rhs) : lhs_(lhs), rhs_(rhs) { }
+  BinaryExpression(NodePtr lhs, NodePtr rhs) : lhs_(lhs), rhs_(rhs) { }
 
 public:
   virtual void visit( NodeVisitor& v ) { v.visitBinaryExpr(*this); }
@@ -156,21 +156,21 @@ private:
 
 class BinaryOperator : public BinaryExpression {
 protected:
-  BinaryOperator( result_type lhs, result_type rhs ) : BinaryExpression( lhs, rhs ) { };
+  BinaryOperator( NodePtr lhs, NodePtr rhs ) : BinaryExpression( lhs, rhs ) { };
 public:
   virtual void visit( NodeVisitor& v ) { v.visitBinaryOpr(*this); }
 };
 
 class AndOpr : public BinaryOperator {
 public:
-  AndOpr( result_type lhs, result_type rhs ) : BinaryOperator(lhs, rhs) { }
+  AndOpr( NodePtr lhs, NodePtr rhs ) : BinaryOperator(lhs, rhs) { }
 
   void visit( NodeVisitor& v ) { v.visitAndOpr(*this); }
 };
 
 class OrOpr : public BinaryOperator {
 public:
-  OrOpr( result_type lhs, result_type rhs ) : BinaryOperator(lhs, rhs) { }
+  OrOpr( NodePtr lhs, NodePtr rhs ) : BinaryOperator(lhs, rhs) { }
 
   void visit( NodeVisitor& v ) { v.visitOrOpr(*this); }
 };
@@ -178,119 +178,119 @@ public:
 
 class LogicalAndOpr : public BinaryOperator {
 public:
-  LogicalAndOpr( result_type lhs, result_type rhs ) : BinaryOperator(lhs, rhs) { }
+  LogicalAndOpr( NodePtr lhs, NodePtr rhs ) : BinaryOperator(lhs, rhs) { }
 
   void visit( NodeVisitor& v ) { v.visitLogicalAndOpr(*this); }
 };
 
 class LogicalOrOpr : public BinaryOperator {
 public:
-  LogicalOrOpr( result_type lhs, result_type rhs ) : BinaryOperator(lhs, rhs) { }
+  LogicalOrOpr( NodePtr lhs, NodePtr rhs ) : BinaryOperator(lhs, rhs) { }
 
   void visit( NodeVisitor& v ) { v.visitLogicalOrOpr(*this); }
 };
 
 class XorOpr : public BinaryOperator {
 public:
-  XorOpr( result_type lhs, result_type rhs ) : BinaryOperator(lhs, rhs) { }
+  XorOpr( NodePtr lhs, NodePtr rhs ) : BinaryOperator(lhs, rhs) { }
 
   void visit( NodeVisitor& v ) { v.visitXorOpr(*this); }
 };
 
 class EqualOpr : public BinaryOperator {
 public:
-  EqualOpr( result_type lhs, result_type rhs ) : BinaryOperator(lhs, rhs) { }
+  EqualOpr( NodePtr lhs, NodePtr rhs ) : BinaryOperator(lhs, rhs) { }
 
   void visit( NodeVisitor& v ) { v.visitEqualOpr(*this); }
 };
 
 class NotEqualOpr : public BinaryOperator {
 public:
-  NotEqualOpr( result_type lhs, result_type rhs ) : BinaryOperator(lhs, rhs) { }
+  NotEqualOpr( NodePtr lhs, NodePtr rhs ) : BinaryOperator(lhs, rhs) { }
 
   void visit( NodeVisitor& v ) { v.visitNotEqualOpr(*this); }
 };
 
 class LessOpr : public BinaryOperator {
 public:
-  LessOpr( result_type lhs, result_type rhs ) : BinaryOperator(lhs, rhs) { }
+  LessOpr( NodePtr lhs, NodePtr rhs ) : BinaryOperator(lhs, rhs) { }
 
   void visit( NodeVisitor& v ) { v.visitLessOpr(*this); }
 };
 
 class LessEqualOpr : public BinaryOperator {
 public:
-  LessEqualOpr( result_type lhs, result_type rhs ) : BinaryOperator(lhs, rhs) { }
+  LessEqualOpr( NodePtr lhs, NodePtr rhs ) : BinaryOperator(lhs, rhs) { }
 
   void visit( NodeVisitor& v ) { v.visitLessEqualOpr(*this); }
 };
 
 class GreaterOpr : public BinaryOperator {
 public:
-  GreaterOpr( result_type lhs, result_type rhs ) : BinaryOperator(lhs, rhs) { }
+  GreaterOpr( NodePtr lhs, NodePtr rhs ) : BinaryOperator(lhs, rhs) { }
 
   void visit( NodeVisitor& v ) { v.visitGreaterOpr(*this); }
 };
 
 class GreaterEqualOpr : public BinaryOperator {
 public:
-  GreaterEqualOpr( result_type lhs, result_type rhs ) : BinaryOperator(lhs, rhs) { }
+  GreaterEqualOpr( NodePtr lhs, NodePtr rhs ) : BinaryOperator(lhs, rhs) { }
 
   void visit( NodeVisitor& v ) { v.visitGreaterEqualOpr(*this); }
 };
 
 class PlusOpr : public BinaryOperator {
 public:
-  PlusOpr( result_type lhs, result_type rhs ) : BinaryOperator(lhs, rhs) { }
+  PlusOpr( NodePtr lhs, NodePtr rhs ) : BinaryOperator(lhs, rhs) { }
 
   void visit( NodeVisitor& v ) { v.visitPlusOpr(*this); }
 };
 
 class MinusOpr : public BinaryOperator {
 public:
-  MinusOpr( result_type lhs, result_type rhs ) : BinaryOperator(lhs, rhs) { }
+  MinusOpr( NodePtr lhs, NodePtr rhs ) : BinaryOperator(lhs, rhs) { }
 
   void visit( NodeVisitor& v ) { v.visitMinusOpr(*this); }
 };
 
 class MultipliesOpr : public BinaryOperator {
 public:
-  MultipliesOpr( result_type lhs, result_type rhs ) : BinaryOperator(lhs, rhs) { }
+  MultipliesOpr( NodePtr lhs, NodePtr rhs ) : BinaryOperator(lhs, rhs) { }
 
   void visit( NodeVisitor& v ) { v.visitMultipliesOpr(*this); }
 };
 
 class DevideOpr : public BinaryOperator {
 public:
-  DevideOpr( result_type lhs, result_type rhs ) : BinaryOperator(lhs, rhs) { }
+  DevideOpr( NodePtr lhs, NodePtr rhs ) : BinaryOperator(lhs, rhs) { }
 
   void visit( NodeVisitor& v ) { v.visitDevideOpr(*this); }
 };
 
 class ModuloOpr : public BinaryOperator {
 public:
-  ModuloOpr( result_type lhs, result_type rhs ) : BinaryOperator(lhs, rhs) { }
+  ModuloOpr( NodePtr lhs, NodePtr rhs ) : BinaryOperator(lhs, rhs) { }
 
   void visit( NodeVisitor& v ) { v.visitModuloOpr(*this); }
 };
 
 class ShiftLeftOpr : public BinaryOperator {
 public:
-  ShiftLeftOpr( result_type lhs, result_type rhs ) : BinaryOperator(lhs, rhs) { }
+  ShiftLeftOpr( NodePtr lhs, NodePtr rhs ) : BinaryOperator(lhs, rhs) { }
 
   void visit( NodeVisitor& v ) { v.visitShiftLeftOpr(*this); }
 };
 
 class ShiftRightOpr : public BinaryOperator {
 public:
-  ShiftRightOpr( result_type lhs, result_type rhs ) : BinaryOperator(lhs, rhs) { }
+  ShiftRightOpr( NodePtr lhs, NodePtr rhs ) : BinaryOperator(lhs, rhs) { }
 
   void visit( NodeVisitor& v ) { v.visitShiftRightOpr(*this); }
 };
 
 class AssignOpr : public BinaryOperator {
 public:
-  AssignOpr( result_type lhs, result_type rhs ) : BinaryOperator(lhs, rhs) { }
+  AssignOpr( NodePtr lhs, NodePtr rhs ) : BinaryOperator(lhs, rhs) { }
 
   void visit( NodeVisitor& v ) { v.visitAssignOpr(*this); }
 };
@@ -302,7 +302,7 @@ public:
 
 class TernaryExpression : public Node {
 protected:
-  TernaryExpression( result_type a, result_type b, result_type c ) : Node(), a_(a), b_(b), c_(c) { }
+  TernaryExpression( NodePtr a, NodePtr b, NodePtr c ) : Node(), a_(a), b_(b), c_(c) { }
 public:
   virtual void visit( NodeVisitor& v ) { v.visitTernaryExpr(*this); }
 
@@ -317,7 +317,7 @@ private:
 
 class IfThenElse : public TernaryExpression {
 public:
-  IfThenElse( result_type a, result_type b, result_type c ) : TernaryExpression(a,b,c) { }
+  IfThenElse( NodePtr a, NodePtr b, NodePtr c ) : TernaryExpression(a,b,c) { }
 
   void visit( NodeVisitor& v ) { v.visitIfThenElse(*this); }
 };

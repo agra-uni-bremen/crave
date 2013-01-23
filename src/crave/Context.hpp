@@ -6,12 +6,15 @@
 #include "ExpressionTraits.hpp"
 #include "expression/Node.hpp"
 
+#include <boost/foreach.hpp>
 #include <boost/proto/core.hpp>
 #include <boost/proto/debug.hpp>
 #include <boost/proto/context/callable.hpp>
 #include <boost/proto/context/null.hpp>
+#include <boost/range/value_type.hpp>
 
 #include <map>
+#include <set>
 
 
 namespace crave {
@@ -235,8 +238,17 @@ namespace crave {
         boost::proto::terminal<operator_inside>::type const & tag,
 	  Value const & value, CollectionTerm const & c)
     {
-      // FIXME: needed collection for inside
-//      return new Inside( value, c.front(), c.end() );
+      typedef typename proto::result_of::value<CollectionTerm>::type Collection;
+      typedef typename boost::range_value<Collection>::type CollectionEntry;
+
+      std::set<Constant> constants;
+      BOOST_FOREACH( CollectionEntry const & i, boost::proto::value(c) )
+      {
+        unsigned width = bitsize_traits<CollectionEntry>::value;
+        bool sign = boost::is_signed<CollectionEntry>::value;
+        constants.insert( Constant( i, width, sign ) );
+      }
+      return new Inside( proto::eval( value, *this ), constants );
     }
 
     template<typename Var, typename Value>

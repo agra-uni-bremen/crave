@@ -12,7 +12,7 @@ class ToDotVisitor : public NodeVisitor {
 public:
   ToDotVisitor( std::ostream & os ) : NodeVisitor(), out_(os), nodes_() { }
 
-  bool visitNode( Node const & );
+  void visitNode( Node const & );
   void visitTerminal( Terminal const & );
   void visitUnaryExpr( UnaryExpression const & );
   void visitUnaryOpr( UnaryOperator const & );
@@ -48,6 +48,9 @@ public:
   void visitAssignOpr( AssignOpr const & );
   void visitVectorAccess( VectorAccess const & );
   void visitIfThenElse( IfThenElse const & );
+
+private:
+  bool putNode(Node const *);
 
 private:
   std::ostream& out_;

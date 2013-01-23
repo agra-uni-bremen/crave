@@ -4,16 +4,18 @@
 
 namespace crave {
 
-bool ToDotVisitor::visitNode(Node const &n)
+inline bool ToDotVisitor::putNode(Node const *n)
 {
-  if (nodes_.find(&n) == nodes_.end()) {
-    nodes_.insert(&n);
+  if (nodes_.find(n) != nodes_.end())
+    return false;
 
-    out_ << "\t" << reinterpret_cast<long>(&n);
+  nodes_.insert(n);
+  return true;
+}
 
-    return true;
-  }
-  return false;
+void ToDotVisitor::visitNode(Node const &n)
+{
+  out_ << "\t" << reinterpret_cast<long>(&n);
 }
 
 void ToDotVisitor::visitTerminal(Terminal const &t)
@@ -66,14 +68,18 @@ void ToDotVisitor::visitTernaryExpr(TernaryExpression const &te) {
 
 void ToDotVisitor::visitPlaceholder( Placeholder const &pl )
 {
-  if ( visitNode(pl) )
+  if ( putNode(&pl) )
+  {
+    visitNode(pl);
     out_ << " [label=\"placeholder: " << pl.id() << "\"]" << std::endl;
+  }
 }
 
 void ToDotVisitor::visitVariableExpr(VariableExpr const &ve)
 {
-  if ( visitNode(ve) )
+  if ( putNode(&ve) )
   {
+    visitNode(ve);
     out_ << " [label=\"variable: " << ve.id();
     visitTerminal(ve);
     out_ << "\"]" << std::endl;
@@ -82,8 +88,9 @@ void ToDotVisitor::visitVariableExpr(VariableExpr const &ve)
 
 void ToDotVisitor::visitConstant(Constant const &c)
 {
-  if ( visitNode(c) )
+  if ( putNode(&c) )
   {
+    visitNode(c);
     out_ << " [label=\"constant: ";
     if (c.sign())
       out_ << static_cast<long>(c.value());
@@ -96,8 +103,9 @@ void ToDotVisitor::visitConstant(Constant const &c)
 
 void ToDotVisitor::visitVectorExpr(VectorExpr const &ve)
 {
-  if ( visitNode(ve) )
+  if ( putNode(&ve) )
   {
+    visitNode(ve);
     out_ << " [label=\"variable: " << ve.id();
     visitTerminal(ve);
     out_ << "\"]" << std::endl;
@@ -106,8 +114,9 @@ void ToDotVisitor::visitVectorExpr(VectorExpr const &ve)
 
 void ToDotVisitor::visitNotOpr(NotOpr const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
+    visitNode(o);
     out_ << " [label=\"";
     visitUnaryOpr(o);
     out_ << ": not (!)\"]" << std::endl;
@@ -117,8 +126,9 @@ void ToDotVisitor::visitNotOpr(NotOpr const &o)
 
 void ToDotVisitor::visitNegOpr(NegOpr const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
+    visitNode(o);
     out_ << " [label=\"";
     visitUnaryOpr(o);
     out_ << ": neg (-)\"]" << std::endl;
@@ -128,8 +138,9 @@ void ToDotVisitor::visitNegOpr(NegOpr const &o)
 
 void ToDotVisitor::visitComplementOpr(ComplementOpr const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
+    visitNode(o);
     out_ << " [label=\"";
     visitUnaryOpr(o);
     out_ << ": complement (~)\"]" << std::endl;
@@ -139,8 +150,9 @@ void ToDotVisitor::visitComplementOpr(ComplementOpr const &o)
 
 void ToDotVisitor::visitInside(Inside const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
+    visitNode(o);
     out_ << " [label=\"";
     visitUnaryExpr(o);
     out_ << "inside\n{ ";
@@ -152,8 +164,9 @@ void ToDotVisitor::visitInside(Inside const &o)
 
 void ToDotVisitor::visitLogicalAndOpr(LogicalAndOpr const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
+    visitNode(o);
     out_ << " [label=\"";
     visitBinaryOpr(o);
     out_ << ": and (&&)\"]" << std::endl;
@@ -163,8 +176,9 @@ void ToDotVisitor::visitLogicalAndOpr(LogicalAndOpr const &o)
 
 void ToDotVisitor::visitLogicalOrOpr(LogicalOrOpr const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
+    visitNode(o);
     out_ << " [label=\"";
     visitBinaryOpr(o);
     out_ << ": or (||)\"]" << std::endl;
@@ -174,8 +188,9 @@ void ToDotVisitor::visitLogicalOrOpr(LogicalOrOpr const &o)
 
 void ToDotVisitor::visitAndOpr(AndOpr const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
+    visitNode(o);
     out_ << " [label=\"";
     visitBinaryOpr(o);
     out_ << ": and (&&)\"]" << std::endl;
@@ -185,8 +200,9 @@ void ToDotVisitor::visitAndOpr(AndOpr const &o)
 
 void ToDotVisitor::visitOrOpr(OrOpr const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
+    visitNode(o);
     out_ << " [label=\"";
     visitBinaryOpr(o);
     out_ << ": or (||)\"]" << std::endl;
@@ -196,8 +212,9 @@ void ToDotVisitor::visitOrOpr(OrOpr const &o)
 
 void ToDotVisitor::visitXorOpr(XorOpr const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
+    visitNode(o);
     out_ << " [label=\"";
     visitBinaryOpr(o);
     out_ << ": xor (^)\"]" << std::endl;
@@ -207,8 +224,9 @@ void ToDotVisitor::visitXorOpr(XorOpr const &o)
 
 void ToDotVisitor::visitEqualOpr(EqualOpr const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
+    visitNode(o);
     out_ << " [label=\"";
     visitBinaryOpr(o);
     out_ << ": equal (==)\"]" << std::endl;
@@ -218,8 +236,9 @@ void ToDotVisitor::visitEqualOpr(EqualOpr const &o)
 
 void ToDotVisitor::visitNotEqualOpr(NotEqualOpr const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
+    visitNode(o);
     out_ << " [label=\"";
     visitBinaryOpr(o);
     out_ << ": not_equal (!=)\"]" << std::endl;
@@ -229,8 +248,9 @@ void ToDotVisitor::visitNotEqualOpr(NotEqualOpr const &o)
 
 void ToDotVisitor::visitLessOpr(LessOpr const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
+    visitNode(o);
     out_ << " [label=\"";
     visitBinaryOpr(o);
     out_ << ": less (<)\"]" << std::endl;
@@ -240,8 +260,9 @@ void ToDotVisitor::visitLessOpr(LessOpr const &o)
 
 void ToDotVisitor::visitLessEqualOpr(LessEqualOpr const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
+    visitNode(o);
     out_ << " [label=\"";
     visitBinaryOpr(o);
     out_ << ": less_equal (<=)\"]" << std::endl;
@@ -251,8 +272,9 @@ void ToDotVisitor::visitLessEqualOpr(LessEqualOpr const &o)
 
 void ToDotVisitor::visitGreaterOpr(GreaterOpr const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
+    visitNode(o);
     out_ << " [label=\"";
     visitBinaryOpr(o);
     out_ << ": greater (>)\"]" << std::endl;
@@ -262,8 +284,9 @@ void ToDotVisitor::visitGreaterOpr(GreaterOpr const &o)
 
 void ToDotVisitor::visitGreaterEqualOpr(GreaterEqualOpr const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
+    visitNode(o);
     out_ << " [label=\"";
     visitBinaryOpr(o);
     out_ << ": greater_equal (>=)\"]" << std::endl;
@@ -273,8 +296,9 @@ void ToDotVisitor::visitGreaterEqualOpr(GreaterEqualOpr const &o)
 
 void ToDotVisitor::visitPlusOpr(PlusOpr const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
+    visitNode(o);
     out_ << " [label=\"";
     visitBinaryOpr(o);
     out_ << ": plus (+)\"]" << std::endl;
@@ -284,8 +308,9 @@ void ToDotVisitor::visitPlusOpr(PlusOpr const &o)
 
 void ToDotVisitor::visitMinusOpr(MinusOpr const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
+    visitNode(o);
     out_ << " [label=\"";
     visitBinaryOpr(o);
     out_ << ": minus (-)\"]" << std::endl;
@@ -295,8 +320,9 @@ void ToDotVisitor::visitMinusOpr(MinusOpr const &o)
 
 void ToDotVisitor::visitMultipliesOpr(MultipliesOpr const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
+    visitNode(o);
     out_ << " [label=\"";
     visitBinaryOpr(o);
     out_ << ": multiplies (*)\"]" << std::endl;
@@ -306,8 +332,9 @@ void ToDotVisitor::visitMultipliesOpr(MultipliesOpr const &o)
 
 void ToDotVisitor::visitDevideOpr(DevideOpr const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
+    visitNode(o);
     out_ << " [label=\"";
     visitBinaryOpr(o);
     out_ << ": devide (/)\"]" << std::endl;
@@ -317,8 +344,9 @@ void ToDotVisitor::visitDevideOpr(DevideOpr const &o)
 
 void ToDotVisitor::visitModuloOpr(ModuloOpr const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
+    visitNode(o);
     out_ << " [label=\"";
     visitBinaryOpr(o);
     out_ << ": modulo (%)\"]" << std::endl;
@@ -328,8 +356,9 @@ void ToDotVisitor::visitModuloOpr(ModuloOpr const &o)
 
 void ToDotVisitor::visitShiftLeftOpr(ShiftLeftOpr const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
+    visitNode(o);
     out_ << " [label=\"";
     visitBinaryOpr(o);
     out_ << ": shift_left (<<)\"]" << std::endl;
@@ -339,8 +368,9 @@ void ToDotVisitor::visitShiftLeftOpr(ShiftLeftOpr const &o)
 
 void ToDotVisitor::visitShiftRightOpr(ShiftRightOpr const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
+    visitNode(o);
     out_ << " [label=\"";
     visitBinaryOpr(o);
     out_ << ": shift_right (>>)\"]" << std::endl;
@@ -350,8 +380,9 @@ void ToDotVisitor::visitShiftRightOpr(ShiftRightOpr const &o)
 
 void ToDotVisitor::visitAssignOpr(AssignOpr const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
+    visitNode(o);
     out_ << " [label=\"";
     visitBinaryOpr(o);
     out_ << ": assign (=)\"]" << std::endl;
@@ -361,15 +392,22 @@ void ToDotVisitor::visitAssignOpr(AssignOpr const &o)
 
 void ToDotVisitor::visitVectorAccess(VectorAccess const &o)
 {
-  if ( visitNode(o) )
+  if ( putNode(&o) )
   {
-    out_ << " [label=\"";
-    visitBinaryExpr(o);
-    out_ << "vector_access ([])\"]" << std::endl;
+    visitNode(o);
+    out_ << " [label=\"vector_access ([])\"]" << std::endl;
   }
   visitBinaryExpr(o);
 }
 
-void ToDotVisitor::visitIfThenElse(IfThenElse const &ite) { }
+void ToDotVisitor::visitIfThenElse(IfThenElse const &ite)
+{
+  if ( putNode(&ite) )
+  {
+    visitNode(ite);
+    out_ << " [label=\"if_then_else (?:)\"]" << std::endl;
+  }
+  visitTernaryExpr(ite);
+}
 
 } // end crave namespace

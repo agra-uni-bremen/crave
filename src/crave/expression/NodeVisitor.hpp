@@ -49,7 +49,7 @@ protected:
   virtual ~NodeVisitor() { }
 
 public:
-  virtual bool visitNode( Node const & ) = 0;
+  virtual void visitNode( Node const & ) = 0;
   virtual void visitTerminal( Terminal const & ) = 0;
   virtual void visitUnaryExpr( UnaryExpression const & ) = 0;
   virtual void visitUnaryOpr( UnaryOperator const & ) = 0;
