@@ -34,7 +34,7 @@ public:
   void visitXorOpr( XorOpr const & );
   void visitEqualOpr( EqualOpr const & );
   void visitNotEqualOpr( NotEqualOpr const & );
-  void visitLessOpr( LessOpr const &o );
+  void visitLessOpr( LessOpr const & );
   void visitLessEqualOpr( LessEqualOpr const & );
   void visitGreaterOpr( GreaterOpr const & );
   void visitGreaterEqualOpr( GreaterEqualOpr const & );

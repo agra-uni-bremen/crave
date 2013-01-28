@@ -43,7 +43,7 @@ public:
   virtual void visitXorOpr( XorOpr const & );
   virtual void visitEqualOpr( EqualOpr const & );
   virtual void visitNotEqualOpr( NotEqualOpr const & );
-  virtual void visitLessOpr( LessOpr const &o );
+  virtual void visitLessOpr( LessOpr const & );
   virtual void visitLessEqualOpr( LessEqualOpr const & );
   virtual void visitGreaterOpr( GreaterOpr const & );
   virtual void visitGreaterEqualOpr( GreaterEqualOpr const & );
@@ -59,8 +59,8 @@ public:
   virtual void visitIfThenElse( IfThenElse const & );
 
 
-  virtual void makeAssertion( Node const &);
-  virtual void makeAssumption( Node const&);
+  virtual void makeAssertion( Node const & );
+  virtual void makeAssumption( Node const& );
   virtual bool solve();
 
 private: // typedefs
@@ -544,6 +544,36 @@ void metaSMTVisitorImpl<SolverType>::visitIfThenElse( IfThenElse const &ite )
 
   result_type result = evaluate( solver_, preds::Ite( preds::equal(fst.first, qf_bv::bit1) , snd.first, trd.first ) );
   exprStack_.push( std::make_pair( result, fst.second || snd.second || trd.second ) );
+}
+
+
+
+template<typename SolverType>
+void metaSMTVisitorImpl<SolverType>::makeAssertion(Node const &expr)
+{
+  expr.visit(*this);
+
+  stack_entry entry;
+  pop(entry);
+
+  metaSMT::assertion(solver_, preds::Or(entry.first, preds::False));
+}
+
+template<typename SolverType>
+void metaSMTVisitorImpl<SolverType>::makeAssumption(Node const&expr)
+{
+  expr.visit(*this);
+
+  stack_entry entry;
+  pop(entry);
+
+  metaSMT::assumption(solver_, preds::Or(entry.first, preds::False));
+}
+
+template<typename SolverType>
+bool metaSMTVisitorImpl<SolverType>::solve()
+{
+  return metaSMT::solve(solver_);
 }
 
 } // namespace crave
