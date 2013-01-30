@@ -1,5 +1,6 @@
 #include "../../crave/expression/Node.hpp"
 #include "../../crave/expression/NodeVisitor.hpp"
+#include "../../crave/expression/FactoryMetaSMT.hpp"
 #include "metaSMTNodeVisitorImpl.hpp"
 
 #include <metaSMT/DirectSolver_Context.hpp>
@@ -7,15 +8,8 @@
 
 namespace crave {
 
-class FactoryMetaSMT {
-public:
-  /**
-    * creates a new metaSMTVisitor with SWORD as the backend.
-    * Caller is responsible for deleting the visitor.
-    **/
-  static metaSMTVisitor* newVisitorSWORD() {
-  	return new metaSMTVisitorImpl< metaSMT::DirectSolver_Context< metaSMT::solver::SWORD_Backend > > ();
-  }
+metaSMTVisitor* FactoryMetaSMT::newVisitorSWORD() {
+  return new metaSMTVisitorImpl< metaSMT::DirectSolver_Context< metaSMT::solver::SWORD_Backend > > ();
 };
 
 metaSMTVisitor* visitor = FactoryMetaSMT::newVisitorSWORD();
