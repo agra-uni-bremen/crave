@@ -67,13 +67,14 @@ BOOST_AUTO_TEST_CASE( less )
   gen(a < 256u);
 
   std::set<unsigned> generated;
-  while (gen.next()) {
+  for(unsigned iterations = 0; gen.next(); ++iterations) {
     unsigned av = gen[a];
     generated.insert(av);
     gen( a != av );
+    BOOST_REQUIRE_LT( iterations, 300);
   }
 
-  BOOST_CHECK_EQUAL( generated.size(), 256);
+  BOOST_REQUIRE_EQUAL( generated.size(), 256);
 }
 
 BOOST_AUTO_TEST_CASE( less_equal )
