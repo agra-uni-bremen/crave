@@ -2,11 +2,12 @@
 
 #include "Context.hpp"
 #include "expression/ToDotNodeVisitor.hpp"
-#include "expression/metaSMTNodeVisitor.hpp"
+#include "expression/FactoryMetaSMT.hpp"
 #include "expression/Node.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/function.hpp>
+#include <boost/scoped_ptr.hpp>
 
 #include <map>
 #include <set>
@@ -164,11 +165,10 @@ struct Generator {
   }
 
   bool next() {
-
-    metaSMTVisitor visitor;
+    boost::scoped_ptr<metaSMTVisitor> visitor( FactoryMetaSMT::newVisitorSWORD() );
 
     BOOST_FOREACH(boost::intrusive_ptr<Node> n, constraints_) {
-      visitor.makeAssertion(*n);
+      visitor->makeAssertion(*n);
     }
 
     // pre_solve()
@@ -177,10 +177,10 @@ struct Generator {
         it != named_constraints_.end(); ++it) {
 
       if (0 == disabled_named_constaints_.count(it->first))
-        visitor.makeAssumption(*it->second);
+        visitor->makeAssumption(*it->second);
     }
 
-    return visitor.solve();
+    return visitor->solve();
   }
 
   /**
