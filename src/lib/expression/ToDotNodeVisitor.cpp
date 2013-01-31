@@ -4,7 +4,7 @@
 
 namespace crave {
 
-inline bool ToDotVisitor::putNode(Node const *n)
+bool ToDotVisitor::putNode(Node const *n)
 {
   if (nodes_.find(n) != nodes_.end())
     return false;
@@ -153,13 +153,21 @@ void ToDotVisitor::visitInside(Inside const &o)
   if ( putNode(&o) )
   {
     visitNode(o);
-    out_ << " [label=\"";
-    visitUnaryExpr(o);
-    out_ << "inside\n{ ";
+    out_ << " [label=\"inside\n{ ";
     BOOST_FOREACH ( unsigned long u, o.collection() ) out_ << u << " ";
     out_ << "}\"]" << std::endl;
   }
   visitUnaryExpr(o);
+}
+
+void ToDotVisitor::visitExtendExpr( ExtendExpression const &e )
+{
+  if ( putNode(&e) )
+  {
+    visitNode(e);
+    out_ << " [label=\"extend by " << e.value() << "\"]" << std::endl;
+  }
+  visitUnaryExpr(e);
 }
 
 void ToDotVisitor::visitLogicalAndOpr(LogicalAndOpr const &o)

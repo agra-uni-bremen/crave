@@ -46,7 +46,7 @@ struct Generator {
   template<typename Expr>
   Generator & operator()(Expr expr) {
 
-    constraints_.push_back(boost::proto::eval(expr, ctx));
+    constraints_.push_back(boost::proto::eval(FixWidth()(expr), ctx));
     return *this;
   }
 
@@ -59,7 +59,7 @@ struct Generator {
     if (ite != named_constraints_.end() || constraint_name >= ite->first)
       throw std::runtime_error("Constraint already exists.");
 
-    boost::intrusive_ptr<Node> nested_expr = boost::proto::eval(expr, ctx);
+    boost::intrusive_ptr<Node> nested_expr = boost::proto::eval(FixWidth()(expr), ctx);
 
     constraints_.push_back(nested_expr);
     named_constraints_.insert(ite, std::make_pair(constraint_name, nested_expr));
@@ -204,9 +204,11 @@ struct Generator {
 
     os << "digraph AST {" << std::endl;
     ToDotVisitor visitor(os);
+
     BOOST_FOREACH ( boost::intrusive_ptr<Node> n, constraints_ )
       n->visit(visitor);
     os << "}" << std::endl;
+
     return os;
   }
 

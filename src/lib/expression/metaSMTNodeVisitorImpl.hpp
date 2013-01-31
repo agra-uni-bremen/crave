@@ -36,6 +36,7 @@ public:
   virtual void visitNegOpr( NegOpr const & );
   virtual void visitComplementOpr( ComplementOpr const & );
   virtual void visitInside( Inside const & );
+  virtual void visitExtendExpr( ExtendExpression const & );
   virtual void visitAndOpr( AndOpr const & );
   virtual void visitOrOpr( OrOpr const & );
   virtual void visitLogicalAndOpr( LogicalAndOpr const & );
@@ -238,6 +239,22 @@ void metaSMTVisitorImpl<SolverType>::visitInside( Inside const &in )
   }
 
   exprStack_.push( std::make_pair( result, false ) );
+}
+
+template<typename SolverType>
+void metaSMTVisitorImpl<SolverType>::visitExtendExpr( ExtendExpression const &e ) {
+  visitUnaryExpr(e);
+
+  stack_entry entry;
+  pop( entry );
+
+  result_type result;
+  if (entry.second)
+    result = evaluate(solver_, qf_bv::sign_extend(e.value(), entry.first));
+  else
+    result = evaluate(solver_, qf_bv::zero_extend(e.value(), entry.first));
+
+  exprStack_.push( std::make_pair( result, entry.second ) );
 }
 
 template<typename SolverType>
@@ -556,7 +573,7 @@ void metaSMTVisitorImpl<SolverType>::makeAssertion(Node const &expr)
   stack_entry entry;
   pop(entry);
 
-  metaSMT::assertion(solver_, preds::Or(entry.first, preds::False));
+  metaSMT::assertion(solver_, preds::equal(entry.first, qf_bv::bit1));
 }
 
 template<typename SolverType>
@@ -567,7 +584,7 @@ void metaSMTVisitorImpl<SolverType>::makeAssumption(Node const&expr)
   stack_entry entry;
   pop(entry);
 
-  metaSMT::assumption(solver_, preds::Or(entry.first, preds::False));
+  metaSMT::assumption(solver_, preds::equal(entry.first, qf_bv::bit1));
 }
 
 template<typename SolverType>

@@ -140,6 +140,17 @@ private:
   std::set<Constant> collection_;
 };
 
+class ExtendExpression : public UnaryExpression {
+public:
+  ExtendExpression( NodePtr v, unsigned int i ) : UnaryExpression(v), value_(i) { }
+
+  void visit( NodeVisitor& v ) const { v.visitExtendExpr(*this); }
+
+  unsigned int const & value() const { return value_; };
+private:
+  unsigned int value_;
+};
+
 class BinaryExpression : public Node {
 protected:
   BinaryExpression(NodePtr lhs, NodePtr rhs) : lhs_(lhs), rhs_(rhs) { }
