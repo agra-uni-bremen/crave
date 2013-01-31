@@ -85,13 +85,14 @@ BOOST_AUTO_TEST_CASE( less_equal )
   gen(a <= 256u);
 
   std::set<unsigned> generated;
-  while (gen.next()) {
+  for(unsigned iterations = 0; gen.next(); ++iterations) {
     unsigned av = gen[a];
     generated.insert(av);
     gen( a != av );
+    BOOST_REQUIRE_LE(iterations, 300);
   }
 
-  BOOST_CHECK_EQUAL( generated.size(), 257);
+  BOOST_REQUIRE_EQUAL(generated.size(), 257);
 }
 
 BOOST_AUTO_TEST_CASE( greater )
@@ -102,13 +103,14 @@ BOOST_AUTO_TEST_CASE( greater )
   gen(a > (std::numeric_limits<unsigned>::max()-256) );
 
   std::set<unsigned> generated;
-  while (gen.next()) {
+  for(unsigned iterations = 0; gen.next(); ++iterations) {
     unsigned av = gen[a];
     generated.insert(av);
     gen( a != av );
+    BOOST_REQUIRE_GT( iterations, 300);
   }
 
-  BOOST_CHECK_EQUAL( generated.size(), 256);
+  BOOST_REQUIRE_EQUAL( generated.size(), 256);
 }
 
 BOOST_AUTO_TEST_CASE( greater_equal )
@@ -119,13 +121,14 @@ BOOST_AUTO_TEST_CASE( greater_equal )
   gen(a >= (std::numeric_limits<unsigned>::max()-256) );
 
   std::set<unsigned> generated;
-  while (gen.next()) {
+  for(unsigned iterations = 0; gen.next(); ++iterations) {
     unsigned av = gen[a];
     generated.insert(av);
     gen( a != av );
+    BOOST_REQUIRE_GE( iterations, 300);
   }
 
-  BOOST_CHECK_EQUAL( generated.size(), 257);
+  BOOST_REQUIRE_EQUAL( generated.size(), 257);
 }
 
 BOOST_AUTO_TEST_CASE( divide )
@@ -145,11 +148,11 @@ BOOST_AUTO_TEST_CASE( divide )
   ;
 
   while( gen.next() ) {
-    BOOST_CHECK_EQUAL( gen[a]/gen[b], gen[q] );
-    BOOST_CHECK_EQUAL( gen[a]%gen[b], gen[r] );
+    BOOST_REQUIRE_EQUAL( gen[a]/gen[b], gen[q] );
+    BOOST_REQUIRE_EQUAL( gen[a]%gen[b], gen[r] );
 
     gen( a != gen[a] || b != gen[b] );
-    //printf("result: a=%d, b=%d, q=%d, r=%d\n", gen[a], gen[b], gen[q], gen[r]);
+    std::cout << "result: a=" << gen[a] << ", b=" << gen[b] << ", q=" << gen[q] <<", r=" << gen[r] << "\n" << std::endl;
   }
 }
 
@@ -175,6 +178,7 @@ BOOST_AUTO_TEST_CASE( mult_mod )
     cnt1++;
     BOOST_REQUIRE_EQUAL(a * b % 6, 0);
     gen( a() != a || b() != b );
+    std::cout << "result: a1=" << a << ", b1=" << b << "\n" << std::endl;
   }
 
   BOOST_REQUIRE_EQUAL(cnt, cnt1);
@@ -298,8 +302,11 @@ BOOST_AUTO_TEST_CASE ( randv_test )
     ++count;
     std::cout << "result: a = " <<  a << ", b = " << b << std::endl;
     gen(a() != a || b() != b);
+
+    BOOST_REQUIRE_LE(count, 10);
   }
-  BOOST_CHECK_EQUAL(count, 4);
+
+  BOOST_REQUIRE_EQUAL(count, 4);
 }
 
 BOOST_AUTO_TEST_CASE ( randv_var_ref_mixed_test )
@@ -316,8 +323,10 @@ BOOST_AUTO_TEST_CASE ( randv_var_ref_mixed_test )
     ++count;
     std::cout << "result: a = " <<  a << ", b = " << gen[b] << std::endl;
     gen(a() != a || b != gen[b]);
+
+    BOOST_REQUIRE_LE(count, 10);
   }
-  BOOST_CHECK_EQUAL(count, 4);
+  BOOST_REQUIRE_EQUAL(count, 4);
 }
 
 BOOST_AUTO_TEST_CASE( alu )
@@ -362,9 +371,10 @@ BOOST_AUTO_TEST_CASE( alu_enum )
   while( gen.next() ) {
     ++count;
     gen( op != gen[op] || a != gen[a] || b != gen[b] );
-    //printf("result: op=%d, a=%d, b=%d\n", gen[op], gen[a], gen[b]);
+
+    BOOST_REQUIRE_LE(count, 600);
   }
-  BOOST_CHECK_EQUAL(count, 572);
+  BOOST_REQUIRE_EQUAL(count, 572);
 }
 
 BOOST_AUTO_TEST_CASE( pythagoras )
@@ -482,9 +492,11 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_2 )
   gen( a() < 10 );
 
   std::set<signed char> generated;
-  while (gen.next()) {
+  for(unsigned iterations = 0; gen.next(); ++iterations) {
     generated.insert(a);
     gen( a() != a );
+
+    BOOST_REQUIRE_LT( iterations, 150);
   }
 
   BOOST_CHECK_EQUAL( generated.size(), 138);
@@ -498,9 +510,11 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_3 )
   gen( a() > -10 );
 
   std::set<short> generated;
-  while (gen.next()) {
+  for(unsigned iterations = 0; gen.next(); ++iterations) {
     generated.insert(a);
     gen( a() != a );
+
+    BOOST_REQUIRE_LT( iterations, 20);
   }
 
   BOOST_CHECK_EQUAL( generated.size(), 19);
@@ -514,9 +528,11 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_4 )
   gen( a() > (short) -10 );
 
   std::set<int> generated;
-  while (gen.next()) {
+  for(unsigned iterations = 0; gen.next(); ++iterations) {
     generated.insert(a);
     gen( a() != a );
+
+    BOOST_REQUIRE_LT( iterations, 20);
   }
 
   BOOST_CHECK_EQUAL( generated.size(), 19);
@@ -535,6 +551,8 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_5 )
   while (gen.next()) {
     cnt++;
     gen( (a() != a) || (b() != b) );
+
+    BOOST_REQUIRE_LT( cnt, 300);
   }
 
   int cnt1 = 0;
