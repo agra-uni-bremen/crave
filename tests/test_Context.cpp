@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE( less_equal )
     unsigned av = gen[a];
     generated.insert(av);
     gen( a != av );
-    BOOST_REQUIRE_LE(iterations, 300);
+    BOOST_REQUIRE_LT(iterations, 300);
   }
 
   BOOST_REQUIRE_EQUAL(generated.size(), 257);
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE( greater )
     unsigned av = gen[a];
     generated.insert(av);
     gen( a != av );
-    BOOST_REQUIRE_GT( iterations, 300);
+    BOOST_REQUIRE_LT( iterations, 300);
   }
 
   BOOST_REQUIRE_EQUAL( generated.size(), 256);
@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE( greater_equal )
     unsigned av = gen[a];
     generated.insert(av);
     gen( a != av );
-    BOOST_REQUIRE_GE( iterations, 300);
+    BOOST_REQUIRE_LT( iterations, 300);
   }
 
   BOOST_REQUIRE_EQUAL( generated.size(), 257);

@@ -562,8 +562,15 @@ void metaSMTVisitorImpl<SolverType>::visitShiftRightOpr( ShiftRightOpr const &o 
 template<typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitAssignOpr( AssignOpr const &o )
 {
+  stack_entry fst, snd;
+  evalBinExpr(o, fst, snd);
 
+  result_type result = evaluate( solver_, preds::True );
+  lazy_.insert(std::make_pair(&o, &result));
+  exprStack_.push( std::make_pair( result, fst.second || snd.second ) );
 }
+
+// TODO: create RandomizeExpression -> lazy_.erase(&o); evaluate(solver_, preds::True);
 
 template<typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitVectorAccess( VectorAccess const &o )
@@ -608,6 +615,12 @@ void metaSMTVisitorImpl<SolverType>::makeAssumption(Node const &expr)
 template<typename SolverType>
 bool metaSMTVisitorImpl<SolverType>::solve()
 {
+  // pre_solve()
+  for (typename std::map<Node const*, result_type const*>::const_iterator ite =
+      lazy_.begin(); ite != lazy_.end(); ++ite) {
+    metaSMT::assumption(solver_, *ite->second);
+  }
+
   return metaSMT::solve(solver_);
 }
 
