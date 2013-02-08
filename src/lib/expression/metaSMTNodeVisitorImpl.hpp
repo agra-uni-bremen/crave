@@ -2,13 +2,15 @@
 #define METASMTNODEVISITORIMPL_H
 
 #include "../../crave/expression/metaSMTNodeVisitor.hpp"
+#include "../../crave/AssignResult.hpp"
 
 #include <boost/foreach.hpp>
 #include <metaSMT/frontend/QF_BV.hpp>
 #include <metaSMT/DirectSolver_Context.hpp>
 
-#include <utility>
+#include <map>
 #include <stack>
+#include <utility>
 
 
 namespace crave {
@@ -19,7 +21,7 @@ namespace crave {
 template<typename SolverType>
 class metaSMTVisitorImpl : public metaSMTVisitor {
 public:
-  metaSMTVisitorImpl() : metaSMTVisitor(), solver_(), exprStack_() { }
+  metaSMTVisitorImpl() : metaSMTVisitor(), solver_(), exprStack_(), terminals_() { }
 
   virtual void visitNode( Node const & );
   virtual void visitTerminal( Terminal const & );
@@ -61,8 +63,9 @@ public:
 
 
   virtual void makeAssertion( Node const & );
-  virtual void makeAssumption( Node const& );
+  virtual void makeAssumption( Node const & );
   virtual bool solve();
+  virtual bool read( Node const& var, AssignResult& );
 
 private: // typedefs
   typedef typename SolverType::result_type result_type;
@@ -78,6 +81,8 @@ private: // methods
 private: // data
   SolverType solver_;
   std::stack<stack_entry> exprStack_;
+  std::map<Node const*, qf_bv::bitvector> terminals_;
+  std::map<Node const*, result_type const *> lazy_;
 };
 
 template<typename SolverType>
@@ -130,7 +135,19 @@ void metaSMTVisitorImpl<SolverType>::visitNode( Node const& ) { }
 template<typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitTerminal( Terminal const &t )
 {
-  qf_bv::bitvector bit_vec = qf_bv::new_bitvector( t.bitsize() );
+  std::map<Node const*, qf_bv::bitvector>::iterator ite(terminals_.lower_bound(&t));
+
+  qf_bv::bitvector bit_vec;
+  if (ite != terminals_.end() && !(terminals_.key_comp()(&t, ite->first))) {
+    // &t already exists
+    bit_vec = ite->second;
+  }
+  else
+  {
+    bit_vec = qf_bv::new_bitvector( t.bitsize() );
+    terminals_.insert( ite, std::make_pair(&t, bit_vec) );
+  }
+
   result_type result = evaluate( solver_, bit_vec );
   exprStack_.push( std::make_pair( result, t.sign() ) );
 }
@@ -577,7 +594,7 @@ void metaSMTVisitorImpl<SolverType>::makeAssertion(Node const &expr)
 }
 
 template<typename SolverType>
-void metaSMTVisitorImpl<SolverType>::makeAssumption(Node const&expr)
+void metaSMTVisitorImpl<SolverType>::makeAssumption(Node const &expr)
 {
   expr.visit(*this);
 
@@ -591,6 +608,21 @@ template<typename SolverType>
 bool metaSMTVisitorImpl<SolverType>::solve()
 {
   return metaSMT::solve(solver_);
+}
+
+template<typename SolverType>
+bool metaSMTVisitorImpl<SolverType>::read(Node const& var, AssignResult& assign)
+{
+  // assert(type_of(Node) == Terminal)
+  std::map<Node const *, qf_bv::bitvector>::const_iterator ite(terminals_.find(&var));
+  if (ite == terminals_.end())
+    return false;
+
+  qf_bv::bitvector var_expr = ite->second;
+  std::string res = metaSMT::read_value( solver_, var_expr );
+  assign.set_value( res );
+
+  return true;
 }
 
 } // namespace crave

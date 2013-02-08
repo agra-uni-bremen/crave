@@ -258,10 +258,18 @@ public:
     // FIXME: Generate IR //
   }
 
+  bool getNodeByID(int const idx, result_type& var) const {
+    std::map<int, result_type>::const_iterator ite(variables_.find(idx));
+    if (ite == variables_.end())
+      return false;
+
+    var = ite->second;
+    return true;
+  }
 private:
   std::map<int, result_type> variables_; // result_type = expression* / variable_expression*
-  std::vector<boost::intrusive_ptr<Node> > read_references_;
-  std::vector<boost::intrusive_ptr<Node> > write_references_;
+  std::vector<result_type> read_references_;
+  std::vector<result_type> write_references_;
 };
 // Context
 

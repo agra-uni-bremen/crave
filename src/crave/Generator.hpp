@@ -1,9 +1,11 @@
 #pragma once
 
+#include "AssignResult.hpp"
 #include "Context.hpp"
 #include "expression/ToDotNodeVisitor.hpp"
 #include "expression/FactoryMetaSMT.hpp"
 #include "expression/Node.hpp"
+#include "FactoryAssignResult.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/function.hpp>
@@ -33,36 +35,42 @@ struct Soft_Generator {
 
 struct Soft;
 struct Generator {
+  typedef boost::intrusive_ptr<Node> NodePtr;
 
   Generator()
-  : ctx() { }
+  : ctx_(), constraints_(), named_constraints_(), disabled_named_constaints_(),
+    metaSMT_visitor_(FactoryMetaSMT::newVisitorSWORD()) { }
 
   template<typename Expr>
   Generator(Expr expr)
-  : ctx() {
-    (*this)(expr);
-  }
+  : ctx_(), constraints_(), named_constraints_(), disabled_named_constaints_(),
+    metaSMT_visitor_(FactoryMetaSMT::newVisitorSWORD()) {
+      (*this)(expr);
+    }
 
   template<typename Expr>
   Generator & operator()(Expr expr) {
 
-    constraints_.push_back(boost::proto::eval(FixWidth()(expr), ctx));
+    NodePtr n(boost::proto::eval(FixWidth()(expr), ctx_));
+    constraints_.push_back(n);
+    metaSMT_visitor_->makeAssertion(*n);
     return *this;
   }
 
   template<typename Expr>
   Generator & operator()(std::string constraint_name, Expr expr) {
 
-    typename std::map<std::string, boost::intrusive_ptr<Node> >::iterator ite(
+    typename std::map<std::string, NodePtr>::iterator ite(
         named_constraints_.lower_bound(constraint_name));
 
     if (ite != named_constraints_.end() || constraint_name >= ite->first)
       throw std::runtime_error("Constraint already exists.");
 
-    boost::intrusive_ptr<Node> nested_expr = boost::proto::eval(FixWidth()(expr), ctx);
+    NodePtr nested_expr = boost::proto::eval(FixWidth()(expr), ctx_);
 
     constraints_.push_back(nested_expr);
     named_constraints_.insert(ite, std::make_pair(constraint_name, nested_expr));
+    metaSMT_visitor_->makeAssertion(*nested_expr); // FIXME var_is_enabled -> nested_expr
 
     return *this;
   }
@@ -73,7 +81,7 @@ struct Generator {
 
   bool enable_constraint(std::string constraint_name) {
 
-    if (named_constraints_.find(constraint_name) == named_constraints_.end())
+    if (0 == named_constraints_.count(constraint_name))
       return false;
 
     disabled_named_constaints_.erase(constraint_name);
@@ -82,7 +90,7 @@ struct Generator {
 
   bool disable_constraint(std::string constraint_name) {
 
-    if (named_constraints_.find(constraint_name) == named_constraints_.end())
+    if (0 == named_constraints_.count(constraint_name))
       return false;
 
     disabled_named_constaints_.insert(constraint_name);
@@ -91,7 +99,7 @@ struct Generator {
 
   bool is_constraint_enabled(std::string constraint_name) {
 
-    assert (named_constraints_.find(constraint_name) != named_constraints_.end());
+    assert (0 != named_constraints_.count(constraint_name));
 
     return 0 == disabled_named_constaints_.count(constraint_name);
   }
@@ -165,22 +173,16 @@ struct Generator {
   }
 
   bool next() {
-    boost::scoped_ptr<metaSMTVisitor> visitor( FactoryMetaSMT::newVisitorSWORD() );
-
-    BOOST_FOREACH(boost::intrusive_ptr<Node> n, constraints_) {
-      visitor->makeAssertion(*n);
-    }
-
     // pre_solve()
-    for (std::map<std::string, boost::intrusive_ptr<Node> >::const_iterator
+    for (std::map<std::string, NodePtr>::const_iterator
         it = named_constraints_.begin();
         it != named_constraints_.end(); ++it) {
 
       if (0 == disabled_named_constaints_.count(it->first))
-        visitor->makeAssumption(*it->second);
+        metaSMT_visitor_->makeAssumption(*it->second);
     }
 
-    return visitor->solve();
+    return metaSMT_visitor_->solve();
   }
 
   /**
@@ -188,8 +190,14 @@ struct Generator {
    **/
   template<typename T>
   T operator[](Variable<T> const & var) {
-    // FIXME: new backend for solving
-    //return ctx.read(var);
+
+    boost::scoped_ptr<AssignResult> result( FactoryAssignResult<T>::newAssignResult() );
+
+    NodePtr node;
+    ctx_.getNodeByID(var.id(), node);
+    metaSMT_visitor_->read(*node, *result);
+
+    return static_cast<T>(result->value()); // FIXME is there another way to get value?
   }
 
   void new_disjunction() { /* FIXME: new backend for enums */
@@ -213,10 +221,12 @@ struct Generator {
   }
 
 private:
-  Context ctx;
+  Context ctx_;
   std::vector<boost::intrusive_ptr<Node> > constraints_;
   std::map<std::string, boost::intrusive_ptr<Node> > named_constraints_;
   std::set<std::string> disabled_named_constaints_;
+
+  boost::scoped_ptr<metaSMTVisitor> metaSMT_visitor_;
 //      std::map<int, Context*> vecCtx;
 //      std::map<std::string, Context*> ctxOfCstr;
 //      std::set<int> uniqueVecSet;
