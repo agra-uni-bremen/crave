@@ -7,6 +7,7 @@
 #include <boost/foreach.hpp>
 #include <metaSMT/frontend/QF_BV.hpp>
 #include <metaSMT/DirectSolver_Context.hpp>
+#include <metaSMT/Priority_Context.hpp>
 
 #include <map>
 #include <stack>

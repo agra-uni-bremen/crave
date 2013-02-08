@@ -11,6 +11,8 @@ namespace crave {
       * Caller is responsible for deleting the visitor.
       **/
     static metaSMTVisitor* newVisitorSWORD();
+
+    static metaSMTVisitor* newVisitorPriority();
   };
 
 } // namespace crave;
