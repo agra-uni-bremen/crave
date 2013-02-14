@@ -19,6 +19,7 @@ namespace crave {
   {
     protected:
       rand_base() { }
+      ~rand_base() { }
 
     public:
       virtual bool next() = 0;
@@ -30,7 +31,7 @@ namespace crave {
     public:
       template<typename context>
       rand_obj_of(rand_obj_of<context>* parent = 0) { if (parent != 0) parent->addChild(this); }
-      bool next() {
+      virtual bool next() {
         return constraint.next();
       }
       bool enable_constraint(std::string name) { return constraint.enable_constraint(name); }

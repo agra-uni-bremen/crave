@@ -1,20 +1,26 @@
 #pragma once
 
+#include "../lib/AssignResultImpl.hpp"
 #include "bitsize_traits.hpp"
 #include "Constraint.hpp"
 #include "VectorConstraint.hpp"
 #include "ExpressionTraits.hpp"
 #include "expression/Node.hpp"
+#include "expression/metaSMTNodeVisitor.hpp"
 
 #include <boost/foreach.hpp>
+#include <boost/intrusive_ptr.hpp>
 #include <boost/proto/core.hpp>
 #include <boost/proto/debug.hpp>
 #include <boost/proto/context/callable.hpp>
 #include <boost/proto/context/null.hpp>
 #include <boost/range/value_type.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <map>
+#include <utility>
 #include <set>
+#include <vector>
 
 namespace crave {
 
@@ -24,6 +30,10 @@ public:
   typedef Node expression;
   typedef boost::intrusive_ptr<expression> result_type;
 
+private:
+  typedef std::pair<int, boost::shared_ptr<AssignResult> > WriteRefPair;
+
+public:
   template<typename value_type>
   result_type operator()(proto::tag::terminal, var_tag<value_type> const & tag) {
 
@@ -52,11 +62,11 @@ public:
       result_type var = (*this)(t, static_cast<var_tag<value_type> >(ref));
 
       variables_.insert(std::make_pair(ref.id, var));
-      write_references_.push_back(var);
+      write_references_.push_back( std::make_pair(
+              ref.id, boost::shared_ptr<crave::AssignResult>(
+                  new AssignResultToRef<value_type>(ref.ref))
+              ) );
 
-      // FIXME: implement ne way to handle write references
-      // boost::function0<void> f = writeReference<value_type>(ref.ref, *this, ref.id);
-      // _post_hook.push_back(f);
       return var;
     }
   }
@@ -266,10 +276,22 @@ public:
     var = ite->second;
     return true;
   }
+
+  bool readWriteReferences(metaSMTVisitor &visitor) {
+
+    NodePtr node;
+    BOOST_FOREACH (WriteRefPair& pair, write_references_) {
+
+      if (!(getNodeByID(pair.first, node) &&
+            visitor.read(*node, *pair.second)))
+        return false;
+    }
+    return true;
+  }
 private:
   std::map<int, result_type> variables_; // result_type = expression* / variable_expression*
   std::vector<result_type> read_references_;
-  std::vector<result_type> write_references_;
+  std::vector<WriteRefPair> write_references_;
 };
 // Context
 

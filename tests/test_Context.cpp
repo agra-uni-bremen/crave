@@ -179,6 +179,7 @@ BOOST_AUTO_TEST_CASE( mult_mod )
     BOOST_REQUIRE_EQUAL(a * b % 6, 0);
     gen( a() != a || b() != b );
     std::cout << "result: a1=" << a << ", b1=" << b << "\n" << std::endl;
+    BOOST_REQUIRE_LE(cnt1, cnt);
   }
 
   BOOST_REQUIRE_EQUAL(cnt, cnt1);

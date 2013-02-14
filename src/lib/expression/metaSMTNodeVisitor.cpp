@@ -7,7 +7,7 @@
 #include <metaSMT/DirectSolver_Context.hpp>
 #include <metaSMT/Priority_Context.hpp>
 #include <metaSMT/UnpackFuture_Context.hpp>
-#include <metaSMT/backend/CUDD_Distributed.hpp> // FIXME: hidden dependencies in CUDD_Distributed.hpp
+#include <metaSMT/backend/CUDD_Distributed.hpp>
 
 namespace crave {
 

@@ -22,7 +22,7 @@ namespace crave {
 template<typename SolverType>
 class metaSMTVisitorImpl : public metaSMTVisitor {
 public:
-  metaSMTVisitorImpl() : metaSMTVisitor(), solver_(), exprStack_(), terminals_() { }
+  metaSMTVisitorImpl() : metaSMTVisitor(), solver_(), exprStack_(), terminals_(), lazy_() { }
 
   virtual void visitNode( Node const & );
   virtual void visitTerminal( Terminal const & );

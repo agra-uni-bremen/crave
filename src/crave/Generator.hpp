@@ -182,22 +182,28 @@ struct Generator {
         metaSMT_visitor_->makeAssumption(*it->second);
     }
 
-    return metaSMT_visitor_->solve();
+    bool result = metaSMT_visitor_->solve();
+    // post_solve(result)
+    if (result) {
+      ctx_.readWriteReferences(*metaSMT_visitor_);
+    }
+    return result;
   }
 
   /**
    * read variable "var"
    **/
   template<typename T>
-  T operator[](Variable<T> const & var) {
+  T operator[](Variable<T> const &var) {
 
-    boost::scoped_ptr<AssignResult> result( FactoryAssignResult<T>::newAssignResult() );
+    //boost::scoped_ptr<AssignResult> result( FactoryAssignResult<T>::newAssignResult() );
+    AssignResultImpl<T> result;
 
     NodePtr node;
     ctx_.getNodeByID(var.id(), node);
-    metaSMT_visitor_->read(*node, *result);
+    metaSMT_visitor_->read(*node, result);
 
-    return static_cast<T>(result->value()); // FIXME is there another way to get value?
+    return result.value();
   }
 
   void new_disjunction() { /* FIXME: new backend for enums */
