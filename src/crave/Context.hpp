@@ -30,12 +30,13 @@ public:
   typedef boost::intrusive_ptr<expression> result_type;
 
 private:
+  typedef std::pair<int, boost::shared_ptr<crave::AssignReadRef> > ReadRefPair;
   typedef std::pair<int, boost::shared_ptr<crave::AssignResult> > WriteRefPair;
 
 public:
-  Context(std::map<int, result_type>& vars,
+  Context(std::map<int, result_type>& vars, std::vector<ReadRefPair>& read_refs,
           std::vector<WriteRefPair>& write_refs)
-          : variables_(vars), read_references_(), write_references_(write_refs) { }
+          : variables_(vars), read_references_(read_refs), write_references_(write_refs) { }
 
   template<typename value_type>
   result_type operator()(proto::tag::terminal, var_tag<value_type> const & tag) {
@@ -220,11 +221,12 @@ public:
       result_type var = (*this)(t, static_cast<var_tag<Integer> >(ref));
 
       variables_.insert(std::make_pair(ref.id, var));
-      read_references_.push_back(var);
 
-      // FIXME: implement new way to handle references //
-      //boost::function0<result_type> f = getLazyReference<Integer>(ref.ref, solver, var);
-      //_lazy[ref.id] = f;
+      unsigned width = bitsize_traits<Integer>::value;
+      bool sign = boost::is_signed<Integer>::value;
+      result_type equal = new EqualOpr(var, new Constant(ref.ref, width, sign));
+      boost::shared_ptr<crave::AssignReadRef> assign(new AssignReadRef(equal));
+      read_references_.push_back(std::make_pair(ref.id, assign));
 
       return var;
     }
@@ -273,7 +275,7 @@ public:
 
 private:
   std::map<int, result_type>& variables_;
-  std::vector<result_type> read_references_;
+  std::vector<ReadRefPair>& read_references_;
   std::vector<WriteRefPair>& write_references_;
 };
 // Context

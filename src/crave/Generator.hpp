@@ -37,20 +37,21 @@ struct Generator {
   typedef boost::intrusive_ptr<Node> NodePtr;
 
 private:
+  typedef std::pair<int, boost::shared_ptr<crave::AssignReadRef> > ReadRefPair;
   typedef std::pair<int, boost::shared_ptr<crave::AssignResult> > WriteRefPair;
 
 public:
   Generator()
   : constraints_(), named_constraints_(), disabled_named_constaints_(),
-    variables_(), write_references_(),
-    ctx_(variables_, write_references_),
+    variables_(), read_references_(), write_references_(),
+    ctx_(variables_, read_references_, write_references_),
     metaSMT_visitor_(FactoryMetaSMT::newVisitorSWORD()) { }
 
   template<typename Expr>
   Generator(Expr expr)
   : constraints_(), named_constraints_(), disabled_named_constaints_(),
-    variables_(), write_references_(),
-    ctx_(variables_, write_references_),
+    variables_(), read_references_(), write_references_(),
+    ctx_(variables_, read_references_, write_references_),
     metaSMT_visitor_(FactoryMetaSMT::newVisitorSWORD()) {
       (*this)(expr);
     }
@@ -188,6 +189,9 @@ public:
       if (0 == disabled_named_constaints_.count(it->first))
         metaSMT_visitor_->makeAssumption(*it->second);
     }
+    BOOST_FOREACH(ReadRefPair pair, read_references_) {
+      metaSMT_visitor_->makeAssumption(*(*pair.second).value());
+    }
 
     bool result = metaSMT_visitor_->solve();
     // post_solve(result)
@@ -236,6 +240,7 @@ private:
   std::set<std::string> disabled_named_constaints_;
 
   std::map<int, boost::intrusive_ptr<Node> > variables_;
+  std::vector<ReadRefPair> read_references_;
   std::vector<WriteRefPair> write_references_;
 
   Context ctx_;

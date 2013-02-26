@@ -5,10 +5,12 @@
 #include <string>
 
 #include <boost/function.hpp>
+#include <boost/intrusive_ptr.hpp>
 #include <boost/optional.hpp>
 #include <boost/type_traits/is_signed.hpp>
 
 #include "../crave/AssignResult.hpp"
+#include "../crave/expression/Node.hpp"
 
 namespace crave {
 
@@ -95,6 +97,24 @@ namespace crave {
   protected:
     T& value_;
     Random random_;
+  };
+
+  struct AssignReadRef {
+  public:
+  AssignReadRef(boost::intrusive_ptr<Node>& expr)
+  : value_(expr) { }
+    ~AssignReadRef() { }
+
+  typedef boost::intrusive_ptr<Node> result_type;
+
+  public:
+    result_type const & value() const
+    {
+      return value_;
+    };
+
+  protected:
+    boost::intrusive_ptr<Node> const value_;
   };
 } /* namespace crave */
 
