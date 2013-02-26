@@ -5,7 +5,6 @@
 #include "expression/ToDotNodeVisitor.hpp"
 #include "expression/FactoryMetaSMT.hpp"
 #include "expression/Node.hpp"
-#include "FactoryAssignResult.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/function.hpp>
@@ -37,13 +36,21 @@ struct Soft;
 struct Generator {
   typedef boost::intrusive_ptr<Node> NodePtr;
 
+private:
+  typedef std::pair<int, boost::shared_ptr<crave::AssignResult> > WriteRefPair;
+
+public:
   Generator()
-  : ctx_(), constraints_(), named_constraints_(), disabled_named_constaints_(),
+  : constraints_(), named_constraints_(), disabled_named_constaints_(),
+    variables_(), write_references_(),
+    ctx_(variables_, write_references_),
     metaSMT_visitor_(FactoryMetaSMT::newVisitorSWORD()) { }
 
   template<typename Expr>
   Generator(Expr expr)
-  : ctx_(), constraints_(), named_constraints_(), disabled_named_constaints_(),
+  : constraints_(), named_constraints_(), disabled_named_constaints_(),
+    variables_(), write_references_(),
+    ctx_(variables_, write_references_),
     metaSMT_visitor_(FactoryMetaSMT::newVisitorSWORD()) {
       (*this)(expr);
     }
@@ -185,7 +192,9 @@ struct Generator {
     bool result = metaSMT_visitor_->solve();
     // post_solve(result)
     if (result) {
-      ctx_.readWriteReferences(*metaSMT_visitor_);
+      BOOST_FOREACH(WriteRefPair pair, write_references_) {
+        metaSMT_visitor_->read(*variables_[pair.first], *pair.second);
+      }
     }
     return result;
   }
@@ -196,13 +205,8 @@ struct Generator {
   template<typename T>
   T operator[](Variable<T> const &var) {
 
-    //boost::scoped_ptr<AssignResult> result( FactoryAssignResult<T>::newAssignResult() );
     AssignResultImpl<T> result;
-
-    NodePtr node;
-    ctx_.getNodeByID(var.id(), node);
-    metaSMT_visitor_->read(*node, result);
-
+    metaSMT_visitor_->read(*variables_[var.id()], result);
     return result.value();
   }
 
@@ -227,11 +231,14 @@ struct Generator {
   }
 
 private:
-  Context ctx_;
   std::vector<boost::intrusive_ptr<Node> > constraints_;
   std::map<std::string, boost::intrusive_ptr<Node> > named_constraints_;
   std::set<std::string> disabled_named_constaints_;
 
+  std::map<int, boost::intrusive_ptr<Node> > variables_;
+  std::vector<WriteRefPair> write_references_;
+
+  Context ctx_;
   boost::scoped_ptr<metaSMTVisitor> metaSMT_visitor_;
 //      std::map<int, Context*> vecCtx;
 //      std::map<std::string, Context*> ctxOfCstr;

@@ -6,7 +6,6 @@
 #include "VectorConstraint.hpp"
 #include "ExpressionTraits.hpp"
 #include "expression/Node.hpp"
-#include "expression/metaSMTNodeVisitor.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/intrusive_ptr.hpp>
@@ -31,9 +30,13 @@ public:
   typedef boost::intrusive_ptr<expression> result_type;
 
 private:
-  typedef std::pair<int, boost::shared_ptr<AssignResult> > WriteRefPair;
+  typedef std::pair<int, boost::shared_ptr<crave::AssignResult> > WriteRefPair;
 
 public:
+  Context(std::map<int, result_type>& vars,
+          std::vector<WriteRefPair>& write_refs)
+          : variables_(vars), read_references_(), write_references_(write_refs) { }
+
   template<typename value_type>
   result_type operator()(proto::tag::terminal, var_tag<value_type> const & tag) {
 
@@ -268,30 +271,10 @@ public:
     // FIXME: Generate IR //
   }
 
-  bool getNodeByID(int const idx, result_type& var) const {
-    std::map<int, result_type>::const_iterator ite(variables_.find(idx));
-    if (ite == variables_.end())
-      return false;
-
-    var = ite->second;
-    return true;
-  }
-
-  bool readWriteReferences(metaSMTVisitor &visitor) {
-
-    NodePtr node;
-    BOOST_FOREACH (WriteRefPair& pair, write_references_) {
-
-      if (!(getNodeByID(pair.first, node) &&
-            visitor.read(*node, *pair.second)))
-        return false;
-    }
-    return true;
-  }
 private:
-  std::map<int, result_type> variables_; // result_type = expression* / variable_expression*
+  std::map<int, result_type>& variables_;
   std::vector<result_type> read_references_;
-  std::vector<WriteRefPair> write_references_;
+  std::vector<WriteRefPair>& write_references_;
 };
 // Context
 
