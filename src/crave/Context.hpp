@@ -65,7 +65,6 @@ public:
     } else {
       result_type var = (*this)(t, static_cast<var_tag<value_type> >(ref));
 
-      variables_.insert(std::make_pair(ref.id, var));
       write_references_.push_back( std::make_pair(
               ref.id, boost::shared_ptr<crave::AssignResult>(
                   new AssignResultToRef<value_type>(ref.ref))
@@ -219,8 +218,6 @@ public:
       return ite->second;
     } else {
       result_type var = (*this)(t, static_cast<var_tag<Integer> >(ref));
-
-      variables_.insert(std::make_pair(ref.id, var));
 
       unsigned width = bitsize_traits<Integer>::value;
       bool sign = boost::is_signed<Integer>::value;
