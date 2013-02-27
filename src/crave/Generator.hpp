@@ -37,7 +37,7 @@ struct Generator {
   typedef boost::intrusive_ptr<Node> NodePtr;
 
 private:
-  typedef std::pair<int, boost::shared_ptr<crave::AssignReadRef> > ReadRefPair;
+  typedef std::pair<int, boost::shared_ptr<crave::ReferenceExpression> > ReadRefPair;
   typedef std::pair<int, boost::shared_ptr<crave::AssignResult> > WriteRefPair;
 
 public:
@@ -190,7 +190,7 @@ public:
         metaSMT_visitor_->makeAssumption(*it->second);
     }
     BOOST_FOREACH(ReadRefPair pair, read_references_) {
-      metaSMT_visitor_->makeAssumption(*(*pair.second).value());
+      metaSMT_visitor_->makeAssumption(*(*pair.second).expr());
     }
 
     bool result = metaSMT_visitor_->solve();

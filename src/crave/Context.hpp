@@ -6,6 +6,7 @@
 #include "VectorConstraint.hpp"
 #include "ExpressionTraits.hpp"
 #include "expression/Node.hpp"
+#include "expression/ReferenceExpression.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/intrusive_ptr.hpp>
@@ -30,7 +31,7 @@ public:
   typedef boost::intrusive_ptr<expression> result_type;
 
 private:
-  typedef std::pair<int, boost::shared_ptr<crave::AssignReadRef> > ReadRefPair;
+  typedef std::pair<int, boost::shared_ptr<crave::ReferenceExpression> > ReadRefPair;
   typedef std::pair<int, boost::shared_ptr<crave::AssignResult> > WriteRefPair;
 
 public:
@@ -219,11 +220,8 @@ public:
     } else {
       result_type var = (*this)(t, static_cast<var_tag<Integer> >(ref));
 
-      unsigned width = bitsize_traits<Integer>::value;
-      bool sign = boost::is_signed<Integer>::value;
-      result_type equal = new EqualOpr(var, new Constant(ref.ref, width, sign));
-      boost::shared_ptr<crave::AssignReadRef> assign(new AssignReadRef(equal));
-      read_references_.push_back(std::make_pair(ref.id, assign));
+      boost::shared_ptr<crave::ReferenceExpression> refExpr(new ReferenceExpressionImpl<Integer>(ref.ref, var));
+      read_references_.push_back(std::make_pair(ref.id, refExpr));
 
       return var;
     }

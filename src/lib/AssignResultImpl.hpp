@@ -99,23 +99,6 @@ namespace crave {
     Random random_;
   };
 
-  struct AssignReadRef {
-  public:
-  AssignReadRef(boost::intrusive_ptr<Node>& expr)
-  : value_(expr) { }
-    ~AssignReadRef() { }
-
-  typedef boost::intrusive_ptr<Node> result_type;
-
-  public:
-    result_type const & value() const
-    {
-      return value_;
-    };
-
-  protected:
-    boost::intrusive_ptr<Node> const value_;
-  };
 } /* namespace crave */
 
 #endif /* ASSIGNRESULTIMPL_HPP_ */
