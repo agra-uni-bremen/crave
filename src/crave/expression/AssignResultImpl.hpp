@@ -1,16 +1,14 @@
-#ifndef ASSIGNRESULTIMPL_HPP_
-#define ASSIGNRESULTIMPL_HPP_
+#pragma once
 
-
-#include <string>
+#include "../AssignResult.hpp"
+#include "Node.hpp"
 
 #include <boost/function.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/optional.hpp>
 #include <boost/type_traits/is_signed.hpp>
 
-#include "../crave/AssignResult.hpp"
-#include "../crave/expression/Node.hpp"
+#include <string>
 
 namespace crave {
 
@@ -100,5 +98,3 @@ namespace crave {
   };
 
 } /* namespace crave */
-
-#endif /* ASSIGNRESULTIMPL_HPP_ */

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../lib/AssignResultImpl.hpp"
 #include "bitsize_traits.hpp"
 #include "Constraint.hpp"
 #include "VectorConstraint.hpp"
 #include "ExpressionTraits.hpp"
 #include "expression/Node.hpp"
+#include "expression/AssignResultImpl.hpp"
 #include "expression/ReferenceExpression.hpp"
 
 #include <boost/foreach.hpp>
