@@ -565,9 +565,9 @@ void metaSMTVisitorImpl<SolverType>::visitAssignOpr( AssignOpr const &o )
   stack_entry fst, snd;
   evalBinExpr(o, fst, snd);
 
-  result_type result = evaluate( solver_, preds::True );
+  result_type result = evaluate( solver_, preds::equal(snd.first, fst.first) );//qf_bv::bvcomp(fst.first, snd.first) );
   lazy_.insert(std::make_pair(&o, &result));
-  exprStack_.push( std::make_pair( result, fst.second || snd.second ) );
+  exprStack_.push( std::make_pair( evaluate( solver_, preds::True ), false ) );
 }
 
 // TODO: create RandomizeExpression -> lazy_.erase(&o); evaluate(solver_, preds::True);
