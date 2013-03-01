@@ -43,14 +43,14 @@ private:
 public:
   Generator()
   : constraints_(), named_constraints_(), disabled_named_constaints_(),
-    variables_(), read_references_(), write_references_(),
+    variables_(), read_references_(), write_references_(), pre_hooks_(),
     ctx_(variables_, read_references_, write_references_),
     metaSMT_visitor_(FactoryMetaSMT::newVisitorSWORD()) { }
 
   template<typename Expr>
   Generator(Expr expr)
   : constraints_(), named_constraints_(), disabled_named_constaints_(),
-    variables_(), read_references_(), write_references_(),
+    variables_(), read_references_(), write_references_(), pre_hooks_(),
     ctx_(variables_, read_references_, write_references_),
     metaSMT_visitor_(FactoryMetaSMT::newVisitorSWORD()) {
       (*this)(expr);
@@ -113,7 +113,7 @@ public:
   }
 
   void add_pre_hook(boost::function0<bool> f) {
-    // FIXME: ctx.add_pre_hook(f);
+    pre_hooks_.push_back(f);
   }
 
   /**
@@ -182,6 +182,10 @@ public:
 
   bool next() {
     // pre_solve()
+    BOOST_FOREACH(boost::function0<bool> f, pre_hooks_) {
+      if (!f()) return false;
+    }
+
     for (std::map<std::string, NodePtr>::const_iterator
         it = named_constraints_.begin();
         it != named_constraints_.end(); ++it) {
@@ -190,7 +194,7 @@ public:
         metaSMT_visitor_->makeAssumption(*it->second);
     }
     BOOST_FOREACH(ReadRefPair pair, read_references_) {
-      metaSMT_visitor_->makeAssumption(*(*pair.second).expr());
+      metaSMT_visitor_->makeAssumption(*pair.second->expr());
     }
 
     bool result = metaSMT_visitor_->solve();
@@ -242,6 +246,7 @@ private:
   std::map<int, boost::intrusive_ptr<Node> > variables_;
   std::vector<ReadRefPair> read_references_;
   std::vector<WriteRefPair> write_references_;
+  std::vector<boost::function0<bool> > pre_hooks_;
 
   Context ctx_;
   boost::scoped_ptr<metaSMTVisitor> metaSMT_visitor_;

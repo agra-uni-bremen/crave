@@ -15,12 +15,9 @@ using boost::format;
 
 struct Context_Fixture {
   Context_Fixture ()
-//  : ctx()
   {
     crave::set_global_seed(0);
   }
-//  protected:
-//    Context ctx;
 };
 
 BOOST_FIXTURE_TEST_SUITE(Distribution_t, Context_Fixture )

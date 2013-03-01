@@ -18,8 +18,6 @@ struct Context_Fixture {
   Context_Fixture ()
   {
   }
-//  protected:
-//    Context ctx;
 };
 
 BOOST_FIXTURE_TEST_SUITE(Context_t, Context_Fixture )
