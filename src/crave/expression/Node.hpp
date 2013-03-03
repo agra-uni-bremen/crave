@@ -151,6 +151,13 @@ private:
   unsigned int value_;
 };
 
+class RandomizeExpr : public UnaryExpression {
+public:
+  RandomizeExpr( NodePtr c ) : UnaryExpression(c) { }
+
+  void visit( NodeVisitor& v ) const { v.visitRandomizeExpr(*this); }
+};
+
 class BinaryExpression : public Node {
 protected:
   BinaryExpression(NodePtr lhs, NodePtr rhs) : lhs_(lhs), rhs_(rhs) { }

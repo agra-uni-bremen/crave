@@ -190,25 +190,16 @@ public:
 
   template<typename Expr1, typename Expr2>
   result_type operator()(proto::tag::assign, Expr1 const & e1, Expr2 const & e2) {
-    //std::cout << "eval assign" << std::endl;
+
     result_type expr1, expr2;
     expr1 = proto::eval(e1, *this);
     expr2 = proto::eval(e2, *this);
 
     return new AssignOpr(expr1, expr2);
-    //FIXME: Generate IR // boost::function0<result_type> f = getID( evaluate(solver,
-    //FIXME: Generate IR //     preds::equal(expr1, expr2)) );
-    //FIXME: Generate IR // _lazy[proto::value(e1).id] = f;
-
-    // TODO: maybe new syntax for this feature: gen.assign( x(), 3)
-    // FIXME: Generate IR // return evaluate( solver, preds::True);
   }
 
   result_type operator()(proto::tag::terminal t, randomize_tag const & tag) {
-    return new Constant(1, 1, false);
-    // FIXME: reverts previous function
-    //_lazy.erase(tag.id);
-    //return evaluate( solver, preds::True);
+    return new RandomizeExpr(variables_.at(tag.id));
   }
 
   template<typename Integer>

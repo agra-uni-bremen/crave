@@ -170,6 +170,16 @@ void ToDotVisitor::visitExtendExpr( ExtendExpression const &e )
   visitUnaryExpr(e);
 }
 
+void ToDotVisitor::visitRandomizeExpr(RandomizeExpr const &e)
+{
+  if ( putNode(&e) )
+  {
+    visitNode(e);
+    out_ << " [label=\"randomize\"]" << std::endl;
+  }
+  visitUnaryExpr(e);
+}
+
 void ToDotVisitor::visitLogicalAndOpr(LogicalAndOpr const &o)
 {
   if ( putNode(&o) )

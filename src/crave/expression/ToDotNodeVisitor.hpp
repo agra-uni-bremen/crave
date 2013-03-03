@@ -28,6 +28,7 @@ public:
   void visitComplementOpr( ComplementOpr const & );
   void visitInside( Inside const & );
   void visitExtendExpr( ExtendExpression const & );
+  void visitRandomizeExpr( RandomizeExpr const & );
   void visitAndOpr( AndOpr const & );
   void visitOrOpr( OrOpr const & );
   void visitLogicalAndOpr( LogicalAndOpr const & );

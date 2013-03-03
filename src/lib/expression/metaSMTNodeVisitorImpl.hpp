@@ -40,6 +40,7 @@ public:
   virtual void visitComplementOpr( ComplementOpr const & );
   virtual void visitInside( Inside const & );
   virtual void visitExtendExpr( ExtendExpression const & );
+  virtual void visitRandomizeExpr( RandomizeExpr const & );
   virtual void visitAndOpr( AndOpr const & );
   virtual void visitOrOpr( OrOpr const & );
   virtual void visitLogicalAndOpr( LogicalAndOpr const & );
@@ -273,6 +274,13 @@ void metaSMTVisitorImpl<SolverType>::visitExtendExpr( ExtendExpression const &e 
     result = evaluate(solver_, qf_bv::zero_extend(e.value(), entry.first));
 
   exprStack_.push( std::make_pair( result, entry.second ) );
+}
+
+template<typename SolverType>
+void metaSMTVisitorImpl<SolverType>::visitRandomizeExpr( RandomizeExpr const &e ) {
+
+  lazy_.erase(e.child().get());
+  exprStack_.push( std::make_pair( evaluate(solver_, preds::True), false ) );
 }
 
 template<typename SolverType>

@@ -19,6 +19,7 @@ class NegOpr;
 class ComplementOpr;
 class Inside;
 class ExtendExpression;
+class RandomizeExpr;
 class BinaryExpression;
 class BinaryOperator;
 class AndOpr;
@@ -66,6 +67,7 @@ public:
   virtual void visitComplementOpr( ComplementOpr const & ) = 0;
   virtual void visitInside( Inside const & ) = 0;
   virtual void visitExtendExpr( ExtendExpression const & ) = 0;
+  virtual void visitRandomizeExpr( RandomizeExpr const & ) = 0;
   virtual void visitAndOpr( AndOpr const & ) = 0;
   virtual void visitOrOpr( OrOpr const & ) = 0;
   virtual void visitLogicalAndOpr( LogicalAndOpr const & ) = 0;
