@@ -247,7 +247,14 @@ public:
   result_type operator()(proto::tag::function,
       boost::proto::terminal<operator_dist>::type const & tag,
       Var const & var_term, Value const & probability) {
-    // FIXME: implement new way to specify distributions //
+
+    result_type expr = proto::eval(var_term, *this);
+    read_references_.push_back(std::make_pair(
+        proto::value(var_term).id,
+        boost::shared_ptr<crave::ReferenceExpression>(
+            new DistReferenceExpr(proto::value(probability), expr)
+    )));
+    return new Constant(1, 1, false);
   }
 
   template<typename Expr1, typename Expr2>

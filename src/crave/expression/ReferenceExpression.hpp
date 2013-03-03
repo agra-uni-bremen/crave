@@ -1,8 +1,13 @@
 #pragma once
 
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_01.hpp>
+
 #include "../bitsize_traits.hpp"
 
 namespace crave {
+
+  extern boost::mt19937 rng;
 
   struct ReferenceExpression {
   public:
@@ -29,4 +34,18 @@ namespace crave {
     ReferenceExpression::result_type expr_;
   };
 
+  struct DistReferenceExpr : ReferenceExpression {
+    DistReferenceExpr(float prob, ReferenceExpression::result_type expr)
+    : value_(), probability_(prob), expr_(expr) { }
+
+    virtual ReferenceExpression::result_type expr() const {
+      float res = boost::uniform_01<float>()(rng);
+      value_ = res <= probability_;
+      return new EqualOpr(expr_, new Constant(value_, 1, false));
+    }
+  private:
+    mutable bool value_;
+    float probability_;
+    ReferenceExpression::result_type expr_;
+  };
 } /* namespace crave */
