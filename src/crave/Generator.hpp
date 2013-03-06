@@ -71,14 +71,13 @@ public:
     typename std::map<std::string, NodePtr>::iterator ite(
         named_constraints_.lower_bound(constraint_name));
 
-    if (ite != named_constraints_.end() || constraint_name >= ite->first)
+    if (ite != named_constraints_.end() && constraint_name >= ite->first)
       throw std::runtime_error("Constraint already exists.");
 
     NodePtr nested_expr = boost::proto::eval(FixWidth()(expr), ctx_);
 
     constraints_.push_back(nested_expr);
     named_constraints_.insert(ite, std::make_pair(constraint_name, nested_expr));
-    metaSMT_visitor_->makeAssertion(*nested_expr); // FIXME var_is_enabled -> nested_expr
 
     return *this;
   }
