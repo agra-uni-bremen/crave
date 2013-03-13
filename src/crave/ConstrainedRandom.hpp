@@ -8,6 +8,7 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
+#include <boost/preprocessor/variadic/size.hpp>
 
 #include <limits>
 #include <vector>
@@ -266,13 +267,13 @@ class randv<typename> : public randv_prim_base<typename>, public randomize_base<
 
 } // namespace crave
 
-#define CRAVE_ENUM(name, count, ...) \
+#define CRAVE_ENUM(name, ...) \
 namespace crave { \
   template<> \
   struct randv<name> : randv<int> { \
     randv(rand_obj* parent) : randv<int>(parent) { \
       if (parent == 0) throw std::runtime_error("randv<enum> must be owned by an instance of rand_obj."); \
-      init_enum_values(parent, count, __VA_ARGS__); \
+      init_enum_values(parent, BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), __VA_ARGS__); \
     } \
     void init_enum_values(rand_obj* parent, int c, ...) { \
       va_list values; \
