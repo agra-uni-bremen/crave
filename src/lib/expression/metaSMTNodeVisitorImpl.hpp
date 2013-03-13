@@ -25,7 +25,7 @@ class metaSMTVisitorImpl : public metaSMTVisitor {
 public:
   metaSMTVisitorImpl()
   : metaSMTVisitor(), solver_(), exprStack_(), terminals_(), lazy_(),
-    assumptions_(), pre_hooks_() { }
+    soft_(evaluate(solver_, preds::True)), assumptions_(), pre_hooks_() { }
 
   virtual void visitNode( Node const & );
   virtual void visitTerminal( Terminal const & );
@@ -68,6 +68,7 @@ public:
 
 
   virtual void makeAssertion( Node const & );
+  virtual void makeSoftAssertion( Node const & );
   virtual void makeAssumption( Node const & );
   virtual void addPreHook( boost::function0<bool> );
   virtual bool solve();
@@ -92,6 +93,7 @@ private: // data
   std::stack<stack_entry> exprStack_;
   std::map<Node const*, qf_bv::bitvector> terminals_;
   std::map<Node const*, result_type const *> lazy_;
+  result_type soft_;
 
   std::vector<result_type> assumptions_;
   std::vector<boost::function0<bool> > pre_hooks_;
@@ -618,6 +620,17 @@ void metaSMTVisitorImpl<SolverType>::makeAssertion(Node const &expr)
 }
 
 template<typename SolverType>
+void metaSMTVisitorImpl<SolverType>::makeSoftAssertion( Node const &expr )
+{
+  expr.visit(*this);
+
+  stack_entry entry;
+  pop(entry);
+
+  soft_ = evaluate(solver_, preds::And(soft_, entry.first));
+}
+
+template<typename SolverType>
 void metaSMTVisitorImpl<SolverType>::makeAssumption(Node const &expr)
 {
   expr.visit(*this);
@@ -656,12 +669,18 @@ bool metaSMTVisitorImpl<SolverType>::preSolve()
 template<typename SolverType>
 bool metaSMTVisitorImpl<SolverType>::solve()
 {
+  // first run is for check if soft constrains are satisfiable
+  // second run will be executed if softconstrains aren't satisfiable
+  for ( unsigned run = 0; run < 2; ++run ) {
+
     if ( !preSolve() ) break;
+    if ( run == 0 ) metaSMT::assumption(solver_, soft_);
 
     if ( metaSMT::solve(solver_) ) {
       postSolveClear();
       return true;
     }
+  }
   postSolveClear();
   return false;
 }

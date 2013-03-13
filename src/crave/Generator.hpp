@@ -126,7 +126,11 @@ public:
 
   template<typename Expr>
   Generator & soft(Expr e) {
-    // FIXME: ctx.soft_assertion( FixWidth()(e) );
+
+    NodePtr n(boost::proto::eval(FixWidth()(e), ctx_));
+    soft_constraints_.push_back(n);
+    metaSMT_visitor_->makeSoftAssertion(*n);
+
     return *this;
   }
 
@@ -225,13 +229,17 @@ public:
   void add_to_disjunction(Expr expr) { /* FIXME: new backend for enums */
   }
 
-  std::ostream& print_dot_graph(std::ostream& os) {
+  std::ostream& print_dot_graph(std::ostream& os, bool const with_softs = false) {
 
     os << "digraph AST {" << std::endl;
     ToDotVisitor visitor(os);
 
     BOOST_FOREACH ( boost::intrusive_ptr<Node> n, constraints_ )
       n->visit(visitor);
+    if (with_softs) {
+      BOOST_FOREACH ( boost::intrusive_ptr<Node> n, soft_constraints_ )
+        n->visit(visitor);
+    }
     os << "}" << std::endl;
 
     return os;
@@ -239,6 +247,7 @@ public:
 
 private:
   std::vector<boost::intrusive_ptr<Node> > constraints_;
+  std::vector<boost::intrusive_ptr<Node> > soft_constraints_;
   std::map<std::string, boost::intrusive_ptr<Node> > named_constraints_;
   std::set<std::string> disabled_named_constaints_;
 

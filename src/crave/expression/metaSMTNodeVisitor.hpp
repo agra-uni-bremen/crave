@@ -12,6 +12,7 @@ namespace crave {
 class metaSMTVisitor : public NodeVisitor {
 public:
   virtual void makeAssertion( Node const & ) = 0;
+  virtual void makeSoftAssertion( Node const & ) = 0;
   virtual void makeAssumption( Node const & ) = 0;
   virtual void addPreHook( boost::function0<bool> ) = 0;
   virtual bool solve() = 0;
