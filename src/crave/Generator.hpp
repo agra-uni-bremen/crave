@@ -182,7 +182,7 @@ public:
   bool next() {
     // pre_solve()
     BOOST_FOREACH(boost::function0<bool> f, pre_hooks_) {
-      if (!f()) return false;
+      metaSMT_visitor_->addPreHook(f);
     }
 
     for (std::map<std::string, NodePtr>::const_iterator
@@ -249,9 +249,6 @@ private:
 
   Context ctx_;
   boost::scoped_ptr<metaSMTVisitor> metaSMT_visitor_;
-//      std::map<int, Context*> vecCtx;
-//      std::map<std::string, Context*> ctxOfCstr;
-//      std::set<int> uniqueVecSet;
 };
 
 template<typename Expr>

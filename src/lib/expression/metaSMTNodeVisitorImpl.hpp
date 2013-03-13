@@ -5,6 +5,7 @@
 #include "../../crave/AssignResult.hpp"
 
 #include <boost/foreach.hpp>
+#include <boost/function.hpp>
 #include <metaSMT/frontend/QF_BV.hpp>
 #include <metaSMT/DirectSolver_Context.hpp>
 #include <metaSMT/Priority_Context.hpp>
@@ -22,7 +23,9 @@ namespace crave {
 template<typename SolverType>
 class metaSMTVisitorImpl : public metaSMTVisitor {
 public:
-  metaSMTVisitorImpl() : metaSMTVisitor(), solver_(), exprStack_(), terminals_(), lazy_() { }
+  metaSMTVisitorImpl()
+  : metaSMTVisitor(), solver_(), exprStack_(), terminals_(), lazy_(),
+    assumptions_(), pre_hooks_() { }
 
   virtual void visitNode( Node const & );
   virtual void visitTerminal( Terminal const & );
@@ -66,6 +69,7 @@ public:
 
   virtual void makeAssertion( Node const & );
   virtual void makeAssumption( Node const & );
+  virtual void addPreHook( boost::function0<bool> );
   virtual bool solve();
   virtual bool read( Node const& var, AssignResult& );
 
@@ -80,11 +84,17 @@ private: // methods
   void evalBinExpr( BinaryExpression const& expr,  stack_entry & fst, stack_entry & snd );
   void evalTernExpr( TernaryExpression const& expr,  stack_entry & fst, stack_entry & snd, stack_entry & trd );
 
+  bool preSolve();
+  void postSolveClear();
+
 private: // data
   SolverType solver_;
   std::stack<stack_entry> exprStack_;
   std::map<Node const*, qf_bv::bitvector> terminals_;
   std::map<Node const*, result_type const *> lazy_;
+
+  std::vector<result_type> assumptions_;
+  std::vector<boost::function0<bool> > pre_hooks_;
 };
 
 template<typename SolverType>
@@ -578,8 +588,6 @@ void metaSMTVisitorImpl<SolverType>::visitAssignOpr( AssignOpr const &o )
   exprStack_.push( std::make_pair( evaluate( solver_, preds::True ), false ) );
 }
 
-// TODO: create RandomizeExpression -> lazy_.erase(&o); evaluate(solver_, preds::True);
-
 template<typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitVectorAccess( VectorAccess const &o )
 {
@@ -617,19 +625,52 @@ void metaSMTVisitorImpl<SolverType>::makeAssumption(Node const &expr)
   stack_entry entry;
   pop(entry);
 
-  metaSMT::assumption(solver_, preds::equal(entry.first, qf_bv::bit1));
+  assumptions_.push_back(evaluate(solver_, preds::equal(entry.first, qf_bv::bit1)));
+}
+
+template<typename SolverType>
+void metaSMTVisitorImpl<SolverType>::addPreHook( boost::function0<bool> f)
+{
+  pre_hooks_.push_back(f);
+}
+
+template<typename SolverType>
+bool metaSMTVisitorImpl<SolverType>::preSolve()
+{
+  for (typename std::vector<boost::function0<bool> >::const_iterator ite =
+       pre_hooks_.begin(); ite != pre_hooks_.end(); ++ite) {
+    if (!(*ite)()) return false;
+  }
+
+  for (typename std::map<Node const*, result_type const*>::const_iterator ite =
+       lazy_.begin(); ite != lazy_.end(); ++ite) {
+    metaSMT::assumption(solver_, *ite->second);
+  }
+  for (typename std::vector<result_type>::const_iterator ite = assumptions_.begin();
+       ite != assumptions_.end(); ++ite) {
+    metaSMT::assumption(solver_, *ite);
+  }
+  return true;
 }
 
 template<typename SolverType>
 bool metaSMTVisitorImpl<SolverType>::solve()
 {
-  // pre_solve()
-  for (typename std::map<Node const*, result_type const*>::const_iterator ite =
-      lazy_.begin(); ite != lazy_.end(); ++ite) {
-    metaSMT::assumption(solver_, *ite->second);
-  }
+    if ( !preSolve() ) break;
 
-  return metaSMT::solve(solver_);
+    if ( metaSMT::solve(solver_) ) {
+      postSolveClear();
+      return true;
+    }
+  postSolveClear();
+  return false;
+}
+
+template<typename SolverType>
+void metaSMTVisitorImpl<SolverType>::postSolveClear()
+{
+  assumptions_.clear();
+  pre_hooks_.clear();
 }
 
 template<typename SolverType>
