@@ -163,25 +163,6 @@ namespace crave {
     randv(rand_obj* parent) : randv_prim_base<T>(parent) { }
     randv(const randv& other) : randv_prim_base<T>(other) { }
     bool next() { return true; }
-    //bool next() { value = nextValue(); return true; }
-    //randv<T>& operator=(const randv<T>& i) { value = i.value; return *this; }
-    //randv<T>& operator=(T i) { value = i; return *this; }
-
-  public:
-    //randv<T>& operator++()     { ++value;  return *this; }
-    //T         operator++(int)  { T tmp = value; ++value; return tmp; }
-    //randv<T>& operator--()     { --value;  return *this; }
-    //T         operator--(int)  { T tmp = value; --value; return tmp; }
-    //randv<T>& operator+=(T i)  { value += i;  return *this; }
-    //randv<T>& operator-=(T i)  { value -= i;  return *this; }
-    //randv<T>& operator*=(T i)  { value *= i;  return *this; }
-    //randv<T>& operator/=(T i)  { value /= i;  return *this; }
-    //randv<T>& operator%=(T i)  { value %= i;  return *this; }
-    //randv<T>& operator&=(T i)  { value &= i;  return *this; }
-    //randv<T>& operator|=(T i)  { value |= i;  return *this; }
-    //randv<T>& operator^=(T i)  { value ^= i;  return *this; }
-    //randv<T>& operator<<=(T i) { value <<= i;  return *this; }
-    //randv<T>& operator>>=(T i) { value >>= i;  return *this; }
   };
 
 #define _COMMON_INTERFACE(Typename) \

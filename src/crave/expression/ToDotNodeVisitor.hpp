@@ -28,7 +28,6 @@ public:
   void visitComplementOpr( ComplementOpr const & );
   void visitInside( Inside const & );
   void visitExtendExpr( ExtendExpression const & );
-  void visitRandomizeExpr( RandomizeExpr const & );
   void visitAndOpr( AndOpr const & );
   void visitOrOpr( OrOpr const & );
   void visitLogicalAndOpr( LogicalAndOpr const & );
@@ -47,7 +46,6 @@ public:
   void visitModuloOpr( ModuloOpr const & );
   void visitShiftLeftOpr( ShiftLeftOpr const & );
   void visitShiftRightOpr( ShiftRightOpr const & );
-  void visitAssignOpr( AssignOpr const & );
   void visitVectorAccess( VectorAccess const & );
   void visitIfThenElse( IfThenElse const & );
 

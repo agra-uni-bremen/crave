@@ -188,20 +188,6 @@ public:
     return new ExtendExpression(proto::eval(e, *this), proto::value(by_width).value);
   }
 
-  template<typename Expr1, typename Expr2>
-  result_type operator()(proto::tag::assign, Expr1 const & e1, Expr2 const & e2) {
-
-    result_type expr1, expr2;
-    expr1 = proto::eval(e1, *this);
-    expr2 = proto::eval(e2, *this);
-
-    return new AssignOpr(expr1, expr2);
-  }
-
-  result_type operator()(proto::tag::terminal t, randomize_tag const & tag) {
-    return new RandomizeExpr(variables_.at(tag.id));
-  }
-
   template<typename Integer>
   result_type operator()(proto::tag::terminal t, read_ref_tag<Integer> const & ref) {
 

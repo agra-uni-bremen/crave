@@ -24,7 +24,7 @@ template<typename SolverType>
 class metaSMTVisitorImpl : public metaSMTVisitor {
 public:
   metaSMTVisitorImpl()
-  : metaSMTVisitor(), solver_(), exprStack_(), terminals_(), lazy_(),
+  : metaSMTVisitor(), solver_(), exprStack_(), terminals_(),
     soft_(evaluate(solver_, preds::True)), assumptions_(), pre_hooks_() { }
 
   virtual void visitNode( Node const & );
@@ -43,7 +43,6 @@ public:
   virtual void visitComplementOpr( ComplementOpr const & );
   virtual void visitInside( Inside const & );
   virtual void visitExtendExpr( ExtendExpression const & );
-  virtual void visitRandomizeExpr( RandomizeExpr const & );
   virtual void visitAndOpr( AndOpr const & );
   virtual void visitOrOpr( OrOpr const & );
   virtual void visitLogicalAndOpr( LogicalAndOpr const & );
@@ -62,7 +61,6 @@ public:
   virtual void visitModuloOpr( ModuloOpr const & );
   virtual void visitShiftLeftOpr( ShiftLeftOpr const & );
   virtual void visitShiftRightOpr( ShiftRightOpr const & );
-  virtual void visitAssignOpr( AssignOpr const & );
   virtual void visitVectorAccess( VectorAccess const & );
   virtual void visitIfThenElse( IfThenElse const & );
 
@@ -92,7 +90,6 @@ private: // data
   SolverType solver_;
   std::stack<stack_entry> exprStack_;
   std::map<Node const*, qf_bv::bitvector> terminals_;
-  std::map<Node const*, result_type const *> lazy_;
   result_type soft_;
 
   std::vector<result_type> assumptions_;
@@ -286,13 +283,6 @@ void metaSMTVisitorImpl<SolverType>::visitExtendExpr( ExtendExpression const &e 
     result = evaluate(solver_, qf_bv::zero_extend(e.value(), entry.first));
 
   exprStack_.push( std::make_pair( result, entry.second ) );
-}
-
-template<typename SolverType>
-void metaSMTVisitorImpl<SolverType>::visitRandomizeExpr( RandomizeExpr const &e ) {
-
-  lazy_.erase(e.child().get());
-  exprStack_.push( std::make_pair( evaluate(solver_, preds::True), false ) );
 }
 
 template<typename SolverType>
@@ -580,17 +570,6 @@ void metaSMTVisitorImpl<SolverType>::visitShiftRightOpr( ShiftRightOpr const &o 
 }
 
 template<typename SolverType>
-void metaSMTVisitorImpl<SolverType>::visitAssignOpr( AssignOpr const &o )
-{
-  stack_entry fst, snd;
-  evalBinExpr(o, fst, snd);
-
-  result_type result = evaluate( solver_, preds::equal(snd.first, fst.first) );//qf_bv::bvcomp(fst.first, snd.first) );
-  lazy_.insert(std::make_pair(&o, &result));
-  exprStack_.push( std::make_pair( evaluate( solver_, preds::True ), false ) );
-}
-
-template<typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitVectorAccess( VectorAccess const &o )
 {
 
@@ -655,10 +634,6 @@ bool metaSMTVisitorImpl<SolverType>::preSolve()
     if (!(*ite)()) return false;
   }
 
-  for (typename std::map<Node const*, result_type const*>::const_iterator ite =
-       lazy_.begin(); ite != lazy_.end(); ++ite) {
-    metaSMT::assumption(solver_, *ite->second);
-  }
   for (typename std::vector<result_type>::const_iterator ite = assumptions_.begin();
        ite != assumptions_.end(); ++ite) {
     metaSMT::assumption(solver_, *ite);

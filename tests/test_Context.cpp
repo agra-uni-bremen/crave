@@ -208,34 +208,6 @@ BOOST_AUTO_TEST_CASE ( shiftleft )
   }
 }
 
-// temporaly fix a variable to a certain value using the assign operator
-BOOST_AUTO_TEST_CASE ( fix_variable )
-{
-  Variable<unsigned> a;
-  Variable<unsigned> b;
-
-  Generator gen (a < b);
-  gen ( b = 7 ) ;
-
-  unsigned c = 0;
-  while( gen.next() ) {
-    ++c;
-    unsigned av = gen[a];
-    unsigned bv = gen[b];
-    BOOST_REQUIRE_LT( av, 7 );
-    BOOST_REQUIRE_EQUAL( bv, 7);
-    gen( a != gen[a] );
-    if (c > 10) break;
-  }
-  // found 7 solutions
-  BOOST_REQUIRE_EQUAL( c, 7);
-
-  //display_expr( b =  randomize );
-  gen( b = randomize );
-
-  gen();
-}
-
 BOOST_AUTO_TEST_CASE ( by_reference )
 {
   unsigned b=0;
