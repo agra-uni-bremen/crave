@@ -221,14 +221,6 @@ public:
     return result.value();
   }
 
-  void new_disjunction() { /* FIXME: new backend for enums */
-  }
-  void end_disjunction() { /* FIXME: new backend for enums */
-  }
-  template<typename Expr>
-  void add_to_disjunction(Expr expr) { /* FIXME: new backend for enums */
-  }
-
   std::ostream& print_dot_graph(std::ostream& os, bool const with_softs = false) {
 
     os << "digraph AST {" << std::endl;

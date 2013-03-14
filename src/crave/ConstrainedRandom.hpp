@@ -12,6 +12,7 @@
 
 #include <limits>
 #include <vector>
+#include <set>
 #include <cstdarg>
 
 namespace crave {
@@ -278,10 +279,10 @@ namespace crave { \
     void init_enum_values(rand_obj* parent, int c, ...) { \
       va_list values; \
       va_start(values, c); \
-      parent->constraint.new_disjunction(); \
+      std::set<int> s; \
       for (int i = 0; i < c; ++i) \
-        parent->constraint.add_to_disjunction(var == va_arg(values, int)); \
-      parent->constraint.end_disjunction(); \
+        s.insert(va_arg(values, int)); \
+      parent->constraint(inside(var,s)); \
       va_end(values); \
     } \
   }; \
