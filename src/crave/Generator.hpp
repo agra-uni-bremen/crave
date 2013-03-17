@@ -45,14 +45,14 @@ public:
   : constraints_(), named_constraints_(), disabled_named_constaints_(),
     variables_(), read_references_(), write_references_(), pre_hooks_(),
     ctx_(variables_, read_references_, write_references_),
-    metaSMT_visitor_(FactoryMetaSMT::newVisitorSWORD()) { }
+    metaSMT_visitor_(FactoryMetaSMT::newVisitorSWORD()), okay_(false) { }
 
   template<typename Expr>
   Generator(Expr expr)
   : constraints_(), named_constraints_(), disabled_named_constaints_(),
     variables_(), read_references_(), write_references_(), pre_hooks_(),
     ctx_(variables_, read_references_, write_references_),
-    metaSMT_visitor_(FactoryMetaSMT::newVisitorSWORD()) {
+    metaSMT_visitor_(FactoryMetaSMT::newVisitorSWORD()), okay_(false) {
       (*this)(expr);
     }
 
@@ -201,8 +201,9 @@ public:
     }
 
     bool result = metaSMT_visitor_->solve();
+    okay_ |= result;
     // post_solve(result)
-    if (result) {
+    if (okay_) {
       BOOST_FOREACH(WriteRefPair pair, write_references_) {
         metaSMT_visitor_->read(*variables_[pair.first], *pair.second);
       }
@@ -250,6 +251,8 @@ private:
 
   Context ctx_;
   boost::scoped_ptr<metaSMTVisitor> metaSMT_visitor_;
+
+  bool okay_;
 };
 
 template<typename Expr>
