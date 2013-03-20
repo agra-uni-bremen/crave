@@ -300,7 +300,7 @@ struct Item2 : public rand_obj {
   rand_vec<int> data;
 };
 
-BOOST_AUTO_TEST_CASE ( t6 )
+BOOST_AUTO_TEST_CASE ( item_with_vector )
 {
   Item2 it;
   for (int i = 0; i < 20; i++) {
