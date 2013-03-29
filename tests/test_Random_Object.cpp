@@ -19,7 +19,7 @@ enum color_enum {
   GREEN,
   BLUE
 };
-CRAVE_ENUM(color_enum, RED, GREEN, BLUE);
+CRAVE_ENUM(color_enum, (RED)(GREEN)(BLUE));
 
 enum football_enum {
   GK,  // Goalkeeper
@@ -40,7 +40,7 @@ enum football_enum {
   RW,  // Right Winger
   CF   // Centre Striker
 };
-CRAVE_ENUM(football_enum, GK, SW, LWB, LB, LCB, RCB, RB, RWB, DM, LM, CM, RM, AM, LW, SS, RW, CF);
+CRAVE_ENUM(football_enum, (GK)(SW)(LWB)(LB)(LCB)(RCB)(RB)(RWB)(DM)(LM)(CM)(RM)(AM)(LW)(SS)(RW)(CF));
 
 BOOST_FIXTURE_TEST_SUITE(Random_Object_t, Context_Fixture )
 

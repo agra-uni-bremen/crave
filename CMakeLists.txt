@@ -33,7 +33,7 @@ set(Boost_ADDITIONAL_VERSIONS "1.50.0")
 find_package ( Boost REQUIRED COMPONENTS system thread)
 
 find_package ( metaSMT REQUIRED )
-add_definitions( "-DBOOST_PP_VARIADICS ${metaSMT_CXXFLAGS}" )
+add_definitions( "${metaSMT_CXXFLAGS}" )
 
 find_package ( SystemC )
 
