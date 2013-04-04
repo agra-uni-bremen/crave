@@ -43,7 +43,6 @@ namespace crave {
       return proto::make_expr< proto::tag::assign>
         ( *this, e);
       }
-
   };
 
 
@@ -76,9 +75,6 @@ namespace crave {
   struct read_ref_tag : public var_tag<value_type> {
   read_ref_tag(int id_,  value_type const & ref_) : var_tag<value_type>(id_), ref(ref_) { }; value_type const & ref; };
 
-  struct randomize_tag { unsigned id; };
-  const randomize_tag randomize = { 0 };
-
   struct operator_inside {};
   struct operator_dist {};
 
@@ -103,12 +99,6 @@ namespace crave {
   template <typename OUT, typename value_type>
   OUT & operator<< (OUT & out, vector_tag<value_type> const & tag) {
     out << "vector<" << tag.id << ">" ;
-    return out;
-  }
-
-  template <typename OUT>
-  OUT & operator<< (OUT & out, randomize_tag const & tag ) {
-    out << "randomize_tag <" << tag.id << ">"  ;
     return out;
   }
 
@@ -151,16 +141,6 @@ namespace crave {
       return proto::make_expr< proto::tag::assign, Constraint_Domain>
         ( boost::cref(*this), boost::cref(e));
       }
-
-    proto::result_of::make_expr<
-        proto::tag::terminal
-      , Constraint_Domain
-      , randomize_tag
-      > ::type
-    operator= ( randomize_tag const & e ) const {
-      const randomize_tag tag = { id() };
-      return proto::make_expr< proto::tag::terminal, Constraint_Domain> ( tag );
-    }
   };
 
   template<typename value_type_>
@@ -200,16 +180,6 @@ namespace crave {
       return proto::make_expr< proto::tag::assign, Constraint_Domain>
         ( boost::cref(*this), boost::cref(e));
       }
-
-    proto::result_of::make_expr<
-        proto::tag::terminal
-      , Constraint_Domain
-      , randomize_tag
-      > ::type
-    operator= ( randomize_tag const & e ) const {
-      const randomize_tag tag = { id() };
-      return proto::make_expr< proto::tag::terminal, Constraint_Domain > ( tag );
-    }
   };
 
 

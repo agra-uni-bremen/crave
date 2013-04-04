@@ -263,4 +263,4 @@ namespace crave { \
       parent->constraint(inside(var, s)); \
     } \
   }; \
-} \
+}
