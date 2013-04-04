@@ -35,9 +35,10 @@ private:
   typedef std::pair<int, boost::shared_ptr<crave::AssignResult> > WriteRefPair;
 
 public:
-  Context(std::map<int, result_type>& vars, std::vector<ReadRefPair>& read_refs,
-          std::vector<WriteRefPair>& write_refs)
-          : variables_(vars), read_references_(read_refs), write_references_(write_refs) { }
+  Context(std::map<int, result_type>& vars, std::map<int, result_type>& vec_vars,
+          std::vector<ReadRefPair>& read_refs, std::vector<WriteRefPair>& write_refs)
+          : variables_(vars), vector_variables_(vec_vars),
+            read_references_(read_refs), write_references_(write_refs) { }
 
   template<typename value_type>
   result_type operator()(proto::tag::terminal, var_tag<value_type> const & tag) {
@@ -249,11 +250,27 @@ public:
     BOOST_STATIC_ASSERT(( boost::is_same<
         typename proto::tag_of<Expr1>::type,
         proto::tag::terminal >::value ));
-    // FIXME: Generate IR //
+
+    int vec_id = proto::value(e1).id;
+
+    std::map<int, result_type>::const_iterator ite = vector_variables_.find(vec_id);
+    if ( ite != vector_variables_.end() ) {
+        return ite->second;
+    } else {
+
+      typedef typename proto::result_of::value<Expr1>::type value_type;
+      unsigned width = bitsize_traits<value_type>::value;
+      bool sign = boost::is_signed<value_type>::value;
+
+      result_type vec = new VectorAccess(new VectorExpr(vec_id, width, sign), proto::eval(e2, *this));
+      vector_variables_.insert( std::make_pair(vec_id, vec) );
+      return vec;
+    }
   }
 
 private:
   std::map<int, result_type>& variables_;
+  std::map<int, result_type>& vector_variables_;
   std::vector<ReadRefPair>& read_references_;
   std::vector<WriteRefPair>& write_references_;
 };

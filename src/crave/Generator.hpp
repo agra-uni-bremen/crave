@@ -43,15 +43,15 @@ private:
 public:
   Generator()
   : constraints_(), named_constraints_(), disabled_named_constaints_(),
-    variables_(), read_references_(), write_references_(), pre_hooks_(),
-    ctx_(variables_, read_references_, write_references_),
+    variables_(), vector_variables_(), read_references_(), write_references_(),
+    pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
     metaSMT_visitor_(FactoryMetaSMT::newVisitorSWORD()), okay_(false) { }
 
   template<typename Expr>
   Generator(Expr expr)
   : constraints_(), named_constraints_(), disabled_named_constaints_(),
-    variables_(), read_references_(), write_references_(), pre_hooks_(),
-    ctx_(variables_, read_references_, write_references_),
+    variables_(), vector_variables_(), read_references_(), write_references_(),
+    pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
     metaSMT_visitor_(FactoryMetaSMT::newVisitorSWORD()), okay_(false) {
       (*this)(expr);
     }
@@ -245,6 +245,7 @@ private:
   std::set<std::string> disabled_named_constaints_;
 
   std::map<int, boost::intrusive_ptr<Node> > variables_;
+  std::map<int, boost::intrusive_ptr<Node> > vector_variables_;
   std::vector<ReadRefPair> read_references_;
   std::vector<WriteRefPair> write_references_;
   std::vector<boost::function0<bool> > pre_hooks_;

@@ -106,7 +106,7 @@ void ToDotVisitor::visitVectorExpr(VectorExpr const &ve)
   if ( putNode(&ve) )
   {
     visitNode(ve);
-    out_ << " [label=\"variable: " << ve.id();
+    out_ << " [label=\"vector variable: " << ve.id();
     visitTerminal(ve);
     out_ << "\"]" << std::endl;
   }
