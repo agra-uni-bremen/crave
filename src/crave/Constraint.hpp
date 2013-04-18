@@ -67,6 +67,8 @@ namespace crave {
   template<typename value_type>
   struct vector_tag { vector_tag(int id_): id(id_) { }; int id; };
 
+  struct placeholder_tag { placeholder_tag(int id_): id(id_) { }; int id; };
+
   template<typename value_type>
   struct write_ref_tag : public var_tag<value_type> {
   write_ref_tag(int id_,  value_type & ref_) : var_tag<value_type>(id_), ref(ref_) { }; value_type & ref; };
@@ -99,6 +101,12 @@ namespace crave {
   template <typename OUT, typename value_type>
   OUT & operator<< (OUT & out, vector_tag<value_type> const & tag) {
     out << "vector<" << tag.id << ">" ;
+    return out;
+  }
+
+  template <typename OUT>
+  OUT & operator<< (OUT & out, placeholder_tag const & tag) {
+    out << "placeholder<" << tag.id << ">" ;
     return out;
   }
 
@@ -157,6 +165,16 @@ namespace crave {
 
     Variable<unsigned int> _size;
     const Variable<unsigned int>& size() const { return _size; }
+  };
+
+  struct placeholder : public Constraint< boost::proto::terminal<placeholder_tag>::type >
+  {
+    typedef Constraint< proto::terminal< placeholder_tag >::type > base_type;
+    placeholder()
+      : base_type( proto::make_expr<proto::tag::terminal>(placeholder_tag(new_var_id())) )
+    {}
+
+    int id() const { return boost::proto::value(*this).id; }
   };
 
   template<typename value_type_>

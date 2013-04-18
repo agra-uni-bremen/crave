@@ -182,16 +182,18 @@ BOOST_AUTO_TEST_CASE( Pythagoras )
 
 class ItemPacketBaseConstraint : public rand_obj {
 public:
-  ItemPacketBaseConstraint() : rand_obj(), msg_length(this), src_addr(this), dest_addr(this), msg(this) {
+  ItemPacketBaseConstraint() : i_(), rand_obj(), msg_length(this), src_addr(this), dest_addr(this), msg(this) {
   constraint(msg_length() < 80);
   constraint(msg_length() > 2);
   constraint(src_addr() != dest_addr());
   constraint(msg().size() == msg_length());
 
 
-  constraint.foreach(msg, _i, msg()[_i] >= ' ' && msg()[_i] <= 'z');
+  constraint.foreach(msg, i_, msg()[i_] >= ' ' && msg()[i_] <= 'z');
 
   }
+
+  placeholder i_;
   randv<uint> src_addr;
   randv<uint> dest_addr;
   randv<unsigned short> msg_length;

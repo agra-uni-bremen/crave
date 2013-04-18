@@ -58,6 +58,20 @@ public:
     }
   }
 
+  result_type operator()(proto::tag::terminal, placeholder_tag const & tag) {
+
+    std::map<int, result_type>::iterator ite(variables_.lower_bound(tag.id));
+    if (ite == variables_.end() || tag.id < ite->first) {
+
+      result_type ph = new Placeholder(tag.id);
+      variables_.insert(ite, std::make_pair(tag.id, ph));
+      return ph;
+
+    } else {
+      return ite->second;
+    }
+  }
+
   template<typename value_type>
   result_type operator()(proto::tag::terminal t, write_ref_tag<value_type> const & ref) {
 

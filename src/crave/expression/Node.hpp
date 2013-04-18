@@ -301,6 +301,8 @@ public:
 
 class VectorAccess : public BinaryExpression {
 public:
+  VectorAccess( NodePtr lhs, NodePtr rhs ) : BinaryExpression(lhs, rhs) {}
+
   void visit( NodeVisitor& v ) const { v.visitVectorAccess(*this); }
 };
 

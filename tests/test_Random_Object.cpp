@@ -288,14 +288,15 @@ BOOST_AUTO_TEST_CASE ( binary_search_test )
 }
 
 struct Item2 : public rand_obj {
-  Item2() : address(this), data(this) {
+  Item2() : i(), address(this), data(this) {
     constraint(address() % 4 == 0);
     constraint(address() <= 1000u);
     constraint(data().size() == 4);
-    constraint.foreach(data, _i, -50 <= data()[_i] && data()[_i] <= 50);
-    constraint.foreach(data, _i, data()[_i - 1] <= data()[_i]);
+    constraint.foreach(data, i, -50 <= data()[i] && data()[i] <= 50);
+    constraint.foreach(data, i, data()[i - 1] <= data()[i]);
   }
 
+  placeholder i;
   randv<unsigned> address;
   rand_vec<int> data;
 };

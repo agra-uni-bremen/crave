@@ -15,6 +15,7 @@ namespace crave {
   template<typename T> struct write_ref_tag;
   template<typename T> struct read_ref_tag;
   template<typename T> struct vector_tag;
+                       struct placeholder_tag;
 
   template <typename T, typename Enable = void>
   struct bitsize_traits : boost::mpl::int_<0> {
@@ -32,6 +33,8 @@ namespace crave {
 
   template<>
   struct bitsize_traits<bool> : boost::mpl::int_<1> {};
+  template<>
+  struct bitsize_traits<placeholder_tag> : public bitsize_traits<unsigned> {};
 
   template<typename T>
   struct bitsize_traits< randv<T> > : public bitsize_traits<T> {};

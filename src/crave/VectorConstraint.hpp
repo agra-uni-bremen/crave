@@ -55,9 +55,6 @@ class TypeInfo<typename> \
 
 #undef  _DEF_TYPE
 
-  typedef Variable<unsigned int> IndexVariable;
-  extern IndexVariable _i;
-
   class __rand_vec_base {
     public:
       virtual CppType element_type() { return UNSUPPORTED; }

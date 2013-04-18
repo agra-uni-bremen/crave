@@ -140,24 +140,22 @@ public:
   // FIXME: change IndexVariable to Placeholder
   template<typename value_type, typename Expr>
   Generator & foreach(const __rand_vec <value_type> & v,
-      const IndexVariable & i, Expr e) {
-    assert(i.id() == _i.id());
-    // FIXME
+      const placeholder & p, Expr e) {
+
     return *this;
   }
 
   template<typename value_type, typename Expr>
   Generator & soft_foreach(const __rand_vec <value_type> & v,
-      const IndexVariable & i, Expr e) {
-    assert(i.id() == _i.id());
-    // FIXME
+      const placeholder & i, Expr e) {
+
     return *this;
   }
 
   template<typename value_type, typename Expr>
   Generator & foreach(std::string constraint_name,
-      const __rand_vec <value_type> & v, const IndexVariable & i, Expr e) {
-    // FIXME
+      const __rand_vec <value_type> & v, const placeholder & i, Expr e) {
+
     return *this;
   }
 
