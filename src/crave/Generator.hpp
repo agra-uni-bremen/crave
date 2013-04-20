@@ -2,6 +2,7 @@
 
 #include "AssignResult.hpp"
 #include "Context.hpp"
+#include "Statement.hpp"
 #include "expression/ToDotNodeVisitor.hpp"
 #include "expression/FactoryMetaSMT.hpp"
 #include "expression/Node.hpp"
@@ -42,14 +43,14 @@ private:
 
 public:
   Generator()
-  : constraints_(), named_constraints_(), disabled_named_constaints_(),
+  : constraints_(), named_constraints_(), disabled_named_constaints_(), foreach_statements_(),
     variables_(), vector_variables_(), read_references_(), write_references_(),
     pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
     metaSMT_visitor_(FactoryMetaSMT::newVisitorSWORD()), okay_(false) { }
 
   template<typename Expr>
   Generator(Expr expr)
-  : constraints_(), named_constraints_(), disabled_named_constaints_(),
+  : constraints_(), named_constraints_(), disabled_named_constaints_(), foreach_statements_(),
     variables_(), vector_variables_(), read_references_(), write_references_(),
     pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
     metaSMT_visitor_(FactoryMetaSMT::newVisitorSWORD()), okay_(false) {
@@ -142,6 +143,14 @@ public:
   Generator & foreach(const __rand_vec <value_type> & v,
       const placeholder & p, Expr e) {
 
+    unsigned width = bitsize_traits<value_type>::value;
+    bool sign = boost::is_signed<value_type>::value;
+
+    VectorExpr vec_expr(v().id(), width, sign);
+    Placeholder ph(p.id());
+    NodePtr f_expr(boost::proto::eval(FixWidth()(e), ctx_));
+
+    foreach_statements_.push_back(ForeachStatement(vec_expr, ph, f_expr));
     return *this;
   }
 
@@ -241,6 +250,7 @@ private:
   std::vector<boost::intrusive_ptr<Node> > soft_constraints_;
   std::map<std::string, boost::intrusive_ptr<Node> > named_constraints_;
   std::set<std::string> disabled_named_constaints_;
+  std::vector<ForeachStatement> foreach_statements_;
 
   std::map<int, boost::intrusive_ptr<Node> > variables_;
   std::map<int, boost::intrusive_ptr<Node> > vector_variables_;
