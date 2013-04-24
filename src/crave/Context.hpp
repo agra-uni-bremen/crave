@@ -268,18 +268,20 @@ public:
     int vec_id = proto::value(e1).id;
 
     std::map<int, result_type>::const_iterator ite = vector_variables_.find(vec_id);
+    result_type vec;
     if ( ite != vector_variables_.end() ) {
-        return ite->second;
+        vec = ite->second;
     } else {
 
       typedef typename proto::result_of::value<Expr1>::type value_type;
       unsigned width = bitsize_traits<value_type>::value;
       bool sign = boost::is_signed<value_type>::value;
 
-      result_type vec = new VectorAccess(new VectorExpr(vec_id, width, sign), proto::eval(e2, *this));
+      vec = new VectorExpr(vec_id, width, sign);
       vector_variables_.insert( std::make_pair(vec_id, vec) );
-      return vec;
     }
+
+    return new VectorAccess(vec, proto::eval(e2, *this));
   }
 
 private:
