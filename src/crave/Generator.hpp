@@ -242,6 +242,8 @@ public:
       BOOST_FOREACH ( boost::intrusive_ptr<Node> n, soft_constraints_ )
         n->visit(visitor);
     }
+    BOOST_FOREACH ( ForeachStatement fs, foreach_statements_ )
+      fs.get_expression()->visit(visitor);
     os << "}" << std::endl;
 
     return os;
