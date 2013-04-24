@@ -3,6 +3,7 @@
 #include "AssignResult.hpp"
 #include "Context.hpp"
 #include "Statement.hpp"
+#include "VectorConstraint.hpp"
 #include "expression/ToDotNodeVisitor.hpp"
 #include "expression/FactoryMetaSMT.hpp"
 #include "expression/Node.hpp"
@@ -44,14 +45,14 @@ private:
 public:
   Generator()
   : constraints_(), named_constraints_(), disabled_named_constaints_(), foreach_statements_(),
-    variables_(), vector_variables_(), read_references_(), write_references_(),
+    variables_(), vector_variables_(), vectors_(), read_references_(), write_references_(),
     pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
     metaSMT_visitor_(FactoryMetaSMT::newVisitorSWORD()), okay_(false) { }
 
   template<typename Expr>
   Generator(Expr expr)
   : constraints_(), named_constraints_(), disabled_named_constaints_(), foreach_statements_(),
-    variables_(), vector_variables_(), read_references_(), write_references_(),
+    variables_(), vector_variables_(), vectors_(), read_references_(), write_references_(),
     pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
     metaSMT_visitor_(FactoryMetaSMT::newVisitorSWORD()), okay_(false) {
       (*this)(expr);
@@ -151,6 +152,7 @@ public:
     NodePtr f_expr(boost::proto::eval(FixWidth()(e), ctx_));
 
     foreach_statements_.push_back(ForeachStatement(vec_expr, ph, f_expr));
+    vectors_[v().id()] = &v;
     return *this;
   }
 
@@ -254,6 +256,7 @@ private:
 
   std::map<int, boost::intrusive_ptr<Node> > variables_;
   std::map<int, boost::intrusive_ptr<Node> > vector_variables_;
+  std::map<int, __rand_vec_base const*> vectors_;
   std::vector<ReadRefPair> read_references_;
   std::vector<WriteRefPair> write_references_;
   std::vector<boost::function0<bool> > pre_hooks_;

@@ -60,14 +60,11 @@ class TypeInfo<typename> \
       virtual CppType element_type() { return UNSUPPORTED; }
   };
 
-  typedef std::map<int, __rand_vec_base*> RandVecMap;
-  extern RandVecMap __rand_vec_map;
-
   template<typename T1, typename T2>
   class __rand_vec_base1 : public __rand_vec_base
   {
     public:
-      __rand_vec_base1() { __rand_vec_map[sym_vec.id()] = this; }
+      __rand_vec_base1() { }
       const Vector<T1>& operator()() const { return sym_vec; }
 
       CppType element_type() { return TypeInfo<T1>(); }
