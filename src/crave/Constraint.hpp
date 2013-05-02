@@ -79,6 +79,8 @@ namespace crave {
 
   struct operator_inside {};
   struct operator_dist {};
+  struct operator_if_then {};
+  struct operator_if_then_else : operator_if_then {};
 
   template <typename OUT, typename value_type>
   OUT & operator<< (OUT & out, var_tag<value_type> const & tag) {
@@ -118,6 +120,16 @@ namespace crave {
   template <typename OUT>
   OUT & operator<< (OUT & out, operator_dist const & tag ) {
     return out << "dist"  ;
+  }
+
+  template <typename OUT>
+  OUT & operator<< (OUT & out, operator_if_then const & tag ) {
+   return out << "if_then"  ;
+  }
+
+  template <typename OUT>
+  OUT & operator<< (OUT & out, operator_if_then_else const & tag ) {
+   return out << static_cast<operator_if_then>(tag) << "_else"  ;
   }
 
   int new_var_id();
@@ -228,6 +240,8 @@ namespace crave {
 
   boost::proto::terminal<operator_inside>::type const inside = {};
   boost::proto::terminal<operator_dist>::type const dist = {};
+  boost::proto::terminal<operator_if_then>::type const if_then = {};
+  boost::proto::terminal<operator_if_then_else>::type const if_then_else = {};
 } // namespace crave
 
 //  vim: ft=cpp:ts=2:sw=2:expandtab

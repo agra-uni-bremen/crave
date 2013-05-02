@@ -148,6 +148,18 @@ public:
     return new XorOpr(proto::eval(e1, *this), proto::eval(e2, *this));
   }
 
+  template<typename Expr1, typename Expr2>
+  result_type operator()(proto::tag::function f, proto::terminal<operator_if_then>::type const& t,
+      Expr1 const & e1, Expr2 const & e2) {
+   return new IfThenElse(proto::eval(e1, *this), proto::eval(e2, *this), new Constant(1, 1, false));
+  }
+
+  template<typename Expr1, typename Expr2, typename Expr3>
+  result_type operator()(proto::tag::function, proto::terminal<operator_if_then_else>::type const,
+      Expr1 const & e1, Expr2 const & e2, Expr3 const & e3) {
+    return new IfThenElse(proto::eval(e1, *this), proto::eval(e2, *this), proto::eval(e3, *this));
+  }
+
   template<typename Expr>
   result_type operator()(proto::tag::negate, Expr const & e) {
     return new NegOpr(proto::eval(e, *this));
