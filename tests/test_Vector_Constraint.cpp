@@ -12,7 +12,6 @@ using boost::format;
 using namespace crave;
 
 #define ref(x) reference(x)
-#define IF_THEN(a, b) !(a) || (b)
 
 template<typename T>
 bool check_unique(rand_vec<T>& v) {
@@ -30,7 +29,7 @@ struct Item : public rand_obj {
   Item() : i_(), v(this) {
     constraint(30 <= v().size() && v().size() <= 50);
     constraint.foreach(v, i_, v()[i_] == v()[i_ - 1] + v()[i_ - 2]);
-    constraint.foreach(v, i_, IF_THEN(i_ <= 1, v()[i_] == i_ ) );
+    constraint.foreach(v, i_, if_then(i_ <= 1, v()[i_] == i_ ) );
   }
 
   placeholder i_;
@@ -40,6 +39,7 @@ struct Item : public rand_obj {
 BOOST_AUTO_TEST_CASE ( fibo_test )
 {
   Item it;
+  it.constraint.print_dot_graph(std::cout);
   it.next();
   BOOST_REQUIRE(30 <= it.v.size() && it.v.size() <= 50);
   BOOST_REQUIRE(it.v[0] == 0);
@@ -167,9 +167,9 @@ BOOST_AUTO_TEST_CASE ( constraint_management_test )
 struct Item5 : public rand_obj {
   Item5() : x(), v(this) {
     constraint(v().size() == 50);
-    constraint.foreach(v, x, IF_THEN(x < 25, v()[x] == x));
-    constraint.foreach(v, x, IF_THEN(x == 25, v()[x] == 0));
-    constraint.foreach(v, x, IF_THEN(x > 25, v()[x] + x == 200));
+    constraint.foreach(v, x, if_then(x < 25, v()[x] == x));
+    constraint.foreach(v, x, if_then(x == 25, v()[x] == 0));
+    constraint.foreach(v, x, if_then(x > 25, v()[x] + x == 200));
   }
 
   placeholder x;
@@ -179,6 +179,7 @@ struct Item5 : public rand_obj {
 BOOST_AUTO_TEST_CASE ( index_constraint_test )
 {
   Item5 it;
+  it.constraint.print_dot_graph(std::cout);
   it.next();
   BOOST_REQUIRE(it.v.size() == 50);
   for (uint i = 0; i < it.v.size(); i++) {
@@ -204,7 +205,7 @@ BOOST_AUTO_TEST_CASE ( soft_vec_constraint )
   gen1.foreach(v, i, v()[i] >= v()[i - 1]);
   gen1.foreach(v, i, v()[i] <= 1000);
   gen1.soft_foreach(v, i, v()[i] <= v()[i - 1]);
-  gen1.soft_foreach(v, i, IF_THEN(i == 0, v()[i] % 13 == 3));
+  gen1.soft_foreach(v, i, if_then(i == 0, v()[i] % 13 == 3));
   BOOST_REQUIRE(gen1.next());
   for (int j = 0; j < 10; j++) {
     BOOST_REQUIRE(v.size() == 4);

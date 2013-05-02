@@ -795,6 +795,27 @@ BOOST_AUTO_TEST_CASE (dist_of_boolean75)
   BOOST_REQUIRE_GT( counter, 425 );
 }
 
+BOOST_AUTO_TEST_CASE (if_then_else_t1) {
+  randv<bool> a(0);
+  randv<unsigned int> b(0);
+  Generator gen;
+
+  gen(dist(a(), 0.5));
+  gen(if_then_else(a(), b() > 0 && b() <= 50, b() > 50 && b() <= 100 ));
+
+  for (int i = 0; i < 1000; ++i) {
+    std::cout << "a[" << (a ? "true": "false") << "], b = " << b << std::endl;
+    BOOST_REQUIRE( gen.next() );
+    if(a) {
+      BOOST_REQUIRE_GT( b, 0 );
+      BOOST_REQUIRE_LE( b, 50 );
+    } else {
+      BOOST_REQUIRE_GT( b, 50 );
+      BOOST_REQUIRE_LE( b, 100 );
+    }
+  }
+}
+
 BOOST_AUTO_TEST_SUITE_END() // Context
 
 bitsize_traits<long> _instanciate1;
