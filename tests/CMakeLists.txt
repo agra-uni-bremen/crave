@@ -1,5 +1,5 @@
 if ( NOT TIMEOUT )
-set(TIMEOUT 15)
+  set(TIMEOUT 15)
 endif()
 include_directories (../src)
 

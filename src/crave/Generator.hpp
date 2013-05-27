@@ -47,14 +47,17 @@ public:
   : constraints_(), named_constraints_(), disabled_named_constaints_(), foreach_statements_(),
     variables_(), vector_variables_(), vectors_(), read_references_(), write_references_(),
     pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
-    metaSMT_visitor_(FactoryMetaSMT::newVisitorSWORD()), okay_(false) { }
+    solver_(NULL), okay_(false), solver_type_() {
+      set_backend("SWORD");
+  }
 
   template<typename Expr>
   Generator(Expr expr)
   : constraints_(), named_constraints_(), disabled_named_constaints_(), foreach_statements_(),
     variables_(), vector_variables_(), vectors_(), read_references_(), write_references_(),
     pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
-    metaSMT_visitor_(FactoryMetaSMT::newVisitorSWORD()), okay_(false) {
+    solver_(NULL), okay_(false), solver_type_() {
+      set_backend("SWORD");
       (*this)(expr);
     }
 
@@ -63,7 +66,7 @@ public:
 
     NodePtr n(boost::proto::eval(FixWidth()(expr), ctx_));
     constraints_.push_back(n);
-    metaSMT_visitor_->makeAssertion(*n);
+    solver_->makeAssertion(*n);
     return *this;
   }
 
@@ -82,6 +85,11 @@ public:
     named_constraints_.insert(ite, std::make_pair(constraint_name, nested_expr));
 
     return *this;
+  }
+
+  void set_backend(std::string const& type) {
+    solver_type_ = type;
+    solver_.reset(FactoryMetaSMT::getInstanceOf(type));
   }
 
   std::vector<std::vector<std::string> > analyse_contradiction() {
@@ -131,7 +139,7 @@ public:
 
     NodePtr n(boost::proto::eval(FixWidth()(e), ctx_));
     soft_constraints_.push_back(n);
-    metaSMT_visitor_->makeSoftAssertion(*n);
+    solver_->makeSoftAssertion(*n);
 
     return *this;
   }
@@ -192,29 +200,39 @@ public:
     return Soft_Generator(*this);
   }
 
+
+  #define _GEN_VEC(typename) if (!gen_vec_(static_cast<__rand_vec<typename>*>(vec_base), solver.get())) return false
+  bool solve_vectors_() {
+
+    return true;
+  }
+  #undef _GEN_VEC
+
+public:
   bool next() {
     // pre_solve()
     BOOST_FOREACH(boost::function0<bool> f, pre_hooks_) {
-      metaSMT_visitor_->addPreHook(f);
+      solver_->addPreHook(f);
     }
 
     for (std::map<std::string, NodePtr>::const_iterator
-        it = named_constraints_.begin();
-        it != named_constraints_.end(); ++it) {
+         it = named_constraints_.begin();
+         it != named_constraints_.end(); ++it) {
 
       if (0 == disabled_named_constaints_.count(it->first))
-        metaSMT_visitor_->makeAssumption(*it->second);
+        solver_->makeAssumption(*it->second);
     }
     BOOST_FOREACH(ReadRefPair pair, read_references_) {
-      metaSMT_visitor_->makeAssumption(*pair.second->expr());
+      solver_->makeAssumption(*pair.second->expr());
     }
 
-    bool result = metaSMT_visitor_->solve();
+    bool result = solver_->solve() &&
+                  solve_vectors_();
     okay_ |= result;
     // post_solve(result)
     if (okay_) {
       BOOST_FOREACH(WriteRefPair pair, write_references_) {
-        metaSMT_visitor_->read(*variables_[pair.first], *pair.second);
+        solver_->read(*variables_[pair.first], *pair.second);
       }
     }
     return result;
@@ -227,7 +245,7 @@ public:
   T operator[](Variable<T> const &var) {
 
     AssignResultImpl<T> result;
-    metaSMT_visitor_->read(*variables_[var.id()], result);
+    solver_->read(*variables_[var.id()], result);
     return result.value();
   }
 
@@ -263,10 +281,13 @@ private:
   std::vector<WriteRefPair> write_references_;
   std::vector<boost::function0<bool> > pre_hooks_;
 
+  // solver
   Context ctx_;
-  boost::scoped_ptr<metaSMTVisitor> metaSMT_visitor_;
+  boost::scoped_ptr<metaSMTVisitor> solver_;
 
+  // auxiliary-attributes
   bool okay_;
+  std::string solver_type_;
 };
 
 template<typename Expr>

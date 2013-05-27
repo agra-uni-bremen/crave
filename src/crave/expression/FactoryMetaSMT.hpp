@@ -2,6 +2,8 @@
 
 #include "metaSMTNodeVisitor.hpp"
 
+#include <string>
+
 namespace crave {
 
   class FactoryMetaSMT {
@@ -12,7 +14,11 @@ namespace crave {
       **/
     static metaSMTVisitor* newVisitorSWORD();
 
+    static metaSMTVisitor* newVisitorCudd();
+
     static metaSMTVisitor* newVisitorPriority();
+
+    static metaSMTVisitor* getInstanceOf(std::string const&);
   };
 
 } // namespace crave;
