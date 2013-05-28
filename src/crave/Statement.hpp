@@ -22,19 +22,20 @@ struct Statement {
   expression expr_;
 };
 
-struct ForeachStatement : public Statement {
+struct VectorStatement : Statement {
 
-  ForeachStatement(VectorExpr const &vec, Placeholder const &pl, expression expr) : Statement(expr), vec_expr_(vec), placeholder_(pl) { }
+  VectorStatement(boost::intrusive_ptr<VectorExpr> vec, Placeholder const &pl, expression expr)
+  : Statement(expr), vec_expr_(vec), placeholder_(pl) { }
 
-  inline VectorExpr const & get_vector_expr() const {
+  inline boost::intrusive_ptr<VectorExpr> get_vector_expr() {
     return vec_expr_;
   }
   inline Placeholder const & get_placeholder() const {
     return placeholder_;
   }
 
- private:
-  VectorExpr vec_expr_;
+private:
+  boost::intrusive_ptr<VectorExpr> vec_expr_;
   Placeholder placeholder_;
 };
 

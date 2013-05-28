@@ -147,20 +147,20 @@ public:
   /**
    * foreach
    **/
-  // FIXME: change IndexVariable to Placeholder
   template<typename value_type, typename Expr>
   Generator & foreach(const __rand_vec <value_type> & v,
       const placeholder & p, Expr e) {
 
-    unsigned width = bitsize_traits<value_type>::value;
-    bool sign = boost::is_signed<value_type>::value;
-
-    VectorExpr vec_expr(v().id(), width, sign);
-    Placeholder ph(p.id());
     NodePtr f_expr(boost::proto::eval(FixWidth()(e), ctx_));
 
-    foreach_statements_.push_back(ForeachStatement(vec_expr, ph, f_expr));
-    vectors_[v().id()] = &v;
+    boost::intrusive_ptr<VectorExpr> vec_expr(vector_variables_[v().id()].get());
+    Placeholder ph(p.id());
+
+    foreach_statements_.insert(std::make_pair(v().id(), VectorStatement(vec_expr, ph, f_expr)));
+
+    if (0 == vectors_.count(v().id())) {
+      vectors_[v().id()] = &v;
+    }
     return *this;
   }
 
@@ -260,22 +260,25 @@ public:
       BOOST_FOREACH ( boost::intrusive_ptr<Node> n, soft_constraints_ )
         n->visit(visitor);
     }
-    BOOST_FOREACH ( ForeachStatement fs, foreach_statements_ )
-      fs.get_expression()->visit(visitor);
+    typedef std::pair<int const, VectorStatement> ForeachMapPair;
+    BOOST_FOREACH ( ForeachMapPair& fp, foreach_statements_ )
+      fp.second.get_expression()->visit(visitor);
     os << "}" << std::endl;
 
     return os;
   }
 
 private:
+  // constraints
   std::vector<boost::intrusive_ptr<Node> > constraints_;
   std::vector<boost::intrusive_ptr<Node> > soft_constraints_;
   std::map<std::string, boost::intrusive_ptr<Node> > named_constraints_;
   std::set<std::string> disabled_named_constaints_;
-  std::vector<ForeachStatement> foreach_statements_;
+  std::multimap<int, VectorStatement> foreach_statements_;
 
+  // variables
   std::map<int, boost::intrusive_ptr<Node> > variables_;
-  std::map<int, boost::intrusive_ptr<Node> > vector_variables_;
+  std::map<int, boost::intrusive_ptr<VectorExpr> > vector_variables_;
   std::map<int, __rand_vec_base const*> vectors_;
   std::vector<ReadRefPair> read_references_;
   std::vector<WriteRefPair> write_references_;

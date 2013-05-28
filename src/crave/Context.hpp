@@ -35,7 +35,7 @@ private:
   typedef std::pair<int, boost::shared_ptr<crave::AssignResult> > WriteRefPair;
 
 public:
-  Context(std::map<int, result_type>& vars, std::map<int, result_type>& vec_vars,
+  Context(std::map<int, result_type>& vars, std::map<int, boost::intrusive_ptr<VectorExpr> >& vec_vars,
           std::vector<ReadRefPair>& read_refs, std::vector<WriteRefPair>& write_refs)
           : variables_(vars), vector_variables_(vec_vars),
             read_references_(read_refs), write_references_(write_refs) { }
@@ -151,7 +151,7 @@ public:
   template<typename Expr1, typename Expr2>
   result_type operator()(proto::tag::function f, proto::terminal<operator_if_then>::type const& t,
       Expr1 const & e1, Expr2 const & e2) {
-   return new IfThenElse(proto::eval(e1, *this), proto::eval(e2, *this), new Constant(1, 1, false));
+    return new IfThenElse(proto::eval(e1, *this), proto::eval(e2, *this), new Constant(1, 1, false));
   }
 
   template<typename Expr1, typename Expr2, typename Expr3>
@@ -279,8 +279,8 @@ public:
 
     int vec_id = proto::value(e1).id;
 
-    std::map<int, result_type>::const_iterator ite = vector_variables_.find(vec_id);
-    result_type vec;
+    std::map<int, boost::intrusive_ptr<VectorExpr> >::const_iterator ite = vector_variables_.find(vec_id);
+    boost::intrusive_ptr<VectorExpr> vec;
     if ( ite != vector_variables_.end() ) {
         vec = ite->second;
     } else {
@@ -298,7 +298,7 @@ public:
 
 private:
   std::map<int, result_type>& variables_;
-  std::map<int, result_type>& vector_variables_;
+  std::map<int, boost::intrusive_ptr<VectorExpr> >& vector_variables_;
   std::vector<ReadRefPair>& read_references_;
   std::vector<WriteRefPair>& write_references_;
 };
