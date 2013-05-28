@@ -1,6 +1,7 @@
 add_library (crave
   ConstrainedRandom.cpp
   expression/metaSMTNodeVisitor.cpp
+  expression/ReplaceVisitor.cpp
   expression/ToDotNodeVisitor.cpp
 )
 target_link_libraries (crave
