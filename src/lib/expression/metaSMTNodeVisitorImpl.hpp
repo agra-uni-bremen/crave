@@ -89,7 +89,7 @@ private: // methods
 private: // data
   SolverType solver_;
   std::stack<stack_entry> exprStack_;
-  std::map<Node const*, qf_bv::bitvector> terminals_;
+  std::map<int, qf_bv::bitvector> terminals_;
   result_type soft_;
 
   std::vector<result_type> assumptions_;
@@ -144,24 +144,7 @@ template<typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitNode( Node const& ) { }
 
 template<typename SolverType>
-void metaSMTVisitorImpl<SolverType>::visitTerminal( Terminal const &t )
-{
-  std::map<Node const*, qf_bv::bitvector>::iterator ite(terminals_.lower_bound(&t));
-
-  qf_bv::bitvector bit_vec;
-  if (ite != terminals_.end() && !(terminals_.key_comp()(&t, ite->first))) {
-    // &t already exists
-    bit_vec = ite->second;
-  }
-  else
-  {
-    bit_vec = qf_bv::new_bitvector( t.bitsize() );
-    terminals_.insert( ite, std::make_pair(&t, bit_vec) );
-  }
-
-  result_type result = evaluate( solver_, bit_vec );
-  exprStack_.push( std::make_pair( result, t.sign() ) );
-}
+void metaSMTVisitorImpl<SolverType>::visitTerminal( Terminal const &t ) { }
 
 template<typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitUnaryExpr( UnaryExpression const &ue )
@@ -196,7 +179,21 @@ void metaSMTVisitorImpl<SolverType>::visitPlaceholder( Placeholder const & ) { }
 template<typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitVariableExpr( VariableExpr const &ve )
 {
-  visitTerminal(ve);
+  std::map<int, qf_bv::bitvector>::iterator ite(terminals_.lower_bound(ve.id()));
+
+  qf_bv::bitvector bit_vec;
+  if (ite != terminals_.end() && !(terminals_.key_comp()(ve.id(), ite->first))) {
+    // &t already exists
+    bit_vec = ite->second;
+  }
+  else
+  {
+    bit_vec = qf_bv::new_bitvector( ve.bitsize() );
+    terminals_.insert( ite, std::make_pair(ve.id(), bit_vec) );
+  }
+
+  result_type result = evaluate( solver_, bit_vec );
+  exprStack_.push( std::make_pair( result, ve.sign() ) );
 }
 
 template<typename SolverType>
@@ -209,10 +206,7 @@ void metaSMTVisitorImpl<SolverType>::visitConstant( Constant const &c )
 }
 
 template<typename SolverType>
-void metaSMTVisitorImpl<SolverType>::visitVectorExpr( VectorExpr const &ve )
-{
-  visitTerminal(ve);
-}
+void metaSMTVisitorImpl<SolverType>::visitVectorExpr( VectorExpr const &ve ) { }
 
 template<typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitNotOpr( NotOpr const &o )
@@ -668,10 +662,11 @@ void metaSMTVisitorImpl<SolverType>::postSolveClear()
 }
 
 template<typename SolverType>
-bool metaSMTVisitorImpl<SolverType>::read(Node const& var, AssignResult& assign)
+bool metaSMTVisitorImpl<SolverType>::read(Node const& v, AssignResult& assign)
 {
-  // assert(type_of(Node) == Terminal)
-  std::map<Node const *, qf_bv::bitvector>::const_iterator ite(terminals_.find(&var));
+  // assert(static_cast<VariableExpr const *>(&var) != 0);
+  VariableExpr const& var = *static_cast<VariableExpr const*>(&v);
+  std::map<int, qf_bv::bitvector>::const_iterator ite(terminals_.find(var.id()));
   if (ite == terminals_.end())
     return false;
 
