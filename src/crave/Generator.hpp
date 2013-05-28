@@ -4,6 +4,7 @@
 #include "Context.hpp"
 #include "Statement.hpp"
 #include "VectorConstraint.hpp"
+#include "expression/ReplaceVisitor.hpp"
 #include "expression/ToDotNodeVisitor.hpp"
 #include "expression/FactoryMetaSMT.hpp"
 #include "expression/Node.hpp"
@@ -11,6 +12,7 @@
 #include <boost/foreach.hpp>
 #include <boost/function.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <map>
 #include <set>
@@ -56,10 +58,28 @@ public:
   : constraints_(), named_constraints_(), disabled_named_constaints_(), foreach_statements_(),
     variables_(), vector_variables_(), vectors_(), read_references_(), write_references_(),
     pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
-    solver_(NULL), okay_(false), solver_type_() {
+    solver_(NULL), vector_solvers_(), okay_(false), solver_type_() {
       set_backend("SWORD");
       (*this)(expr);
     }
+
+  Generator(std::string const &type)
+  : constraints_(), named_constraints_(), disabled_named_constaints_(), foreach_statements_(),
+    variables_(), vector_variables_(), vectors_(), read_references_(), write_references_(),
+    pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
+    solver_(NULL), vector_solvers_(), okay_(false), solver_type_() {
+      set_backend(type);
+  }
+
+  template<typename Expr>
+  Generator(std::string const &type, Expr expr)
+  : constraints_(), named_constraints_(), disabled_named_constaints_(), foreach_statements_(),
+    variables_(), vector_variables_(), vectors_(), read_references_(), write_references_(),
+    pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
+    solver_(NULL), vector_solvers_(), okay_(false), solver_type_() {
+      set_backend(type);
+      (*this)(expr);
+  }
 
   template<typename Expr>
   Generator & operator()(Expr expr) {
@@ -148,7 +168,7 @@ public:
    * foreach
    **/
   template<typename value_type, typename Expr>
-  Generator & foreach(const __rand_vec <value_type> & v,
+  Generator & foreach(__rand_vec <value_type> & v,
       const placeholder & p, Expr e) {
 
     NodePtr f_expr(boost::proto::eval(FixWidth()(e), ctx_));
@@ -160,6 +180,8 @@ public:
 
     if (0 == vectors_.count(v().id())) {
       vectors_[v().id()] = &v;
+      vector_solvers_[v().id()] =
+        boost::shared_ptr<metaSMTVisitor>(FactoryMetaSMT::getInstanceOf(solver_type_));
     }
     return *this;
   }
@@ -200,10 +222,94 @@ public:
     return Soft_Generator(*this);
   }
 
+private:
+  template<typename Integral>
+  bool gen_vec_ (__rand_vec<Integral>* rvp, metaSMTVisitor* solver) {
+    __rand_vec<Integral>& vec = *rvp;
+
+    // get size of vector
+    unsigned int size;
+    if (variables_.find(vec().size().id()) != variables_.end()) {
+      AssignResultImpl<unsigned int> ar_size;
+      solver_->read(*variables_[vec().size().id()], ar_size);
+      size = ar_size.value();
+      vec.resize(size);
+    } else {
+      size = vec.size();
+    }
+
+    // get foreach statements of given vector variable
+    typedef std::multimap<int, VectorStatement>::iterator fe_iterator;
+    std::pair<fe_iterator, fe_iterator> range = foreach_statements_.equal_range(vec().id());
+
+    // initialize VariableExprs for each vector element
+    unsigned int bitsize = range.first->second.get_vector_expr()->bitsize();
+    bool sign = range.first->second.get_vector_expr()->sign();
+    std::vector<NodePtr> variables(size);
+    for (unsigned int i = 0; i < size; ++i)
+      variables[i] = new VariableExpr(new_var_id(), bitsize, sign);
+
+    // replace vector variables and placeholders and make assumptions
+    ReplaceVisitor replacer(variables);
+    for (fe_iterator ite = range.first; ite != range.second; ++ite) {
+
+      VectorStatement const& fe_statement = ite->second;
+      for (unsigned int i = 0; i < size; ++i) {
+
+        replacer.set_vec_idx(i);
+        fe_statement.get_expression()->visit(replacer);
+
+        if (replacer.okay())
+          solver->makeAssumption(*replacer.result());
+
+        replacer.reset();
+      }
+    }
+
+    if (!solver->solve())
+      return false;
+
+    // read results
+    for (unsigned int i = 0; i < size; ++i) {
+      AssignResultImpl<Integral> ar_size;
+      solver->read(*variables[i], ar_size);
+      vec[i] = ar_size.value();
+    }
+    return true;
+  }
 
   #define _GEN_VEC(typename) if (!gen_vec_(static_cast<__rand_vec<typename>*>(vec_base), solver.get())) return false
   bool solve_vectors_() {
 
+    typedef std::pair<int, NodePtr> VectorVariablePair;
+    BOOST_FOREACH(VectorVariablePair p, vector_variables_) {
+
+      int vec_id = p.first;
+      NodePtr vec_expr = p.second;
+      boost::shared_ptr<metaSMTVisitor> solver = vector_solvers_[vec_id];
+      __rand_vec_base* vec_base = vectors_[vec_id];
+
+      switch (vec_base->element_type()) {
+        case BOOL: _GEN_VEC(bool); break;
+        case INT: _GEN_VEC(int); break;
+        case UINT: _GEN_VEC(unsigned int); break;
+        case CHAR: _GEN_VEC(char); break;
+        case SCHAR: _GEN_VEC(signed char); break;
+        case UCHAR: _GEN_VEC(unsigned char); break;
+        case SHORT: _GEN_VEC(short); break;
+        case USHORT: _GEN_VEC(unsigned short); break;
+        case LONG:  _GEN_VEC(long); break;
+        case ULONG:  _GEN_VEC(unsigned long); break;
+        case LLONG: _GEN_VEC(long long); break;
+        case ULLONG: _GEN_VEC(unsigned long long); break;
+        default:
+          assert(false && "not supported yet");
+          return false; // unknown vectors can not be generated
+      }
+
+      if (!solver->solve())
+        return false;
+    }
     return true;
   }
   #undef _GEN_VEC
@@ -279,7 +385,7 @@ private:
   // variables
   std::map<int, boost::intrusive_ptr<Node> > variables_;
   std::map<int, boost::intrusive_ptr<VectorExpr> > vector_variables_;
-  std::map<int, __rand_vec_base const*> vectors_;
+  std::map<int, __rand_vec_base*> vectors_;
   std::vector<ReadRefPair> read_references_;
   std::vector<WriteRefPair> write_references_;
   std::vector<boost::function0<bool> > pre_hooks_;
@@ -287,6 +393,7 @@ private:
   // solver
   Context ctx_;
   boost::scoped_ptr<metaSMTVisitor> solver_;
+  std::map<int, boost::shared_ptr<metaSMTVisitor> > vector_solvers_;
 
   // auxiliary-attributes
   bool okay_;

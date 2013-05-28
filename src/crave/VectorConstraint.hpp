@@ -57,7 +57,7 @@ class TypeInfo<typename> \
 
   class __rand_vec_base {
     public:
-      virtual CppType element_type() { return UNSUPPORTED; }
+      virtual CppType element_type() const { return UNSUPPORTED; }
   };
 
   template<typename T1, typename T2>
@@ -67,10 +67,11 @@ class TypeInfo<typename> \
       __rand_vec_base1() { }
       const Vector<T1>& operator()() const { return sym_vec; }
 
-      CppType element_type() { return TypeInfo<T1>(); }
+      virtual CppType element_type() const { return TypeInfo<T1>(); }
 
       typename std::vector<T2>::size_type size() const { return real_vec.size(); }
       T1& operator[](const int& idx) const { return (T1&) real_vec[idx]; }
+      void resize(typename std::vector<T2>::size_type n) { real_vec.resize(n); }
       void push_back(const T1& x) { real_vec.push_back(x); }
       void clear() { real_vec.clear(); }
 
