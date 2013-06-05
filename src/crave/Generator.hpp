@@ -47,8 +47,9 @@ private:
 public:
   Generator()
   : constraints_(), named_constraints_(), disabled_named_constaints_(), foreach_statements_(),
-    variables_(), vector_variables_(), vectors_(), read_references_(), write_references_(),
-    pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
+    soft_foreach_statements_(), variables_(), vector_variables_(), vectors_(), read_references_(),
+    write_references_(), pre_hooks_(),
+    ctx_(variables_, vector_variables_, read_references_, write_references_),
     solver_(NULL), okay_(false), solver_type_() {
       set_backend("SWORD");
   }
@@ -56,27 +57,30 @@ public:
   template<typename Expr>
   Generator(Expr expr)
   : constraints_(), named_constraints_(), disabled_named_constaints_(), foreach_statements_(),
-    variables_(), vector_variables_(), vectors_(), read_references_(), write_references_(),
-    pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
-    solver_(NULL), vector_solvers_(), okay_(false), solver_type_() {
+    soft_foreach_statements_(), variables_(), vector_variables_(), vectors_(), read_references_(),
+    write_references_(), pre_hooks_(),
+    ctx_(variables_, vector_variables_, read_references_, write_references_),
+    solver_(NULL), okay_(false), solver_type_() {
       set_backend("SWORD");
       (*this)(expr);
     }
 
   Generator(std::string const &type)
   : constraints_(), named_constraints_(), disabled_named_constaints_(), foreach_statements_(),
-    variables_(), vector_variables_(), vectors_(), read_references_(), write_references_(),
-    pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
-    solver_(NULL), vector_solvers_(), okay_(false), solver_type_() {
+    soft_foreach_statements_(), variables_(), vector_variables_(), vectors_(), read_references_(),
+    write_references_(), pre_hooks_(),
+    ctx_(variables_, vector_variables_, read_references_, write_references_),
+    solver_(NULL), okay_(false), solver_type_() {
       set_backend(type);
   }
 
   template<typename Expr>
   Generator(std::string const &type, Expr expr)
   : constraints_(), named_constraints_(), disabled_named_constaints_(), foreach_statements_(),
-    variables_(), vector_variables_(), vectors_(), read_references_(), write_references_(),
-    pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
-    solver_(NULL), vector_solvers_(), okay_(false), solver_type_() {
+    soft_foreach_statements_(), variables_(), vector_variables_(), vectors_(), read_references_(),
+    write_references_(), pre_hooks_(),
+    ctx_(variables_, vector_variables_, read_references_, write_references_),
+    solver_(NULL), okay_(false), solver_type_() {
       set_backend(type);
       (*this)(expr);
   }
@@ -169,7 +173,7 @@ public:
    **/
   template<typename value_type, typename Expr>
   Generator & foreach(__rand_vec <value_type> & v,
-      const placeholder & p, Expr e) {
+                      const placeholder & p, Expr e) {
 
     NodePtr f_expr(boost::proto::eval(FixWidth()(e), ctx_));
 
@@ -187,9 +191,22 @@ public:
   }
 
   template<typename value_type, typename Expr>
-  Generator & soft_foreach(const __rand_vec <value_type> & v,
-      const placeholder & i, Expr e) {
+  Generator & soft_foreach(__rand_vec <value_type> & v,
+                           const placeholder & p, Expr e) {
 
+    NodePtr sf_expr(boost::proto::eval(FixWidth()(e), ctx_));
+
+    boost::intrusive_ptr<VectorExpr> vec_expr(vector_variables_[v().id()].get());
+    Placeholder ph(p.id());
+
+    soft_foreach_statements_.insert(std::make_pair(v().id(),
+                                                   VectorStatement(vec_expr, ph, sf_expr)));
+
+    if (0 == vectors_.count(v().id())) {
+      vectors_[v().id()] = &v;
+      vector_solvers_[v().id()] =
+        boost::shared_ptr<metaSMTVisitor>(FactoryMetaSMT::getInstanceOf(solver_type_));
+    }
     return *this;
   }
 
@@ -261,6 +278,23 @@ private:
 
         if (replacer.okay())
           solver->makeAssumption(*replacer.result());
+
+        replacer.reset();
+      }
+    }
+
+    // add soft constraints
+    range = soft_foreach_statements_.equal_range(vec().id());
+    for (fe_iterator ite = range.first; ite != range.second; ++ite) {
+
+      VectorStatement const& fe_statement = ite->second;
+      for (unsigned int i = 0; i < size; ++i) {
+
+        replacer.set_vec_idx(i);
+        fe_statement.get_expression()->visit(replacer);
+
+        if (replacer.okay())
+          solver->makeSoftAssertion(*replacer.result());
 
         replacer.reset();
       }
@@ -381,6 +415,7 @@ private:
   std::map<std::string, boost::intrusive_ptr<Node> > named_constraints_;
   std::set<std::string> disabled_named_constaints_;
   std::multimap<int, VectorStatement> foreach_statements_;
+  std::multimap<int, VectorStatement> soft_foreach_statements_;
 
   // variables
   std::map<int, boost::intrusive_ptr<Node> > variables_;
