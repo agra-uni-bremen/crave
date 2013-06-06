@@ -5,6 +5,7 @@
 #include <boost/intrusive_ptr.hpp>
 
 #include <ostream>
+#include <string>
 
 namespace crave {
 
@@ -37,6 +38,19 @@ struct VectorStatement : Statement {
 private:
   boost::intrusive_ptr<VectorExpr> vec_expr_;
   Placeholder placeholder_;
+};
+
+struct NamedVectorStatement : VectorStatement {
+
+  NamedVectorStatement (std::string name, boost::intrusive_ptr< VectorExpr > vec,
+                        const Placeholder& pl, expression expr)
+  : VectorStatement(vec, pl, expr), name_(name) { }
+
+  inline std::string const& get_name() const {
+    return name_;
+  }
+private:
+  std::string name_;
 };
 
 } // end namespace crave
