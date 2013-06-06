@@ -147,12 +147,13 @@ struct Item4 : public rand_obj {
 BOOST_AUTO_TEST_CASE ( constraint_management_test )
 {
   Item4 it;
+
   BOOST_REQUIRE( !it.next() );
 
   it.disable_constraint("c1");
   BOOST_REQUIRE( it.next() );
   for (uint i = 0; i < it.v.size(); i++)
-    BOOST_REQUIRE( it.v[i] > 100 );
+    BOOST_REQUIRE_GT( it.v[i], 100 );
 
   it.enable_constraint("c1");
   it.disable_constraint("c2");

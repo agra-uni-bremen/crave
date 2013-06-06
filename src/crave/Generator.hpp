@@ -47,8 +47,8 @@ private:
 public:
   Generator()
   : constraints_(), named_constraints_(), disabled_named_constaints_(), foreach_statements_(),
-    soft_foreach_statements_(), variables_(), vector_variables_(), vectors_(), read_references_(),
-    write_references_(), pre_hooks_(),
+    soft_foreach_statements_(), named_foreach_statements_(), variables_(),
+    vector_variables_(), vectors_(), read_references_(), write_references_(), pre_hooks_(),
     ctx_(variables_, vector_variables_, read_references_, write_references_),
     solver_(NULL), okay_(false), solver_type_() {
       set_backend("SWORD");
@@ -57,8 +57,8 @@ public:
   template<typename Expr>
   Generator(Expr expr)
   : constraints_(), named_constraints_(), disabled_named_constaints_(), foreach_statements_(),
-    soft_foreach_statements_(), variables_(), vector_variables_(), vectors_(), read_references_(),
-    write_references_(), pre_hooks_(),
+    soft_foreach_statements_(), named_foreach_statements_(), variables_(),
+    vector_variables_(), vectors_(), read_references_(), write_references_(), pre_hooks_(),
     ctx_(variables_, vector_variables_, read_references_, write_references_),
     solver_(NULL), okay_(false), solver_type_() {
       set_backend("SWORD");
@@ -67,8 +67,8 @@ public:
 
   Generator(std::string const &type)
   : constraints_(), named_constraints_(), disabled_named_constaints_(), foreach_statements_(),
-    soft_foreach_statements_(), variables_(), vector_variables_(), vectors_(), read_references_(),
-    write_references_(), pre_hooks_(),
+    soft_foreach_statements_(), named_foreach_statements_(), variables_(),
+    vector_variables_(), vectors_(), read_references_(), write_references_(), pre_hooks_(),
     ctx_(variables_, vector_variables_, read_references_, write_references_),
     solver_(NULL), okay_(false), solver_type_() {
       set_backend(type);
@@ -77,8 +77,8 @@ public:
   template<typename Expr>
   Generator(std::string const &type, Expr expr)
   : constraints_(), named_constraints_(), disabled_named_constaints_(), foreach_statements_(),
-    soft_foreach_statements_(), variables_(), vector_variables_(), vectors_(), read_references_(),
-    write_references_(), pre_hooks_(),
+    soft_foreach_statements_(), named_foreach_statements_(), variables_(),
+    vector_variables_(), vectors_(), read_references_(), write_references_(), pre_hooks_(),
     ctx_(variables_, vector_variables_, read_references_, write_references_),
     solver_(NULL), okay_(false), solver_type_() {
       set_backend(type);
@@ -122,25 +122,41 @@ public:
 
   bool enable_constraint(std::string constraint_name) {
 
-    if (0 == named_constraints_.count(constraint_name))
-      return false;
+    if (1 == named_constraints_.count(constraint_name)) {
+      disabled_named_constaints_.erase(constraint_name);
+      return true;
+    }
 
-    disabled_named_constaints_.erase(constraint_name);
-    return true;
+    typedef std::pair<int, NamedVectorStatement> NamedPair;
+    BOOST_FOREACH (NamedPair pair, named_foreach_statements_) {
+      if (0 == pair.second.get_name().compare(constraint_name)) {
+        disabled_named_constaints_.erase(pair.second.get_name());
+        return true;
+      }
+    }
+    return false;
   }
 
   bool disable_constraint(std::string constraint_name) {
 
-    if (0 == named_constraints_.count(constraint_name))
-      return false;
+    if (1 == named_constraints_.count(constraint_name)) {
+      disabled_named_constaints_.insert(constraint_name);
+      return true;
+    }
 
-    disabled_named_constaints_.insert(constraint_name);
-    return true;
+    typedef std::pair<int, NamedVectorStatement> NamedPair;
+    BOOST_FOREACH (NamedPair pair, named_foreach_statements_) {
+      if (0 == pair.second.get_name().compare(constraint_name)) {
+        disabled_named_constaints_.insert(pair.second.get_name());
+        return true;
+      }
+    }
+    return false;
   }
 
   bool is_constraint_enabled(std::string constraint_name) {
-
-    assert (0 != named_constraints_.count(constraint_name));
+    // named_foreach_statements_ or named_constraints_ includes the constraint_name
+//     assert (0 != named_constraints_.count(constraint_name));
 
     return 0 == disabled_named_constaints_.count(constraint_name);
   }
@@ -212,8 +228,27 @@ public:
 
   template<typename value_type, typename Expr>
   Generator & foreach(std::string constraint_name,
-      const __rand_vec <value_type> & v, const placeholder & i, Expr e) {
+      __rand_vec <value_type> & v, const placeholder & p, Expr e) {
 
+    typedef std::multimap<int, NamedVectorStatement>::iterator nfe_iterator;
+    std::pair<nfe_iterator, nfe_iterator> nrange =
+        named_foreach_statements_.equal_range(v().id());
+
+    for (nfe_iterator ite = nrange.first; ite != nrange.second; ++ite)
+      if (0 == ite->second.get_name().compare(constraint_name))
+        throw std::runtime_error("Constraint already exists.");
+
+    NodePtr f_expr(boost::proto::eval(FixWidth()(e), ctx_));
+    Placeholder ph(p.id());
+    boost::intrusive_ptr<VectorExpr> vec_expr(vector_variables_[v().id()].get());
+    NamedVectorStatement vec_stmt(constraint_name, vec_expr, ph, f_expr);
+
+    named_foreach_statements_.insert(nrange.first, std::make_pair(v().id(), vec_stmt));
+    if (0 == vectors_.count(v().id())){
+      vectors_[v().id()] = &v;
+      vector_solvers_[v().id()] =
+        boost::shared_ptr<metaSMTVisitor>(FactoryMetaSMT::getInstanceOf(solver_type_));
+    }
     return *this;
   }
 
@@ -260,43 +295,72 @@ private:
     std::pair<fe_iterator, fe_iterator> range = foreach_statements_.equal_range(vec().id());
 
     // initialize VariableExprs for each vector element
-    unsigned int bitsize = range.first->second.get_vector_expr()->bitsize();
-    bool sign = range.first->second.get_vector_expr()->sign();
     std::vector<NodePtr> variables(size);
     for (unsigned int i = 0; i < size; ++i)
-      variables[i] = new VariableExpr(new_var_id(), bitsize, sign);
+      variables[i] = new VariableExpr(new_var_id(), 1, true);
 
-    // replace vector variables and placeholders and make assumptions
     ReplaceVisitor replacer(variables);
-    for (fe_iterator ite = range.first; ite != range.second; ++ite) {
 
-      VectorStatement const& fe_statement = ite->second;
-      for (unsigned int i = 0; i < size; ++i) {
+    // check if an entry exists
+    if (range.first != range.second) {
 
-        replacer.set_vec_idx(i);
-        fe_statement.get_expression()->visit(replacer);
+      // replace vector variables and placeholders and make assumptions
+      for (fe_iterator ite = range.first; ite != range.second; ++ite) {
 
-        if (replacer.okay())
-          solver->makeAssumption(*replacer.result());
+        VectorStatement const& fe_statement = ite->second;
+        for (unsigned int i = 0; i < size; ++i) {
 
-        replacer.reset();
+          replacer.set_vec_idx(i);
+          fe_statement.get_expression()->visit(replacer);
+
+          if (replacer.okay())
+            solver->makeAssumption(*replacer.result());
+
+          replacer.reset();
+        }
       }
-    }
+    } // end if range.first != range.second
 
-    // add soft constraints
+    // add soft constraints to solver
     range = soft_foreach_statements_.equal_range(vec().id());
-    for (fe_iterator ite = range.first; ite != range.second; ++ite) {
+    if (range.first != range.second) {
+      for (fe_iterator ite = range.first; ite != range.second; ++ite) {
 
-      VectorStatement const& fe_statement = ite->second;
-      for (unsigned int i = 0; i < size; ++i) {
+        VectorStatement const& fe_statement = ite->second;
+        for (unsigned int i = 0; i < size; ++i) {
 
-        replacer.set_vec_idx(i);
-        fe_statement.get_expression()->visit(replacer);
+          replacer.set_vec_idx(i);
+          fe_statement.get_expression()->visit(replacer);
 
-        if (replacer.okay())
-          solver->makeSoftAssertion(*replacer.result());
+          if (replacer.okay())
+            solver->makeSoftAssertion(*replacer.result());
 
-        replacer.reset();
+          replacer.reset();
+        }
+      }
+    }  // end if
+
+    // add named constraints to solver
+    typedef std::multimap<int, NamedVectorStatement>::iterator nfe_iterator;
+    std::pair<nfe_iterator, nfe_iterator> nrange =
+        named_foreach_statements_.equal_range(vec().id());
+
+    if (nrange.first != nrange.second) {
+      for (nfe_iterator ite = nrange.first; ite != nrange.second; ++ite) {
+
+        NamedVectorStatement const& fe_statement = ite->second;
+        if (is_constraint_enabled(fe_statement.get_name())) {
+          for (unsigned int i = 0; i < size; ++i) {
+
+            replacer.set_vec_idx(i);
+            fe_statement.get_expression()->visit(replacer);
+
+            if (replacer.okay())
+              solver->makeAssumption(*replacer.result());
+
+            replacer.reset();
+          }
+        }
       }
     }
 
@@ -416,6 +480,7 @@ private:
   std::set<std::string> disabled_named_constaints_;
   std::multimap<int, VectorStatement> foreach_statements_;
   std::multimap<int, VectorStatement> soft_foreach_statements_;
+  std::multimap<int, NamedVectorStatement> named_foreach_statements_;
 
   // variables
   std::map<int, boost::intrusive_ptr<Node> > variables_;
