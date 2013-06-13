@@ -238,7 +238,7 @@ public:
 class EqualOpr : public BinaryOperator {
 public:
   EqualOpr( NodePtr lhs, NodePtr rhs ) : BinaryOperator(lhs, rhs) { }
-  EqualOpr( EqualOpr const& e ) : BinaryOperator(e) { std::cout << "equal copied\n";}
+  EqualOpr( EqualOpr const& e ) : BinaryOperator(e) { }
 
   void visit( NodeVisitor& v ) const { v.visitEqualOpr(*this); }
 };
