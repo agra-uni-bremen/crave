@@ -46,40 +46,40 @@ private:
 
 public:
   Generator()
-  : constraints_(), named_constraints_(), disabled_named_constaints_(), foreach_statements_(),
-    soft_foreach_statements_(), named_foreach_statements_(), variables_(),
-    vector_variables_(), vectors_(), read_references_(), write_references_(), pre_hooks_(),
-    ctx_(variables_, vector_variables_, read_references_, write_references_),
+  : constraints_(), named_constraints_(), disabled_named_constaints_(), unique_vectors_(),
+    foreach_statements_(), soft_foreach_statements_(), named_foreach_statements_(), variables_(),
+    vector_variables_(), vectors_(), vector_elements_(), read_references_(), write_references_(),
+    pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
     solver_(NULL), okay_(false), solver_type_() {
       set_backend("SWORD");
   }
 
   template<typename Expr>
   Generator(Expr expr)
-  : constraints_(), named_constraints_(), disabled_named_constaints_(), foreach_statements_(),
-    soft_foreach_statements_(), named_foreach_statements_(), variables_(),
-    vector_variables_(), vectors_(), read_references_(), write_references_(), pre_hooks_(),
-    ctx_(variables_, vector_variables_, read_references_, write_references_),
+  : constraints_(), named_constraints_(), disabled_named_constaints_(), unique_vectors_(),
+    foreach_statements_(), soft_foreach_statements_(), named_foreach_statements_(), variables_(),
+    vector_variables_(), vectors_(), vector_elements_(), read_references_(), write_references_(),
+    pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
     solver_(NULL), okay_(false), solver_type_() {
       set_backend("SWORD");
       (*this)(expr);
     }
 
   Generator(std::string const &type)
-  : constraints_(), named_constraints_(), disabled_named_constaints_(), foreach_statements_(),
-    soft_foreach_statements_(), named_foreach_statements_(), variables_(),
-    vector_variables_(), vectors_(), read_references_(), write_references_(), pre_hooks_(),
-    ctx_(variables_, vector_variables_, read_references_, write_references_),
+  : constraints_(), named_constraints_(), disabled_named_constaints_(), unique_vectors_(),
+    foreach_statements_(), soft_foreach_statements_(), named_foreach_statements_(), variables_(),
+    vector_variables_(), vectors_(), vector_elements_(), read_references_(), write_references_(),
+    pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
     solver_(NULL), okay_(false), solver_type_() {
       set_backend(type);
   }
 
   template<typename Expr>
   Generator(std::string const &type, Expr expr)
-  : constraints_(), named_constraints_(), disabled_named_constaints_(), foreach_statements_(),
-    soft_foreach_statements_(), named_foreach_statements_(), variables_(),
-    vector_variables_(), vectors_(), read_references_(), write_references_(), pre_hooks_(),
-    ctx_(variables_, vector_variables_, read_references_, write_references_),
+  : constraints_(), named_constraints_(), disabled_named_constaints_(), unique_vectors_(),
+    foreach_statements_(), soft_foreach_statements_(), named_foreach_statements_(), variables_(),
+    vector_variables_(), vectors_(), vector_elements_(), read_references_(), write_references_(),
+    pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
     solver_(NULL), okay_(false), solver_type_() {
       set_backend(type);
       (*this)(expr);
@@ -256,14 +256,20 @@ public:
    * unique & non_unique
    **/
   template<typename value_type>
-  Generator & unique(const __rand_vec <value_type> & v) {
-    // FIXME
+  Generator & unique(__rand_vec <value_type> & v) {
+
+    if (0 == vectors_.count(v().id())) {
+      vectors_[v().id()] = &v;
+      vector_solvers_[v().id()] =
+        boost::shared_ptr<metaSMTVisitor>(FactoryMetaSMT::getInstanceOf(solver_type_));
+    }
+    unique_vectors_.insert(v().id());
     return *this;
   }
 
   template<typename value_type>
   Generator & non_unique(const __rand_vec <value_type> & v) {
-    // FIXME
+    unique_vectors_.erase(v().id());
     return *this;
   }
 
@@ -290,14 +296,18 @@ private:
       size = vec.size();
     }
 
+    ElementsVector& variables = vector_elements_[vec().id()];
+    if (size != variables.size())  {
+      variables.resize(size);
+      for (unsigned int i = 0; i < size; ++i) {
+        boost::intrusive_ptr<VariableExpr> var_expr = new VariableExpr(new_var_id(), 1, true);
+        variables[i] = var_expr;
+      }
+    }
+
     // get foreach statements of given vector variable
     typedef std::multimap<int, VectorStatement>::iterator fe_iterator;
     std::pair<fe_iterator, fe_iterator> range = foreach_statements_.equal_range(vec().id());
-
-    // initialize VariableExprs for each vector element
-    std::vector<NodePtr> variables(size);
-    for (unsigned int i = 0; i < size; ++i)
-      variables[i] = new VariableExpr(new_var_id(), 1, true);
 
     ReplaceVisitor replacer(variables);
 
@@ -360,6 +370,17 @@ private:
 
             replacer.reset();
           }
+        }
+      }
+    }
+
+    // make unique
+    if (1 == unique_vectors_.count(vec().id())) {
+      int i = 0;
+      for (ElementsVector::const_iterator var = variables.begin();
+           var != variables.end(); ++var, ++i) {
+        for (int j = i + 1; j < variables.size(); ++j) {
+          solver->makeAssumption(*(new NotEqualOpr(variables[i], variables[j])));
         }
       }
     }
@@ -473,11 +494,15 @@ public:
   }
 
 private:
+  // typedefs
+  typedef std::vector<boost::intrusive_ptr<VariableExpr> > ElementsVector;
+
   // constraints
   std::vector<boost::intrusive_ptr<Node> > constraints_;
   std::vector<boost::intrusive_ptr<Node> > soft_constraints_;
   std::map<std::string, boost::intrusive_ptr<Node> > named_constraints_;
   std::set<std::string> disabled_named_constaints_;
+  std::set<int> unique_vectors_;
   std::multimap<int, VectorStatement> foreach_statements_;
   std::multimap<int, VectorStatement> soft_foreach_statements_;
   std::multimap<int, NamedVectorStatement> named_foreach_statements_;
@@ -486,6 +511,7 @@ private:
   std::map<int, boost::intrusive_ptr<Node> > variables_;
   std::map<int, boost::intrusive_ptr<VectorExpr> > vector_variables_;
   std::map<int, __rand_vec_base*> vectors_;
+  std::map<int, ElementsVector> vector_elements_;
   std::vector<ReadRefPair> read_references_;
   std::vector<WriteRefPair> write_references_;
   std::vector<boost::function0<bool> > pre_hooks_;

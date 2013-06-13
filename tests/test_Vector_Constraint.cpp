@@ -117,18 +117,18 @@ BOOST_AUTO_TEST_CASE ( unique_test_2 )
   rand_vec<unsigned int> v(NULL);
   placeholder idx;
   Generator gen;
-  gen(v().size() == 11);
-  gen.foreach(v, idx, v()[idx] < 10);
+  gen(v().size() == 7);
+  gen.foreach(v, idx, v()[idx] < 6);
 
   gen.unique(v);
   BOOST_REQUIRE(!gen.next());
 
   gen.non_unique(v);
   BOOST_REQUIRE(gen.next());
-  BOOST_REQUIRE(v.size() == 11);
+  BOOST_REQUIRE(v.size() == 7);
   for (uint i = 0; i < v.size(); i++) {
     std::cout << v[i] << " ";
-    BOOST_REQUIRE(v[i] < 10);
+    BOOST_REQUIRE(v[i] < 6);
   }
   std::cout << std::endl;
 }
@@ -226,8 +226,10 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_1 )
   gen.unique(a);
 
   BOOST_REQUIRE(gen.next());
-  for (uint i = 0; i < a.size(); i++)
-    BOOST_REQUIRE(a[i] < 10);
+  for (uint i = 0; i < a.size(); i++) {
+    BOOST_REQUIRE_LT(a[i], 10);
+    std::cout << " " << (int)a[i];
+  }std::cout << std::endl;
   BOOST_REQUIRE(check_unique(a));
 }
 
