@@ -18,7 +18,7 @@
 #include <metaSMT/Priority_Context.hpp>
 #include <metaSMT/UnpackFuture_Context.hpp>
 #include <metaSMT/BitBlast.hpp>
-#include <metaSMT/backend/SWORD_Backend.hpp>
+#include <metaSMT/backend/Boolector.hpp>
 #include <metaSMT/backend/CUDD_Distributed.hpp>
 #include <metaSMT/frontend/QF_BV.hpp>
 #include <metaSMT/support/contradiction_analysis.hpp>
@@ -106,7 +106,7 @@ namespace crave {
     > SolverType1;
     typedef metaSMT::DirectSolver_Context <
       metaSMT::UnpackFuture_Context <
-      metaSMT::solver::SWORD_Backend
+      metaSMT::solver::Boolector
       >
     > SolverType2;
 
@@ -645,7 +645,7 @@ namespace crave {
     }
 
     bool do_solve () {
-      const unsigned limit = 5;
+      const unsigned limit = 0;
       // first run is for check if soft constrains are satisfiable
       // second run will be executed if softconstrains aren't satisfiable
       for ( unsigned run = 0; run < 2; ++run ) {
@@ -704,7 +704,6 @@ namespace crave {
 
 
     void assign_random_bits() {
-      return;
       std::vector <result_type> bits;
 
       typedef std::pair<int,qf_bv::bitvector> var_pair;
@@ -720,7 +719,7 @@ namespace crave {
       }
 
       std::random_shuffle(bits.begin(),bits.end());
-      int len = bits.size() > 0 ? boost::uniform_int<int>(0, bits.size() - 1)(rng) : 0;
+      int len = bits.size() > 0 ? boost::uniform_int<int>(0, bits.size() / 5)(rng) : 0;
       for(int i = 0; i < len ; ++i) {
        metaSMT::assumption(solver, preds::equal(bits[i], qf_bv::bvuint(boost::uniform_int<int>(0, 1)(rng), 1)));
       }
