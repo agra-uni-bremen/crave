@@ -32,15 +32,15 @@ namespace crave {
       template<typename context>
       rand_obj_of(rand_obj_of<context>* parent = 0) { if (parent != 0) parent->addChild(this); }
       bool next() {
-        return constraint.next();
+        for (uint i = 0; i < children.size(); i++) 
+          if (!children[i]->next()) return false; 
+        if (!constraint.next()) return false;
+        return true;
       }
       bool enable_constraint(std::string name) { return constraint.enable_constraint(name); }
       bool disable_constraint(std::string name) { return constraint.disable_constraint(name); }
       bool is_constraint_enabled(std::string name) { return constraint.is_constraint_enabled(name); }
-      void addChild(rand_base* rb) {
-        children.push_back(rb);
-        constraint.add_pre_hook(boost::bind<bool>(&rand_base::next, rb));
-      }
+      void addChild(rand_base* rb) { children.push_back(rb); }
 
     protected:
       rand_obj_of() { }

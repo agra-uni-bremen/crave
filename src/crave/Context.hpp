@@ -15,9 +15,9 @@
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/uniform_01.hpp>
 #include <metaSMT/DirectSolver_Context.hpp>
-#include <metaSMT/Priority_Context.hpp>
+// #include <metaSMT/Priority_Context.hpp>
 #include <metaSMT/UnpackFuture_Context.hpp>
-#include <metaSMT/BitBlast.hpp>
+// #include <metaSMT/BitBlast.hpp>
 #include <metaSMT/backend/Boolector.hpp>
 // #include <metaSMT/backend/CUDD_Distributed.hpp>
 #include <metaSMT/frontend/QF_BV.hpp>
