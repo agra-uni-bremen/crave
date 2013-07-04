@@ -12,33 +12,6 @@ namespace crave {
 
   extern boost::mt19937 rng;
 
-  struct DetectReadRef : proto::callable_context< DetectReadRef, proto::null_context > {
-    DetectReadRef() : readRefFound(false) {}
-    typedef void result_type;
-    template<typename value_type>
-    result_type operator() (proto::tag::terminal, read_ref_tag<value_type> const & ) {
-      readRefFound = true;
-    }
-    bool readRefFound;
-  };
-
-  struct readRefExists {
-    template<typename Expr>
-    readRefExists(Expr expr) { proto::eval(expr, drr); }
-    operator bool() const { return drr.readRefFound; }
-    DetectReadRef drr;
-  };
-
-/*
-  struct ReadRefExists
-  : proto::or_ <
-      proto::terminal<read_ref_tag<proto::_> >
-    , proto::binary_expr<proto::_, ReadRefExists(proto::_), proto::_>
-    , proto::binary_expr<proto::_, proto::_, ReadRefExists(proto::_) >
-    , proto::unary_expr<proto::_, ReadRefExists(proto::_) >
-    > {};
-*/
-
   struct bitvector_less {
     bool operator() (qf_bv::bitvector const & a, qf_bv::bitvector const & b) {
       return boost::proto::value(a).id < boost::proto::value(b).id;
@@ -47,26 +20,22 @@ namespace crave {
 
   struct AllSAT_base : public metaSMT_Context_base<AllSAT_base>
   {
-    AllSAT_base(unsigned _sol_limit)
+    AllSAT_base(int _limit_param)
     : metaSMT_Context_base<AllSAT_base>()
-    , read_ref_found(false)
-    , is_solved(false)
-    , sol_limit(_sol_limit)
-    { }
+    , limit_param(_limit_param)
+    { reset(); }
 
     typedef metaSMT_Context_base<AllSAT_base> Super;
 
     // BEGIN functions that modify the constraints
     template<typename Expr>
     void assertion (Expr e) {
-      read_ref_found |= readRefExists(e);
       Super::assertion(e);
       reset();
     }
 
     template<typename Expr>
     void assertion (std::string constraint_name, Expr e) {
-      read_ref_found |= readRefExists(e);
       Super::assertion(constraint_name, e);
       reset();
     }
@@ -83,7 +52,6 @@ namespace crave {
 
     template<typename Expr>
     void soft_assertion (Expr e) {
-      read_ref_found |= readRefExists(e);
       Super::soft_assertion(e);
       reset();
     }
@@ -133,17 +101,24 @@ namespace crave {
     bool solve_all(bool soft) {
       using namespace boost::phoenix;
       using namespace boost::phoenix::arg_names;
-      // gather all solutions
+
+      old_solutions = all_solutions;
+      all_solutions.clear();
+      
       while (true) {
         solution_t solution;
 
         pre_solve();
         if (soft) assumption(solver,_soft);
 
-        for (uint i = 0; i < all_solutions.size(); i++)
-           block_solution(all_solutions[i]);
+        for (uint i = 0; i < old_solutions.size(); i++) block_solution(old_solutions[i]);	
+        for (uint i = 0; i < all_solutions.size(); i++) block_solution(all_solutions[i]);
 
-        if (!metaSMT::solve(solver)) break;
+        if (!metaSMT::solve(solver)) {
+	  // completely solved
+	  all_solutions.insert(all_solutions.end(), old_solutions.begin(), old_solutions.end());
+	  return true;
+	}
 
         std::for_each(_variables.begin(), _variables.end(),
           bind(&AllSAT_base::store_solution, this, ref(solution), boost::phoenix::arg_names::arg1)
@@ -157,30 +132,42 @@ namespace crave {
 
         if (all_solutions.size() == sol_limit) break;
       }
-      return all_solutions.size() > 0;
+      return false;
     }
 
     bool do_solve()  {
       // always reset if read references exist in the constraints
-      if(read_ref_found) reset();
-      if(is_solved) {
-        // use next shuffled solution
-        ++current;
-        if( current == all_solutions.end() ) {
+      if(has_read_ref()) reset();
+      if(current == all_solutions.end()) {
+	// we need new solutions
+	if (is_solved) {
+	  // all solutions avaiable, just shuffle
+          std::random_shuffle(all_solutions.begin(), all_solutions.end(), rng);
+          current=all_solutions.begin();	  
+	}
+	else {
+	  // get new solutions		  
+	  if (!ignore_soft) {
+	    is_solved = solve_all(true);
+	    if (all_solutions.size() == 0) {
+	      assert(is_solved);
+	      ignore_soft = true;
+	    }
+	  }	  
+	  if (ignore_soft) is_solved = solve_all(false);	  
+	  
+          std::cout << "AllSAT found " << (is_solved ? "all " : "") << all_solutions.size() << " solution(s)" << std::endl;
+	  
           std::random_shuffle(all_solutions.begin(), all_solutions.end(), rng);
           current=all_solutions.begin();
-        }
-      } else {
-        is_solved = solve_all(true);
-        // if soft constraint satisfiable
-        if (!is_solved ) is_solved = solve_all(false);
-
-//        std::cout << "AllSAT found " << all_solutions.size() << " solution(s)" << std::endl;
-        std::random_shuffle(all_solutions.begin(), all_solutions.end(), rng);
-        current=all_solutions.begin();
-
+	}
       }
-      return is_solved;
+      else {
+	++current;
+	if(current == all_solutions.end()) 
+	  return do_solve();
+      }
+      return all_solutions.size() > 0;
     }
 
     template<typename T>
@@ -192,11 +179,10 @@ namespace crave {
 
     template<typename T>
     bool read ( T & v, unsigned id) {
-      assert(is_solved && "AllSAT::solve was not called or not successful");
+      assert(current != all_solutions.end() && "AllSAT::solve was not called or not successful");
       std::map<int, qf_bv::bitvector>::const_iterator ite
         = _variables.find(id);
       if ( ite != _variables.end() ) {
-        assert ( current != all_solutions.end() );
         solution_t::const_iterator sit = current->find(ite->second);
         assert( sit != current->end() && "ERROR: no assignment for variable" );
         AssignResult<T> assign;
@@ -208,11 +194,10 @@ namespace crave {
 
     template<typename T>
     bool read ( T & v, vecVar & vv) {
-      assert(is_solved && "AllSAT::solve was not called or not successful");
+      assert(current != all_solutions.end() && "AllSAT::solve was not called or not successful");
       std::map<vecVar, qf_bv::bitvector>::const_iterator ite
         = _vector_variables.find(vv);
       if ( ite != _vector_variables.end() ) {
-        assert ( current != all_solutions.end() );
         solution_t::const_iterator sit = current->find(ite->second);
         assert( sit != current->end() && "ERROR: no assignment for variable" );
         AssignResult<T> assign;
@@ -230,21 +215,23 @@ namespace crave {
     } rng;
 
     void reset() {
-      if (is_solved) {
-//        std::cout << "AllSAT reset" << std::endl;
-        is_solved = false;
-        all_solutions.clear();
-      }
+      is_solved = false;
+      all_solutions.clear();
+      current = all_solutions.begin();
+      old_solutions.clear();
+      ignore_soft = false;
+      sol_limit = limit_param < 0 ? 0 : (limit_param > 0 ? limit_param : (has_read_ref() ? 20 : 100)); 
     }
 
-    bool read_ref_found;
     bool is_solved;
+    bool ignore_soft;
+    int limit_param;
     unsigned sol_limit;
-    all_solutions_t all_solutions;
+    all_solutions_t all_solutions, old_solutions;
     all_solutions_t::iterator current;
   };
 
-  template<unsigned N = 0>
+  template<int N = 0> // negative = no limit, 0 = auto choose limit, positive = fixed limit
   struct AllSAT : public AllSAT_base {
     AllSAT() : AllSAT_base(N) { }
   };

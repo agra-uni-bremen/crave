@@ -12,14 +12,10 @@
 
 namespace crave {
 
-  typedef AllSAT<50> DefaultContext;
-
-  template<typename ContextT=DefaultContext>
+  template<typename ContextT>
   struct Generator;
 
-  typedef Generator<> DefaultGenerator;
-
-  template< typename T=DefaultContext>
+  template< typename T>
   struct Soft_Generator {
     Soft_Generator(Generator<T> & gen) : gen(gen) {}
 

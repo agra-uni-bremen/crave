@@ -19,7 +19,7 @@
 #include <metaSMT/UnpackFuture_Context.hpp>
 #include <metaSMT/BitBlast.hpp>
 #include <metaSMT/backend/Boolector.hpp>
-#include <metaSMT/backend/CUDD_Distributed.hpp>
+// #include <metaSMT/backend/CUDD_Distributed.hpp>
 #include <metaSMT/frontend/QF_BV.hpp>
 #include <metaSMT/support/contradiction_analysis.hpp>
 
@@ -98,20 +98,21 @@ namespace crave {
 
     public:
 
-    typedef metaSMT::DirectSolver_Context <
-      metaSMT::UnpackFuture_Context <
-      metaSMT::BitBlast <
-      metaSMT::solver::CUDD_Distributed
-      > >
-    > SolverType1;
+//     typedef metaSMT::DirectSolver_Context <
+//       metaSMT::UnpackFuture_Context <
+//       metaSMT::BitBlast <
+//       metaSMT::solver::CUDD_Distributed
+//       > >
+//     > SolverType1;
     typedef metaSMT::DirectSolver_Context <
       metaSMT::UnpackFuture_Context <
       metaSMT::solver::Boolector
       >
     > SolverType2;
 
-    typedef metaSMT::Priority_Context< SolverType1, SolverType2 > SolverType;
-    //typedef  SolverType1 SolverType; // BDD Only
+//     typedef metaSMT::Priority_Context< SolverType1, SolverType2 > SolverType;
+//     typedef  SolverType1 SolverType; // BDD Only
+    typedef  SolverType2 SolverType; // SMT Only
 
     typedef SolverType::result_type result_type;
 
@@ -804,6 +805,8 @@ namespace crave {
     void end_disjunction() { metaSMT::assertion(solver, _disjunction ); }
     template<typename Expr>
     void add_to_disjunction (Expr expr) { _disjunction = evaluate( solver, preds::Or(_disjunction, proto::eval( expr, ctx() ) ) ); }
+    
+    bool has_read_ref() { return !(_lazy.empty() && _lazy_vec.empty()); }
 
     protected:
       inline derived_context & ctx() {  return  static_cast<derived_context&>(*this); }

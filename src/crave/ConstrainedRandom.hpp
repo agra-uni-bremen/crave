@@ -13,6 +13,9 @@
 
 namespace crave {
 
+  typedef AllSAT<> DefaultContext;
+  typedef Generator<DefaultContext> DefaultGenerator; 
+
   class rand_base
   {
     protected:
@@ -21,8 +24,8 @@ namespace crave {
     public:
       virtual bool next() = 0;
   };
-
-  template<typename context_type=Context>
+  
+  template<typename context_type=DefaultContext>
   class rand_obj_of : public rand_base
   {
     public:
