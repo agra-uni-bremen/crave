@@ -11,6 +11,8 @@
 namespace crave {
 
   extern boost::mt19937 rng;
+  extern const unsigned AllSATSmallLimit;
+  extern const unsigned AllSATBigLimit;
 
   struct bitvector_less {
     bool operator() (qf_bv::bitvector const & a, qf_bv::bitvector const & b) {
@@ -156,7 +158,7 @@ namespace crave {
 	  }	  
 	  if (ignore_soft) is_solved = solve_all(false);	  
 	  
-          std::cout << "AllSAT found " << (is_solved ? "all " : "") << all_solutions.size() << " solution(s)" << std::endl;
+//           std::cout << "AllSAT found " << (is_solved ? "all " : "") << all_solutions.size() << " solution(s)" << std::endl;
 	  
           std::random_shuffle(all_solutions.begin(), all_solutions.end(), rng);
           current=all_solutions.begin();
@@ -220,7 +222,7 @@ namespace crave {
       current = all_solutions.begin();
       old_solutions.clear();
       ignore_soft = false;
-      sol_limit = limit_param < 0 ? 0 : (limit_param > 0 ? limit_param : (has_read_ref() ? 20 : 100)); 
+      sol_limit = limit_param < 0 ? 0 : (limit_param > 0 ? limit_param : (has_read_ref() ? AllSATSmallLimit : AllSATBigLimit)); 
     }
 
     bool is_solved;
@@ -231,9 +233,9 @@ namespace crave {
     all_solutions_t::iterator current;
   };
 
-  template<int N = 0> // negative = no limit, 0 = auto choose limit, positive = fixed limit
+  template<int LimParam = 0> // LimParam: negative = no limit, 0 = auto choose between small and big limit, positive = fixed limit
   struct AllSAT : public AllSAT_base {
-    AllSAT() : AllSAT_base(N) { }
+    AllSAT() : AllSAT_base(LimParam) { }
   };
 
 } /* crave */

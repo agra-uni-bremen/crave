@@ -3,7 +3,10 @@
 #include "../crave/ConstrainedRandom.hpp"
 
 namespace crave {
-
+  
+  const unsigned AllSATSmallLimit = 20;
+  const unsigned AllSATBigLimit = 100;
+  
   int new_var_id() { static int _ID=0; return ++_ID;}
 
   boost::mt19937 rng(std::time(0));
