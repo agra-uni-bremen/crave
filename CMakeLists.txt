@@ -78,6 +78,9 @@ INSTALL( FILES
 	${PROJECT_BINARY_DIR}/${PROJECT_NAME}.pc
 	DESTINATION lib/pkgconfig/)
 
+if ( NOT CRAVE_TEST_TIMEOUT )
+set(CRAVE_TEST_TIMEOUT 15)
+endif()
 
 add_subdirectory ( tests )
 

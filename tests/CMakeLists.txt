@@ -1,6 +1,3 @@
-if ( NOT TIMEOUT )
-set(TIMEOUT 15)
-endif()
 include_directories (../src)
 
 find_program(AWK awk)
@@ -16,7 +13,7 @@ function (add_all_tests prog cfile)
   foreach(test  ${test_cases})
     #message(STATUS "${prog}/${test} ${prog} -t ${test}")
     add_test("${prog}/${test}" ${prog} -t ${test})
-    set_tests_properties ("${prog}/${test}" PROPERTIES TIMEOUT ${TIMEOUT})
+    set_tests_properties ("${prog}/${test}" PROPERTIES TIMEOUT ${CRAVE_TEST_TIMEOUT})
   endforeach(test)
 endfunction(add_all_tests)
 
