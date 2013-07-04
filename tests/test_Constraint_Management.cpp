@@ -54,7 +54,7 @@ bool cmp_vec(std::vector<std::string> const &a, std::vector<std::string> const &
 }
 
 //sortieren
-void sort_results( std::vector<std::vector<string> > &results )
+void sort_results( std::vector<std::vector<std::string> > &results )
 {
   for(unsigned i = 0; i < results.size();i++)
   {

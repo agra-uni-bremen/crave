@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE ( unique_test_1 )
 BOOST_AUTO_TEST_CASE ( unique_test_2 )
 {
   rand_vec<unsigned int> v(NULL);
-  Generator<> gen;
+  DefaultGenerator gen;
   gen(v().size() == 11);
   gen.foreach(v, _i, v()[_i] < 10);
 
@@ -186,13 +186,13 @@ BOOST_AUTO_TEST_CASE ( soft_vec_constraint )
 {
   rand_vec<unsigned int> v(NULL);
 
-  Generator<> gen;
+  DefaultGenerator gen;
   gen(v().size() == 10);
   gen.foreach(v, _i, v()[_i] >= v()[_i - 1]);
   gen.soft_foreach(v, _i, v()[_i] < v()[_i - 1]);
   BOOST_REQUIRE(gen.next());
 
-  Generator<> gen1;
+  DefaultGenerator gen1;
   gen1(v().size() == 4);
   gen1.foreach(v, _i, v()[_i] >= v()[_i - 1]);
   gen1.foreach(v, _i, v()[_i] <= 1000);
