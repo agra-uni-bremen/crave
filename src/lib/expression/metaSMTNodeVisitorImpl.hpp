@@ -9,6 +9,7 @@
 #include <metaSMT/frontend/QF_BV.hpp>
 #include <metaSMT/DirectSolver_Context.hpp>
 #include <metaSMT/Priority_Context.hpp>
+#include <metaSMT/support/contradiction_analysis.hpp>
 
 #include <map>
 #include <stack>
@@ -69,6 +70,8 @@ public:
   virtual void makeSoftAssertion( Node const & );
   virtual void makeAssumption( Node const & );
   virtual void addPreHook( boost::function0<bool> );
+  virtual std::vector<std::vector<unsigned int> > analyseContradiction(
+                  std::map<unsigned int, boost::intrusive_ptr<Node> > const &);
   virtual bool solve();
   virtual bool read( Node const& var, AssignResult& );
 
@@ -633,6 +636,30 @@ bool metaSMTVisitorImpl<SolverType>::preSolve()
     metaSMT::assumption(solver_, *ite);
   }
   return true;
+}
+
+template<typename SolverType>
+std::vector<std::vector<unsigned int> > metaSMTVisitorImpl<SolverType>::analyseContradiction(
+                                  std::map<unsigned int, boost::intrusive_ptr<Node> > const &s)
+{
+  std::vector<std::vector<unsigned int> > results;
+  std::map<unsigned int, result_type> result_map;
+
+  typedef std::pair<unsigned int, boost::intrusive_ptr<Node> > NodePair;
+
+  BOOST_FOREACH (NodePair entry, s) {
+    entry.second->visit(*this);
+    stack_entry st_entry;
+    pop(st_entry);
+
+    result_type var(evaluate(solver_, preds::new_variable()));
+    metaSMT::assertion(solver_, preds::implies(var, st_entry.first));
+    result_map.insert(std::make_pair(entry.first, var));
+  }
+
+  results = metaSMT::analyze_conflicts(solver_, result_map, metaSMT::evaluate(solver_, preds::True), results);
+
+  return results;
 }
 
 template<typename SolverType>

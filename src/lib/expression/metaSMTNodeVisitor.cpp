@@ -45,6 +45,7 @@ metaSMTVisitor* FactoryMetaSMT::getInstanceOf(std::string const& type) {
   else if (0 == type.compare("Priority"))
     return newVisitorPriority();
   assert("Unsupported backend is choosen.");
+  return NULL;
 }
 
 } // end crave namespace

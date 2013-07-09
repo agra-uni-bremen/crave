@@ -97,16 +97,17 @@ public:
   template<typename Expr>
   Generator & operator()(std::string constraint_name, Expr expr) {
 
-    typename std::map<std::string, NodePtr>::iterator ite(
+    typename std::map<std::string, NamedStatement>::iterator ite(
         named_constraints_.lower_bound(constraint_name));
 
     if (ite != named_constraints_.end() && constraint_name >= ite->first)
       throw std::runtime_error("Constraint already exists.");
 
     NodePtr nested_expr = boost::proto::eval(FixWidth()(expr), ctx_);
+    NamedStatement named_stmt(constraint_name, new_var_id(), nested_expr);
 
     constraints_.push_back(nested_expr);
-    named_constraints_.insert(ite, std::make_pair(constraint_name, nested_expr));
+    named_constraints_.insert(ite, std::make_pair(constraint_name, named_stmt));
 
     return *this;
   }
@@ -117,7 +118,33 @@ public:
   }
 
   std::vector<std::vector<std::string> > analyse_contradiction() {
-    //FIXME: return ctx.analyse_contradiction();
+
+    boost::scoped_ptr<metaSMTVisitor> solver(FactoryMetaSMT::getInstanceOf(solver_type_));
+    std::vector<std::vector<std::string> > str_vec;
+
+    std::map<unsigned int, NodePtr> s;
+    typedef std::pair<std::string, NamedStatement> Si_Pair;
+    std::vector<std::string> out;
+    std::vector<std::vector<unsigned int> > results;
+
+    BOOST_FOREACH(Si_Pair si, named_constraints_)
+    {
+      s.insert(std::make_pair(s.size(), si.second.get_expression()));
+      out.push_back(si.first);
+    }
+
+    results = solver->analyseContradiction(s);
+
+    BOOST_FOREACH(std::vector<unsigned int> result, results)
+    {
+      std::vector<std::string> vec;
+      BOOST_FOREACH(unsigned int i, result)
+      {
+        vec.push_back(out[i]);
+      }
+      str_vec.push_back(vec);
+    }
+    return str_vec;
   }
 
   bool enable_constraint(std::string constraint_name) {
@@ -440,12 +467,12 @@ public:
       solver_->addPreHook(f);
     }
 
-    for (std::map<std::string, NodePtr>::const_iterator
+    for (std::map<std::string, NamedStatement>::const_iterator
          it = named_constraints_.begin();
          it != named_constraints_.end(); ++it) {
 
       if (0 == disabled_named_constaints_.count(it->first))
-        solver_->makeAssumption(*it->second);
+        solver_->makeAssumption(*it->second.get_expression());
     }
     BOOST_FOREACH(ReadRefPair pair, read_references_) {
       solver_->makeAssumption(*pair.second->expr());
@@ -500,7 +527,7 @@ private:
   // constraints
   std::vector<boost::intrusive_ptr<Node> > constraints_;
   std::vector<boost::intrusive_ptr<Node> > soft_constraints_;
-  std::map<std::string, boost::intrusive_ptr<Node> > named_constraints_;
+  std::map<std::string, NamedStatement> named_constraints_;
   std::set<std::string> disabled_named_constaints_;
   std::set<int> unique_vectors_;
   std::multimap<int, VectorStatement> foreach_statements_;
