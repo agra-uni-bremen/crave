@@ -40,6 +40,23 @@ private:
   Placeholder placeholder_;
 };
 
+struct NamedStatement : Statement {
+
+  NamedStatement(std::string const name, int id, expression const expr)
+  : Statement(expr), id_(id),  name_(name) { }
+
+  inline std::string const& get_name() const {
+    return name_;
+  }
+  inline int get_var_id() const {
+    return id_;
+  }
+
+private:
+  int id_;
+  std::string name_;
+};
+
 struct NamedVectorStatement : VectorStatement {
 
   NamedVectorStatement (std::string name, boost::intrusive_ptr< VectorExpr > vec,
