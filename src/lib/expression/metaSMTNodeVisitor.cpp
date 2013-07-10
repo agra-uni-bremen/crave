@@ -3,6 +3,7 @@
 #include "metaSMTNodeVisitorImpl.hpp"
 
 #include <metaSMT/backend/SWORD_Backend.hpp>
+#include <metaSMT/backend/Boolector.hpp>
 #include <metaSMT/BitBlast.hpp>
 #include <metaSMT/DirectSolver_Context.hpp>
 #include <metaSMT/Priority_Context.hpp>
@@ -11,16 +12,20 @@
 
 namespace crave {
 
-metaSMTVisitor* FactoryMetaSMT::newVisitorSWORD() {
+metaSMTVisitor* newVisitorSWORD() {
   return new metaSMTVisitorImpl< metaSMT::DirectSolver_Context< metaSMT::solver::SWORD_Backend > > ();
-};
+}
 
-metaSMTVisitor* FactoryMetaSMT::newVisitorCudd() {
+metaSMTVisitor* newVisitorBoolector() {
+  return new metaSMTVisitorImpl< metaSMT::DirectSolver_Context< metaSMT::solver::Boolector > > ();
+}
+
+metaSMTVisitor* newVisitorCudd() {
   return new metaSMTVisitorImpl<
       metaSMT::DirectSolver_Context< metaSMT::BitBlast< metaSMT::solver::CUDD_Distributed > > > ();
 }
 
-metaSMTVisitor* FactoryMetaSMT::newVisitorPriority() {
+metaSMTVisitor* newVisitorPriority() {
   typedef metaSMT::DirectSolver_Context <
     metaSMT::UnpackFuture_Context <
     metaSMT::BitBlast <
@@ -40,6 +45,8 @@ metaSMTVisitor* FactoryMetaSMT::newVisitorPriority() {
 metaSMTVisitor* FactoryMetaSMT::getInstanceOf(std::string const& type) {
   if (0 == type.compare("SWORD"))
     return newVisitorSWORD();
+  else if (0 == type.compare("Boolector"))
+    return newVisitorBoolector();
   else if (0 == type.compare("Cudd"))
     return newVisitorCudd();
   else if (0 == type.compare("Priority"))

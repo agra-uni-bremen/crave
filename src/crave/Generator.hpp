@@ -51,7 +51,7 @@ public:
     vector_variables_(), vectors_(), vector_elements_(), read_references_(), write_references_(),
     pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
     solver_(NULL), okay_(false), solver_type_() {
-      set_backend("SWORD");
+      set_backend("Boolector");
   }
 
   template<typename Expr>
@@ -61,7 +61,7 @@ public:
     vector_variables_(), vectors_(), vector_elements_(), read_references_(), write_references_(),
     pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
     solver_(NULL), okay_(false), solver_type_() {
-      set_backend("SWORD");
+      set_backend("Boolector");
       (*this)(expr);
     }
 
