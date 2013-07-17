@@ -6,12 +6,12 @@
 using std::ostream;
 
 namespace crave {
-  namespace proto = boost::proto;
+  namespace bproto = boost::proto;
 
   struct Constraint_Domain;
 
   struct Constraint_Grammar
-  : proto::_
+  : bproto::_
   {};
 
   template<typename T>
@@ -22,9 +22,9 @@ namespace crave {
 
   template<typename Expr>
   struct Constraint
-  : proto::extends<Expr, Constraint<Expr>, Constraint_Domain >
+  : bproto::extends<Expr, Constraint<Expr>, Constraint_Domain >
   {
-    typedef proto::extends<Expr, Constraint<Expr>, Constraint_Domain > base_type;
+    typedef bproto::extends<Expr, Constraint<Expr>, Constraint_Domain > base_type;
 
     Constraint(Expr const & expr = Expr())
       : base_type(expr)
@@ -33,31 +33,31 @@ namespace crave {
 
 
    template<typename T, typename E2>
-   typename proto::result_of::make_expr<
-          proto::tag::assign
+   typename bproto::result_of::make_expr<
+          bproto::tag::assign
         , Constraint_Domain
         , Expr
         , E2
       > ::type
       operator= ( E2 e ) {
-      return proto::make_expr< proto::tag::assign>
+      return bproto::make_expr< bproto::tag::assign>
         ( *this, e);
       }
   };
 
 
   struct Constraint_Domain
-  : proto::domain<proto::generator<Constraint>, Constraint_Grammar>
+  : bproto::domain<bproto::generator<Constraint>, Constraint_Grammar>
   {};
 
    template<typename Expr>
    void check (Constraint<Expr> const & ) {
-     BOOST_MPL_ASSERT((proto::matches<Expr, Constraint_Grammar>));
+     BOOST_MPL_ASSERT((bproto::matches<Expr, Constraint_Grammar>));
    }
 
    template<typename Expr>
    void check_not (Constraint<Expr> const & ) {
-     BOOST_MPL_ASSERT_NOT((proto::matches<Expr, Constraint_Grammar>));
+     BOOST_MPL_ASSERT_NOT((bproto::matches<Expr, Constraint_Grammar>));
    }
 
 
@@ -135,11 +135,11 @@ namespace crave {
   int new_var_id();
 
   template<typename value_type_>
-  struct Variable : public Constraint< typename boost::proto::terminal< var_tag<value_type_> >::type >
+  struct Variable : public Constraint< typename bproto::terminal< var_tag<value_type_> >::type >
   {
-    typedef Constraint< typename proto::terminal< var_tag<value_type_> >::type > base_type;
+    typedef Constraint< typename bproto::terminal< var_tag<value_type_> >::type > base_type;
     Variable()
-      : base_type( proto::make_expr< proto::tag::terminal>
+      : base_type( bproto::make_expr< bproto::tag::terminal>
         ( var_tag<value_type_>(new_var_id() ) ) )
     {}
 
@@ -149,65 +149,65 @@ namespace crave {
     { linkto.addVariable(*this); }
 
     typedef value_type_ value_type;
-    int id() const {  return boost::proto::value(*this).id; };
+    int id() const {  return bproto::value(*this).id; };
 
-   typename proto::result_of::make_expr<
-          proto::tag::assign
+   typename bproto::result_of::make_expr<
+          bproto::tag::assign
         , Constraint_Domain
         , Variable<value_type_> const &
         , value_type_ const &
       > ::type const
       operator= ( value_type_ const & e ) const {
-      return proto::make_expr< proto::tag::assign, Constraint_Domain>
+      return bproto::make_expr< bproto::tag::assign, Constraint_Domain>
         ( boost::cref(*this), boost::cref(e));
       }
   };
 
   template<typename value_type_>
-  struct Vector : public Constraint< typename boost::proto::terminal< vector_tag<value_type_> >::type >
+  struct Vector : public Constraint< typename bproto::terminal< vector_tag<value_type_> >::type >
   {
-    typedef Constraint< typename proto::terminal< vector_tag<value_type_> >::type > base_type;
+    typedef Constraint< typename bproto::terminal< vector_tag<value_type_> >::type > base_type;
     Vector()
-      : base_type( proto::make_expr< proto::tag::terminal>
+      : base_type( bproto::make_expr< bproto::tag::terminal>
         ( vector_tag<value_type_>(new_var_id() ) ) )
     {}
 
     typedef value_type_ value_type;
-    int id() const {  return boost::proto::value(*this).id; };
+    int id() const {  return bproto::value(*this).id; };
 
     Variable<unsigned int> _size;
     const Variable<unsigned int>& size() const { return _size; }
   };
 
-  struct placeholder : public Constraint< boost::proto::terminal<placeholder_tag>::type >
+  struct placeholder : public Constraint< bproto::terminal<placeholder_tag>::type >
   {
-    typedef Constraint< proto::terminal< placeholder_tag >::type > base_type;
+    typedef Constraint< bproto::terminal< placeholder_tag >::type > base_type;
     placeholder()
-      : base_type( proto::make_expr<proto::tag::terminal>(placeholder_tag(new_var_id())) )
+      : base_type( bproto::make_expr<bproto::tag::terminal>(placeholder_tag(new_var_id())) )
     {}
 
-    int id() const { return boost::proto::value(*this).id; }
+    int id() const { return bproto::value(*this).id; }
   };
 
   template<typename value_type_>
   struct WriteReference : public Constraint< typename boost::proto::terminal< write_ref_tag<value_type_> >::type >
   {
-    typedef Constraint< typename proto::terminal< write_ref_tag<value_type_> >::type > base_type;
+    typedef Constraint< typename bproto::terminal< write_ref_tag<value_type_> >::type > base_type;
     WriteReference(value_type_ & ref)
-      : base_type( proto::make_expr< proto::tag::terminal>
+      : base_type( bproto::make_expr< bproto::tag::terminal>
         ( write_ref_tag<value_type_>(new_var_id(), ref ) ) )
     {}
     typedef value_type_ value_type;
     int id() const {  return boost::proto::value(*this).id; };
 
-   typename proto::result_of::make_expr<
-          proto::tag::assign
+   typename bproto::result_of::make_expr<
+          bproto::tag::assign
         , Constraint_Domain
         , WriteReference<value_type_> const &
         , value_type_ const &
       > ::type const
       operator= ( value_type_ const & e ) const {
-      return proto::make_expr< proto::tag::assign, Constraint_Domain>
+      return bproto::make_expr< bproto::tag::assign, Constraint_Domain>
         ( boost::cref(*this), boost::cref(e));
       }
   };
@@ -216,9 +216,9 @@ namespace crave {
   template<typename value_type_>
   struct ReadReference : public Constraint< typename boost::proto::terminal< read_ref_tag<value_type_> >::type >
   {
-    typedef Constraint< typename proto::terminal< read_ref_tag<value_type_> >::type > base_type;
+    typedef Constraint< typename bproto::terminal< read_ref_tag<value_type_> >::type > base_type;
     ReadReference(value_type_ &  ref)
-      : base_type( proto::make_expr< proto::tag::terminal>
+      : base_type( bproto::make_expr< bproto::tag::terminal>
         ( read_ref_tag<value_type_>(new_var_id(), ref) ) )
     {}
     typedef value_type_ value_type;
@@ -226,14 +226,14 @@ namespace crave {
   };
 
       template<typename T>
-      typename proto::result_of::make_expr<
-          proto::tag::terminal
+      typename bproto::result_of::make_expr<
+          bproto::tag::terminal
         , Constraint_Domain
         , read_ref_tag<T>
       > ::type
       reference( T const &  ref )
       {
-        return proto::make_expr< proto::tag::terminal, Constraint_Domain >( read_ref_tag<T>( new_var_id(), ref )) ;
+        return bproto::make_expr< bproto::tag::terminal, Constraint_Domain >( read_ref_tag<T>( new_var_id(), ref )) ;
       }
 
 

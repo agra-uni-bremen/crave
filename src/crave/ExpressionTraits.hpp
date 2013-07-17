@@ -13,7 +13,7 @@
 #include <boost/type_traits/is_signed.hpp>
 
 namespace crave {
-  namespace proto = boost::proto;
+  namespace bproto = boost::proto;
 
   struct extend_tag {};
   template<typename Stream>
@@ -22,37 +22,37 @@ namespace crave {
   }
 
   struct BooleanResult
-  : proto::or_<
+  : bproto::or_<
       // comparison
-      proto::or_<
-        proto::nary_expr< proto::tag::less_equal, proto::vararg< proto::_> >
-      , proto::nary_expr< proto::tag::less, proto::vararg< proto::_> >
-      , proto::nary_expr< proto::tag::greater, proto::vararg< proto::_> >
-      , proto::nary_expr< proto::tag::greater_equal, proto::vararg< proto::_> >
-      , proto::nary_expr< proto::tag::equal_to, proto::vararg< proto::_> >
-      , proto::nary_expr< proto::tag::not_equal_to, proto::vararg< proto::_> >
+      bproto::or_<
+        bproto::nary_expr< bproto::tag::less_equal, bproto::vararg< bproto::_> >
+      , bproto::nary_expr< bproto::tag::less, bproto::vararg< bproto::_> >
+      , bproto::nary_expr< bproto::tag::greater, bproto::vararg< bproto::_> >
+      , bproto::nary_expr< bproto::tag::greater_equal, bproto::vararg< bproto::_> >
+      , bproto::nary_expr< bproto::tag::equal_to, bproto::vararg< bproto::_> >
+      , bproto::nary_expr< bproto::tag::not_equal_to, bproto::vararg< bproto::_> >
       >
       // logic
-    , proto::or_<
-        proto::nary_expr< proto::tag::logical_and, proto::vararg< proto::_> >
-      , proto::nary_expr< proto::tag::logical_or, proto::vararg< proto::_> >
-      , proto::nary_expr< proto::tag::logical_not, proto::vararg< proto::_> >
+    , bproto::or_<
+        bproto::nary_expr< bproto::tag::logical_and, bproto::vararg< bproto::_> >
+      , bproto::nary_expr< bproto::tag::logical_or, bproto::vararg< bproto::_> >
+      , bproto::nary_expr< bproto::tag::logical_not, bproto::vararg< bproto::_> >
       >
   > {};
 
   struct ExpressionSize
-  : proto::or_<
-    proto::when<proto::terminal<proto::_>, bitsize_traits<proto::_value>() >
-  , proto::when<BooleanResult, boost::mpl::int_<1>() >
-  , proto::when<proto::subscript< proto::_, proto::_ >, ExpressionSize(proto::_left) >
-  , proto::when<proto::binary_expr< extend_tag,  proto::_, proto::_ >,
+  : bproto::or_<
+    bproto::when<bproto::terminal<bproto::_>, bitsize_traits<bproto::_value>() >
+  , bproto::when<BooleanResult, boost::mpl::int_<1>() >
+  , bproto::when<bproto::subscript< bproto::_, bproto::_ >, ExpressionSize(bproto::_left) >
+  , bproto::when<bproto::binary_expr< extend_tag,  bproto::_, bproto::_ >,
       boost::mpl::int_<0>()
     >
-  , proto::when<
-      proto::nary_expr<proto::_, proto::vararg<proto::_> >
-    , proto::fold<proto::_, boost::mpl::int_<0>(), boost::mpl::max<ExpressionSize, proto::_state>()>
+  , bproto::when<
+      bproto::nary_expr<bproto::_, bproto::vararg<bproto::_> >
+    , bproto::fold<bproto::_, boost::mpl::int_<0>(), boost::mpl::max<ExpressionSize, bproto::_state>()>
     >
-  , proto::when<proto::_, boost::mpl::int_<0>() >
+  , bproto::when<bproto::_, boost::mpl::int_<0>() >
   > {};
 
   struct FixWidth;
@@ -65,55 +65,55 @@ namespace crave {
   };
 
   struct InjectExtend_
-  : proto::when< proto::_, proto::binary_expr<extend_tag,
-      proto::terminal< Minus< proto::_state, proto::_expr >::type ()
-          > (Minus< proto::_state, proto::_expr >::type () )
-      ,  proto::_expr
+  : bproto::when< bproto::_, bproto::binary_expr<extend_tag,
+      bproto::terminal< Minus< bproto::_state, bproto::_expr >::type ()
+          > (Minus< bproto::_state, bproto::_expr >::type () )
+      ,  bproto::_expr
       >(
-         proto::terminal< Minus< proto::_state, proto::_expr >::type ()
-            > ( Minus< proto::_state, proto::_expr >::type () )
-      ,  proto::_expr
+         bproto::terminal< Minus< bproto::_state, bproto::_expr >::type ()
+            > ( Minus< bproto::_state, bproto::_expr >::type () )
+      ,  bproto::_expr
       )>
   {};
 
   struct FixFirstLarger
-  : proto::and_<
-    proto::binary_expr<proto::_, proto::_, proto::_>
-  , proto::if_< boost::mpl::less< ExpressionSize( proto::_left),  ExpressionSize( proto::_right) >() >
+  : bproto::and_<
+    bproto::binary_expr<bproto::_, bproto::_, bproto::_>
+  , bproto::if_< boost::mpl::less< ExpressionSize( bproto::_left),  ExpressionSize( bproto::_right) >() >
   // transform to:
-  , proto::when<proto::_, proto::binary_expr<
-      proto::tag_of< proto::_expr >(),
-      InjectExtend_( FixWidth(proto::_left), proto::_right),
-      FixWidth(proto::_right)
+  , bproto::when<bproto::_, bproto::binary_expr<
+      bproto::tag_of< bproto::_expr >(),
+      InjectExtend_( FixWidth(bproto::_left), bproto::_right),
+      FixWidth(bproto::_right)
     > (
-      InjectExtend_( FixWidth(proto::_left), proto::_right),
-      FixWidth(proto::_right)
+      InjectExtend_( FixWidth(bproto::_left), bproto::_right),
+      FixWidth(bproto::_right)
     ) >
   >{};
 
 
   struct FixSecondLarger
-  : proto::and_<
-    proto::binary_expr<proto::_, proto::_, proto::_>
-  , proto::if_< boost::mpl::greater< ExpressionSize( proto::_left),  ExpressionSize( proto::_right) >() >
+  : bproto::and_<
+    bproto::binary_expr<bproto::_, bproto::_, bproto::_>
+  , bproto::if_< boost::mpl::greater< ExpressionSize( bproto::_left),  ExpressionSize( bproto::_right) >() >
   // transform to:
-  , proto::when<proto::_, proto::binary_expr<
-      proto::tag_of< proto::_expr >(),
-      FixWidth(proto::_left),
-      InjectExtend_( FixWidth(proto::_right), proto::_left)
+  , bproto::when<bproto::_, bproto::binary_expr<
+      bproto::tag_of< bproto::_expr >(),
+      FixWidth(bproto::_left),
+      InjectExtend_( FixWidth(bproto::_right), bproto::_left)
     > (
-      FixWidth(proto::_left),
-      InjectExtend_( FixWidth(proto::_right), proto::_left)
+      FixWidth(bproto::_left),
+      InjectExtend_( FixWidth(bproto::_right), bproto::_left)
     ) >
   >{};
 
   struct FixWidth
-  : proto::or_<
-     proto::terminal<proto::_>
-  ,  proto::subscript<proto::_, proto::_>
+  : bproto::or_<
+     bproto::terminal<bproto::_>
+  ,  bproto::subscript<bproto::_, bproto::_>
   ,  FixFirstLarger
   ,  FixSecondLarger
-  ,  proto::nary_expr<proto::_, proto::vararg<FixWidth> >
+  ,  bproto::nary_expr<bproto::_, bproto::vararg<FixWidth> >
   >{};
 
 /***************************************************************************/
@@ -121,30 +121,30 @@ namespace crave {
 /***************************************************************************/
 
   struct FixedUnsigned
-  : proto::or_<
-      proto::nary_expr< proto::tag::less_equal, proto::vararg< proto::_> >
-    , proto::nary_expr< proto::tag::less, proto::vararg< proto::_> >
-    , proto::nary_expr< proto::tag::greater, proto::vararg< proto::_> >
-    , proto::nary_expr< proto::tag::greater_equal, proto::vararg< proto::_> >
-    , proto::nary_expr< proto::tag::equal_to, proto::vararg< proto::_> >
-    , proto::nary_expr< proto::tag::not_equal_to, proto::vararg< proto::_> >
+  : bproto::or_<
+      bproto::nary_expr< bproto::tag::less_equal, bproto::vararg< bproto::_> >
+    , bproto::nary_expr< bproto::tag::less, bproto::vararg< bproto::_> >
+    , bproto::nary_expr< bproto::tag::greater, bproto::vararg< bproto::_> >
+    , bproto::nary_expr< bproto::tag::greater_equal, bproto::vararg< bproto::_> >
+    , bproto::nary_expr< bproto::tag::equal_to, bproto::vararg< bproto::_> >
+    , bproto::nary_expr< bproto::tag::not_equal_to, bproto::vararg< bproto::_> >
   > {};
 
   struct IsSigned
-  : proto::and_<
-      proto::not_< FixedUnsigned >
-    , proto::or_ <
-        proto::and_<
-          proto::terminal<proto::_>
-        , proto::if_< boost::is_signed< proto::_value > () >
+  : bproto::and_<
+      bproto::not_< FixedUnsigned >
+    , bproto::or_ <
+        bproto::and_<
+          bproto::terminal<bproto::_>
+        , bproto::if_< boost::is_signed< bproto::_value > () >
         >
-      , proto::subscript< IsSigned, proto::_ >
-      , proto::and_<
-          proto::not_< proto::subscript<proto::_, proto::_ > >
-        , proto::when< proto::binary_expr<proto::_, proto::_, proto::_>
-        , proto::or_<
-            IsSigned( proto::_left )
-          , IsSigned( proto::_right )
+      , bproto::subscript< IsSigned, bproto::_ >
+      , bproto::and_<
+          bproto::not_< bproto::subscript<bproto::_, bproto::_ > >
+        , bproto::when< bproto::binary_expr<bproto::_, bproto::_, bproto::_>
+        , bproto::or_<
+            IsSigned( bproto::_left )
+          , IsSigned( bproto::_right )
           >
         >
       >
