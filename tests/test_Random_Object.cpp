@@ -1,4 +1,3 @@
-#define BOOST_TEST_MODULE Random_Object_t
 #include <boost/test/unit_test.hpp>
 
 #include <crave/ConstrainedRandom.hpp>
@@ -11,8 +10,6 @@
 //using namespace std;
 using boost::format;
 using namespace crave;
-
-struct Context_Fixture {};
 
 enum color_enum {
   RED,
@@ -49,14 +46,15 @@ public:
   randv<color_enum> color;
   randv<int> x;
 
-  my_rand_obj(rand_obj* parent = 0) : rand_obj(parent), color(this), x(this) {
+  my_rand_obj(std::string const& type, rand_obj* parent = 0) : rand_obj(parent), color(this), x(this) {
+    set_solver_backend(type);
     constraint(color() == x());
   }
 };
 
 BOOST_AUTO_TEST_CASE( t_rand_enum )
 {
-  my_rand_obj obj(0);
+  my_rand_obj obj(solver_type, 0);
   for (int i = 0; i < 20; i++) {
     BOOST_REQUIRE(obj.next());
     std::cout << obj.color << " " << obj.x << std::endl;
@@ -74,7 +72,8 @@ class tall_rand_enum_obj : public rand_obj {
 public:
   randv<football_enum> player;
 
-  tall_rand_enum_obj(rand_obj* parent = 0) : rand_obj(parent), player(this) {
+  tall_rand_enum_obj(std::string const& type, rand_obj* parent = 0) : rand_obj(parent), player(this) {
+    set_solver_backend(type);
     constraint(player() == GK && player() != CF);
   }
 };
@@ -83,14 +82,15 @@ class tall_rand_enum_obj_gt : public rand_obj {
 public:
   randv<football_enum> player;
 
-  tall_rand_enum_obj_gt(rand_obj* parent = 0) : rand_obj(parent), player(this) {
+  tall_rand_enum_obj_gt(std::string const& type, rand_obj* parent = 0) : rand_obj(parent), player(this) {
+    set_solver_backend(type);
     constraint(player() > AM);
   }
 };
 
 BOOST_AUTO_TEST_CASE( enum_no_overflow )
 {
-  tall_rand_enum_obj obj(0);
+  tall_rand_enum_obj obj(solver_type, 0);
   BOOST_REQUIRE(obj.next());
 
   BOOST_REQUIRE_EQUAL(obj.player, GK);
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE( enum_no_overflow )
 
 BOOST_AUTO_TEST_CASE( enum_gt )
 {
-  tall_rand_enum_obj_gt obj(0);
+  tall_rand_enum_obj_gt obj(solver_type, 0);
 
   for (int i = 0; i<100; ++i) {
     BOOST_REQUIRE(obj.next());
@@ -109,7 +109,8 @@ BOOST_AUTO_TEST_CASE( enum_gt )
 
 class item : public rand_obj {
 public:
-  item(rand_obj* parent) : rand_obj(parent), a(this), b(this), c(this) {
+  item(std::string const& type, rand_obj* parent) : rand_obj(parent), a(this), b(this), c(this) {
+    set_solver_backend(type);
     constraint(a() + b() == c());
   }
 public:
@@ -120,7 +121,7 @@ public:
 
 class item1 : public item {
 public:
-  item1(rand_obj* parent) : item(parent) {
+  item1(std::string const& type, rand_obj* parent) : item(type, parent) {
     constraint(10 <= a() && a() <= 20);
     constraint(a() +  b() + c() <= 200);
   }
@@ -128,7 +129,7 @@ public:
 
 class item2 : public item1 {
 public:
-  item2(rand_obj* parent) : item1(parent), d(this) {
+  item2(std::string const& type, rand_obj* parent) : item1(type, parent), d(this) {
     constraint(a() + b() + c() == 100);
   }
   randv<int> d;
@@ -136,7 +137,7 @@ public:
 
 BOOST_AUTO_TEST_CASE( t2 )
 {
-  item it(0);
+  item it(solver_type, 0);
   it.next();
   std::cout << it.a << " " << it.b << " " << it.c << std::endl;
   BOOST_REQUIRE(it.a + it.b == it.c);
@@ -144,7 +145,7 @@ BOOST_AUTO_TEST_CASE( t2 )
 
 BOOST_AUTO_TEST_CASE( t3 )
 {
-  item1 it(0);
+  item1 it(solver_type, 0);
   it.next();
   std::cout << it.a << " " << it.b << " " << it.c << std::endl;
   BOOST_REQUIRE(it.a + it.b == it.c);
@@ -154,7 +155,7 @@ BOOST_AUTO_TEST_CASE( t3 )
 
 BOOST_AUTO_TEST_CASE( t4 )
 {
-  item2 it(0);
+  item2 it(solver_type, 0);
   it.next();
   std::cout << it.a << " " << it.b << " " << it.c << std::endl;
   BOOST_REQUIRE(it.a + it.b == it.c);
@@ -164,7 +165,8 @@ BOOST_AUTO_TEST_CASE( t4 )
 
 class obj : public rand_obj {
 public:
-  obj(rand_obj* parent) : rand_obj(parent), a(this), b(this), c(this), d(this), e(this), f(this) {
+  obj(std::string const& type, rand_obj* parent) : rand_obj(parent), a(this), b(this), c(this), d(this), e(this), f(this) {
+    set_solver_backend(type);
     a.range(-20, -10);
     b.range(10, 20);
     c.range(-20, -10);
@@ -187,7 +189,7 @@ public:
 
 class obj1 : public obj {
 public:
-  obj1(rand_obj* parent) : obj(parent) {
+  obj1(std::string const& type, rand_obj* parent) : obj(type, parent) {
     e.range('A', 'Z');
     f.range('a', 'z');
   }
@@ -195,7 +197,8 @@ public:
 
 class obj2 : public rand_obj {
 public:
-  obj2(rand_obj* parent) : rand_obj(parent), g(this), h(this), i(this), j(this), k(this), l(this) {
+  obj2(std::string const& type, rand_obj* parent) : rand_obj(parent), g(this), h(this), i(this), j(this), k(this), l(type, this) {
+    set_solver_backend(type);
     g.range(-20, -10);
     h.range(10, 20);
     i.range(-20, -10);
@@ -216,7 +219,7 @@ public:
 
 BOOST_AUTO_TEST_CASE( t5 )
 {
-  obj it(0);
+  obj it(solver_type, 0);
   for (int i = 0; i < 20; i++) {
     it.next();
     BOOST_REQUIRE(-20 <= it.a && it.a <= -10);
@@ -227,7 +230,7 @@ BOOST_AUTO_TEST_CASE( t5 )
     BOOST_REQUIRE('A' <= it.f && it.f <= 'Z');
   }
 
-  obj1 it1(0);
+  obj1 it1(solver_type, 0);
   for (int i = 0; i < 20; i++) {
     it1.next();
     BOOST_REQUIRE(-20 <= it1.a && it1.a <= -10);
@@ -238,7 +241,7 @@ BOOST_AUTO_TEST_CASE( t5 )
     BOOST_REQUIRE('A' <= it1.e && it1.e <= 'Z');
   }
 
-  obj2 it2(0);
+  obj2 it2(solver_type, 0);
   for (int i = 0; i < 20; i++) {
     it2.next();
     BOOST_REQUIRE(-20 <= it2.g && it2.g <= -10);
@@ -254,12 +257,11 @@ BOOST_AUTO_TEST_CASE( t5 )
   }
 }
 
-#define ref(x) reference(x)
-
 struct Item1 : public rand_obj {
-  Item1() : x(this), pivot(0) {
+  Item1(std::string const& type) : x(this), pivot(0) {
+    set_solver_backend(type);
     constraint("c1", x() * x() >= 24);
-    constraint("c2", x() <= ref(pivot));
+    constraint("c2", x() <= reference(pivot));
   }
 
   bool next() {
@@ -282,13 +284,14 @@ struct Item1 : public rand_obj {
 
 BOOST_AUTO_TEST_CASE ( binary_search_test )
 {
-  Item1 it;
+  Item1 it(solver_type);
   it.next();
   BOOST_REQUIRE_EQUAL(it.x, 5);
 }
 
 struct Item2 : public rand_obj {
-  Item2() : i(), address(this), data(this) {
+  Item2(std::string const& type) : i(), address(this), data(this) {
+    set_solver_backend(type);
     constraint(address() % 4 == 0);
     constraint(address() <= 1000u);
     constraint(data().size() == 4);
@@ -303,7 +306,7 @@ struct Item2 : public rand_obj {
 
 BOOST_AUTO_TEST_CASE ( item_with_vector )
 {
-  Item2 it;
+  Item2 it(solver_type);
   for (int i = 0; i < 20; i++) {
     BOOST_REQUIRE(it.next());
     BOOST_REQUIRE(it.data.size() == 4);
@@ -319,8 +322,8 @@ BOOST_AUTO_TEST_CASE ( item_with_vector )
 
 class Constraint_base : public Generator {
   public:
-    Constraint_base()
-      : Generator()
+    Constraint_base(std::string const& type)
+      : Generator(type)
       , constraint(*this)
       , soft_constraint( constraint )
     {}
@@ -334,21 +337,21 @@ class Constraint1 : public Constraint_base {
   public:
     Variable<unsigned> x;
 
-    Constraint1 () {
+    Constraint1 (std::string const& type) : Constraint_base(type) {
       constraint( x<10 );
     }
 };
 
 class Constraint2 : public Constraint1 {
   public:
-    Constraint2 () {
+    Constraint2 (std::string const& type) : Constraint1(type) {
       constraint( x>6 );
     }
 };
 
 BOOST_AUTO_TEST_CASE( t1 )
 {
-  Constraint2 c2;
+  Constraint2 c2(solver_type);
 
   c2();
   unsigned r = c2[c2.x];

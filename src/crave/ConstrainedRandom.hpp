@@ -43,6 +43,9 @@ namespace crave {
         children.push_back(rb);
         constraint.add_pre_hook(boost::bind<bool>(&rand_base::next, rb));
       }
+      inline void set_solver_backend(std::string const type) {
+        constraint.set_backend(type);
+      }
 
     protected:
       rand_obj_of() { }

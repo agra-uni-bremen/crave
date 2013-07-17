@@ -1,4 +1,3 @@
-#define BOOST_TEST_MODULE Syntax
 #include <boost/test/unit_test.hpp>
 
 #include <crave/ConstrainedRandom.hpp>
@@ -6,11 +5,7 @@
 //using namespace std;
 using namespace crave;
 
-class Syntax_Fixture {
-  protected:
-};
-
-BOOST_FIXTURE_TEST_SUITE(Syntax, Syntax_Fixture )
+BOOST_FIXTURE_TEST_SUITE(Syntax, Context_Fixture )
 
 BOOST_AUTO_TEST_CASE( constants )
 {

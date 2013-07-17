@@ -25,20 +25,17 @@ find_library(PTHREAD pthread)
 add_library (${PROJECT_NAME}_boost_test ${STATIC_OR_SHARED} boost_test.cpp)
 link_libraries (${PROJECT_NAME}_boost_test ${PROJECT_NAME} ${Boost_THREAD_LIBRARY} ${PTHREAD} )
 
-add_executable (Syntax test_Syntax.cpp )
-add_all_tests(Syntax test_Syntax.cpp )
+add_executable(Boolector Boolector.cpp)
+add_all_tests(Boolector Boolector.cpp)
 
-add_executable (Context test_Context.cpp )
-add_all_tests(Context test_Context.cpp )
+add_executable(SWORD SWORD.cpp)
+add_all_tests(SWORD SWORD.cpp)
 
-add_executable (Random_Object test_Random_Object.cpp )
-add_all_tests(Random_Object test_Random_Object.cpp )
+add_executable(Cudd Cudd.cpp)
+add_all_tests(Cudd Cudd.cpp)
 
-add_executable (Constraint_Management test_Constraint_Management.cpp )
-add_all_tests(Constraint_Management test_Constraint_Management.cpp )
-
-add_executable (Vector_Constraint test_Vector_Constraint.cpp )
-add_all_tests(Vector_Constraint test_Vector_Constraint.cpp )
+add_executable(Priority Priority.cpp)
+add_all_tests(Priority Priority.cpp)
 
 add_executable (Distribution test_Distribution.cpp )
 add_all_tests(Distribution test_Distribution.cpp )
