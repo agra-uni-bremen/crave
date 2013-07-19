@@ -1,4 +1,3 @@
-#define BOOST_TEST_MODULE allsat
 #include <boost/test/unit_test.hpp>
 
 #include <crave/ConstrainedRandom.hpp>
@@ -13,14 +12,6 @@
 using namespace crave;
 
 using boost::format;
-
-struct Context_Fixture {
-  Context_Fixture ()
-  {
-  }
-  protected:
-  Generator<AllSAT<> > gen;
-};
 
 class sif_seq_item : public rand_obj_of<AllSAT<> > {
 public:

@@ -1,8 +1,8 @@
-#define BOOST_TEST_MODULE SWORD
+#define BOOST_TEST_MODULE Z3
 #include <string>
 
 struct Context_Fixture {
-  Context_Fixture () : solver_type("SWORD") { }
+  Context_Fixture () : solver_type("Z3") { }
   std::string const solver_type;
 };
 
@@ -11,3 +11,4 @@ struct Context_Fixture {
 #include "test_Random_Object.cpp"
 #include "test_Constraint_Management.cpp"
 #include "test_Vector_Constraint.cpp"
+#include "test_Distribution.cpp"

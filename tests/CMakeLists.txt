@@ -25,20 +25,20 @@ find_library(PTHREAD pthread)
 add_library (${PROJECT_NAME}_boost_test ${STATIC_OR_SHARED} boost_test.cpp)
 link_libraries (${PROJECT_NAME}_boost_test ${PROJECT_NAME} ${Boost_THREAD_LIBRARY} ${PTHREAD} )
 
-add_executable(Boolector Boolector.cpp)
-add_all_tests(Boolector Boolector.cpp)
+add_executable(use_Boolector use_Boolector.cpp)
+add_all_tests(use_Boolector use_Boolector.cpp)
 
-add_executable(SWORD SWORD.cpp)
-add_all_tests(SWORD SWORD.cpp)
+add_executable(use_Z3 use_Z3.cpp)
+add_all_tests(use_Z3 use_Z3.cpp)
 
-add_executable(Cudd Cudd.cpp)
-add_all_tests(Cudd Cudd.cpp)
+add_executable(use_SWORD use_SWORD.cpp)
+add_all_tests(use_SWORD use_SWORD.cpp)
 
-add_executable(Priority Priority.cpp)
-add_all_tests(Priority Priority.cpp)
+add_executable(use_Cudd use_Cudd.cpp)
+add_all_tests(use_Cudd use_Cudd.cpp)
 
-add_executable (Distribution test_Distribution.cpp )
-add_all_tests(Distribution test_Distribution.cpp )
+add_executable(use_Priority use_Priority.cpp)
+add_all_tests(use_Priority use_Priority.cpp)
 
 if(SystemC_FOUND)
   find_package(Threads REQUIRED)

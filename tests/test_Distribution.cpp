@@ -1,4 +1,3 @@
-#define BOOST_TEST_MODULE Distribution_t
 #include <boost/test/unit_test.hpp>
 
 #include <crave/ConstrainedRandom.hpp>
@@ -12,13 +11,6 @@
 using namespace crave;
 
 using boost::format;
-
-struct Context_Fixture {
-  Context_Fixture ()
-  {
-    crave::set_global_seed(0);
-  }
-};
 
 BOOST_FIXTURE_TEST_SUITE(Distribution_t, Context_Fixture )
 
