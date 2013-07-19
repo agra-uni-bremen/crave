@@ -2,8 +2,8 @@
 #include "../../crave/expression/FactoryMetaSMT.hpp"
 #include "metaSMTNodeVisitorImpl.hpp"
 
-#include <metaSMT/backend/SWORD_Backend.hpp>
 #include <metaSMT/backend/Boolector.hpp>
+#include <metaSMT/backend/SWORD_Backend.hpp>
 #include <metaSMT/backend/Z3_Backend.hpp>
 #include <metaSMT/backend/CUDD_Distributed.hpp>
 
