@@ -50,8 +50,7 @@ public:
     foreach_statements_(), soft_foreach_statements_(), named_foreach_statements_(), variables_(),
     vector_variables_(), vectors_(), vector_elements_(), read_references_(), write_references_(),
     pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
-    solver_(NULL), okay_(false), solver_type_() {
-      set_backend("Boolector");
+    solver_(FactoryMetaSMT::getNewInstance()), okay_(false), constraint_id_(0) {
   }
 
   template<typename Expr>
@@ -60,30 +59,9 @@ public:
     foreach_statements_(), soft_foreach_statements_(), named_foreach_statements_(), variables_(),
     vector_variables_(), vectors_(), vector_elements_(), read_references_(), write_references_(),
     pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
-    solver_(NULL), okay_(false), solver_type_() {
-      set_backend("Boolector");
+    solver_(FactoryMetaSMT::getNewInstance()), okay_(false), constraint_id_(0) {
       (*this)(expr);
     }
-
-  Generator(std::string const &type)
-  : constraints_(), named_constraints_(), disabled_named_constaints_(), unique_vectors_(),
-    foreach_statements_(), soft_foreach_statements_(), named_foreach_statements_(), variables_(),
-    vector_variables_(), vectors_(), vector_elements_(), read_references_(), write_references_(),
-    pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
-    solver_(NULL), okay_(false), solver_type_() {
-      set_backend(type);
-  }
-
-  template<typename Expr>
-  Generator(std::string const &type, Expr expr)
-  : constraints_(), named_constraints_(), disabled_named_constaints_(), unique_vectors_(),
-    foreach_statements_(), soft_foreach_statements_(), named_foreach_statements_(), variables_(),
-    vector_variables_(), vectors_(), vector_elements_(), read_references_(), write_references_(),
-    pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
-    solver_(NULL), okay_(false), solver_type_() {
-      set_backend(type);
-      (*this)(expr);
-  }
 
   template<typename Expr>
   Generator & operator()(Expr expr) {
@@ -112,14 +90,13 @@ public:
     return *this;
   }
 
-  void set_backend(std::string const& type) {
-    solver_type_ = type;
-    solver_.reset(FactoryMetaSMT::getInstanceOf(type));
+  static void set_solver_backend(std::string const& type) {
+    FactoryMetaSMT::setSolverType(type);
   }
 
   std::vector<std::vector<std::string> > analyse_contradiction() {
 
-    boost::scoped_ptr<metaSMTVisitor> solver(FactoryMetaSMT::getInstanceOf(solver_type_));
+    boost::scoped_ptr<metaSMTVisitor> solver(FactoryMetaSMT::getNewInstance());
     std::vector<std::vector<std::string> > str_vec;
 
     std::map<unsigned int, NodePtr> s;
@@ -228,7 +205,7 @@ public:
     if (0 == vectors_.count(v().id())) {
       vectors_[v().id()] = &v;
       vector_solvers_[v().id()] =
-        boost::shared_ptr<metaSMTVisitor>(FactoryMetaSMT::getInstanceOf(solver_type_));
+        boost::shared_ptr<metaSMTVisitor>(FactoryMetaSMT::getNewInstance());
     }
     return *this;
   }
@@ -248,7 +225,7 @@ public:
     if (0 == vectors_.count(v().id())) {
       vectors_[v().id()] = &v;
       vector_solvers_[v().id()] =
-        boost::shared_ptr<metaSMTVisitor>(FactoryMetaSMT::getInstanceOf(solver_type_));
+        boost::shared_ptr<metaSMTVisitor>(FactoryMetaSMT::getNewInstance());
     }
     return *this;
   }
@@ -274,7 +251,7 @@ public:
     if (0 == vectors_.count(v().id())){
       vectors_[v().id()] = &v;
       vector_solvers_[v().id()] =
-        boost::shared_ptr<metaSMTVisitor>(FactoryMetaSMT::getInstanceOf(solver_type_));
+        boost::shared_ptr<metaSMTVisitor>(FactoryMetaSMT::getNewInstance());
     }
     return *this;
   }
@@ -288,7 +265,7 @@ public:
     if (0 == vectors_.count(v().id())) {
       vectors_[v().id()] = &v;
       vector_solvers_[v().id()] =
-        boost::shared_ptr<metaSMTVisitor>(FactoryMetaSMT::getInstanceOf(solver_type_));
+        boost::shared_ptr<metaSMTVisitor>(FactoryMetaSMT::getNewInstance());
     }
     unique_vectors_.insert(v().id());
     return *this;
@@ -401,6 +378,8 @@ private:
       }
     }
 
+    // TODO: substitute the known values
+
     // make unique
     if (1 == unique_vectors_.count(vec().id())) {
       int i = 0;
@@ -452,9 +431,6 @@ private:
           assert(false && "not supported yet");
           return false; // unknown vectors can not be generated
       }
-
-      if (!solver->solve())
-        return false;
     }
     return true;
   }
@@ -549,8 +525,8 @@ private:
   std::map<int, boost::shared_ptr<metaSMTVisitor> > vector_solvers_;
 
   // auxiliary-attributes
-  bool okay_;
-  std::string solver_type_;
+  mutable bool okay_;
+  mutable unsigned int constraint_id_;
 };
 
 template<typename Expr>

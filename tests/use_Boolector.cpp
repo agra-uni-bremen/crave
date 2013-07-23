@@ -1,9 +1,12 @@
 #define BOOST_TEST_MODULE Boolector
+#include <crave/ConstrainedRandom.hpp>
+
 #include <string>
 
 struct Context_Fixture {
-  Context_Fixture () : solver_type("Boolector") { }
-  std::string const solver_type;
+  Context_Fixture () {
+    crave::set_solver_backend("Boolector");
+  }
 };
 
 #include "test_Syntax.cpp"

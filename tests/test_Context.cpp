@@ -1,6 +1,5 @@
 #include <boost/test/unit_test.hpp>
 
-#include <crave/ConstrainedRandom.hpp>
 #include <crave/ExpressionTraits.hpp>
 
 #include <boost/format.hpp>
@@ -17,7 +16,7 @@ BOOST_FIXTURE_TEST_SUITE(Context_t, Context_Fixture )
 
 BOOST_AUTO_TEST_CASE ( multiple_solver_instances )
 {
-  Generator gen1( solver_type ), gen2( solver_type );
+  Generator gen1, gen2;
   Variable<int> r1, r2;
   gen1(r1 < 6);
   gen2(r2 < 6);
@@ -29,7 +28,7 @@ BOOST_AUTO_TEST_CASE ( multiple_solver_instances )
 BOOST_AUTO_TEST_CASE( constants )
 {
   Variable<unsigned> x;
-  Generator gen( solver_type, x == 135421 );
+  Generator gen( x == 135421 );
   gen();
   BOOST_CHECK_EQUAL( gen[x], 135421 );
 }
@@ -38,7 +37,7 @@ BOOST_AUTO_TEST_CASE( boolean )
 {
   Variable<bool> b;
 
-  Generator gen( solver_type );
+  Generator gen;
   gen(b == b)(); // create a new assignment
 
   bool b1 = gen[b];
@@ -54,7 +53,7 @@ BOOST_AUTO_TEST_CASE( less )
 {
   Variable<unsigned> a;
 
-  Generator gen( solver_type );
+  Generator gen;
   gen(a < 256u);
 
   std::set<unsigned> generated;
@@ -72,7 +71,7 @@ BOOST_AUTO_TEST_CASE( less_equal )
 {
   Variable<unsigned> a;
 
-  Generator gen( solver_type );
+  Generator gen;
   gen(a <= 256u);
 
   std::set<unsigned> generated;
@@ -90,7 +89,7 @@ BOOST_AUTO_TEST_CASE( greater )
 {
   Variable<unsigned> a;
 
-  Generator gen( solver_type );
+  Generator gen;
   gen(a > (std::numeric_limits<unsigned>::max()-256) );
 
   std::set<unsigned> generated;
@@ -108,7 +107,7 @@ BOOST_AUTO_TEST_CASE( greater_equal )
 {
   Variable<unsigned> a;
 
-  Generator gen( solver_type );
+  Generator gen;
   gen(a >= (std::numeric_limits<unsigned>::max()-256) );
 
   std::set<unsigned> generated;
@@ -129,7 +128,7 @@ BOOST_AUTO_TEST_CASE( divide )
   Variable<unsigned char> q;
   Variable<unsigned char> r;
 
-  Generator gen( solver_type );
+  Generator gen;
   gen
     ( b != (unsigned char)  0u )
     ( a  < (unsigned char) 16u )
@@ -152,7 +151,7 @@ BOOST_AUTO_TEST_CASE( mult_mod )
   randv<int> a(0);
   randv<int> b(0);
 
-  Generator gen( solver_type );
+  Generator gen;
   gen
     ( -3 <= a() && a() <= 3 )
     ( -3 <= b() && b() <= 3 )
@@ -182,7 +181,7 @@ BOOST_AUTO_TEST_CASE ( shiftleft )
   Variable<unsigned> b;
   Variable<unsigned> c;
 
-  Generator gen( solver_type );
+  Generator gen;
   gen
     ( a <  256u )
     ( b <  (unsigned) (sizeof(unsigned)*8u) )
@@ -206,7 +205,7 @@ BOOST_AUTO_TEST_CASE ( by_reference )
   unsigned b=0;
   Variable<unsigned> a;
 
-  Generator gen ( solver_type, a == reference(b) );
+  Generator gen ( a == reference(b) );
 
   while( gen.next() ) {
     unsigned av = gen[a];
@@ -223,7 +222,7 @@ BOOST_AUTO_TEST_CASE ( named_reference )
   Variable<unsigned> a, c;
   ReadReference<unsigned> b(bv);
 
-  Generator gen ( solver_type, a == b );
+  Generator gen ( a == b );
   gen(c != b);
 
   while( gen.next() ) {
@@ -238,7 +237,7 @@ BOOST_AUTO_TEST_CASE ( named_reference )
 
 BOOST_AUTO_TEST_CASE ( soft_constraint_t )
 {
-  Generator gen( solver_type );
+  Generator gen;
   Variable<int> r;
   gen( r<6 );
   soft(gen)( r == 2 );
@@ -253,7 +252,7 @@ BOOST_AUTO_TEST_CASE ( soft_constraint_t )
 
 BOOST_AUTO_TEST_CASE ( randv_test )
 {
-  Generator gen( solver_type );
+  Generator gen;
   randv<int> a(NULL);
   randv<int> b(NULL);
   std::cout << "init: a = " <<  a << ", b = " << b << std::endl;
@@ -275,7 +274,7 @@ BOOST_AUTO_TEST_CASE ( randv_test )
 
 BOOST_AUTO_TEST_CASE ( randv_var_ref_mixed_test )
 {
-  Generator gen( solver_type );
+  Generator gen;
   randv<int> a(0);
   Variable<int> b;
   gen
@@ -299,7 +298,7 @@ BOOST_AUTO_TEST_CASE( alu )
   Variable<unsigned> a;
   Variable<unsigned> b;
 
-  Generator gen( solver_type );
+  Generator gen;
   gen
     ( a < 16)
     ( b < 16)
@@ -320,7 +319,7 @@ BOOST_AUTO_TEST_CASE( alu_enum )
   Variable<unsigned> a;
   Variable<unsigned> b;
 
-  Generator gen( solver_type );
+  Generator gen;
   gen
     ( a < 16u)
     ( b < 16u)
@@ -347,7 +346,7 @@ BOOST_AUTO_TEST_CASE( pythagoras )
   Variable<unsigned long long> b;
   Variable<unsigned long long> c;
 
-  Generator gen( solver_type );
+  Generator gen;
   gen(a*a + b*b == c*c)(); // create a new assignment
 
   unsigned long long av = gen[a];
@@ -362,7 +361,7 @@ BOOST_AUTO_TEST_CASE ( negative_var )
   randv<int> a(NULL);
   randv<int> b(NULL);
 
-  Generator gen( solver_type );
+  Generator gen;
   gen
     ( a() + b() <= 120 )
     ( a() > 120  )
@@ -379,7 +378,7 @@ BOOST_AUTO_TEST_CASE ( signed_less_zero )
 {
   randv<int> a(NULL);
 
-  Generator gen( solver_type );
+  Generator gen;
   gen
     ( a() < 0 )
   ;
@@ -437,7 +436,7 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_1 )
   //boost::proto::display_expr( b()+a() >= 120);
   //boost::proto::display_expr( FixWidth()(b()+a() >= 120));
 
-  Generator gen( solver_type );
+  Generator gen;
   gen
     (  a() + b() >= 120 )
   ;
@@ -452,7 +451,7 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_1 )
 BOOST_AUTO_TEST_CASE ( mixed_bv_width_2 )
 {
   randv<signed char> a(NULL);
-  Generator gen( solver_type );
+  Generator gen;
   gen( a() < 10 );
 
   std::set<signed char> generated;
@@ -469,7 +468,7 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_2 )
 BOOST_AUTO_TEST_CASE ( mixed_bv_width_3 )
 {
   randv<short> a(NULL);
-  Generator gen( solver_type );
+  Generator gen;
   gen( a() <  10 );
   gen( a() > -10 );
 
@@ -487,7 +486,7 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_3 )
 BOOST_AUTO_TEST_CASE ( mixed_bv_width_4 )
 {
   randv<int> a(NULL);
-  Generator gen( solver_type );
+  Generator gen;
   gen( a() < (signed char) 10 );
   gen( a() > (short) -10 );
 
@@ -506,7 +505,7 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_5 )
 {
   randv<short> a(NULL);
   randv<signed char> b(NULL);
-  Generator gen( solver_type );
+  Generator gen;
   gen( -3 <= a() && a() <= 3 );
   gen( -3 <= b() && b() <= 3 );
   gen( (-2 <= a() + b()) && (a() + b() <= 2) );
@@ -532,7 +531,7 @@ BOOST_AUTO_TEST_CASE( mixed_bv_width_6 )
   randv<short> a(0);
   randv<signed char> b(0);
 
-  Generator gen( solver_type );
+  Generator gen;
   gen
     ( -3 <= a() && a() <= 3 )
     ( -3 <= b() && b() <= 3 )
@@ -563,7 +562,7 @@ BOOST_AUTO_TEST_CASE ( element_inside_set )
 
   randv<unsigned> x(0);
 
-  Generator gen( solver_type );
+  Generator gen;
   gen ( inside(x(),s) );
 
   BOOST_REQUIRE(gen.next());
@@ -604,7 +603,7 @@ BOOST_AUTO_TEST_CASE ( element_inside_vec )
   randv<unsigned> x(0);
   unsigned tmp;
 
-  Generator gen( solver_type );
+  Generator gen;
   gen ( inside(x(),v) );
 
   BOOST_REQUIRE(gen.next());
@@ -645,7 +644,7 @@ BOOST_AUTO_TEST_CASE ( element_inside_array )
 
   randv<unsigned> x(0);
   //unsigned y = a.begin();
-  Generator gen( solver_type );
+  Generator gen;
   gen ( inside(x(),a) );
 
   BOOST_REQUIRE(gen.next());
@@ -685,7 +684,7 @@ BOOST_AUTO_TEST_CASE ( element_inside_list )
 
   randv<unsigned> x(0);
 
-  Generator gen( solver_type );
+  Generator gen;
   gen ( inside(x(),l) );
 
   BOOST_REQUIRE(gen.next());
@@ -733,7 +732,7 @@ BOOST_AUTO_TEST_CASE (dist_of_boolean25)
   randv<bool> a(0);
   int counter = 0;
 
-  Generator gen( solver_type );
+  Generator gen;
   gen ( dist(a(), 0.25) );
   for (unsigned i = 0; i < 1000; i++) {
     BOOST_REQUIRE( gen.next() );
@@ -753,7 +752,7 @@ BOOST_AUTO_TEST_CASE ( dist_of_boolean50 )
   randv<bool> a(0);
   int counter = 0;
 
-  Generator gen( solver_type );
+  Generator gen;
   gen ( dist(a(),0.5) );
   for (unsigned i = 0; i < 1000; i++) {
     BOOST_REQUIRE( gen.next() );
@@ -773,7 +772,7 @@ BOOST_AUTO_TEST_CASE (dist_of_boolean75)
   randv<bool> a(0);
   int counter = 0;
 
-  Generator gen( solver_type );
+  Generator gen;
   gen ( dist(a(),0.75) );
   for (unsigned i = 0; i < 1000; i++) {
     BOOST_REQUIRE( gen.next() );
@@ -791,7 +790,7 @@ BOOST_AUTO_TEST_CASE (dist_of_boolean75)
 BOOST_AUTO_TEST_CASE (if_then_else_t1) {
   randv<bool> a(0);
   randv<unsigned int> b(0);
-  Generator gen( solver_type );
+  Generator gen;
 
   gen(dist(a(), 0.5));
   gen(if_then_else(a(), b() > 0 && b() <= 50, b() > 50 && b() <= 100 ));

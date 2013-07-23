@@ -1,7 +1,5 @@
 #include <boost/test/unit_test.hpp>
 
-#include <crave/ConstrainedRandom.hpp>
-
 //using namespace std;
 using namespace crave;
 

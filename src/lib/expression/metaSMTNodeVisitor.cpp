@@ -14,6 +14,12 @@
 
 namespace crave {
 
+std::string metaSMTVisitor::solver_type = "Boolector";
+
+void FactoryMetaSMT::setSolverType(std::string const& type) {
+  metaSMTVisitor::solver_type = type;
+}
+
 typedef metaSMT::DirectSolver_Context <
   metaSMT::UnpackFuture_Context <
   metaSMT::BitBlast <
@@ -60,16 +66,16 @@ metaSMTVisitor* newVisitorPriority() {
   return new metaSMTVisitorImpl<SolverType>();
 }
 
-metaSMTVisitor* FactoryMetaSMT::getInstanceOf(std::string const& type) {
-  if (0 == type.compare("SWORD"))
+metaSMTVisitor* FactoryMetaSMT::getNewInstance() {
+  if (0 == metaSMTVisitor::solver_type.compare("SWORD"))
     return newVisitorSWORD();
-  else if (0 == type.compare("Boolector"))
+  else if (0 == metaSMTVisitor::solver_type.compare("Boolector"))
     return newVisitorBoolector();
-  else if (0 == type.compare("Z3"))
+  else if (0 == metaSMTVisitor::solver_type.compare("Z3"))
     return newVisitorZ3();
-  else if (0 == type.compare("Cudd"))
+  else if (0 == metaSMTVisitor::solver_type.compare("Cudd"))
     return newVisitorCudd();
-  else if (0 == type.compare("Priority"))
+  else if (0 == metaSMTVisitor::solver_type.compare("Priority"))
     return newVisitorPriority();
   assert("Unsupported backend is choosen.");
   return NULL;

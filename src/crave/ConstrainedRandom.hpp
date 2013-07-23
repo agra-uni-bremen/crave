@@ -43,9 +43,6 @@ namespace crave {
         children.push_back(rb);
         constraint.add_pre_hook(boost::bind<bool>(&rand_base::next, rb));
       }
-      inline void set_solver_backend(std::string const type) {
-        constraint.set_backend(type);
-      }
 
     protected:
       rand_obj_of() { }
@@ -86,6 +83,7 @@ namespace crave {
   extern boost::mt19937 rng;
 
   void set_global_seed(unsigned int s);
+  void set_solver_backend(std::string const&);
 
   template<typename T>
   struct weighted_range
