@@ -255,12 +255,12 @@ void metaSMTVisitorImpl<SolverType>::visitInside( Inside const &in )
   stack_entry entry;
   pop( entry );
 
-  result_type result = evaluate(solver_,  qf_bv::bit0);
+  result_type result = evaluate(solver_, preds::False);
   BOOST_FOREACH( Constant c, in.collection() ) {
     stack_entry constExpr;
     c.visit(*this);
     pop(constExpr);
-    result = evaluate(solver_, qf_bv::bvor( result, qf_bv::bvcomp( entry.first, constExpr.first)) );
+    result = evaluate(solver_, preds::Or( result, preds::equal( entry.first, constExpr.first)) );
   }
 
   exprStack_.push( std::make_pair( result, false ) );
@@ -308,7 +308,7 @@ void metaSMTVisitorImpl<SolverType>::visitLogicalAndOpr( LogicalAndOpr const &o 
   stack_entry fst, snd;
   evalBinExpr(o, fst, snd);
 
-  result_type result = evaluate( solver_, qf_bv::bvand( fst.first, snd.first ) );
+  result_type result = evaluate( solver_, preds::And( fst.first, snd.first ) );
   exprStack_.push( std::make_pair( result, fst.second || snd.second ) );
 }
 
@@ -318,7 +318,7 @@ void metaSMTVisitorImpl<SolverType>::visitLogicalOrOpr( LogicalOrOpr const &o )
   stack_entry fst, snd;
   evalBinExpr(o, fst, snd);
 
-  result_type result = evaluate( solver_, qf_bv::bvor( fst.first, snd.first ) );
+  result_type result = evaluate( solver_, preds::Or( fst.first, snd.first ) );
   exprStack_.push( std::make_pair( result, fst.second || snd.second ) );
 }
 
@@ -338,7 +338,7 @@ void metaSMTVisitorImpl<SolverType>::visitEqualOpr( EqualOpr const &o )
   stack_entry fst, snd;
   evalBinExpr(o, fst, snd);
 
-  result_type result = evaluate( solver_, qf_bv::bvcomp( fst.first, snd.first ) );
+  result_type result = evaluate( solver_, preds::equal( fst.first, snd.first ) );
   exprStack_.push( std::make_pair( result, false ) );
 }
 
@@ -348,7 +348,7 @@ void metaSMTVisitorImpl<SolverType>::visitNotEqualOpr( NotEqualOpr const &o )
   stack_entry fst, snd;
   evalBinExpr(o, fst, snd);
 
-  result_type result = evaluate( solver_, qf_bv::bvnot(qf_bv::bvcomp( fst.first, snd.first )) );
+  result_type result = evaluate( solver_, preds::nequal( fst.first, snd.first ) );
   exprStack_.push( std::make_pair( result, false ) );
 }
 
@@ -578,7 +578,7 @@ void metaSMTVisitorImpl<SolverType>::visitIfThenElse( IfThenElse const &ite )
   stack_entry fst, snd, trd;
   evalTernExpr(ite, fst, snd, trd);
 
-  result_type result = evaluate( solver_, preds::Ite( preds::equal(fst.first, qf_bv::bit1) , snd.first, trd.first ) );
+  result_type result = evaluate( solver_, preds::Ite( preds::equal(fst.first, preds::True) , snd.first, trd.first ) );
   exprStack_.push( std::make_pair( result, fst.second || snd.second || trd.second ) );
 }
 
@@ -592,7 +592,7 @@ void metaSMTVisitorImpl<SolverType>::makeAssertion(Node const &expr)
   stack_entry entry;
   pop(entry);
 
-  metaSMT::assertion(solver_, preds::equal(entry.first, qf_bv::bit1));
+  metaSMT::assertion(solver_, preds::equal(entry.first, preds::True));
 }
 
 template<typename SolverType>
@@ -614,7 +614,7 @@ void metaSMTVisitorImpl<SolverType>::makeAssumption(Node const &expr)
   stack_entry entry;
   pop(entry);
 
-  assumptions_.push_back(evaluate(solver_, preds::equal(entry.first, qf_bv::bit1)));
+  assumptions_.push_back(evaluate(solver_, preds::equal(entry.first, preds::True)));
 }
 
 template<typename SolverType>

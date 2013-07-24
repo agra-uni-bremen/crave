@@ -56,7 +56,7 @@ metaSMTVisitor* newVisitorCudd() {
 }
 
 metaSMTVisitor* newVisitorPriority() {
-  typedef metaSMT::Priority_Context< SWORDSolverType, CUDDSolverType > SolverType;
+  typedef metaSMT::Priority_Context< BoolectorSolverType, CUDDSolverType > SolverType;
   return new metaSMTVisitorImpl<SolverType>();
 }
 
