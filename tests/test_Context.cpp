@@ -789,17 +789,17 @@ BOOST_AUTO_TEST_CASE (dist_of_boolean75)
 }
 
 BOOST_AUTO_TEST_CASE (if_then_else_t1) {
-  randv<bool> a(0);
+  randv<unsigned int> a(0);
   randv<unsigned int> b(0);
   Generator gen( solver_type );
 
-  gen(dist(a(), 0.5));
-  gen(if_then_else(a(), b() > 0 && b() <= 50, b() > 50 && b() <= 100 ));
+  gen(a() < 10);
+  gen(if_then_else(a() < 5, b() > 0 && b() <= 50, b() > 50 && b() <= 100 ));
 
   for (int i = 0; i < 1000; ++i) {
-    std::cout << "a[" << (a ? "true": "false") << "], b = " << b << std::endl;
+    std::cout << "a =" << a << ", b = " << b << std::endl;
     BOOST_REQUIRE( gen.next() );
-    if(a) {
+    if(a < 5) {
       BOOST_REQUIRE_GT( b, 0 );
       BOOST_REQUIRE_LE( b, 50 );
     } else {
