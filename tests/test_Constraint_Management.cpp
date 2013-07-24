@@ -1,6 +1,5 @@
 #include <boost/test/unit_test.hpp>
 
-#include <crave/ConstrainedRandom.hpp>
 #include <crave/Generator.hpp>
 
 #include <boost/format.hpp>
@@ -64,8 +63,7 @@ BOOST_FIXTURE_TEST_SUITE(Constraint_Management_t, Context_Fixture )
 
 class Item : public rand_obj {
 public:
-  Item(std::string const& type) : rand_obj(), a(this), b(this) {
-    set_solver_backend(type);
+  Item() : rand_obj(), a(this), b(this) {
     constraint("sum", a() + b() == 4);
     constraint("product", a() * b() == 4);
     constraint(a() < 10);
@@ -83,7 +81,7 @@ public:
 
 BOOST_AUTO_TEST_CASE( t1 )
 {
-  Item it(solver_type);
+  Item it;
 
   BOOST_REQUIRE(!it.next() );
   BOOST_REQUIRE( it.is_constraint_enabled("sum") );
@@ -129,8 +127,7 @@ BOOST_AUTO_TEST_CASE( t1 )
 
 class Item1 : public rand_obj {
 public:
-  Item1(std::string const& type) : rand_obj(), a(this) {
-    set_solver_backend(type);
+  Item1() : rand_obj(), a(this) {
     constraint("abc", a() == 4);
     constraint("def", a() == 3);
     constraint("abc", a() == 3);
@@ -140,13 +137,12 @@ public:
 
 BOOST_AUTO_TEST_CASE( t2 )
 {
-  BOOST_CHECK_THROW ( Item1 it(solver_type), std::runtime_error );
+  BOOST_CHECK_THROW ( Item1 it, std::runtime_error );
 }
 
 class ItemPythagoras : public rand_obj {
 public:
-  ItemPythagoras(std::string const& type) : rand_obj(), a(this), b(this), c(this) {
-    set_solver_backend(type);
+  ItemPythagoras() : rand_obj(), a(this), b(this), c(this) {
     constraint("pythagoras", a() * a() + b() * b() == c() * c());
     //constraint("div-zero", a() > 0 && b() > 0);
     constraint(a() > 0);
@@ -164,7 +160,7 @@ public:
 
 BOOST_AUTO_TEST_CASE( Pythagoras )
 {
-  ItemPythagoras it(solver_type);
+  ItemPythagoras it;
 
   BOOST_REQUIRE(it.next());
   std::cout << it << std::endl;
@@ -179,9 +175,7 @@ BOOST_AUTO_TEST_CASE( Pythagoras )
 
 class ItemPacketBaseConstraint : public rand_obj {
 public:
-  ItemPacketBaseConstraint(std::string const& type) : i_(), rand_obj(), msg_length(this), src_addr(this), dest_addr(this), msg(this) {
-    set_solver_backend(type);
-
+  ItemPacketBaseConstraint() : i_(), rand_obj(), msg_length(this), src_addr(this), dest_addr(this), msg(this) {
     constraint(msg_length() < 80);
     constraint(msg_length() > 2);
     constraint(src_addr() != dest_addr());
@@ -199,7 +193,7 @@ public:
 
 class ItemPacketHierConstraint : public ItemPacketBaseConstraint {
 public:
-  ItemPacketHierConstraint(std::string const& type) : ItemPacketBaseConstraint(type), dest_min(this), dest_max(this) {
+  ItemPacketHierConstraint() : ItemPacketBaseConstraint(), dest_min(this), dest_max(this) {
   constraint( (dest_addr() > dest_min() ) && (dest_addr() < dest_max()) );
   constraint(
     ( (src_addr() > (dest_addr() + 0x100000))  &&
@@ -221,7 +215,7 @@ public:
 
 BOOST_AUTO_TEST_CASE( PacketHierConstraint )
 {
-  ItemPacketHierConstraint it(solver_type);
+  ItemPacketHierConstraint it;
   for(unsigned i = 0; i < 11 ; ++i) {
     BOOST_REQUIRE(it.next());
     std::cout << it << std::endl;
@@ -233,7 +227,7 @@ BOOST_AUTO_TEST_CASE(no_conflict)
   randv<unsigned short> a(0);
   randv<unsigned short> b(0);
   randv<unsigned short> c(0);
-  Generator gen(solver_type);
+  Generator gen;
   gen
     ("a", a() != b() )
     ("b", b() != c() )
@@ -249,7 +243,7 @@ BOOST_AUTO_TEST_CASE(one_conflict1)
   randv<bool> a(0);
   randv<bool> b(0);
   randv<bool> c(0);
-  Generator gen(solver_type);
+  Generator gen;
   gen
     ("a", a() != b() )
     ("b", b() != c() )
@@ -273,7 +267,7 @@ BOOST_AUTO_TEST_CASE(one_conflict2)
 {
   randv<unsigned short> a(0);
   randv<unsigned short> b(0);
-  Generator gen(solver_type);
+  Generator gen;
   gen
     ("a", a() == 3 )
     ("b", a() > 4  )
@@ -299,7 +293,7 @@ BOOST_AUTO_TEST_CASE(two_conflicts1)
   randv<unsigned short> a(0);
   randv<unsigned short> b(0);
   randv<unsigned short> c(0);
-  Generator gen(solver_type);
+  Generator gen;
   gen
     ("a", a() == 1 )
     ("b", a()  > 5 )
@@ -334,7 +328,7 @@ BOOST_AUTO_TEST_CASE(two_conflicts2)
   randv<unsigned short> d(0);
   randv<unsigned short> e(0);
 
-  Generator gen(solver_type);
+  Generator gen;
   gen
     ("a", a() != b() )
     ("b", b() != c() )
@@ -370,7 +364,7 @@ BOOST_AUTO_TEST_CASE(two_conflicts3)
   randv<unsigned short> b(0);
   randv<unsigned short> c(0);
   randv<unsigned short> d(0);
-  Generator gen(solver_type);
+  Generator gen;
   gen
     ("c1", a() == 2 )
     ("c2", a()  > 5 )

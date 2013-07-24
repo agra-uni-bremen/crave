@@ -1,9 +1,12 @@
 #define BOOST_TEST_MODULE Priority
+#include <crave/ConstrainedRandom.hpp>
+
 #include <string>
 
 struct Context_Fixture {
-  Context_Fixture () : solver_type("Priority") { }
-  std::string const solver_type;
+  Context_Fixture () {
+    crave::set_solver_backend("Priority");
+  }
 };
 
 #include "test_Syntax.cpp"

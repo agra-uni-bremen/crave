@@ -8,11 +8,12 @@ namespace crave {
 
   class FactoryMetaSMT {
   public:
+    static void setSolverType(std::string const&);
     /**
-      * creates a new metaSMTVisitor with SWORD as the backend.
-      * Caller is responsible for deleting the visitor.
+      * creates a new metaSMTVisitor with a backend specified by
+      * metaSMTNodeVisitor::solver_type. Caller is responsible for deleting the visitor.
       **/
-    static metaSMTVisitor* getInstanceOf(std::string const&);
+    static metaSMTVisitor* getNewInstance();
   };
 
 } // namespace crave;

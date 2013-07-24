@@ -1,5 +1,6 @@
 #include <ctime>
 
+#include "../crave/expression/FactoryMetaSMT.hpp"
 #include "../crave/ConstrainedRandom.hpp"
 
 namespace crave {
@@ -22,6 +23,9 @@ namespace crave {
 
   boost::function0<bool> random_bit = random_bit_gen();
 
+  void set_solver_backend(std::string const& type) {
+    FactoryMetaSMT::setSolverType(type);
+  }
 
 } // namespace crave
 

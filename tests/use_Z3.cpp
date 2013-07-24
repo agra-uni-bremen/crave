@@ -1,9 +1,12 @@
 #define BOOST_TEST_MODULE Z3
+#include <crave/ConstrainedRandom.hpp>
+
 #include <string>
 
 struct Context_Fixture {
-  Context_Fixture () : solver_type("Z3") { }
-  std::string const solver_type;
+  Context_Fixture () {
+    crave::set_solver_backend("Z3");
+  }
 };
 
 #include "test_Syntax.cpp"

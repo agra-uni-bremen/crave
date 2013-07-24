@@ -1,7 +1,6 @@
 #define BOOST_TEST_MODULE SystemC_Data
 #include <boost/test/unit_test.hpp>
 
-#include <crave/ConstrainedRandom.hpp>
 #include <crave/SystemC.hpp>
 
 #include <systemc.h>

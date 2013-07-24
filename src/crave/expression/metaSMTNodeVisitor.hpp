@@ -8,6 +8,7 @@
 #include <boost/function.hpp>
 
 #include <map>
+#include <string>
 #include <vector>
 
 namespace crave {
@@ -22,6 +23,8 @@ public:
               std::map<unsigned int, boost::intrusive_ptr<Node> > const & ) = 0;
   virtual bool solve() = 0;
   virtual bool read(Node const&, AssignResult&) = 0;
+
+  static std::string solver_type;
 };
 
 } //end namespace crave

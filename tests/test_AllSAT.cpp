@@ -1,6 +1,5 @@
 #include <boost/test/unit_test.hpp>
 
-#include <crave/ConstrainedRandom.hpp>
 #include <crave/AllSAT.hpp>
 
 #include <boost/format.hpp>
