@@ -65,65 +65,46 @@ struct VectorConstraint : UserConstraint {
 
   typedef std::vector<expression> ExpressionsVector;
   typedef ExpressionsVector::const_iterator const_iterator;
-  typedef std::vector<VariableExpr> VectorElements;
+
+  typedef boost::intrusive_ptr<VariableExpr> VariablePtr;
+  typedef std::vector<VariablePtr> VectorElements;
 
   VectorConstraint(expression const expr, string const& name)
-  : UserConstraint(expr, name), vec_expressions_(), vec_elements_() { }
+  : UserConstraint(expr, name), vec_expressions_() { }
   VectorConstraint(expression const expr, string const& name, bool const soft)
-  : UserConstraint(expr, name, soft), vec_expressions_(), vec_elements_() { }
+  : UserConstraint(expr, name, soft), vec_expressions_() { }
   VectorConstraint(expression const expr, string const& name, bool const soft,
                    bool const enabled)
-  : UserConstraint(expr, name, soft, enabled), vec_expressions_(), vec_elements_() { }
+  : UserConstraint(expr, name, soft, enabled), vec_expressions_() { }
   VectorConstraint(VectorConstraint const& o)
-  : UserConstraint(o), vec_expressions_(o.vec_expressions_), vec_elements_(o.vec_elements_) { }
+  : UserConstraint(o), vec_expressions_(o.vec_expressions_) { }
 
-  std::pair<const_iterator, const_iterator> get_exprs(unsigned int const vec_size) const {
-    if (vec_expressions_.size() != vec_size) {
-      vec_expressions_.resize(vec_size);
-      vec_elements_.resize();
-
-      for (unsigned int i = 0; i < vec_size; ++i)
-        vec_elements_[i] = new VariableExpr(new_var_id(), 1, true);
-
-      ReplaceVisitor replacer(vec_elements_);
-      for (unsigned int i = 0; i < vec_size; ++i) {
-
-        replacer.set_vec_idx(i);
-        expr_->visit(replacer);
-
-        if (replacer.okay())
-          vec_expressions_[i] = replacer.result();
-
-        replacer.reset();
-      }
-    }
-
-    return std::pair<const_iterator, const_iterator>(std::make_pair(
-      vec_expressions_.begin(),
-      vec_expressions_.end()
-    ));
+  ExpressionsVector& get_exprs() const {
+    return vec_expressions_;
   }
 
 private:
   // auxiliary variables
   mutable ExpressionsVector vec_expressions_;
-  mutable VectorElements vec_elements_;
 };
 
 template<typename ConstraintType>
 struct ConstraintSet {
 
   typedef std::string string;
-  typedef std::vector<ConstraintType> ConstraintVector;
-  typedef ConstraintVector::iterator iterator;
-  typedef ConstraintVector::const_iterator const_iterator;
-  typedef ConstraintVector::reference reference;
-  typedef ConstraintVector::const_reference const_reference;
-  typedef ConstraintVector::size_type size_type;
-  typedef ConstraintVector::value_type value_type;
+  typedef std::vector<ConstraintType> ConstraintsVector;
+  typedef typename ConstraintsVector::iterator iterator;
+  typedef typename ConstraintsVector::const_iterator const_iterator;
+  typedef typename ConstraintsVector::reference reference;
+  typedef typename ConstraintsVector::const_reference const_reference;
+  typedef typename ConstraintsVector::size_type size_type;
+  typedef typename ConstraintsVector::value_type value_type;
+
+  typedef boost::intrusive_ptr<VariableExpr> VariablePtr;
+  typedef std::vector<VariablePtr> VectorElements;
 
   ConstraintSet()
-  : constraints_(), changed_(false), unique_(false) { }
+  : constraints_(), changed_(false), unique_(false), vec_elements_() { }
 
   reference operator[](size_type n) {
     changed_ = true;
@@ -231,10 +212,16 @@ struct ConstraintSet {
     unique_ = val;
   }
 
+  VectorElements& get_vec_vars() {
+    return vec_elements_;
+  }
+
 private:
-  ConstraintType constraints_;
+  ConstraintsVector constraints_;
   bool changed_;
   bool unique_;
+
+  mutable VectorElements vec_elements_;
 };
 
 } // end namespace crave

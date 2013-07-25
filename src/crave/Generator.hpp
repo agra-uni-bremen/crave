@@ -2,7 +2,6 @@
 
 #include "AssignResult.hpp"
 #include "Context.hpp"
-#include "Statement.hpp"
 #include "UserConstraint.hpp"
 #include "VectorConstraint.hpp"
 #include "expression/ReplaceVisitor.hpp"
@@ -43,6 +42,11 @@ struct Generator {
   typedef boost::intrusive_ptr<Node> NodePtr;
 
 private:
+  // typedefs
+  typedef std::vector<boost::intrusive_ptr<VariableExpr> > ElementsVector;
+  typedef boost::shared_ptr<metaSMTVisitor> VectorSolverPtr;
+  typedef std::map<int, ConstraintSet<VectorConstraint> > VectorConstraintsMap;
+
   typedef std::pair<int, boost::shared_ptr<crave::ReferenceExpression> > ReadRefPair;
   typedef std::pair<int, boost::shared_ptr<crave::AssignResult> > WriteRefPair;
 
@@ -182,17 +186,22 @@ public:
   Generator & foreach(__rand_vec <value_type> & v,
                       const placeholder & p, Expr e) {
 
-    NodePtr f_expr(boost::proto::eval(FixWidth()(e), ctx_));
+    NodePtr vec_expr(boost::proto::eval(FixWidth()(e), ctx_));
+    std::string name("constraint_" + boost::lexical_cast<std::string>(constraint_id_++));
+    VectorConstraint constraint(vec_expr, name);
 
-    boost::intrusive_ptr<VectorExpr> vec_expr(vector_variables_[v().id()].get());
-    Placeholder ph(p.id());
+    VectorConstraintsMap::iterator ite(vector_constraints_.lower_bound(v().id()));
+    if (ite != vector_constraints_.end() && !(vector_constraints_.key_comp()(v().id(), ite->first))) {
+      // v already exists
+      ite->second.push_back(constraint);
 
-    foreach_statements_.insert(std::make_pair(v().id(), VectorStatement(vec_expr, ph, f_expr)));
+    } else {
 
-    if (0 == vectors_.count(v().id())) {
+      vector_constraints_[v().id()].push_back(constraint);
       vectors_[v().id()] = &v;
       vector_solvers_[v().id()] =
         boost::shared_ptr<metaSMTVisitor>(FactoryMetaSMT::getNewInstance());
+
     }
     return *this;
   }
@@ -201,18 +210,22 @@ public:
   Generator & soft_foreach(__rand_vec <value_type> & v,
                            const placeholder & p, Expr e) {
 
-    NodePtr sf_expr(boost::proto::eval(FixWidth()(e), ctx_));
+    NodePtr vec_expr(boost::proto::eval(FixWidth()(e), ctx_));
+    std::string name("constraint_" + boost::lexical_cast<std::string>(constraint_id_++));
+    VectorConstraint constraint(vec_expr, name, true);
 
-    boost::intrusive_ptr<VectorExpr> vec_expr(vector_variables_[v().id()].get());
-    Placeholder ph(p.id());
+    VectorConstraintsMap::iterator ite(vector_constraints_.lower_bound(v().id()));
+    if (ite != vector_constraints_.end() && !(vector_constraints_.key_comp()(v().id(), ite->first))) {
+      // v already exists
+      ite->second.push_back(constraint);
 
-    soft_foreach_statements_.insert(std::make_pair(v().id(),
-                                                   VectorStatement(vec_expr, ph, sf_expr)));
+    } else {
 
-    if (0 == vectors_.count(v().id())) {
+      vector_constraints_[v().id()].push_back(constraint);
       vectors_[v().id()] = &v;
       vector_solvers_[v().id()] =
         boost::shared_ptr<metaSMTVisitor>(FactoryMetaSMT::getNewInstance());
+
     }
     return *this;
   }
@@ -221,24 +234,27 @@ public:
   Generator & foreach(std::string constraint_name,
       __rand_vec <value_type> & v, const placeholder & p, Expr e) {
 
-    typedef std::multimap<int, NamedVectorStatement>::iterator nfe_iterator;
-    std::pair<nfe_iterator, nfe_iterator> nrange =
-        named_foreach_statements_.equal_range(v().id());
-
-    for (nfe_iterator ite = nrange.first; ite != nrange.second; ++ite)
-      if (0 == ite->second.get_name().compare(constraint_name))
+    typedef std::pair<int, ConstraintSet<VectorConstraint> > vec_pair;
+    BOOST_FOREACH (VectorConstraint c, vector_constraints_[v().id()])
+      if (0 == c.get_name().compare(constraint_name))
         throw std::runtime_error("Constraint already exists.");
 
-    NodePtr f_expr(boost::proto::eval(FixWidth()(e), ctx_));
-    Placeholder ph(p.id());
-    boost::intrusive_ptr<VectorExpr> vec_expr(vector_variables_[v().id()].get());
-    NamedVectorStatement vec_stmt(constraint_name, vec_expr, ph, f_expr);
+    NodePtr vec_expr(boost::proto::eval(FixWidth()(e), ctx_));
+    VectorConstraint constraint(vec_expr, constraint_name);
 
-    named_foreach_statements_.insert(nrange.first, std::make_pair(v().id(), vec_stmt));
-    if (0 == vectors_.count(v().id())){
+    VectorConstraintsMap::iterator ite(vector_constraints_.lower_bound(v().id()));
+    if (ite != vector_constraints_.end() &&
+        !(vector_constraints_.key_comp()(v().id(), ite->first))) {
+      // v already exists
+      ite->second.push_back(constraint);
+
+    } else {
+
+      vector_constraints_[v().id()].push_back(constraint);
       vectors_[v().id()] = &v;
       vector_solvers_[v().id()] =
         boost::shared_ptr<metaSMTVisitor>(FactoryMetaSMT::getNewInstance());
+
     }
     return *this;
   }
@@ -248,19 +264,13 @@ public:
    **/
   template<typename value_type>
   Generator & unique(__rand_vec <value_type> & v) {
-
-    if (0 == vectors_.count(v().id())) {
-      vectors_[v().id()] = &v;
-      vector_solvers_[v().id()] =
-        boost::shared_ptr<metaSMTVisitor>(FactoryMetaSMT::getNewInstance());
-    }
-    unique_vectors_.insert(v().id());
+    vector_constraints_[v().id()].set_unique(true);
     return *this;
   }
 
   template<typename value_type>
   Generator & non_unique(const __rand_vec <value_type> & v) {
-    unique_vectors_.erase(v().id());
+    vector_constraints_[v().id()].set_unique(false);
     return *this;
   }
 
@@ -273,7 +283,7 @@ public:
 
 private:
   template<typename Integral>
-  bool gen_vec_ (__rand_vec<Integral>* rvp, metaSMTVisitor* solver) {
+  bool gen_vec_ (__rand_vec<Integral>* rvp, VectorSolverPtr solver) {
     __rand_vec<Integral>& vec = *rvp;
 
     // get size of vector
@@ -287,110 +297,73 @@ private:
       size = vec.size();
     }
 
-    ElementsVector& variables = vector_elements_[vec().id()];
-    if (size != variables.size())  {
-      variables.resize(size);
-      for (unsigned int i = 0; i < size; ++i) {
-        boost::intrusive_ptr<VariableExpr> var_expr = new VariableExpr(new_var_id(), 1, true);
-        variables[i] = var_expr;
-      }
-    }
+    // build solver for the current vector variable if the vector is changed
+    if (vector_constraints_[vec().id()].is_changed()) {
+      solver.reset(FactoryMetaSMT::getNewInstance());
 
-    // get foreach statements of given vector variable
-    typedef std::multimap<int, VectorStatement>::iterator fe_iterator;
-    std::pair<fe_iterator, fe_iterator> range = foreach_statements_.equal_range(vec().id());
+      BOOST_FOREACH ( VectorConstraint constraint, vector_constraints_[vec().id()] ) {
 
-    ReplaceVisitor replacer(variables);
+        if (constraint.is_enabled()) {
 
-    // check if an entry exists
-    if (range.first != range.second) {
+          VectorConstraint::ExpressionsVector& vec_expressions
+              = constraint.get_exprs();
+          ConstraintSet<VectorConstraint>::VectorElements& vec_elements
+              = vector_constraints_[vec().id()].get_vec_vars();
 
-      // replace vector variables and placeholders and make assumptions
-      for (fe_iterator ite = range.first; ite != range.second; ++ite) {
+          if (vec_expressions.size() != size) {
+            vec_expressions.resize(size);
 
-        VectorStatement const& fe_statement = ite->second;
-        for (unsigned int i = 0; i < size; ++i) {
+            for (unsigned int i = 0; i < size; ++i)
+              vec_elements[i] = new VariableExpr(new_var_id(), 1u, true);
 
-          replacer.set_vec_idx(i);
-          fe_statement.get_expression()->visit(replacer);
+            ReplaceVisitor replacer(vec_elements);
+            for (unsigned int i = 0u; i < size; ++i) {
 
-          if (replacer.okay())
-            solver->makeAssumption(*replacer.result());
+              replacer.set_vec_idx(i);
+              constraint.get_expression()->visit(replacer);
 
-          replacer.reset();
-        }
-      }
-    } // end if range.first != range.second
+              if (replacer.okay())
+                vec_expressions[i] = replacer.result();
 
-    // add soft constraints to solver
-    range = soft_foreach_statements_.equal_range(vec().id());
-    if (range.first != range.second) {
-      for (fe_iterator ite = range.first; ite != range.second; ++ite) {
+              replacer.reset();
+            }
+          }
 
-        VectorStatement const& fe_statement = ite->second;
-        for (unsigned int i = 0; i < size; ++i) {
+          BOOST_FOREACH (VectorConstraint::expression e, vec_expressions) {
+            if (constraint.is_soft()) {
+              solver->makeSoftAssertion(*e);
+            } else {
+              solver->makeAssertion(*e);
+            }
+          }
 
-          replacer.set_vec_idx(i);
-          fe_statement.get_expression()->visit(replacer);
-
-          if (replacer.okay())
-            solver->makeSoftAssertion(*replacer.result());
-
-          replacer.reset();
-        }
-      }
-    }  // end if
-
-    // add named constraints to solver
-    typedef std::multimap<int, NamedVectorStatement>::iterator nfe_iterator;
-    std::pair<nfe_iterator, nfe_iterator> nrange =
-        named_foreach_statements_.equal_range(vec().id());
-
-    if (nrange.first != nrange.second) {
-      for (nfe_iterator ite = nrange.first; ite != nrange.second; ++ite) {
-
-        NamedVectorStatement const& fe_statement = ite->second;
-        if (is_constraint_enabled(fe_statement.get_name())) {
-          for (unsigned int i = 0; i < size; ++i) {
-
-            replacer.set_vec_idx(i);
-            fe_statement.get_expression()->visit(replacer);
-
-            if (replacer.okay())
-              solver->makeAssumption(*replacer.result());
-
-            replacer.reset();
+          if (vector_constraints_[vec().id()].is_unique()) {
+            int i = 0;
+            for (ElementsVector::const_iterator var = vec_elements.begin();
+                var != vec_elements.end(); ++var, ++i) {
+              for (int j = i + 1; j < vec_elements.size(); ++j) {
+                solver->makeAssertion(*(new NotEqualOpr(vec_elements[i], vec_elements[j])));
+              }
+            }
           }
         }
       }
     }
-
     // TODO: substitute the known values
-
-    // make unique
-    if (1 == unique_vectors_.count(vec().id())) {
-      int i = 0;
-      for (ElementsVector::const_iterator var = variables.begin();
-           var != variables.end(); ++var, ++i) {
-        for (int j = i + 1; j < variables.size(); ++j) {
-          solver->makeAssumption(*(new NotEqualOpr(variables[i], variables[j])));
-        }
-      }
-    }
-
     if (!solver->solve())
       return false;
 
-    // read results
-    for (unsigned int i = 0; i < size; ++i) {
+    unsigned int i = 0;
+    BOOST_FOREACH ( VectorConstraint::VariablePtr var,
+                    vector_constraints_[vec().id()].get_vec_vars() ) {
       AssignResultImpl<Integral> ar_size;
-      solver->read(*variables[i], ar_size);
-      vec[i] = ar_size.value();
+      solver->read(*var, ar_size);
+      vec[i++] = ar_size.value();
     }
     return true;
   }
 
-  #define _GEN_VEC(typename) if (!gen_vec_(static_cast<__rand_vec<typename>*>(vec_base), solver.get())) return false
+  #define _GEN_VEC(typename) if (!gen_vec_(static_cast<__rand_vec<typename>*>(vec_base), solver)) return false
   bool solve_vectors_() {
 
     typedef std::pair<int, NodePtr> VectorVariablePair;
@@ -472,30 +445,24 @@ public:
         c.get_expression()->visit(visitor);
     }
 
-    typedef std::pair<int const, VectorStatement> ForeachMapPair;
-    BOOST_FOREACH ( ForeachMapPair& fp, foreach_statements_ )
-      fp.second.get_expression()->visit(visitor);
+    typedef std::pair<int const, ConstraintSet<VectorConstraint> > ForeachMapPair;
+    BOOST_FOREACH ( ForeachMapPair& fp, vector_constraints_ )
+      BOOST_FOREACH ( VectorConstraint c, fp.second )
+        c.get_expression()->visit(visitor);
 
     os << "}" << std::endl;
     return os;
   }
 
 private:
-  // typedefs
-  typedef std::vector<boost::intrusive_ptr<VariableExpr> > ElementsVector;
-
   // constraints
   ConstraintSet<UserConstraint> constraints_;
-  std::set<int> unique_vectors_;
-  std::multimap<int, VectorStatement> foreach_statements_;
-  std::multimap<int, VectorStatement> soft_foreach_statements_;
-  std::multimap<int, NamedVectorStatement> named_foreach_statements_;
+  VectorConstraintsMap vector_constraints_;
 
   // variables
   std::map<int, boost::intrusive_ptr<Node> > variables_;
   std::map<int, boost::intrusive_ptr<VectorExpr> > vector_variables_;
   std::map<int, __rand_vec_base*> vectors_;
-  std::map<int, ElementsVector> vector_elements_;
   std::vector<ReadRefPair> read_references_;
   std::vector<WriteRefPair> write_references_;
   std::vector<boost::function0<bool> > pre_hooks_;
@@ -503,7 +470,7 @@ private:
   // solver
   Context ctx_;
   boost::scoped_ptr<metaSMTVisitor> solver_;
-  std::map<int, boost::shared_ptr<metaSMTVisitor> > vector_solvers_;
+  std::map<int, VectorSolverPtr> vector_solvers_;
 
   // auxiliary-attributes
   mutable unsigned int constraint_id_;
