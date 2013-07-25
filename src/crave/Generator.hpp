@@ -49,7 +49,7 @@ private:
 public:
   Generator()
   : constraints_(), vector_constraints_(), variables_(), vector_variables_(), vectors_(),
-    vector_elements_(), read_references_(), write_references_(), pre_hooks_(),
+    read_references_(), write_references_(), pre_hooks_(),
     ctx_(variables_, vector_variables_, read_references_, write_references_),
     solver_(FactoryMetaSMT::getNewInstance()), constraint_id_(0) {
   }
@@ -57,7 +57,7 @@ public:
   template<typename Expr>
   Generator(Expr expr)
   : constraints_(), vector_constraints_(), variables_(), vector_variables_(), vectors_(),
-    vector_elements_(), read_references_(), write_references_(), pre_hooks_(),
+    read_references_(), write_references_(), pre_hooks_(),
     ctx_(variables_, vector_variables_, read_references_, write_references_),
     solver_(FactoryMetaSMT::getNewInstance()), constraint_id_(0) {
       (*this)(expr);
@@ -71,7 +71,6 @@ public:
     UserConstraint constraint(n, name);
 
     constraints_.push_back(constraint);
-    solver_->makeAssertion(*n);
 
     return *this;
   }
@@ -87,7 +86,6 @@ public:
     UserConstraint constraint(n, constraint_name);
 
     constraints_.push_back(constraint);
-    solver_->makeAssertion(*n);
 
     return *this;
   }
@@ -173,7 +171,6 @@ public:
     UserConstraint constraint(n, name, true);
 
     constraints_.push_back(constraint);
-    solver_->makeSoftAssertion(*n);
 
     return *this;
   }

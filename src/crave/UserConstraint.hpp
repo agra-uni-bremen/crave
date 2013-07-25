@@ -51,7 +51,7 @@ struct UserConstraint {
     enabled_ = false;
   }
 
- private:
+ protected:
   expression expr_;
   string name_;
   bool soft_;
@@ -60,11 +60,11 @@ struct UserConstraint {
 
 struct VectorConstraint : UserConstraint {
 
-  typedef typename UserConstraint::expression expression;
-  typedef typename UserConstraint::string string;
+  typedef UserConstraint::expression expression;
+  typedef UserConstraint::string string;
 
   typedef std::vector<expression> ExpressionsVector;
-  typedef typename ExpressionsVector::const_iterator const_iterator;
+  typedef ExpressionsVector::const_iterator const_iterator;
   typedef std::vector<VariableExpr> VectorElements;
 
   VectorConstraint(expression const expr, string const& name)
@@ -141,12 +141,14 @@ struct ConstraintSet {
   }
 
   iterator begin() {
+    changed_ = true;
     return constraints_.begin();
   }
   const_iterator begin() const {
     return constraints_.begin();
   }
   iterator end() {
+    changed_ = true;
     return constraints_.end();
   }
   const_iterator end() const {
@@ -154,6 +156,7 @@ struct ConstraintSet {
   }
 
   void push_back(value_type const& value) {
+    changed_ = true;
     constraints_.push_back(value);
   }
   void pop_back() {
@@ -162,10 +165,12 @@ struct ConstraintSet {
   }
 
   iterator insert(iterator position, value_type const& value) {
+    changed_ = true;
     return constraints_.insert(position, value);
   }
   template<typename InputIterator>
   void insert(iterator position, InputIterator first, InputIterator last) {
+    changed_ = true;
     constraints_.insert(position, first, last);
   }
 
@@ -222,6 +227,7 @@ struct ConstraintSet {
     return unique_;
   }
   void set_unique(bool const val) {
+    changed_ = true;
     unique_ = val;
   }
 
