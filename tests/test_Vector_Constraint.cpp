@@ -32,13 +32,13 @@ struct Item : public rand_obj {
 BOOST_AUTO_TEST_CASE ( fibo_test )
 {
   Item it;
-  it.constraint.print_dot_graph(std::cout);
   it.next();
-  BOOST_REQUIRE(30 <= it.v.size() && it.v.size() <= 50);
-  BOOST_REQUIRE(it.v[0] == 0);
-  BOOST_REQUIRE(it.v[1] == 1);
+  BOOST_REQUIRE_LE(30, it.v.size());
+  BOOST_REQUIRE_LE(it.v.size(), 50);
+  BOOST_REQUIRE_EQUAL(it.v[0], 0);
+  BOOST_REQUIRE_EQUAL(it.v[1], 1);
   for (uint i = 2; i < it.v.size(); i++)
-    BOOST_REQUIRE(it.v[i] == it.v[i - 1] + it.v[i - 2]);
+    BOOST_REQUIRE_EQUAL(it.v[i], it.v[i - 1] + it.v[i - 2]);
 }
 
 struct Item1 : public rand_obj {
