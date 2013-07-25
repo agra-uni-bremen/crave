@@ -79,13 +79,12 @@ struct VectorConstraint : UserConstraint {
   VectorConstraint(VectorConstraint const& o)
   : UserConstraint(o), vec_expressions_(o.vec_expressions_) { }
 
-  ExpressionsVector& get_exprs() const {
+  ExpressionsVector& get_exprs() {
     return vec_expressions_;
   }
 
 private:
-  // auxiliary variables
-  mutable ExpressionsVector vec_expressions_;
+  ExpressionsVector vec_expressions_;
 };
 
 template<typename ConstraintType>
@@ -221,7 +220,7 @@ private:
   bool changed_;
   bool unique_;
 
-  mutable VectorElements vec_elements_;
+  VectorElements vec_elements_;
 };
 
 } // end namespace crave

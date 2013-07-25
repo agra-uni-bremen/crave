@@ -301,50 +301,53 @@ private:
     if (vector_constraints_[vec().id()].is_changed()) {
       solver.reset(FactoryMetaSMT::getNewInstance());
 
+      ConstraintSet<VectorConstraint>::VectorElements& vec_elements
+          = vector_constraints_[vec().id()].get_vec_vars();
+
+      if (vec_elements.size() != size) {
+        unsigned int old_size = vec_elements.size();
+        vec_elements.resize(size);
+        for (unsigned int i = old_size; i < size; ++i)
+          vec_elements[i] = new VariableExpr(new_var_id(), 1u, true);
+      }
+
       BOOST_FOREACH ( VectorConstraint constraint, vector_constraints_[vec().id()] ) {
 
         if (constraint.is_enabled()) {
 
           VectorConstraint::ExpressionsVector& vec_expressions
               = constraint.get_exprs();
-          ConstraintSet<VectorConstraint>::VectorElements& vec_elements
-              = vector_constraints_[vec().id()].get_vec_vars();
 
           if (vec_expressions.size() != size) {
+            unsigned int old_size = vec_expressions.size();
             vec_expressions.resize(size);
-
-            for (unsigned int i = 0; i < size; ++i)
-              vec_elements[i] = new VariableExpr(new_var_id(), 1u, true);
-
-            ReplaceVisitor replacer(vec_elements);
-            for (unsigned int i = 0u; i < size; ++i) {
-
-              replacer.set_vec_idx(i);
-              constraint.get_expression()->visit(replacer);
-
-              if (replacer.okay())
-                vec_expressions[i] = replacer.result();
-
-              replacer.reset();
-            }
+            for (unsigned int i = old_size; i < size; ++i)
+              vec_expressions[i] = new Constant(true);
           }
 
-          BOOST_FOREACH (VectorConstraint::expression e, vec_expressions) {
-            if (constraint.is_soft()) {
-              solver->makeSoftAssertion(*e);
-            } else {
-              solver->makeAssertion(*e);
+          ReplaceVisitor replacer(vec_elements);
+          for (unsigned int i = 0u; i < size; ++i) {
+
+            replacer.set_vec_idx(i);
+            constraint.get_expression()->visit(replacer);
+
+            if (replacer.okay()) {
+              if (constraint.is_soft())
+                solver->makeSoftAssertion(*replacer.result());
+              else
+                solver->makeAssertion(*replacer.result());
             }
+
+            replacer.reset();
           }
 
           if (vector_constraints_[vec().id()].is_unique()) {
-            int i = 0;
+            unsigned int i = 0;
+
             for (ElementsVector::const_iterator var = vec_elements.begin();
-                var != vec_elements.end(); ++var, ++i) {
-              for (int j = i + 1; j < vec_elements.size(); ++j) {
+                 var != vec_elements.end(); ++var, ++i)
+              for (unsigned int j = i + 1; j < vec_elements.size(); ++j)
                 solver->makeAssertion(*(new NotEqualOpr(vec_elements[i], vec_elements[j])));
-              }
-            }
           }
         }
       }
@@ -438,9 +441,6 @@ public:
     ToDotVisitor visitor(os);
 
     BOOST_FOREACH ( UserConstraint c , constraints_ ) {
-
-      std::cout << c.get_name() << " is " << (c.is_enabled()? "enabled": "disabled") << std::endl;
-
       if (c.is_enabled() && (!c.is_soft() || with_softs))
         c.get_expression()->visit(visitor);
     }
