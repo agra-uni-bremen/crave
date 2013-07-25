@@ -26,7 +26,7 @@ class metaSMTVisitorImpl : public metaSMTVisitor {
 public:
   metaSMTVisitorImpl()
   : metaSMTVisitor(), solver_(), exprStack_(), terminals_(),
-    soft_(evaluate(solver_, preds::True)), assumptions_(), pre_hooks_() { }
+    soft_(evaluate(solver_, preds::True)), has_soft(false), assumptions_(), pre_hooks_() { }
 
   virtual void visitNode( Node const & );
   virtual void visitTerminal( Terminal const & );
@@ -94,6 +94,7 @@ private: // data
   std::stack<stack_entry> exprStack_;
   std::map<int, qf_bv::bitvector> terminals_;
   result_type soft_;
+  bool has_soft;
 
   std::vector<result_type> assumptions_;
   std::vector<boost::function0<bool> > pre_hooks_;
@@ -598,6 +599,7 @@ void metaSMTVisitorImpl<SolverType>::makeAssertion(Node const &expr)
 template<typename SolverType>
 void metaSMTVisitorImpl<SolverType>::makeSoftAssertion( Node const &expr )
 {
+  has_soft = true;
   expr.visit(*this);
 
   stack_entry entry;
@@ -667,8 +669,8 @@ bool metaSMTVisitorImpl<SolverType>::solve()
 {
   // first run is for check if soft constrains are satisfiable
   // second run will be executed if softconstrains aren't satisfiable
-  for ( unsigned run = 0; run < 2; ++run ) {
-
+  unsigned run = has_soft ? 0 : 1;
+  for ( ; run < 2; ++run ) {
     if ( !preSolve() ) break;
     if ( run == 0 ) metaSMT::assumption(solver_, soft_);
 

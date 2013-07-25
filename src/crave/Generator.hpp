@@ -457,8 +457,7 @@ public:
     bool result = solver_->solve() &&
                   solve_vectors_();
     okay_ |= result;
-    // post_solve(result)
-    if (okay_) {
+    if (result) {
       BOOST_FOREACH(WriteRefPair pair, write_references_) {
         solver_->read(*variables_[pair.first], *pair.second);
       }

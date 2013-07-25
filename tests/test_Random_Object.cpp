@@ -265,7 +265,8 @@ struct Item1 : public rand_obj {
         upper = x;
       else
         lower = pivot + 1;
-    }
+    }    
+    x = upper;
     return true;
   }
 
