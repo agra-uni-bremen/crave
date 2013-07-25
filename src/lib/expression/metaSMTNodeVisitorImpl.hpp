@@ -203,9 +203,15 @@ void metaSMTVisitorImpl<SolverType>::visitVariableExpr( VariableExpr const &ve )
 template<typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitConstant( Constant const &c )
 {
-  result_type result = c.sign()?
+  result_type result = c.isBool()?
+  	(c.value()? 
+  	  evaluate( solver_,  preds::True):
+  	  evaluate( solver_,  preds::False)
+  	):
+	(c.sign()?
       evaluate( solver_, qf_bv::bvsint( c.value(), c.bitsize() ) ):
-      evaluate( solver_, qf_bv::bvuint( c.value(), c.bitsize() ) );
+      evaluate( solver_, qf_bv::bvuint( c.value(), c.bitsize() ) )
+    );
   exprStack_.push( std::make_pair( result, c.sign() ) );
 }
 

@@ -21,6 +21,7 @@ protected:
   Node( Node const& n ) : count_(0) { }
 public:
   virtual void visit( NodeVisitor& v ) const { v.visitNode(*this); }
+  std::ostream& printDot(std::ostream& out) const;
 
 // reference counting
   friend inline void intrusive_ptr_add_ref(Node* n) { ++(n->count_); }
@@ -71,6 +72,7 @@ private:
 class Constant : public Terminal {
 public:
   Constant( unsigned long val, unsigned int bs, bool s ) : Terminal(bs, s), value_(val) { }
+  Constant( bool b ) : Terminal(1, true), value_(b) { }
   Constant( Constant const& c ) : Terminal(c.bitsize(), c.sign()), value_(c.value()) { }
 
   void visit( NodeVisitor& v ) const { v.visitConstant(*this); }
@@ -78,6 +80,7 @@ public:
   operator unsigned long() const { return value_; }
 
   unsigned long value() const { return value_; }
+  bool isBool() const { return bitsize() == 1 && sign(); }
 private:
   unsigned long value_;
 };

@@ -4,6 +4,12 @@
 
 namespace crave {
 
+std::ostream& Node::printDot(std::ostream& out) const {
+  ToDotVisitor v(out);
+  this->visit(v);
+  return out;
+}
+
 bool ToDotVisitor::putNode(Node const *n)
 {
   if (nodes_.find(n) != nodes_.end())

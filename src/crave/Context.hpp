@@ -151,7 +151,7 @@ public:
   template<typename Expr1, typename Expr2>
   result_type operator()(bproto::tag::function f, bproto::terminal<operator_if_then>::type const& t,
       Expr1 const & e1, Expr2 const & e2) {
-    return new IfThenElse(bproto::eval(e1, *this), bproto::eval(e2, *this), new Constant(1, 1, false));
+    return new IfThenElse(bproto::eval(e1, *this), bproto::eval(e2, *this), new Constant(true));
   }
 
   template<typename Expr1, typename Expr2, typename Expr3>
@@ -267,7 +267,7 @@ public:
         boost::shared_ptr<crave::ReferenceExpression>(
             new DistReferenceExpr(bproto::value(probability), expr)
     )));
-    return new Constant(1, 1, false);
+    return new Constant(true);
   }
 
   template<typename Expr1, typename Expr2>
