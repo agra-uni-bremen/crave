@@ -213,13 +213,13 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_1 )
   rand_vec<signed char> a(NULL);
   placeholder idx;
   Generator gen;
-  gen(a().size() == 138);
-  gen.foreach(a, idx, a()[idx] < (short) 10 );
+  gen(a().size() == 28);
+  gen.foreach(a, idx, a()[idx] < (short) -100);
   gen.unique(a);
 
   BOOST_REQUIRE(gen.next());
   for (uint i = 0; i < a.size(); i++) {
-    BOOST_REQUIRE_LT(a[i], 10);
+    BOOST_REQUIRE_LT(a[i], -100);
     std::cout << " " << (int)a[i];
   }std::cout << std::endl;
   BOOST_REQUIRE(check_unique(a));
