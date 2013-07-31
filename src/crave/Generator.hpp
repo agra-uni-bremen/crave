@@ -48,20 +48,18 @@ private:
 
 public:
   Generator()
-  : constraints_(), named_constraints_(), disabled_named_constaints_(), unique_vectors_(),
-    foreach_statements_(), soft_foreach_statements_(), named_foreach_statements_(), variables_(),
-    vector_variables_(), vectors_(), vector_elements_(), read_references_(), write_references_(),
-    pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
-    solver_(FactoryMetaSMT::getNewInstance()), okay_(false), constraint_id_(0) {
+  : constraints_(), vector_constraints_(), variables_(), vector_variables_(), vectors_(),
+    vector_elements_(), read_references_(), write_references_(), pre_hooks_(),
+    ctx_(variables_, vector_variables_, read_references_, write_references_),
+    solver_(FactoryMetaSMT::getNewInstance()), constraint_id_(0) {
   }
 
   template<typename Expr>
   Generator(Expr expr)
-  : constraints_(), named_constraints_(), disabled_named_constaints_(), unique_vectors_(),
-    foreach_statements_(), soft_foreach_statements_(), named_foreach_statements_(), variables_(),
-    vector_variables_(), vectors_(), vector_elements_(), read_references_(), write_references_(),
-    pre_hooks_(), ctx_(variables_, vector_variables_, read_references_, write_references_),
-    solver_(FactoryMetaSMT::getNewInstance()), okay_(false), constraint_id_(0) {
+  : constraints_(), vector_constraints_(), variables_(), vector_variables_(), vectors_(),
+    vector_elements_(), read_references_(), write_references_(), pre_hooks_(),
+    ctx_(variables_, vector_variables_, read_references_, write_references_),
+    solver_(FactoryMetaSMT::getNewInstance()), constraint_id_(0) {
       (*this)(expr);
     }
 
