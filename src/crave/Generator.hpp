@@ -3,6 +3,7 @@
 #include "AssignResult.hpp"
 #include "Context.hpp"
 #include "Statement.hpp"
+#include "UserConstraint.hpp"
 #include "VectorConstraint.hpp"
 #include "expression/ReplaceVisitor.hpp"
 #include "expression/ToDotNodeVisitor.hpp"
@@ -11,6 +12,7 @@
 
 #include <boost/foreach.hpp>
 #include <boost/function.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -67,31 +69,48 @@ public:
   Generator & operator()(Expr expr) {
 
     NodePtr n(boost::proto::eval(FixWidth()(expr), ctx_));
-    constraints_.push_back(n);
+    std::string name("constraint_" + boost::lexical_cast<std::string>(constraint_id_++));
+    UserConstraint constraint(n, name);
+
+    constraints_.push_back(constraint);
     solver_->makeAssertion(*n);
+
     return *this;
   }
 
   template<typename Expr>
   Generator & operator()(std::string constraint_name, Expr expr) {
 
-    typename std::map<std::string, NamedStatement>::iterator ite(
-        named_constraints_.lower_bound(constraint_name));
+    BOOST_FOREACH (UserConstraint c, constraints_)
+      if (0 == c.get_name().compare(constraint_name))
+        throw std::runtime_error("Constraint already exists.");
 
-    if (ite != named_constraints_.end() && constraint_name >= ite->first)
-      throw std::runtime_error("Constraint already exists.");
+    NodePtr n(boost::proto::eval(FixWidth()(expr), ctx_));
+    UserConstraint constraint(n, constraint_name);
 
-    NodePtr nested_expr = boost::proto::eval(FixWidth()(expr), ctx_);
-    NamedStatement named_stmt(constraint_name, new_var_id(), nested_expr);
-
-    constraints_.push_back(nested_expr);
-    named_constraints_.insert(ite, std::make_pair(constraint_name, named_stmt));
+    constraints_.push_back(constraint);
+    solver_->makeAssertion(*n);
 
     return *this;
   }
 
-  static void set_solver_backend(std::string const& type) {
-    FactoryMetaSMT::setSolverType(type);
+private:
+  void build_solver_() {
+    BOOST_FOREACH (UserConstraint const& c, constraints_) {
+      if (c.is_enabled()) {
+        if (c.is_soft()) {
+          solver_->makeSoftAssertion(*c.get_expression());
+        } else {
+          solver_->makeAssertion(*c.get_expression());
+        }
+      }
+    }
+  }
+
+public:
+  void reset() {
+    solver_.reset(FactoryMetaSMT::getNewInstance());
+    build_solver_();
   }
 
   std::vector<std::vector<std::string> > analyse_contradiction() {
@@ -100,14 +119,13 @@ public:
     std::vector<std::vector<std::string> > str_vec;
 
     std::map<unsigned int, NodePtr> s;
-    typedef std::pair<std::string, NamedStatement> Si_Pair;
     std::vector<std::string> out;
     std::vector<std::vector<unsigned int> > results;
 
-    BOOST_FOREACH(Si_Pair si, named_constraints_)
+    BOOST_FOREACH(UserConstraint c, constraints_)
     {
-      s.insert(std::make_pair(s.size(), si.second.get_expression()));
-      out.push_back(si.first);
+      s.insert(std::make_pair(s.size(), c.get_expression()));
+      out.push_back(c.get_name());
     }
 
     results = solver->analyseContradiction(s);
@@ -124,45 +142,16 @@ public:
     return str_vec;
   }
 
-  bool enable_constraint(std::string constraint_name) {
-
-    if (1 == named_constraints_.count(constraint_name)) {
-      disabled_named_constaints_.erase(constraint_name);
-      return true;
-    }
-
-    typedef std::pair<int, NamedVectorStatement> NamedPair;
-    BOOST_FOREACH (NamedPair pair, named_foreach_statements_) {
-      if (0 == pair.second.get_name().compare(constraint_name)) {
-        disabled_named_constaints_.erase(pair.second.get_name());
-        return true;
-      }
-    }
-    return false;
+  bool enable_constraint(std::string const& name) {
+    return constraints_.enable_constraint(name);
   }
 
-  bool disable_constraint(std::string constraint_name) {
-
-    if (1 == named_constraints_.count(constraint_name)) {
-      disabled_named_constaints_.insert(constraint_name);
-      return true;
-    }
-
-    typedef std::pair<int, NamedVectorStatement> NamedPair;
-    BOOST_FOREACH (NamedPair pair, named_foreach_statements_) {
-      if (0 == pair.second.get_name().compare(constraint_name)) {
-        disabled_named_constaints_.insert(pair.second.get_name());
-        return true;
-      }
-    }
-    return false;
+  bool disable_constraint(std::string const& name) {
+    return constraints_.disable_constraint(name);
   }
 
-  bool is_constraint_enabled(std::string constraint_name) {
-    // named_foreach_statements_ or named_constraints_ includes the constraint_name
-//     assert (0 != named_constraints_.count(constraint_name));
-
-    return 0 == disabled_named_constaints_.count(constraint_name);
+  bool is_constraint_enabled(std::string const& name) {
+    return constraints_.is_constaint_enabled(name);
   }
 
   void add_pre_hook(boost::function0<bool> f) {
@@ -182,7 +171,10 @@ public:
   Generator & soft(Expr e) {
 
     NodePtr n(boost::proto::eval(FixWidth()(e), ctx_));
-    soft_constraints_.push_back(n);
+    std::string name("constraint_" + boost::lexical_cast<std::string>(constraint_id_++));
+    UserConstraint constraint(n, name, true);
+
+    constraints_.push_back(constraint);
     solver_->makeSoftAssertion(*n);
 
     return *this;
@@ -439,16 +431,13 @@ private:
 public:
   bool next() {
     // pre_solve()
-    BOOST_FOREACH(boost::function0<bool> f, pre_hooks_) {
-      solver_->addPreHook(f);
+    if (constraints_.is_changed()) {
+      reset();
+      constraints_.set_synced();
     }
 
-    for (std::map<std::string, NamedStatement>::const_iterator
-         it = named_constraints_.begin();
-         it != named_constraints_.end(); ++it) {
-
-      if (0 == disabled_named_constaints_.count(it->first))
-        solver_->makeAssumption(*it->second.get_expression());
+    BOOST_FOREACH(boost::function0<bool> f, pre_hooks_) {
+      solver_->addPreHook(f);
     }
     BOOST_FOREACH(ReadRefPair pair, read_references_) {
       solver_->makeAssumption(*pair.second->expr());
@@ -456,7 +445,6 @@ public:
 
     bool result = solver_->solve() &&
                   solve_vectors_();
-    okay_ |= result;
     if (result) {
       BOOST_FOREACH(WriteRefPair pair, write_references_) {
         solver_->read(*variables_[pair.first], *pair.second);
@@ -481,17 +469,19 @@ public:
     os << "digraph AST {" << std::endl;
     ToDotVisitor visitor(os);
 
-    BOOST_FOREACH ( boost::intrusive_ptr<Node> n, constraints_ )
-      n->visit(visitor);
-    if (with_softs) {
-      BOOST_FOREACH ( boost::intrusive_ptr<Node> n, soft_constraints_ )
-        n->visit(visitor);
+    BOOST_FOREACH ( UserConstraint c , constraints_ ) {
+
+      std::cout << c.get_name() << " is " << (c.is_enabled()? "enabled": "disabled") << std::endl;
+
+      if (c.is_enabled() && (!c.is_soft() || with_softs))
+        c.get_expression()->visit(visitor);
     }
+
     typedef std::pair<int const, VectorStatement> ForeachMapPair;
     BOOST_FOREACH ( ForeachMapPair& fp, foreach_statements_ )
       fp.second.get_expression()->visit(visitor);
-    os << "}" << std::endl;
 
+    os << "}" << std::endl;
     return os;
   }
 
@@ -500,10 +490,7 @@ private:
   typedef std::vector<boost::intrusive_ptr<VariableExpr> > ElementsVector;
 
   // constraints
-  std::vector<boost::intrusive_ptr<Node> > constraints_;
-  std::vector<boost::intrusive_ptr<Node> > soft_constraints_;
-  std::map<std::string, NamedStatement> named_constraints_;
-  std::set<std::string> disabled_named_constaints_;
+  ConstraintSet<UserConstraint> constraints_;
   std::set<int> unique_vectors_;
   std::multimap<int, VectorStatement> foreach_statements_;
   std::multimap<int, VectorStatement> soft_foreach_statements_;
@@ -524,7 +511,6 @@ private:
   std::map<int, boost::shared_ptr<metaSMTVisitor> > vector_solvers_;
 
   // auxiliary-attributes
-  mutable bool okay_;
   mutable unsigned int constraint_id_;
 };
 
