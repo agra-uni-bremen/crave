@@ -15,11 +15,7 @@
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/uniform_01.hpp>
 #include <metaSMT/DirectSolver_Context.hpp>
-// #include <metaSMT/Priority_Context.hpp>
-#include <metaSMT/UnpackFuture_Context.hpp>
-// #include <metaSMT/BitBlast.hpp>
 #include <metaSMT/backend/Boolector.hpp>
-// #include <metaSMT/backend/CUDD_Distributed.hpp>
 #include <metaSMT/frontend/QF_BV.hpp>
 #include <metaSMT/support/contradiction_analysis.hpp>
 
@@ -98,22 +94,7 @@ namespace crave {
 
     public:
 
-//     typedef metaSMT::DirectSolver_Context <
-//       metaSMT::UnpackFuture_Context <
-//       metaSMT::BitBlast <
-//       metaSMT::solver::CUDD_Distributed
-//       > >
-//     > SolverType1;
-    typedef metaSMT::DirectSolver_Context <
-      metaSMT::UnpackFuture_Context <
-      metaSMT::solver::Boolector
-      >
-    > SolverType2;
-
-//     typedef metaSMT::Priority_Context< SolverType1, SolverType2 > SolverType;
-//     typedef  SolverType1 SolverType; // BDD Only
-    typedef  SolverType2 SolverType; // SMT Only
-
+    typedef metaSMT::DirectSolver_Context<metaSMT::solver::Boolector> SolverType;
     typedef SolverType::result_type result_type;
 
 
@@ -289,28 +270,6 @@ namespace crave {
       }
     }
 
-
-    template< typename Expr1, typename Expr2>
-    result_type operator() (proto::tag::logical_and, Expr1 const & e1, Expr2 const &  e2) {
-      return evaluate( solver, preds::And(
-          proto::eval( e1, ctx() )
-        , proto::eval( e2, ctx() )
-      ));
-    }
-
-    template< typename Expr1, typename Expr2>
-    result_type operator() (proto::tag::logical_or, Expr1 const & e1, Expr2 const &  e2) {
-      return evaluate( solver, preds::Or(
-          proto::eval( e1, ctx() )
-        , proto::eval( e2, ctx() )
-      ));
-    }
-
-    template< typename Expr>
-    result_type operator() (proto::tag::logical_not, Expr const & e) {
-      return evaluate( solver, preds::Not( proto::eval( e, ctx() ) ) );
-    }
-
     template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::plus, Expr1 const & e1, Expr2 const &  e2) {
       return evaluate( solver, qf_bv::bvadd(
@@ -372,6 +331,35 @@ namespace crave {
     }
 
     template< typename Expr1, typename Expr2>
+    result_type operator() (proto::tag::multiplies, Expr1 const & e1, Expr2 const &  e2) {
+      return evaluate( solver, qf_bv::bvmul(
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
+      ));
+    }
+
+    template< typename Expr1, typename Expr2>
+    result_type operator() (proto::tag::logical_and, Expr1 const & e1, Expr2 const &  e2) {
+      return evaluate( solver, preds::And(
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
+      ));
+    }
+
+    template< typename Expr1, typename Expr2>
+    result_type operator() (proto::tag::logical_or, Expr1 const & e1, Expr2 const &  e2) {
+      return evaluate( solver, preds::Or(
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
+      ));
+    }
+
+    template< typename Expr>
+    result_type operator() (proto::tag::logical_not, Expr const & e) {
+      return evaluate( solver, preds::Not( proto::eval( e, ctx() ) ) );
+    }
+
+    template< typename Expr1, typename Expr2>
     result_type operator() (proto::tag::shift_left, Expr1 const & e1, Expr2 const &  e2) {
       return evaluate( solver, qf_bv::bvshl(
           proto::eval( e1, ctx() )
@@ -379,13 +367,67 @@ namespace crave {
       ));
     }
 
-
     template< typename Expr1, typename Expr2>
-    result_type operator() (proto::tag::multiplies, Expr1 const & e1, Expr2 const &  e2) {
-      return evaluate( solver, qf_bv::bvmul(
+    result_type operator() (proto::tag::shift_right, Expr1 const & e1, Expr2 const &  e2) {
+      return evaluate( solver, qf_bv::bvshr(
           proto::eval( e1, ctx() )
         , proto::eval( e2, ctx() )
       ));
+    }
+    
+    template<typename Expr1, typename Expr2>
+    result_type operator()(proto::tag::bitwise_and, Expr1 const & e1, Expr2 const & e2) {
+      return evaluate( solver, qf_bv::bvand(
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
+      ));
+    }
+
+    template<typename Expr1, typename Expr2>
+    result_type operator()(proto::tag::bitwise_or, Expr1 const & e1, Expr2 const & e2) {
+      return evaluate( solver, qf_bv::bvor(
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
+      ));
+    }
+
+    template<typename Expr1, typename Expr2>
+    result_type operator()(proto::tag::bitwise_xor, Expr1 const & e1, Expr2 const & e2) {
+      return evaluate( solver, qf_bv::bvxor(
+          proto::eval( e1, ctx() )
+        , proto::eval( e2, ctx() )
+      ));
+    }
+
+    template<typename Expr>
+    result_type operator()(proto::tag::negate, Expr const & e) {
+      return evaluate( solver, qf_bv::bvneg( proto::eval( e, ctx() ) ) );
+    }
+
+    template<typename Expr>
+    result_type operator()(proto::tag::complement, Expr const & e) {
+      return evaluate( solver, qf_bv::bvnot( proto::eval( e, ctx() ) ) );
+    }    
+
+    template< typename Integer1, typename Integer2, typename Expr >
+    result_type operator() (proto::tag::function,
+       boost::proto::terminal<operator_bitslice>::type const & tag,	Integer1 const & r, Integer2 const & l, Expr const & e)
+    { 
+      int slice_size = proto::value(r) - proto::value(l) + 1;
+      int expr_size = ExpressionSize()(e);
+      if (slice_size <= 0 || slice_size > expr_size) {
+          throw std::runtime_error("Invalid size of bit slice.");
+      }      
+      return evaluate( solver, 
+        qf_bv::zero_extend( 
+          expr_size - slice_size, 
+          qf_bv::extract(
+            proto::value(r), 
+            proto::value(l), 
+            proto::eval( e, ctx() ) 
+          )
+        )           
+      );
     }
 
     template< typename Integral, typename Expr>
@@ -646,7 +688,7 @@ namespace crave {
     }
 
     bool do_solve () {
-      const unsigned limit = 0;
+      const unsigned limit = 5;
       // first run is for check if soft constrains are satisfiable
       // second run will be executed if softconstrains aren't satisfiable
       for ( unsigned run = 0; run < 2; ++run ) {

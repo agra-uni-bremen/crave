@@ -81,6 +81,7 @@ namespace crave {
 
   struct operator_inside {};
   struct operator_dist {};
+  struct operator_bitslice {};
 
   template <typename OUT, typename value_type>
   OUT & operator<< (OUT & out, var_tag<value_type> const & tag) {
@@ -122,6 +123,11 @@ namespace crave {
     return out << "dist"  ;
   }
 
+  template <typename OUT>
+  OUT & operator<< (OUT & out, operator_bitslice const & tag ) {
+    return out << "bitslice"  ;
+  }
+  
   int new_var_id();
 
   template<typename value_type_>
@@ -240,6 +246,7 @@ namespace crave {
 
   boost::proto::terminal<operator_inside>::type const inside = {};
   boost::proto::terminal<operator_dist>::type const dist = {};
+  boost::proto::terminal<operator_bitslice>::type const bitslice = {};
 } // namespace crave
 
 //  vim: ft=cpp:ts=2:sw=2:expandtab

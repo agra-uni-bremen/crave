@@ -42,7 +42,8 @@ namespace crave {
 
   struct ExpressionSize
   : proto::or_<
-    proto::when<proto::terminal<proto::_>, bitsize_traits<proto::_value>() >
+    proto::when<proto::function< proto::terminal<operator_bitslice> , proto::_, proto::_, proto::_ > , ExpressionSize(proto::_child_c<3>) >
+  , proto::when<proto::terminal<proto::_>, bitsize_traits<proto::_value>() >
   , proto::when<BooleanResult, boost::mpl::int_<1>() >
   , proto::when<proto::subscript< proto::_, proto::_ >, ExpressionSize(proto::_left) >
   , proto::when<proto::binary_expr< extend_tag,  proto::_, proto::_ >,
@@ -128,6 +129,7 @@ namespace crave {
     , proto::nary_expr< proto::tag::greater_equal, proto::vararg< proto::_> >
     , proto::nary_expr< proto::tag::equal_to, proto::vararg< proto::_> >
     , proto::nary_expr< proto::tag::not_equal_to, proto::vararg< proto::_> >
+    , proto::function< proto::terminal<operator_bitslice> , proto::_, proto::_, proto::_ > 
   > {};
 
   struct IsSigned
