@@ -29,6 +29,12 @@ struct UserConstraint {
   : expr_(other.get_expression()), name_(other.get_name()), soft_(other.is_soft()),
     enabled_(other.is_enabled()) { }
 
+  template<typename ostream>
+  friend ostream& operator<<(ostream& os, UserConstraint constr) {
+    os << constr.name_ << " is " << (constr.soft_?"":"not") << " soft and " << (constr.enabled_?"enabled":"disabled");
+    return os;
+  }
+
   inline expression const & get_expression() const {
     return expr_;
   }
@@ -105,6 +111,18 @@ struct ConstraintSet {
   ConstraintSet()
   : constraints_(), changed_(false), unique_(false), vec_elements_() { }
 
+  template<typename ostream>
+  friend ostream& operator<<(ostream& os, ConstraintSet set) {
+    os << "Set is " << (set.changed_?"":"not ") << "changed and " << (set.unique_?"":"not ") << "unique\n"; 
+    os << "Size is " << set.constraints_.size() << "\n";
+
+    BOOST_FOREACH (ConstraintType item, set.constraints_) {
+      os << item << "\n";
+    }
+    os << std::flush;
+    return os;
+  }
+
   reference operator[](size_type n) {
     changed_ = true;
     return constraints_[n];
@@ -161,6 +179,10 @@ struct ConstraintSet {
   iterator erase(iterator first, iterator last) {
     changed_ = true;
     return constraints_.erase(first, last);
+  }
+
+  size_type size() const {
+    return constraints_.size();
   }
 
   void clear() {
