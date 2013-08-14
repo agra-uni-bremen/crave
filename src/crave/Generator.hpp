@@ -143,15 +143,33 @@ public:
   }
 
   bool enable_constraint(std::string const& name) {
-    return constraints_.enable_constraint(name);
+    if (constraints_.enable_constraint(name))
+      return true;
+
+    BOOST_FOREACH ( VectorConstraintsMap::value_type& c_pair , vector_constraints_ )
+      if (c_pair.second.enable_constraint(name))
+        return true;
+    return false;
   }
 
   bool disable_constraint(std::string const& name) {
-    return constraints_.disable_constraint(name);
+    if (constraints_.disable_constraint(name))
+      return true;
+
+    BOOST_FOREACH ( VectorConstraintsMap::value_type& c_pair , vector_constraints_ )
+      if (c_pair.second.disable_constraint(name))
+        return true;
+    return false;
   }
 
   bool is_constraint_enabled(std::string const& name) {
-    return constraints_.is_constaint_enabled(name);
+    if (constraints_.is_constaint_enabled(name))
+      return true;
+
+    BOOST_FOREACH ( VectorConstraintsMap::value_type& c_pair , vector_constraints_ )
+      if (c_pair.second.is_constaint_enabled(name))
+        return true;
+    return false;
   }
 
   void add_pre_hook(boost::function0<bool> f) {
@@ -234,10 +252,12 @@ public:
   Generator & foreach(std::string constraint_name,
       __rand_vec <value_type> & v, const placeholder & p, Expr e) {
 
-    typedef std::pair<int, ConstraintSet<VectorConstraint> > vec_pair;
-    BOOST_FOREACH (VectorConstraint c, vector_constraints_[v().id()])
-      if (0 == c.get_name().compare(constraint_name))
-        throw std::runtime_error("Constraint already exists.");
+    BOOST_FOREACH ( VectorConstraintsMap::value_type c_pair, vector_constraints_ ) {
+      BOOST_FOREACH ( VectorConstraint c, c_pair.second ) {
+        if (0 == c.get_name().compare(constraint_name))
+          throw std::runtime_error("Constraint already exists.");
+      }
+    }
 
     NodePtr vec_expr(boost::proto::eval(FixWidth()(e), ctx_));
     VectorConstraint constraint(vec_expr, constraint_name);
