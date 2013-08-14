@@ -1,6 +1,7 @@
 #define BOOST_TEST_MODULE SystemC_Data
 #include <boost/test/unit_test.hpp>
 
+#include <crave/ConstrainedRandom.hpp>
 #include <crave/SystemC.hpp>
 
 #include <systemc.h>
@@ -27,7 +28,7 @@ BOOST_AUTO_TEST_CASE( sc_bv_t )
 
   Variable< sc_bv<w> > i,j;
 
-  Generator<> gen( i != j );
+  Generator gen( i != j );
   gen();
 
   sc_bv<w> iv = gen[i];
@@ -43,7 +44,7 @@ BOOST_AUTO_TEST_CASE( sc_uint_t )
 
   Variable< sc_uint<w> > i,j,k;
 
-  Generator<> gen( i != j  && i+j == k);
+  Generator gen( i != j  && i+j == k);
 
   unsigned count = 0;
 
@@ -73,7 +74,7 @@ BOOST_AUTO_TEST_CASE( sc_int_t )
 
   Variable< sc_int<w> > i,j,k;
 
-  Generator<> gen( i < j &&  i-j == k );
+  Generator gen( i < j &&  i-j == k );
   gen();
 
   sc_int<w> iv = gen[i];
