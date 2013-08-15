@@ -226,7 +226,7 @@ void metaSMTVisitorImpl<SolverType>::visitNotOpr( NotOpr const &o )
   stack_entry entry;
   pop( entry );
 
-  result_type result = evaluate( solver_, qf_bv::bvnot( entry.first ) );
+  result_type result = evaluate( solver_, preds::Not( entry.first ) );
   exprStack_.push( std::make_pair( result, entry.second ) );
 }
 

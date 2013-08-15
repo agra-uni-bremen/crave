@@ -32,13 +32,13 @@ struct Item : public rand_obj {
 BOOST_AUTO_TEST_CASE ( fibo_test )
 {
   Item it;
-  it.constraint.print_dot_graph(std::cout);
   it.next();
-  BOOST_REQUIRE(30 <= it.v.size() && it.v.size() <= 50);
-  BOOST_REQUIRE(it.v[0] == 0);
-  BOOST_REQUIRE(it.v[1] == 1);
+  BOOST_REQUIRE_LE(30, it.v.size());
+  BOOST_REQUIRE_LE(it.v.size(), 50);
+  BOOST_REQUIRE_EQUAL(it.v[0], 0);
+  BOOST_REQUIRE_EQUAL(it.v[1], 1);
   for (uint i = 2; i < it.v.size(); i++)
-    BOOST_REQUIRE(it.v[i] == it.v[i - 1] + it.v[i - 2]);
+    BOOST_REQUIRE_EQUAL(it.v[i], it.v[i - 1] + it.v[i - 2]);
 }
 
 struct Item1 : public rand_obj {
@@ -213,13 +213,13 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_1 )
   rand_vec<signed char> a(NULL);
   placeholder idx;
   Generator gen;
-  gen(a().size() == 138);
-  gen.foreach(a, idx, a()[idx] < (short) 10 );
+  gen(a().size() == 28);
+  gen.foreach(a, idx, a()[idx] < (short) -100);
   gen.unique(a);
 
   BOOST_REQUIRE(gen.next());
   for (uint i = 0; i < a.size(); i++) {
-    BOOST_REQUIRE_LT(a[i], 10);
+    BOOST_REQUIRE_LT(a[i], -100);
     std::cout << " " << (int)a[i];
   }std::cout << std::endl;
   BOOST_REQUIRE(check_unique(a));

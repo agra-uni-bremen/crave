@@ -88,34 +88,34 @@ BOOST_AUTO_TEST_CASE( t1 )
   BOOST_REQUIRE( it.is_constraint_enabled("product") );
   BOOST_REQUIRE( it.is_constraint_enabled("x") );
 
-  it.disable_constraint("sum");
+  BOOST_REQUIRE( it.disable_constraint("sum") );
   BOOST_REQUIRE( it.next() );
   BOOST_REQUIRE( !it.is_constraint_enabled("sum") );
   BOOST_REQUIRE( it.is_constraint_enabled("product") );
   BOOST_REQUIRE( it.is_constraint_enabled("x") );
   std::cout << it << std::endl;
 
-  it.disable_constraint("product");
+  BOOST_REQUIRE( it.disable_constraint("product") );
   BOOST_REQUIRE( it.next() );
   BOOST_REQUIRE( !it.is_constraint_enabled("sum") );
   BOOST_REQUIRE( !it.is_constraint_enabled("product") );
   BOOST_REQUIRE(  it.is_constraint_enabled("x") );
   std::cout << it << std::endl;
 
-  it.enable_constraint("sum");
+  BOOST_REQUIRE( it.enable_constraint("sum") );
   BOOST_REQUIRE( it.next() );
   BOOST_REQUIRE( it.is_constraint_enabled("sum") );
   BOOST_REQUIRE( !it.is_constraint_enabled("product") );
   BOOST_REQUIRE(  it.is_constraint_enabled("x") );
   std::cout << it << std::endl;
 
-  it.enable_constraint("product");
+  BOOST_REQUIRE( it.enable_constraint("product") );
   BOOST_REQUIRE(!it.next() );
   BOOST_REQUIRE( it.is_constraint_enabled("sum") );
   BOOST_REQUIRE( it.is_constraint_enabled("product") );
   BOOST_REQUIRE( it.is_constraint_enabled("x") );
 
-  it.disable_constraint("x");
+  BOOST_REQUIRE( it.disable_constraint("x"));
   BOOST_REQUIRE( it.next() );
   BOOST_REQUIRE( it.is_constraint_enabled("sum") );
   BOOST_REQUIRE( it.is_constraint_enabled("product") );

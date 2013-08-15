@@ -788,16 +788,15 @@ BOOST_AUTO_TEST_CASE (dist_of_boolean75)
 }
 
 BOOST_AUTO_TEST_CASE (if_then_else_t1) {
-  randv<unsigned int> a(0);
+  unsigned int a;
   randv<unsigned int> b(0);
   Generator gen;
 
-  gen(a() < 10);
-  gen(if_then_else(a() < 5, b() > 0 && b() <= 50, b() > 50 && b() <= 100 ));
+  gen(if_then_else(reference(a) < 5, b() > 0 && b() <= 50, b() > 50 && b() <= 100 ));
 
-  for (int i = 0; i < 1000; ++i) {
-    std::cout << "a =" << a << ", b = " << b << std::endl;
+  for (a = 0; a < 10; ++a) {
     BOOST_REQUIRE( gen.next() );
+    std::cout << "a =" << a << ", b = " << b << std::endl;
     if(a < 5) {
       BOOST_REQUIRE_GT( b, 0 );
       BOOST_REQUIRE_LE( b, 50 );
@@ -807,6 +806,34 @@ BOOST_AUTO_TEST_CASE (if_then_else_t1) {
     }
   }
 }
+
+BOOST_AUTO_TEST_CASE (logical_not_t1) {
+  randv<unsigned int> a(0);
+  Generator gen;
+  gen(!(a() != 0));
+
+  BOOST_REQUIRE( gen.next() );
+  BOOST_CHECK_EQUAL( a, 0 );
+}
+
+BOOST_AUTO_TEST_CASE (logical_not_t2) {
+  randv<unsigned char> a(0);
+  randv<unsigned int> b(0);
+  Generator gen;
+
+  gen(if_then_else(!(a() % 2 == 0), b() > 0 && b() <= 50, b() > 50 && b() <= 100 ));
+
+  BOOST_REQUIRE( gen.next() );
+  std::cout << "a =" << a << ", b = " << b << std::endl;
+  if(a % 2 != 0) {
+    BOOST_REQUIRE_GT( b, 0 );
+    BOOST_REQUIRE_LE( b, 50 );
+  } else {
+    BOOST_REQUIRE_GT( b, 50 );
+    BOOST_REQUIRE_LE( b, 100 );
+  }
+} 
+
 
 BOOST_AUTO_TEST_SUITE_END() // Context
 
