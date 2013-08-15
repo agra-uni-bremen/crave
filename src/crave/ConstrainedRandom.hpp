@@ -27,12 +27,10 @@ namespace crave {
       virtual bool next() = 0;
   };
 
-  template<typename context_type=Context>
-  class rand_obj_of : public rand_base
+  class rand_obj : public rand_base
   {
     public:
-      template<typename context>
-      rand_obj_of(rand_obj_of<context>* parent = 0) { if (parent != 0) parent->addChild(this); }
+      rand_obj(rand_obj* parent = 0) { if (parent != 0) parent->addChild(this); }
       virtual bool next() {
         return constraint.next();
       }
@@ -45,22 +43,10 @@ namespace crave {
       }
 
     protected:
-      rand_obj_of() { }
       std::vector<rand_base*> children;
 
     public:
       Generator constraint;
-  };
-
-  class rand_obj : public rand_obj_of<>
-  {
-    public:
-      template<typename context>
-      rand_obj(rand_obj_of<context>* parent)
-      : rand_obj_of<>(parent)
-      { }
-    protected:
-      rand_obj() { }
   };
 
   template<typename T>
@@ -73,8 +59,7 @@ namespace crave {
       CppType type() { return UNSUPPORTED; }
 
     protected:
-      template<typename context>
-      randv_prim_base(rand_obj_of<context>* parent) : var(value) { if (parent != 0) parent->addChild(this); }
+      randv_prim_base(rand_obj* parent) : var(value) { if (parent != 0) parent->addChild(this); }
       randv_prim_base(const randv_prim_base& other) : var(value), value(other.value) { }
       WriteReference<T> var;
       T value;
@@ -159,8 +144,6 @@ namespace crave {
   class randv : public randv_prim_base<T>, public randomize_base<T>
   {
   public:
-    template<typename context>
-    randv(rand_obj_of<context>* parent) : randv_prim_base<T>(parent) { }
     randv(rand_obj* parent) : randv_prim_base<T>(parent) { }
     randv(const randv& other) : randv_prim_base<T>(other) { }
     bool next() { return true; }
@@ -168,8 +151,6 @@ namespace crave {
 
 #define _COMMON_INTERFACE(Typename) \
 public: \
-  template<typename context> \
-  randv(rand_obj_of<context>* parent) : randv_prim_base<Typename>(parent) { } \
   randv(rand_obj* parent) : randv_prim_base<Typename>(parent) { } \
   randv(const randv& other) : randv_prim_base<Typename>(other) { } \
   bool next() { value = nextValue(); return true; } \
@@ -229,8 +210,6 @@ class randv<typename> : public randv_prim_base<typename>, public randomize_base<
   class rand_vec : public __rand_vec<T>, public rand_base
   {
     public:
-      template<typename context>
-      rand_vec(rand_obj_of<context>* parent) : __rand_vec<T>() { if (parent != 0) parent->addChild(this); }
       rand_vec(rand_obj* parent) : __rand_vec<T>() { if (parent != 0) parent->addChild(this); }
 
       bool next() {
