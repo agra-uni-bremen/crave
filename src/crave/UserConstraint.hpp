@@ -64,46 +64,16 @@ struct UserConstraint {
   bool enabled_;
 };
 
-struct VectorConstraint : UserConstraint {
-
-  typedef UserConstraint::expression expression;
-  typedef UserConstraint::string string;
-
-  typedef std::vector<expression> ExpressionsVector;
-  typedef ExpressionsVector::const_iterator const_iterator;
-
-  typedef boost::intrusive_ptr<VariableExpr> VariablePtr;
-  typedef std::vector<VariablePtr> VectorElements;
-
-  VectorConstraint(expression const expr, string const& name)
-  : UserConstraint(expr, name), vec_expressions_() { }
-  VectorConstraint(expression const expr, string const& name, bool const soft)
-  : UserConstraint(expr, name, soft), vec_expressions_() { }
-  VectorConstraint(expression const expr, string const& name, bool const soft,
-                   bool const enabled)
-  : UserConstraint(expr, name, soft, enabled), vec_expressions_() { }
-  VectorConstraint(VectorConstraint const& o)
-  : UserConstraint(o), vec_expressions_(o.vec_expressions_) { }
-
-  ExpressionsVector& get_exprs() {
-    return vec_expressions_;
-  }
-
-private:
-  ExpressionsVector vec_expressions_;
-};
-
-template<typename ConstraintType>
 struct ConstraintSet {
 
   typedef std::string string;
-  typedef std::vector<ConstraintType> ConstraintsVector;
-  typedef typename ConstraintsVector::iterator iterator;
-  typedef typename ConstraintsVector::const_iterator const_iterator;
-  typedef typename ConstraintsVector::reference reference;
-  typedef typename ConstraintsVector::const_reference const_reference;
-  typedef typename ConstraintsVector::size_type size_type;
-  typedef typename ConstraintsVector::value_type value_type;
+  typedef std::vector<UserConstraint> ConstraintsVector;
+  typedef ConstraintsVector::iterator iterator;
+  typedef ConstraintsVector::const_iterator const_iterator;
+  typedef ConstraintsVector::reference reference;
+  typedef ConstraintsVector::const_reference const_reference;
+  typedef ConstraintsVector::size_type size_type;
+  typedef ConstraintsVector::value_type value_type;
 
   typedef boost::intrusive_ptr<VariableExpr> VariablePtr;
   typedef std::vector<VariablePtr> VectorElements;
@@ -116,7 +86,7 @@ struct ConstraintSet {
     os << "Set is " << (set.changed_?"":"not ") << "changed and " << (set.unique_?"":"not ") << "unique\n"; 
     os << "Size is " << set.constraints_.size() << "\n";
 
-    BOOST_FOREACH (ConstraintType item, set.constraints_) {
+    BOOST_FOREACH (UserConstraint item, set.constraints_) {
       os << item << "\n";
     }
     os << std::flush;
@@ -191,7 +161,7 @@ struct ConstraintSet {
   }
 
   bool enable_constraint(string const& key) {
-    BOOST_FOREACH (ConstraintType& c, constraints_) {
+    BOOST_FOREACH (UserConstraint& c, constraints_) {
       if (0 == c.get_name().compare(key)) {
         c.enable();
         changed_ = true;
@@ -201,7 +171,7 @@ struct ConstraintSet {
     return false;
   }
   bool disable_constraint(string const& key) {
-    BOOST_FOREACH (ConstraintType& c, constraints_) {
+    BOOST_FOREACH (UserConstraint& c, constraints_) {
       if (0 == c.get_name().compare(key)) {
         c.disable();
         changed_ = true;
@@ -211,7 +181,7 @@ struct ConstraintSet {
     return false;
   }
   bool is_constaint_enabled(string const& key) {
-    BOOST_FOREACH (ConstraintType const& c, constraints_)
+    BOOST_FOREACH (UserConstraint const& c, constraints_)
       if (0 == c.get_name().compare(key))
         return c.is_enabled();
 

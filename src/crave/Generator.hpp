@@ -45,7 +45,7 @@ private:
   // typedefs
   typedef std::vector<boost::intrusive_ptr<VariableExpr> > ElementsVector;
   typedef boost::shared_ptr<metaSMTVisitor> VectorSolverPtr;
-  typedef std::map<int, ConstraintSet<VectorConstraint> > VectorConstraintsMap;
+  typedef std::map<int, ConstraintSet> VectorConstraintsMap;
 
   typedef std::pair<int, boost::shared_ptr<crave::ReferenceExpression> > ReadRefPair;
   typedef std::pair<int, boost::shared_ptr<crave::AssignResult> > WriteRefPair;
@@ -206,7 +206,7 @@ public:
 
     NodePtr vec_expr(boost::proto::eval(FixWidth()(e), ctx_));
     std::string name("constraint_" + boost::lexical_cast<std::string>(constraint_id_++));
-    VectorConstraint constraint(vec_expr, name);
+    UserConstraint constraint(vec_expr, name);
 
     VectorConstraintsMap::iterator ite(vector_constraints_.lower_bound(v().id()));
     if (ite != vector_constraints_.end() && !(vector_constraints_.key_comp()(v().id(), ite->first))) {
@@ -230,7 +230,7 @@ public:
 
     NodePtr vec_expr(boost::proto::eval(FixWidth()(e), ctx_));
     std::string name("constraint_" + boost::lexical_cast<std::string>(constraint_id_++));
-    VectorConstraint constraint(vec_expr, name, true);
+    UserConstraint constraint(vec_expr, name, true);
 
     VectorConstraintsMap::iterator ite(vector_constraints_.lower_bound(v().id()));
     if (ite != vector_constraints_.end() && !(vector_constraints_.key_comp()(v().id(), ite->first))) {
@@ -252,15 +252,15 @@ public:
   Generator & foreach(std::string constraint_name,
       __rand_vec <value_type> & v, const placeholder & p, Expr e) {
 
-    BOOST_FOREACH ( VectorConstraintsMap::value_type c_pair, vector_constraints_ ) {
-      BOOST_FOREACH ( VectorConstraint c, c_pair.second ) {
+    BOOST_FOREACH ( VectorConstraintsMap::value_type const& c_pair, vector_constraints_ ) {
+      BOOST_FOREACH ( UserConstraint const& c, c_pair.second ) {
         if (0 == c.get_name().compare(constraint_name))
           throw std::runtime_error("Constraint already exists.");
       }
     }
 
     NodePtr vec_expr(boost::proto::eval(FixWidth()(e), ctx_));
-    VectorConstraint constraint(vec_expr, constraint_name);
+    UserConstraint constraint(vec_expr, constraint_name);
 
     VectorConstraintsMap::iterator ite(vector_constraints_.lower_bound(v().id()));
     if (ite != vector_constraints_.end() &&
@@ -321,7 +321,7 @@ private:
     if (vector_constraints_[vec().id()].is_changed()) {
       solver.reset(FactoryMetaSMT::getNewInstance());
 
-      ConstraintSet<VectorConstraint>::VectorElements& vec_elements
+      ConstraintSet::VectorElements& vec_elements
           = vector_constraints_[vec().id()].get_vec_vars();
 
       if (vec_elements.size() != size) {
@@ -331,19 +331,9 @@ private:
           vec_elements[i] = new VariableExpr(new_var_id(), 1u, true);
       }
 
-      BOOST_FOREACH ( VectorConstraint constraint, vector_constraints_[vec().id()] ) {
+      BOOST_FOREACH ( UserConstraint const& constraint, vector_constraints_[vec().id()] ) {
 
         if (constraint.is_enabled()) {
-
-          VectorConstraint::ExpressionsVector& vec_expressions
-              = constraint.get_exprs();
-
-          if (vec_expressions.size() != size) {
-            unsigned int old_size = vec_expressions.size();
-            vec_expressions.resize(size);
-            for (unsigned int i = old_size; i < size; ++i)
-              vec_expressions[i] = new Constant(true);
-          }
 
           ReplaceVisitor replacer(vec_elements);
           for (unsigned int i = 0u; i < size; ++i) {
@@ -377,7 +367,7 @@ private:
       return false;
 
     unsigned int i = 0;
-    BOOST_FOREACH ( VectorConstraint::VariablePtr var,
+    BOOST_FOREACH ( ConstraintSet::VariablePtr var,
                     vector_constraints_[vec().id()].get_vec_vars() ) {
       AssignResultImpl<Integral> ar_size;
       solver->read(*var, ar_size);
@@ -460,14 +450,13 @@ public:
     os << "digraph AST {" << std::endl;
     ToDotVisitor visitor(os);
 
-    BOOST_FOREACH ( UserConstraint c , constraints_ ) {
+    BOOST_FOREACH ( UserConstraint const& c , constraints_ ) {
       if (c.is_enabled() && (!c.is_soft() || with_softs))
         c.get_expression()->visit(visitor);
     }
 
-    typedef std::pair<int const, ConstraintSet<VectorConstraint> > ForeachMapPair;
-    BOOST_FOREACH ( ForeachMapPair& fp, vector_constraints_ )
-      BOOST_FOREACH ( VectorConstraint c, fp.second )
+    BOOST_FOREACH ( VectorConstraintsMap::value_type const& fp, vector_constraints_ )
+      BOOST_FOREACH ( UserConstraint const& c, fp.second )
         c.get_expression()->visit(visitor);
 
     os << "}" << std::endl;
@@ -476,7 +465,7 @@ public:
 
 private:
   // constraints
-  ConstraintSet<UserConstraint> constraints_;
+  ConstraintSet constraints_;
   VectorConstraintsMap vector_constraints_;
 
   // variables
