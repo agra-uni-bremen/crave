@@ -14,34 +14,44 @@ class Constant;
 class VectorExpr;
 class UnaryExpression;
 class UnaryOperator;
-class NotOpr;
-class NegOpr;
-class ComplementOpr;
-class Inside;
-class ExtendExpression;
-class BinaryExpression;
 class BinaryOperator;
-class AndOpr;
-class OrOpr;
+class BinaryExpression;
+class ExtendExpression;
+class TernaryExpression;
+
+// logical
+class NotOpr;
 class LogicalAndOpr;
 class LogicalOrOpr;
-class XorOpr;
+
+// comparison
 class EqualOpr;
 class NotEqualOpr;
 class LessOpr;
 class LessEqualOpr;
 class GreaterOpr;
 class GreaterEqualOpr;
+
+// bitwise
+class NegOpr;
+class ComplementOpr;
+class AndOpr;
+class OrOpr;
+class XorOpr;
+class ShiftLeftOpr;
+class ShiftRightOpr;
+
+// arithmetic
 class PlusOpr;
 class MinusOpr;
 class MultipliesOpr;
 class DevideOpr;
 class ModuloOpr;
-class ShiftLeftOpr;
-class ShiftRightOpr;
-class VectorAccess;
-class TernaryExpression;
+
+// misc 
+class Inside;
 class IfThenElse;
+class VectorAccess;
 
 class NodeVisitor {
 protected:
