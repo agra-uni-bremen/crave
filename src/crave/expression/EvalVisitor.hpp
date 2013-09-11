@@ -1,11 +1,8 @@
 #ifndef EVALVISITOR_HPP_
 #define EVALVISITOR_HPP_
 
-#include "../Context.hpp"
-#include "../VariableContainer.hpp"
 #include "Node.hpp"
 #include "NodeVisitor.hpp"
-#include "ReferenceExpression.hpp"
 
 #include <map>
 #include <stack>
@@ -15,14 +12,12 @@ namespace crave {
 
 class EvalVisitor : NodeVisitor {
 
-  typedef NodePtr expression;
   typedef std::pair<Constant, bool> stack_entry;
 
 public:
   typedef std::map<int, Constant> eval_map;
 
-  EvalVisitor() : NodeVisitor(), exprStack_(), evalMap_(), result_() { }
-  EvalVisitor(eval_map const& m) : NodeVisitor(), exprStack_(), evalMap_(m), result_() { }
+  EvalVisitor(eval_map& m) : NodeVisitor(), exprStack_(), evalMap_(m), result_() { }
 
 private:
   virtual void visitNode( Node const & );
@@ -69,31 +64,10 @@ private:
   void evalTernExpr( TernaryExpression const&, stack_entry&, stack_entry&, stack_entry& );
 
 public:
-  void set_evaluation_map(eval_map const& m) {
-    evalMap_ = m;
-  }
   Constant get_result() const {
     return result_;
   }
 
-  template<typename Expr>
-  expression get_expression(Expr expr) {
-    return LWGenerator()(expr);
-  }
-
-  template<typename Expr>
-  bool evaluate(Expr expr, eval_map const& m) {
-    set_evaluation_map(m);
-    return evaluate(expr);
-  }
-  template<typename Expr>
-  bool evaluate(Expr expr) {
-    return evaluate(*get_expression(expr));
-  }
-  bool evaluate(Node const& expr, eval_map const& m) {
-    set_evaluation_map(m);
-    return evaluate(expr);
-  }
   bool evaluate(Node const& expr) {
 
     expr.visit(*this);
@@ -106,29 +80,9 @@ public:
 
 private:
   std::stack<stack_entry> exprStack_;
-  eval_map evalMap_;
+  eval_map& evalMap_;
 
   Constant result_;
-
-  class LWGenerator {
-
-    typedef std::pair<int, boost::shared_ptr<crave::ReferenceExpression> > ReadRefPair;
-    typedef std::pair<int, boost::shared_ptr<crave::AssignResult> > WriteRefPair;
-
-  public:
-    LWGenerator()
-      : vars_(), ctx_(vars_) { }
-
-    template<typename Expr>
-    expression operator()(Expr expr) {
-      return boost::proto::eval(FixWidth()(expr), ctx_);
-    }
-
-  private:
-    VariableContainer vars_;
-    
-    Context ctx_;
-  };
 };
 
 inline void EvalVisitor::pop(stack_entry& fst)

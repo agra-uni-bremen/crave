@@ -55,7 +55,7 @@ namespace crave {
     public:
       operator T() const { return value; }
       friend ostream& operator<<(ostream& os, const randv_prim_base<T>& e) { os << e.value; return os; }
-      WriteReference<T>& operator()() { return var; }
+      WriteReference<T> const& operator()() const { return var; }
       CppType type() { return UNSUPPORTED; }
 
     protected:
