@@ -35,237 +35,6 @@ BOOST_AUTO_TEST_CASE (logical_not_t2) {
   }
 }
 
-BOOST_AUTO_TEST_CASE (neg_t1) {
-  randv<int> a(0);
-  randv<int> b(0);
-  Generator gen(a() == -1337);
-
-  BOOST_REQUIRE( gen.next() );
-  BOOST_CHECK_EQUAL( a, -1337 );
-  gen(b() == -a);
-
-  BOOST_REQUIRE( gen.next() );
-  BOOST_CHECK_EQUAL( b, 1337 );
-}
-
-BOOST_AUTO_TEST_CASE (neg_t2) {
-  int a = -1337;
-  randv<int> b(0);
-  Generator gen(b() == -a);
-
-  BOOST_REQUIRE( gen.next() );
-  BOOST_CHECK_EQUAL( b, 1337 );
-}
-
-BOOST_AUTO_TEST_CASE (complement_t1) {
-  randv<int> a(0);
-  randv<int> b(0);
-  Generator gen(a() == 0);
-
-  BOOST_REQUIRE( gen.next() );
-  BOOST_CHECK_EQUAL( a, 0 );
-  gen(b() == ~a);
-
-  BOOST_REQUIRE( gen.next() );
-  BOOST_CHECK_EQUAL( b, -1 );
-}
-
-BOOST_AUTO_TEST_CASE (complement_t2) {
-  int a = 42;
-  randv<int> b(0);
-  Generator gen(b() == ~a);
-
-  BOOST_REQUIRE( gen.next() );
-  BOOST_CHECK_EQUAL( b, -43 );
-}
-
-
-BOOST_AUTO_TEST_CASE ( element_inside_set )
-{
-  std::set<unsigned> s;
-  s.insert(1);
-  s.insert(7);
-  s.insert(9);
-
-  randv<unsigned> x(0);
-
-  Generator gen;
-  gen ( inside(x(),s) );
-
-  BOOST_REQUIRE(gen.next());
-  BOOST_REQUIRE(s.find(x) != s.end());
-
-  unsigned first = x;
-  gen (x() != first);
-
-
-  BOOST_REQUIRE(gen.next());
-  BOOST_REQUIRE(s.find(x) != s.end());
-
-  unsigned second = x;
-  BOOST_REQUIRE_NE(first, second);
-  gen (x() != second);
-
-
-  BOOST_REQUIRE(gen.next());
-  BOOST_REQUIRE(s.find(x) != s.end());
-
-  unsigned third = x;
-  BOOST_REQUIRE_NE(third, second);
-  BOOST_REQUIRE_NE(first, third);
-  gen (x() != third);
-
-
-  BOOST_REQUIRE(!gen.next());
-
-}
-
-BOOST_AUTO_TEST_CASE ( element_inside_vec )
-{
-  std::vector<unsigned> v;
-  v.push_back(1);
-  v.push_back(7);
-  v.push_back(9);
-
-  randv<unsigned> x(0);
-  unsigned tmp;
-
-  Generator gen;
-  gen ( inside(x(),v) );
-
-  BOOST_REQUIRE(gen.next());
-  BOOST_REQUIRE( find(v.begin(), v.end(), x) != v.end());
-
-  unsigned first = x;
-  gen (x() != first);
-
-
-  BOOST_REQUIRE(gen.next());
-  BOOST_REQUIRE(find(v.begin(), v.end(), x) != v.end());
-
-  unsigned second = x;
-  BOOST_REQUIRE_NE(first, second);
-  gen (x() != second);
-
-
-  BOOST_REQUIRE(gen.next());
-  BOOST_REQUIRE( find(v.begin(), v.end(), x) != v.end());
-
-  unsigned third = x;
-  BOOST_REQUIRE_NE(third, second);
-  BOOST_REQUIRE_NE(first, third);
-  gen (x() != third);
-
-
-  BOOST_REQUIRE(!gen.next());
-
-}
-
-BOOST_AUTO_TEST_CASE ( element_inside_array )
-{
-  unsigned a[3];
-  a[0] = 1;
-  a[1] = 7;
-  a[2] = 9;
-
-
-  randv<unsigned> x(0);
-  //unsigned y = a.begin();
-  Generator gen;
-  gen ( inside(x(),a) );
-
-  BOOST_REQUIRE(gen.next());
-  //BOOST_REQUIRE( find(a.begin(), a.end(), x) != a.end());
-
-  unsigned first = x;
-  gen (x() != first);
-
-
-  BOOST_REQUIRE(gen.next());
-  //BOOST_REQUIRE( find(a.begin(), a.end(), x) != a.end());
-
-  unsigned second = x;
-  BOOST_REQUIRE_NE(first, second);
-  gen (x() != second);
-
-
-  BOOST_REQUIRE(gen.next());
-  //BOOST_REQUIRE( find(a.begin(), a.end(), x) != a.end());
-  unsigned third = x;
-  BOOST_REQUIRE_NE(third, second);
-  BOOST_REQUIRE_NE(first, third);
-  gen (x() != third);
-
-
-  BOOST_REQUIRE(!gen.next());
-
-}
-
-
-BOOST_AUTO_TEST_CASE ( element_inside_list )
-{
-  std::list<unsigned> l;
-  l.push_back(1);
-  l.push_back(7);
-  l.push_back(9);
-
-  randv<unsigned> x(0);
-
-  Generator gen;
-  gen ( inside(x(),l) );
-
-  BOOST_REQUIRE(gen.next());
-  BOOST_REQUIRE( find(l.begin(), l.end(), x) != l.end());
-
-  unsigned first = x;
-  gen (x() != first);
-
-
-  BOOST_REQUIRE(gen.next());
-  BOOST_REQUIRE( find(l.begin(), l.end(), x) != l.end());
-
-  unsigned second = x;
-  BOOST_REQUIRE_NE(first, second);
-  gen (x() != second);
-
-
-  BOOST_REQUIRE(gen.next());
-  BOOST_REQUIRE( find(l.begin(), l.end(), x) != l.end());
-
-  unsigned third = x;
-  BOOST_REQUIRE_NE(third, second);
-  BOOST_REQUIRE_NE(first, third);
-  gen (x() != third);
-
-
-  BOOST_REQUIRE(!gen.next());
-
-}
-
-BOOST_AUTO_TEST_CASE (bitwise_and_t1) {
-  randv<unsigned int> a(0);
-  randv<unsigned int> b(0);
-  randv<unsigned int> c(0);
-  Generator gen(a() == 42);
-  gen(b() == 1337);
-
-  BOOST_REQUIRE( gen.next() );
-  gen(c() == (a & b));
-
-  BOOST_REQUIRE( gen.next() );
-  BOOST_CHECK_EQUAL( c, 40 );
-}
-
-BOOST_AUTO_TEST_CASE (bitwise_or_t1) {
-  unsigned int a = 42;
-  unsigned int b = 1337;
-  randv<unsigned int> c(0);
-  Generator gen(c() == (a | b));
-
-  BOOST_REQUIRE( gen.next() );
-  BOOST_CHECK_EQUAL( c, 1339 );
-}
-
 BOOST_AUTO_TEST_CASE (logical_and_t1) {
   randv<bool> a(0);
   randv<bool> b(0);
@@ -274,7 +43,7 @@ BOOST_AUTO_TEST_CASE (logical_and_t1) {
   gen(b() == true);
 
   BOOST_REQUIRE( gen.next() );
-  gen(c() == (a && b));
+  gen(c() == (a() && b()));
 
   BOOST_REQUIRE( gen.next() );
   BOOST_CHECK_EQUAL( c, true );
@@ -283,54 +52,33 @@ BOOST_AUTO_TEST_CASE (logical_and_t1) {
   gen2(b() == false);
 
   BOOST_REQUIRE( gen2.next() );
-  gen2(c() == (a && b));
+  gen2(c() == (a() && b()));
 
   BOOST_REQUIRE( gen2.next() );
   BOOST_CHECK_EQUAL( c, false );
 }
 
 BOOST_AUTO_TEST_CASE (logical_or_t1) {
-  bool a = false;
-  bool b = false;
-  randv<unsigned int> c(0);
-  Generator gen(c() == (a || b));
+  randv<bool> a(0);
+  randv<bool> b(0);
+  randv<bool> c(0);
+  Generator gen(a() == false);
+  gen(b() == false);
+
+  BOOST_REQUIRE( gen.next() );
+  gen(c() == (a() || b()));
 
   BOOST_REQUIRE( gen.next() );
   BOOST_CHECK_EQUAL( c, false );
 
-  Generator gen2(c() == (a || !b));
+  Generator gen2(a() == true);
+  gen2(b() == false);
+
+  BOOST_REQUIRE( gen2.next() );
+  gen2(c() == (a() || b()));
 
   BOOST_REQUIRE( gen2.next() );
   BOOST_CHECK_EQUAL( c, true );
-}
-
-BOOST_AUTO_TEST_CASE (xor_t1) {
-  bool a = true;
-  bool b = true;
-  randv<unsigned int> c(0);
-  Generator gen(c() == (a ^ b));
-
-  BOOST_REQUIRE( gen.next() );
-  BOOST_CHECK_EQUAL( c, false );
-
-  Generator gen2(c() == (a ^ !b));
-
-  BOOST_REQUIRE( gen2.next() );
-  BOOST_CHECK_EQUAL( c, true );
-}
-
-BOOST_AUTO_TEST_CASE (xor_t2) {
-  randv<unsigned int> a(0);
-  randv<unsigned int> b(0);
-  randv<unsigned int> c(0);
-  Generator gen(a() == 65535);
-  gen(b() == 4080);
-
-  BOOST_REQUIRE( gen.next() );
-  gen(c() == (a ^ b));
-
-  BOOST_REQUIRE( gen.next() );
-  BOOST_CHECK_EQUAL( c, 61455 );
 }
 
 
@@ -350,8 +98,10 @@ BOOST_AUTO_TEST_CASE (not_equal_t1) {
   Generator gen(a() < 65535);
   gen(b() != a());
 
-  BOOST_REQUIRE( gen.next() );
-  BOOST_CHECK_NE( a, b );
+  for (int i = 0; i < 300; ++i) {
+    BOOST_REQUIRE( gen.next() );
+    BOOST_CHECK_NE( a, b );
+  }
 }
 
 BOOST_AUTO_TEST_CASE( less )
@@ -426,6 +176,161 @@ BOOST_AUTO_TEST_CASE( greater_equal )
   BOOST_REQUIRE_EQUAL( generated.size(), 257);
 }
 
+BOOST_AUTO_TEST_CASE (neg_t1) {
+  randv<int> a(0);
+  randv<int> b(0);
+  Generator gen(a() == -1337);
+
+  BOOST_REQUIRE( gen.next() );
+  BOOST_CHECK_EQUAL( a, -1337 );
+  gen(b() == -a());
+
+  BOOST_REQUIRE( gen.next() );
+  BOOST_CHECK_EQUAL( b, 1337 );
+}
+
+BOOST_AUTO_TEST_CASE (neg_t2) {
+  randv<bool> a(0);
+  randv<int> b(0);
+  randv<int> c(0);
+  randv<int> d(0);
+  Generator gen( dist(a(), 0.5) );
+  gen( b() == 1337 && c() == 42 );
+  gen( if_then_else( a(), d() == -b(), d() == -c() ) );
+
+  for (int i = 0; i < 50; ++i) {
+    BOOST_CHECK( gen.next() );
+    if (a)
+      BOOST_CHECK_EQUAL( d, -1337 );
+    else
+      BOOST_CHECK_EQUAL( d, -42 );
+  }
+}
+
+BOOST_AUTO_TEST_CASE (complement_t1) {
+  randv<int> a(0);
+  randv<int> b(0);
+  Generator gen(a() == 0);
+
+  BOOST_REQUIRE( gen.next() );
+  BOOST_CHECK_EQUAL( a, 0 );
+  gen(b() == ~a());
+
+  BOOST_REQUIRE( gen.next() );
+  BOOST_CHECK_EQUAL( b, -1 );
+}
+
+BOOST_AUTO_TEST_CASE (bitwise_and_t1) {
+  randv<unsigned int> a(0);
+  randv<unsigned int> b(0);
+  randv<unsigned int> c(0);
+  Generator gen(a() == 42);
+  gen(b() == 1337);
+
+  BOOST_REQUIRE( gen.next() );
+  gen(c() == (a() & b()));
+
+  BOOST_REQUIRE( gen.next() );
+  BOOST_CHECK_EQUAL( c, 40 );
+}
+
+BOOST_AUTO_TEST_CASE (bitwise_or_t1) {
+  randv<unsigned int> a(0);
+  randv<unsigned int> b(0);
+  randv<unsigned int> c(0);
+  Generator gen(a() == 42);
+  gen(b() == 1337);
+
+  BOOST_REQUIRE( gen.next() );
+  gen(c() == (a() | b()));
+
+  BOOST_REQUIRE( gen.next() );
+  BOOST_CHECK_EQUAL( c, 1339 );
+}
+
+BOOST_AUTO_TEST_CASE (xor_t1) {
+  randv<bool> a(0);
+  randv<bool> b(0);
+  randv<unsigned int> c(0);
+  Generator gen(a() == false);
+  gen(b() == false);
+  gen(c() == (a() ^ b()));
+
+  BOOST_REQUIRE( gen.next() );
+  BOOST_CHECK_EQUAL( c, false );
+
+  Generator gen2(a() == false);
+  gen2(b() == true);
+  gen2(c() == (a() ^ b()));
+
+  BOOST_REQUIRE( gen2.next() );
+  BOOST_CHECK_EQUAL( c, true );
+}
+
+BOOST_AUTO_TEST_CASE (xor_t2) {
+  randv<unsigned int> a(0);
+  randv<unsigned int> b(0);
+  randv<unsigned int> c(0);
+  Generator gen(a() == 65535);
+  gen(b() == 4080);
+
+  BOOST_REQUIRE( gen.next() );
+  gen(c() == (a() ^ b()));
+
+  BOOST_REQUIRE( gen.next() );
+  BOOST_CHECK_EQUAL( c, 61455 );
+}
+
+BOOST_AUTO_TEST_CASE ( shiftleft )
+{
+  Variable<unsigned> a;
+  Variable<unsigned> b;
+  Variable<unsigned> c;
+
+  Generator gen;
+  gen
+    ( a <  256u )
+    ( b <  (unsigned) (sizeof(unsigned)*8u) )
+    ( c == (a << b) )
+  ;
+
+  int count = 0;
+  while( gen.next() && ++count < 500) {
+    unsigned av = gen[a];
+    unsigned bv = gen[b];
+    unsigned r  = av << bv;
+
+    BOOST_REQUIRE_EQUAL( r, gen[c] );
+
+    gen( a != gen[a] || b != gen[b] );
+  }
+}
+
+BOOST_AUTO_TEST_CASE ( shiftright )
+{
+  Variable<unsigned> a;
+  Variable<unsigned> b;
+  Variable<unsigned> c;
+
+  Generator gen;
+  gen
+    ( a >  256u )
+    ( b <  8u )
+    ( c == (a >> b) )
+  ;
+
+  int count = 0;
+  while( gen.next() && ++count < 500) {
+    unsigned av = gen[a];
+    unsigned bv = gen[b];
+    unsigned r  = av >> bv;
+
+    BOOST_REQUIRE_EQUAL( r, gen[c] );
+
+    gen( a != gen[a] || b != gen[b] );
+  }
+}
+
 BOOST_AUTO_TEST_CASE( plus_minus )
 {
   Variable<unsigned int> a;
@@ -448,31 +353,6 @@ BOOST_AUTO_TEST_CASE( plus_minus )
 
     gen( a != gen[a] || b != gen[b] );
     std::cout << "#" << cnt++ << ": result: a=" << gen[a] << ", b=" << gen[b] << ", q=" << gen[q] <<", r=" << gen[r] << "\n" << std::endl;
-  }
-}
-
-BOOST_AUTO_TEST_CASE( divide )
-{
-  Variable<unsigned char> a;
-  Variable<unsigned char> b;
-  Variable<unsigned char> q;
-  Variable<unsigned char> r;
-
-  Generator gen;
-  gen
-    ( b != (unsigned char)  0u )
-    ( a  < (unsigned char) 16u )
-    ( b  < (unsigned char) 16u )
-    ( q == a/b )
-    ( r == a%b )
-  ;
-
-  while( gen.next() ) {
-    BOOST_REQUIRE_EQUAL( gen[a]/gen[b], gen[q] );
-    BOOST_REQUIRE_EQUAL( gen[a]%gen[b], gen[r] );
-
-    gen( a != gen[a] || b != gen[b] );
-    std::cout << "result: a=" << gen[a] << ", b=" << gen[b] << ", q=" << gen[q] <<", r=" << gen[r] << "\n" << std::endl;
   }
 }
 
@@ -505,54 +385,219 @@ BOOST_AUTO_TEST_CASE( mult_mod )
   BOOST_REQUIRE_EQUAL(cnt, cnt1);
 }
 
-BOOST_AUTO_TEST_CASE ( shiftleft )
+BOOST_AUTO_TEST_CASE( divide )
 {
-  Variable<unsigned> a;
-  Variable<unsigned> b;
-  Variable<unsigned> c;
+  Variable<unsigned char> a;
+  Variable<unsigned char> b;
+  Variable<unsigned char> q;
+  Variable<unsigned char> r;
 
   Generator gen;
   gen
-    ( a <  256u )
-    ( b <  (unsigned) (sizeof(unsigned)*8u) )
-    ( c == (a << b) )
+    ( b != (unsigned char)  0u )
+    ( a  < (unsigned char) 16u )
+    ( b  < (unsigned char) 16u )
+    ( q == a/b )
+    ( r == a%b )
   ;
 
-  int count = 0;
-  while( gen.next() && ++count < 500) {
-    unsigned av = gen[a];
-    unsigned bv = gen[b];
-    unsigned r  = av << bv;
-
-    BOOST_REQUIRE_EQUAL( r, gen[c] );
+  while( gen.next() ) {
+    BOOST_REQUIRE_EQUAL( gen[a]/gen[b], gen[q] );
+    BOOST_REQUIRE_EQUAL( gen[a]%gen[b], gen[r] );
 
     gen( a != gen[a] || b != gen[b] );
+    std::cout << "result: a=" << gen[a] << ", b=" << gen[b] << ", q=" << gen[q] <<", r=" << gen[r] << "\n" << std::endl;
   }
 }
 
-
-BOOST_AUTO_TEST_CASE ( shiftright )
+BOOST_AUTO_TEST_CASE ( element_inside_set )
 {
-  Variable<unsigned> a;
-  Variable<unsigned> b;
-  Variable<unsigned> c;
+  std::set<unsigned> s;
+  s.insert(1);
+  s.insert(7);
+  s.insert(9);
+
+  randv<unsigned> x(0);
 
   Generator gen;
-  gen
-    ( a >  256u )
-    ( b <  8u )
-    ( c == (a >> b) )
-  ;
+  gen ( inside(x(),s) );
 
-  int count = 0;
-  while( gen.next() && ++count < 500) {
-    unsigned av = gen[a];
-    unsigned bv = gen[b];
-    unsigned r  = av >> bv;
+  BOOST_REQUIRE(gen.next());
+  BOOST_REQUIRE(s.find(x) != s.end());
 
-    BOOST_REQUIRE_EQUAL( r, gen[c] );
+  unsigned first = x;
+  gen (x() != first);
 
-    gen( a != gen[a] || b != gen[b] );
+
+  BOOST_REQUIRE(gen.next());
+  BOOST_REQUIRE(s.find(x) != s.end());
+
+  unsigned second = x;
+  BOOST_REQUIRE_NE(first, second);
+  gen (x() != second);
+
+
+  BOOST_REQUIRE(gen.next());
+  BOOST_REQUIRE(s.find(x) != s.end());
+
+  unsigned third = x;
+  BOOST_REQUIRE_NE(third, second);
+  BOOST_REQUIRE_NE(first, third);
+  gen (x() != third);
+
+
+  BOOST_REQUIRE(!gen.next());
+
+}
+
+BOOST_AUTO_TEST_CASE ( element_inside_vec )
+{
+  std::vector<unsigned> v;
+  v.push_back(1);
+  v.push_back(7);
+  v.push_back(9);
+
+  randv<unsigned> x(0);
+
+  Generator gen;
+  gen ( inside(x(),v) );
+
+  BOOST_REQUIRE(gen.next());
+  BOOST_REQUIRE( find(v.begin(), v.end(), x) != v.end());
+
+  unsigned first = x;
+  gen (x() != first);
+
+
+  BOOST_REQUIRE(gen.next());
+  BOOST_REQUIRE(find(v.begin(), v.end(), x) != v.end());
+
+  unsigned second = x;
+  BOOST_REQUIRE_NE(first, second);
+  gen (x() != second);
+
+
+  BOOST_REQUIRE(gen.next());
+  BOOST_REQUIRE( find(v.begin(), v.end(), x) != v.end());
+
+  unsigned third = x;
+  BOOST_REQUIRE_NE(third, second);
+  BOOST_REQUIRE_NE(first, third);
+  gen (x() != third);
+
+
+  BOOST_REQUIRE(!gen.next());
+
+}
+
+BOOST_AUTO_TEST_CASE ( element_inside_array )
+{
+  unsigned a[3];
+  a[0] = 1;
+  a[1] = 7;
+  a[2] = 9;
+
+
+  randv<unsigned> x(0);
+  //unsigned y = a.begin();
+  Generator gen;
+  gen ( inside(x(),a) );
+
+  BOOST_REQUIRE(gen.next());
+  //BOOST_REQUIRE( find(a.begin(), a.end(), x) != a.end());
+
+  unsigned first = x;
+  gen (x() != first);
+
+
+  BOOST_REQUIRE(gen.next());
+  //BOOST_REQUIRE( find(a.begin(), a.end(), x) != a.end());
+
+  unsigned second = x;
+  BOOST_REQUIRE_NE(first, second);
+  gen (x() != second);
+
+
+  BOOST_REQUIRE(gen.next());
+  //BOOST_REQUIRE( find(a.begin(), a.end(), x) != a.end());
+  unsigned third = x;
+  BOOST_REQUIRE_NE(third, second);
+  BOOST_REQUIRE_NE(first, third);
+  gen (x() != third);
+
+
+  BOOST_REQUIRE(!gen.next());
+
+}
+
+BOOST_AUTO_TEST_CASE ( element_inside_list )
+{
+  std::list<unsigned> l;
+  l.push_back(1);
+  l.push_back(7);
+  l.push_back(9);
+
+  randv<unsigned> x(0);
+
+  Generator gen;
+  gen ( inside(x(),l) );
+
+  BOOST_REQUIRE(gen.next());
+  BOOST_REQUIRE( find(l.begin(), l.end(), x) != l.end());
+
+  unsigned first = x;
+  gen (x() != first);
+
+
+  BOOST_REQUIRE(gen.next());
+  BOOST_REQUIRE( find(l.begin(), l.end(), x) != l.end());
+
+  unsigned second = x;
+  BOOST_REQUIRE_NE(first, second);
+  gen (x() != second);
+
+
+  BOOST_REQUIRE(gen.next());
+  BOOST_REQUIRE( find(l.begin(), l.end(), x) != l.end());
+
+  unsigned third = x;
+  BOOST_REQUIRE_NE(third, second);
+  BOOST_REQUIRE_NE(first, third);
+  gen (x() != third);
+
+
+  BOOST_REQUIRE(!gen.next());
+}
+
+BOOST_AUTO_TEST_CASE ( element_not_inside )
+{
+  {
+    std::set<unsigned> s;
+
+    randv<unsigned> x(0);
+
+    Generator gen;
+    gen ( inside(x(),s) );
+
+    BOOST_REQUIRE(!gen.next());
+  } {
+    std::vector<unsigned> v;
+
+    randv<unsigned> x(0);
+
+    Generator gen;
+    gen ( inside(x(),v) );
+
+    BOOST_REQUIRE(!gen.next());
+  } {
+    std::vector<unsigned> l;
+
+    randv<unsigned> x(0);
+
+    Generator gen;
+    gen ( inside(x(),l) );
+
+    BOOST_REQUIRE(!gen.next());
   }
 }
 
