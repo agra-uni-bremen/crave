@@ -83,7 +83,8 @@ void EvalVisitor::visitNegOpr(const NegOpr& n)
   stack_entry e;
   pop(e);
 
-  exprStack_.push(std::make_pair(Constant(-e.first.value()), e.second));
+  exprStack_.push(std::make_pair(Constant(-e.first.value(), e.first.bitsize(), e.first.sign()),
+                                 e.second));
 }
 
 void EvalVisitor::visitComplementOpr(const ComplementOpr& c)
@@ -93,7 +94,8 @@ void EvalVisitor::visitComplementOpr(const ComplementOpr& c)
   stack_entry e;
   pop(e);
 
-  exprStack_.push(std::make_pair(Constant(~e.first.value()), e.second));
+  exprStack_.push(std::make_pair(Constant(~e.first.value(), e.first.bitsize(), e.first.sign()),
+                                 e.second));
 }
 
 void EvalVisitor::visitInside(const Inside& i)
