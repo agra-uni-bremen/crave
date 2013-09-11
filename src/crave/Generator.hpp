@@ -1,8 +1,8 @@
 #pragma once
 
-#include "AssignResult.hpp"
 #include "Context.hpp"
 #include "UserConstraint.hpp"
+#include "VariableContainer.hpp"
 #include "VectorConstraint.hpp"
 #include "expression/ReplaceVisitor.hpp"
 #include "expression/ToDotNodeVisitor.hpp"
@@ -47,23 +47,16 @@ private:
   typedef boost::shared_ptr<metaSMTVisitor> VectorSolverPtr;
   typedef std::map<int, ConstraintSet> VectorConstraintsMap;
 
-  typedef std::pair<int, boost::shared_ptr<crave::ReferenceExpression> > ReadRefPair;
-  typedef std::pair<int, boost::shared_ptr<crave::AssignResult> > WriteRefPair;
-
 public:
   Generator()
-  : constraints_(), vector_constraints_(), variables_(), vector_variables_(), vectors_(),
-    read_references_(), write_references_(), pre_hooks_(),
-    ctx_(variables_, vector_variables_, read_references_, write_references_),
-    solver_(FactoryMetaSMT::getNewInstance()), constraint_id_(0) {
+  : constraints_(), vector_constraints_(), vars_(), vectors_(), pre_hooks_(),
+    ctx_(vars_), solver_(FactoryMetaSMT::getNewInstance()), constraint_id_(0) {
   }
 
   template<typename Expr>
   Generator(Expr expr)
-  : constraints_(), vector_constraints_(), variables_(), vector_variables_(), vectors_(),
-    read_references_(), write_references_(), pre_hooks_(),
-    ctx_(variables_, vector_variables_, read_references_, write_references_),
-    solver_(FactoryMetaSMT::getNewInstance()), constraint_id_(0) {
+  : constraints_(), vector_constraints_(), vars_(), vectors_(), pre_hooks_(),
+    ctx_(vars_), solver_(FactoryMetaSMT::getNewInstance()), constraint_id_(0) {
       (*this)(expr);
     }
 
@@ -163,11 +156,11 @@ public:
   }
 
   bool is_constraint_enabled(std::string const& name) {
-    if (constraints_.is_constaint_enabled(name))
+    if (constraints_.is_constraint_enabled(name))
       return true;
 
     BOOST_FOREACH ( VectorConstraintsMap::value_type& c_pair , vector_constraints_ )
-      if (c_pair.second.is_constaint_enabled(name))
+      if (c_pair.second.is_constraint_enabled(name))
         return true;
     return false;
   }
@@ -308,9 +301,9 @@ private:
 
     // get size of vector
     unsigned int size;
-    if (variables_.find(vec().size().id()) != variables_.end()) {
+    if (vars_.variables_.find(vec().size().id()) != vars_.variables_.end()) {
       AssignResultImpl<unsigned int> ar_size;
-      solver_->read(*variables_[vec().size().id()], ar_size);
+      solver_->read(*vars_.variables_[vec().size().id()], ar_size);
       size = ar_size.value();
       vec.resize(size);
     } else {
@@ -380,7 +373,7 @@ private:
   bool solve_vectors_() {
 
     typedef std::pair<int, NodePtr> VectorVariablePair;
-    BOOST_FOREACH(VectorVariablePair p, vector_variables_) {
+    BOOST_FOREACH(VectorVariablePair p, vars_.vector_variables_) {
 
       int vec_id = p.first;
       NodePtr vec_expr = p.second;
@@ -420,15 +413,15 @@ public:
     BOOST_FOREACH(boost::function0<bool> f, pre_hooks_) {
       solver_->addPreHook(f);
     }
-    BOOST_FOREACH(ReadRefPair pair, read_references_) {
+    BOOST_FOREACH(VariableContainer::ReadRefPair pair, vars_.read_references_) {
       solver_->makeAssumption(*pair.second->expr());
     }
 
     bool result = solver_->solve() &&
                   solve_vectors_();
     if (result) {
-      BOOST_FOREACH(WriteRefPair pair, write_references_) {
-        solver_->read(*variables_[pair.first], *pair.second);
+      BOOST_FOREACH(VariableContainer::WriteRefPair pair, vars_.write_references_) {
+        solver_->read(*vars_.variables_[pair.first], *pair.second);
       }
     }
     return result;
@@ -441,7 +434,7 @@ public:
   T operator[](Variable<T> const &var) {
 
     AssignResultImpl<T> result;
-    solver_->read(*variables_[var.id()], result);
+    solver_->read(*vars_.variables_[var.id()], result);
     return result.value();
   }
 
@@ -469,11 +462,8 @@ private:
   VectorConstraintsMap vector_constraints_;
 
   // variables
-  std::map<int, boost::intrusive_ptr<Node> > variables_;
-  std::map<int, boost::intrusive_ptr<VectorExpr> > vector_variables_;
+  VariableContainer vars_;
   std::map<int, __rand_vec_base*> vectors_;
-  std::vector<ReadRefPair> read_references_;
-  std::vector<WriteRefPair> write_references_;
   std::vector<boost::function0<bool> > pre_hooks_;
 
   // solver

@@ -180,7 +180,7 @@ struct ConstraintSet {
     }
     return false;
   }
-  bool is_constaint_enabled(string const& key) {
+  bool is_constraint_enabled(string const& key) {
     BOOST_FOREACH (UserConstraint const& c, constraints_)
       if (0 == c.get_name().compare(key))
         return c.is_enabled();

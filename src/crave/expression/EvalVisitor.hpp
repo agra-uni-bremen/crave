@@ -2,15 +2,14 @@
 #define EVALVISITOR_HPP_
 
 #include "../Context.hpp"
+#include "../VariableContainer.hpp"
 #include "Node.hpp"
 #include "NodeVisitor.hpp"
 #include "ReferenceExpression.hpp"
-#include <boost/graph/graph_concepts.hpp>
 
 #include <map>
 #include <stack>
 #include <utility>
-#include <vector>
 
 namespace crave {
 
@@ -118,8 +117,7 @@ private:
 
   public:
     LWGenerator()
-      : variables_(), vector_variables_(), read_references_(), write_references_(),
-        ctx_(variables_, vector_variables_, read_references_, write_references_) { }
+      : vars_(), ctx_(vars_) { }
 
     template<typename Expr>
     expression operator()(Expr expr) {
@@ -127,10 +125,7 @@ private:
     }
 
   private:
-    std::map<int, boost::intrusive_ptr<Node> > variables_;
-    std::map<int, boost::intrusive_ptr<VectorExpr> > vector_variables_;
-    std::vector<ReadRefPair> read_references_;
-    std::vector<WriteRefPair> write_references_;
+    VariableContainer vars_;
     
     Context ctx_;
   };

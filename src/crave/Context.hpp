@@ -4,6 +4,7 @@
 #include "Constraint.hpp"
 #include "VectorConstraint.hpp"
 #include "ExpressionTraits.hpp"
+#include "VariableContainer.hpp"
 #include "expression/Node.hpp"
 #include "expression/AssignResultImpl.hpp"
 #include "expression/ReferenceExpression.hpp"
@@ -35,10 +36,9 @@ private:
   typedef std::pair<int, boost::shared_ptr<crave::AssignResult> > WriteRefPair;
 
 public:
-  Context(std::map<int, result_type>& vars, std::map<int, boost::intrusive_ptr<VectorExpr> >& vec_vars,
-          std::vector<ReadRefPair>& read_refs, std::vector<WriteRefPair>& write_refs)
-          : variables_(vars), vector_variables_(vec_vars),
-            read_references_(read_refs), write_references_(write_refs) { }
+  Context(VariableContainer& vars)
+          : variables_(vars.variables_), vector_variables_(vars.vector_variables_),
+            read_references_(vars.read_references_), write_references_(vars.write_references_) { }
 
   template<typename value_type>
   result_type operator()(bproto::tag::terminal, var_tag<value_type> const & tag) {
