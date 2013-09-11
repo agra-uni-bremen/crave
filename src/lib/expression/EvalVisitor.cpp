@@ -121,8 +121,6 @@ void EvalVisitor::visitExtendExpr(const ExtendExpression& e)
 
 void EvalVisitor::visitAndOpr(const AndOpr& a)
 {
-  visitBinaryExpr(a);
-
   stack_entry lhs, rhs;
   evalBinExpr(a, lhs, rhs);
 
@@ -134,8 +132,6 @@ void EvalVisitor::visitAndOpr(const AndOpr& a)
 
 void EvalVisitor::visitOrOpr(const OrOpr& o)
 {
-  visitBinaryExpr(o);
-
   stack_entry lhs, rhs;
   evalBinExpr(o, lhs, rhs);
 
@@ -147,8 +143,6 @@ void EvalVisitor::visitOrOpr(const OrOpr& o)
 
 void EvalVisitor::visitLogicalAndOpr(const LogicalAndOpr& la)
 {
-  visitBinaryExpr(la);
-
   stack_entry lhs, rhs;
   evalBinExpr(la, lhs, rhs);
 
@@ -158,8 +152,6 @@ void EvalVisitor::visitLogicalAndOpr(const LogicalAndOpr& la)
 
 void EvalVisitor::visitLogicalOrOpr(const LogicalOrOpr& lo)
 {
-  visitBinaryExpr(lo);
-
   stack_entry lhs, rhs;
   evalBinExpr(lo, lhs, rhs);
 
@@ -169,8 +161,6 @@ void EvalVisitor::visitLogicalOrOpr(const LogicalOrOpr& lo)
 
 void EvalVisitor::visitXorOpr(const XorOpr& x)
 {
-  visitBinaryExpr(x);
-
   stack_entry lhs, rhs;
   evalBinExpr(x, lhs, rhs);
 
@@ -182,8 +172,6 @@ void EvalVisitor::visitXorOpr(const XorOpr& x)
 
 void EvalVisitor::visitEqualOpr(const EqualOpr& eq)
 {
-  visitBinaryExpr(eq);
-
   stack_entry lhs, rhs;
   evalBinExpr(eq, lhs, rhs);
 
@@ -193,8 +181,6 @@ void EvalVisitor::visitEqualOpr(const EqualOpr& eq)
 
 void EvalVisitor::visitNotEqualOpr(const NotEqualOpr& neq)
 {
-  visitBinaryExpr(neq);
-
   stack_entry lhs, rhs;
   evalBinExpr(neq, lhs, rhs);
 
@@ -204,8 +190,6 @@ void EvalVisitor::visitNotEqualOpr(const NotEqualOpr& neq)
 
 void EvalVisitor::visitLessOpr(const LessOpr& l)
 {
-  visitBinaryExpr(l);
-
   stack_entry lhs, rhs;
   evalBinExpr(l, lhs, rhs);
 
@@ -215,8 +199,6 @@ void EvalVisitor::visitLessOpr(const LessOpr& l)
 
 void EvalVisitor::visitLessEqualOpr(const LessEqualOpr& le)
 {
-  visitBinaryExpr(le);
-
   stack_entry lhs, rhs;
   evalBinExpr(le, lhs, rhs);
 
@@ -226,8 +208,6 @@ void EvalVisitor::visitLessEqualOpr(const LessEqualOpr& le)
 
 void EvalVisitor::visitGreaterOpr(const GreaterOpr& g)
 {
-  visitBinaryExpr(g);
-
   stack_entry lhs, rhs;
   evalBinExpr(g, lhs, rhs);
 
@@ -237,8 +217,6 @@ void EvalVisitor::visitGreaterOpr(const GreaterOpr& g)
 
 void EvalVisitor::visitGreaterEqualOpr(const GreaterEqualOpr& ge)
 {
-  visitBinaryExpr(ge);
-
   stack_entry lhs, rhs;
   evalBinExpr(ge, lhs, rhs);
 
@@ -248,8 +226,6 @@ void EvalVisitor::visitGreaterEqualOpr(const GreaterEqualOpr& ge)
 
 void EvalVisitor::visitPlusOpr(const PlusOpr& p)
 {
-  visitBinaryExpr(p);
-
   stack_entry lhs, rhs;
   evalBinExpr(p, lhs, rhs);
 
@@ -261,8 +237,6 @@ void EvalVisitor::visitPlusOpr(const PlusOpr& p)
 
 void EvalVisitor::visitMinusOpr(const MinusOpr& m)
 {
-  visitBinaryExpr(m);
-
   stack_entry lhs, rhs;
   evalBinExpr(m, lhs, rhs);
 
@@ -274,8 +248,6 @@ void EvalVisitor::visitMinusOpr(const MinusOpr& m)
 
 void EvalVisitor::visitMultipliesOpr(const MultipliesOpr& m)
 {
-  visitBinaryExpr(m);
-
   stack_entry lhs, rhs;
   evalBinExpr(m, lhs, rhs);
 
@@ -287,8 +259,6 @@ void EvalVisitor::visitMultipliesOpr(const MultipliesOpr& m)
 
 void EvalVisitor::visitDevideOpr(const DevideOpr& d)
 {
-  visitBinaryExpr(d);
-
   stack_entry lhs, rhs;
   evalBinExpr(d, lhs, rhs);
 
@@ -303,8 +273,6 @@ void EvalVisitor::visitDevideOpr(const DevideOpr& d)
 
 void EvalVisitor::visitModuloOpr(const ModuloOpr& m)
 {
-  visitBinaryExpr(m);
-
   stack_entry lhs, rhs;
   evalBinExpr(m, lhs, rhs);
 
@@ -319,8 +287,6 @@ void EvalVisitor::visitModuloOpr(const ModuloOpr& m)
 
 void EvalVisitor::visitShiftLeftOpr(const ShiftLeftOpr& shl)
 {
-  visitBinaryExpr(shl);
-
   stack_entry lhs, rhs;
   evalBinExpr(shl, lhs, rhs);
 
@@ -332,8 +298,6 @@ void EvalVisitor::visitShiftLeftOpr(const ShiftLeftOpr& shl)
 
 void EvalVisitor::visitShiftRightOpr(const ShiftRightOpr& shr)
 {
-  visitBinaryExpr(shr);
-
   stack_entry lhs, rhs;
   evalBinExpr(shr, lhs, rhs);
 
@@ -350,8 +314,6 @@ void EvalVisitor::visitVectorAccess(const VectorAccess& va)
 
 void EvalVisitor::visitIfThenElse(const IfThenElse& ite)
 {
-  visitTernaryExpr(ite);
-
   stack_entry a, b, c;
   evalTernExpr(ite, a, b, c);
 

@@ -51,9 +51,6 @@ BOOST_AUTO_TEST_CASE (logical_not_t2) {
   assignments[a().id()] = Constant(1, 8, false);
 
   BOOST_REQUIRE( eval.evaluate(*expression, assignments) );
-  
-  std::cout << "val = " << eval.get_result().value() << std::endl;
-  
   BOOST_CHECK( !eval.get_result().value() );
 
   assignments.erase(b().id());
