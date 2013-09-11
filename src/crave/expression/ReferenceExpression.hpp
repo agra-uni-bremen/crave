@@ -41,7 +41,7 @@ namespace crave {
     virtual ReferenceExpression::result_type expr() const {
       float res = boost::uniform_01<float>()(rng);
       value_ = res <= probability_;
-      return new EqualOpr(expr_, new Constant(value_, 1, false));
+      return new EqualOpr(expr_, new Constant(value_));
     }
   private:
     mutable bool value_;
