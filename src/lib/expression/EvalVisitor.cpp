@@ -1,0 +1,364 @@
+#include "../../crave/expression/EvalVisitor.hpp"
+
+namespace crave {
+
+void EvalVisitor::visitNode(const Node&) { }
+
+void EvalVisitor::visitTerminal(const Terminal& t)
+{
+
+}
+
+void EvalVisitor::visitUnaryExpr(const UnaryExpression& u)
+{
+  u.child()->visit(*this);
+}
+
+void EvalVisitor::visitUnaryOpr(const UnaryOperator& )
+{
+
+}
+
+void EvalVisitor::visitBinaryExpr(const BinaryExpression& b)
+{
+  b.lhs()->visit(*this);
+  b.rhs()->visit(*this);
+}
+
+void EvalVisitor::visitBinaryOpr(const BinaryOperator& )
+{
+
+}
+
+void EvalVisitor::visitTernaryExpr(const TernaryExpression& t)
+{
+  t.a()->visit(*this);
+  t.b()->visit(*this);
+  t.c()->visit(*this);
+}
+
+
+void EvalVisitor::visitPlaceholder(const Placeholder& )
+{
+
+}
+
+void EvalVisitor::visitVariableExpr(const VariableExpr& v)
+{
+  eval_map::const_iterator ite(evalMap_.find(v.id()));
+  if (ite != evalMap_.end())
+    visitConstant(ite->second);
+  else
+    exprStack_.push(std::make_pair(Constant(), false));
+}
+
+void EvalVisitor::visitConstant(const Constant& c)
+{
+  exprStack_.push(std::make_pair(c, true));
+}
+
+void EvalVisitor::visitVectorExpr(const VectorExpr& v)
+{
+  eval_map::const_iterator ite(evalMap_.find(v.id()));
+  if (ite != evalMap_.end())
+    visitConstant(ite->second);
+  else
+    exprStack_.push(std::make_pair(Constant(), false));
+}
+
+void EvalVisitor::visitNotOpr(const NotOpr& n)
+{
+  visitUnaryExpr(n);
+
+  stack_entry e;
+  pop(e);
+
+  exprStack_.push(std::make_pair(Constant(!e.first.value()), e.second));
+}
+
+void EvalVisitor::visitNegOpr(const NegOpr& n)
+{
+  visitUnaryExpr(n);
+
+  stack_entry e;
+  pop(e);
+
+  exprStack_.push(std::make_pair(Constant(-e.first.value()), e.second));
+}
+
+void EvalVisitor::visitComplementOpr(const ComplementOpr& c)
+{
+  visitUnaryExpr(c);
+
+  stack_entry e;
+  pop(e);
+
+  exprStack_.push(std::make_pair(Constant(~e.first.value()), e.second));
+}
+
+void EvalVisitor::visitInside(const Inside& i)
+{
+  visitUnaryExpr(i);
+
+  stack_entry e;
+  pop(e);
+
+  bool result = i.collection().count(e.first.value());
+  exprStack_.push(std::make_pair(Constant(result), result));
+}
+
+void EvalVisitor::visitExtendExpr(const ExtendExpression& e)
+{
+  visitUnaryExpr(e);
+
+  stack_entry entry;
+  pop(entry);
+
+  Constant const& child = entry.first;
+  Constant constant(child.value(), child.bitsize() + e.value(), child.sign());
+  exprStack_.push(std::make_pair(constant, entry.second));
+}
+
+void EvalVisitor::visitAndOpr(const AndOpr& a)
+{
+  visitBinaryExpr(a);
+
+  stack_entry lhs, rhs;
+  evalBinExpr(a, lhs, rhs);
+
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() & rhs.first.value(),
+                                          lhs.first.bitsize(),
+                                          lhs.first.sign() || rhs.first.sign()),
+                                 lhs.second && rhs.second));
+}
+
+void EvalVisitor::visitOrOpr(const OrOpr& o)
+{
+  visitBinaryExpr(o);
+
+  stack_entry lhs, rhs;
+  evalBinExpr(o, lhs, rhs);
+
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() | rhs.first.value(),
+                                          lhs.first.bitsize(),
+                                          lhs.first.sign() || rhs.first.sign()),
+                                 lhs.second && rhs.second));
+}
+
+void EvalVisitor::visitLogicalAndOpr(const LogicalAndOpr& la)
+{
+  visitBinaryExpr(la);
+
+  stack_entry lhs, rhs;
+  evalBinExpr(la, lhs, rhs);
+
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() && rhs.first.value()),
+                                 lhs.second && rhs.second));
+}
+
+void EvalVisitor::visitLogicalOrOpr(const LogicalOrOpr& lo)
+{
+  visitBinaryExpr(lo);
+
+  stack_entry lhs, rhs;
+  evalBinExpr(lo, lhs, rhs);
+
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() || rhs.first.value()),
+                                 lhs.second && rhs.second));
+}
+
+void EvalVisitor::visitXorOpr(const XorOpr& x)
+{
+  visitBinaryExpr(x);
+
+  stack_entry lhs, rhs;
+  evalBinExpr(x, lhs, rhs);
+
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() ^ rhs.first.value(),
+                                          lhs.first.bitsize(),
+                                          lhs.first.sign() || rhs.first.sign()),
+                                 lhs.second && rhs.second));
+}
+
+void EvalVisitor::visitEqualOpr(const EqualOpr& eq)
+{
+  visitBinaryExpr(eq);
+
+  stack_entry lhs, rhs;
+  evalBinExpr(eq, lhs, rhs);
+
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() == rhs.first.value()),
+                                 lhs.second && rhs.second));
+}
+
+void EvalVisitor::visitNotEqualOpr(const NotEqualOpr& neq)
+{
+  visitBinaryExpr(neq);
+
+  stack_entry lhs, rhs;
+  evalBinExpr(neq, lhs, rhs);
+
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() != rhs.first.value()),
+                                 lhs.second && rhs.second));
+}
+
+void EvalVisitor::visitLessOpr(const LessOpr& l)
+{
+  visitBinaryExpr(l);
+
+  stack_entry lhs, rhs;
+  evalBinExpr(l, lhs, rhs);
+
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() < rhs.first.value()),
+                                 lhs.second && rhs.second));
+}
+
+void EvalVisitor::visitLessEqualOpr(const LessEqualOpr& le)
+{
+  visitBinaryExpr(le);
+
+  stack_entry lhs, rhs;
+  evalBinExpr(le, lhs, rhs);
+
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() <= rhs.first.value()),
+                                 lhs.second && rhs.second));
+}
+
+void EvalVisitor::visitGreaterOpr(const GreaterOpr& g)
+{
+  visitBinaryExpr(g);
+
+  stack_entry lhs, rhs;
+  evalBinExpr(g, lhs, rhs);
+
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() > rhs.first.value()),
+                                 lhs.second && rhs.second));
+}
+
+void EvalVisitor::visitGreaterEqualOpr(const GreaterEqualOpr& ge)
+{
+  visitBinaryExpr(ge);
+
+  stack_entry lhs, rhs;
+  evalBinExpr(ge, lhs, rhs);
+
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() >= rhs.first.value()),
+                                 lhs.second && rhs.second));
+}
+
+void EvalVisitor::visitPlusOpr(const PlusOpr& p)
+{
+  visitBinaryExpr(p);
+
+  stack_entry lhs, rhs;
+  evalBinExpr(p, lhs, rhs);
+
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() + rhs.first.value(),
+                                          lhs.first.bitsize(),
+                                          lhs.first.sign() || rhs.first.sign()),
+                                 lhs.second && rhs.second));
+}
+
+void EvalVisitor::visitMinusOpr(const MinusOpr& m)
+{
+  visitBinaryExpr(m);
+
+  stack_entry lhs, rhs;
+  evalBinExpr(m, lhs, rhs);
+
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() - rhs.first.value(),
+                                          lhs.first.bitsize(),
+                                          lhs.first.sign() || rhs.first.sign()),
+                                 lhs.second && rhs.second));
+}
+
+void EvalVisitor::visitMultipliesOpr(const MultipliesOpr& m)
+{
+  visitBinaryExpr(m);
+
+  stack_entry lhs, rhs;
+  evalBinExpr(m, lhs, rhs);
+
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() * rhs.first.value(),
+                                          lhs.first.bitsize(),
+                                          lhs.first.sign() || rhs.first.sign()),
+                                 lhs.second && rhs.second));
+}
+
+void EvalVisitor::visitDevideOpr(const DevideOpr& d)
+{
+  visitBinaryExpr(d);
+
+  stack_entry lhs, rhs;
+  evalBinExpr(d, lhs, rhs);
+
+  if (0 == rhs.first.value())
+    exprStack_.push(std::make_pair(Constant(), false));
+  else
+    exprStack_.push(std::make_pair(Constant(lhs.first.value() / rhs.first.value(),
+                                            lhs.first.bitsize(),
+                                            lhs.first.sign() || rhs.first.sign()),
+                                   lhs.second && rhs.second));
+}
+
+void EvalVisitor::visitModuloOpr(const ModuloOpr& m)
+{
+  visitBinaryExpr(m);
+
+  stack_entry lhs, rhs;
+  evalBinExpr(m, lhs, rhs);
+
+  if (0 == rhs.first.value())
+    exprStack_.push(std::make_pair(Constant(), false));
+  else
+    exprStack_.push(std::make_pair(Constant(lhs.first.value() % rhs.first.value(),
+                                            lhs.first.bitsize(),
+                                            lhs.first.sign() || rhs.first.sign()),
+                                   lhs.second && rhs.second));
+}
+
+void EvalVisitor::visitShiftLeftOpr(const ShiftLeftOpr& shl)
+{
+  visitBinaryExpr(shl);
+
+  stack_entry lhs, rhs;
+  evalBinExpr(shl, lhs, rhs);
+
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() << rhs.first.value(),
+                                          lhs.first.bitsize(),
+                                          lhs.first.sign() || rhs.first.sign()),
+                                 lhs.second && rhs.second));
+}
+
+void EvalVisitor::visitShiftRightOpr(const ShiftRightOpr& shr)
+{
+  visitBinaryExpr(shr);
+
+  stack_entry lhs, rhs;
+  evalBinExpr(shr, lhs, rhs);
+
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() >> rhs.first.value(),
+                                          lhs.first.bitsize(),
+                                          lhs.first.sign() || rhs.first.sign()),
+                                 lhs.second && rhs.second));
+}
+
+void EvalVisitor::visitVectorAccess(const VectorAccess& va)
+{
+
+}
+
+void EvalVisitor::visitIfThenElse(const IfThenElse& ite)
+{
+  visitTernaryExpr(ite);
+
+  stack_entry a, b, c;
+  evalTernExpr(ite, a, b, c);
+
+  if (a.first.value())
+    exprStack_.push(b);
+  else
+    exprStack_.push(c);
+}
+
+} // end namespace crave
