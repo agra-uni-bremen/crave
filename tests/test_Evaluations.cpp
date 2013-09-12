@@ -54,6 +54,161 @@ BOOST_AUTO_TEST_CASE (logical_not_t2) {
   BOOST_CHECK( !eval.get_result<bool>() );
 }
 
+BOOST_AUTO_TEST_CASE (logical_and_t1) {
+  randv<bool> a(0);
+  randv<bool> b(0);
+  randv<bool> c(0);
+  Evaluator eval;
+
+  eval.assign(a(), true);
+  eval.assign(b(), true);
+
+  BOOST_CHECK( eval.evaluate(a() && b()) );
+  BOOST_CHECK( eval.get_result<bool>() );
+
+  eval.assign(c(), false);
+
+  BOOST_CHECK(  eval.evaluate(c() == (a() && b())) );
+  BOOST_CHECK( !eval.get_result<bool>() );
+
+  eval.assign(a(), false);
+  eval.assign(b(), false);
+
+  BOOST_CHECK( eval.evaluate(c() == (a() && b())) );
+  BOOST_CHECK( eval.get_result<bool>() );
+}
+
+BOOST_AUTO_TEST_CASE (logical_or_t1) {
+  randv<bool> a(0);
+  randv<bool> b(0);
+  randv<bool> c(0);
+  Evaluator eval;
+
+  eval.assign(a(), false);
+  eval.assign(b(), false);
+
+  BOOST_CHECK(  eval.evaluate(a() || b()) );
+  BOOST_CHECK( !eval.get_result<bool>() );
+
+  eval.assign(c(), false);
+
+  BOOST_CHECK( eval.evaluate(c() == (a() || b())) );
+  BOOST_CHECK( eval.get_result<bool>() );
+
+  eval.assign(a(), true);
+  eval.assign(c(), true);
+
+  BOOST_CHECK( eval.evaluate(c() == (a() || b())) );
+  BOOST_CHECK( eval.get_result<bool>() );
+}
+
+BOOST_AUTO_TEST_CASE (equal_t1) {
+  randv<unsigned int> a(0);
+  randv<unsigned int> b(0);
+  Evaluator eval;
+
+  eval.assign(a(), 65535);
+
+  Generator gen(a() == 65535);
+  gen(b() == a());
+
+  BOOST_REQUIRE( eval.evaluate(a()) );
+  BOOST_CHECK_EQUAL( eval.get_result<unsigned int>(), 65535 );
+  BOOST_REQUIRE( eval.evaluate(a() == 65535) );
+  BOOST_CHECK( eval.get_result<bool>() );
+
+  eval.assign(b(), 5);
+
+  BOOST_REQUIRE( eval.evaluate(a() == b()));
+  BOOST_CHECK( !eval.get_result<bool>() );
+}
+
+BOOST_AUTO_TEST_CASE (not_equal_t1) {
+  randv<unsigned int> a(0);
+  randv<unsigned int> b(0);
+  Evaluator eval;
+
+  eval.assign(a(), 25u);
+
+  for (unsigned int i = 0; i < 50u; ++i) {
+
+    eval.assign(b(), i);
+    BOOST_REQUIRE( eval.evaluate(a() != b()) );
+
+    if (i != 25u)
+      BOOST_CHECK( eval.get_result<bool>() );
+    else
+      BOOST_CHECK( !eval.get_result<bool>() );
+  }
+}
+
+BOOST_AUTO_TEST_CASE( less )
+{
+  Variable<unsigned> a;
+  randv<unsigned> b(0);
+  Evaluator eval;
+
+  for (unsigned int i = 0u; i < 50u; ++i) {
+    eval.assign(a, i);
+    BOOST_CHECK( eval.evaluate(a < 50u) );
+    BOOST_CHECK( eval.get_result<bool>() );
+
+    eval.assign(b(), i);
+    BOOST_CHECK( eval.evaluate(b() < 50u) );
+    BOOST_CHECK( eval.get_result<bool>() );
+  }
+}
+
+BOOST_AUTO_TEST_CASE( less_equal )
+{
+  Variable<unsigned> a;
+  randv<unsigned> b(0);
+  Evaluator eval;
+
+  for (unsigned int i = 0u; i <= 50u; ++i) {
+    eval.assign(a, i);
+    BOOST_CHECK( eval.evaluate(a <= 50u) );
+    BOOST_CHECK( eval.get_result<bool>() );
+
+    eval.assign(b(), i);
+    BOOST_CHECK( eval.evaluate(b() <= 50u) );
+    BOOST_CHECK( eval.get_result<bool>() );
+  }
+}
+
+BOOST_AUTO_TEST_CASE( greater )
+{
+  Variable<unsigned> a;
+  randv<unsigned> b(0);
+  Evaluator eval;
+
+  for (unsigned int i = 50u; i < 0u; --i) {
+    eval.assign(a, i);
+    BOOST_CHECK( eval.evaluate(a > 0u) );
+    BOOST_CHECK( eval.get_result<bool>() );
+
+    eval.assign(b(), i);
+    BOOST_CHECK( eval.evaluate(b() > 0u) );
+    BOOST_CHECK( eval.get_result<bool>() );
+  }
+}
+
+BOOST_AUTO_TEST_CASE( greater_equal )
+{
+  Variable<unsigned> a;
+  randv<unsigned> b(0);
+  Evaluator eval;
+
+  for (unsigned int i = 50u; i <= 0u; --i) {
+    eval.assign(a, i);
+    BOOST_CHECK( eval.evaluate(a >= 0u) );
+    BOOST_CHECK( eval.get_result<bool>() );
+
+    eval.assign(b(), i);
+    BOOST_CHECK( eval.evaluate(b() >= 0u) );
+    BOOST_CHECK( eval.get_result<bool>() );
+  }
+}
 
 BOOST_AUTO_TEST_CASE (neg_t1) {
   randv<int> a(0);
@@ -100,9 +255,157 @@ BOOST_AUTO_TEST_CASE (complement_t2) {
   BOOST_CHECK_EQUAL( eval.get_result<int>(), -43 );
 }
 
+BOOST_AUTO_TEST_CASE (bitwise_and_t1) {
+  randv<unsigned int> a(0);
+  randv<unsigned int> b(0);
+  Evaluator eval;
 
+  eval.assign(a(), 42);
+  eval.assign(b(), 1337);
 
+  BOOST_REQUIRE( eval.evaluate(a() & b()) );
+  BOOST_CHECK_EQUAL( eval.get_result<unsigned int>(), 40 );
 }
 
+BOOST_AUTO_TEST_CASE (bitwise_or_t1) {
+  randv<unsigned int> a(0);
+  randv<unsigned int> b(0);
+  Evaluator eval;
+
+  eval.assign(a(), 42);
+  eval.assign(b(), 1337);
+
+  BOOST_REQUIRE( eval.evaluate(a() | b()) );
+  BOOST_CHECK_EQUAL( eval.get_result<unsigned int>(), 1339 );
+}
+
+BOOST_AUTO_TEST_CASE (xor_t1) {
+  randv<bool> a(0);
+  randv<bool> b(0);
+  Evaluator eval;
+
+  eval.assign(a(), false);
+  eval.assign(b(), false);
+
+  BOOST_REQUIRE( eval.evaluate(a() ^ b()) );
+  BOOST_CHECK_EQUAL( eval.get_result<bool>(), false );
+
+  eval.assign(b(), true);
+
+  BOOST_REQUIRE( eval.evaluate(a() ^ b()) );
+  BOOST_CHECK_EQUAL( eval.get_result<bool>(), true );
+}
+
+BOOST_AUTO_TEST_CASE (xor_t2) {
+  randv<unsigned int> a(0);
+  randv<unsigned int> b(0);
+  Evaluator eval;
+
+  eval.assign(a(), 65535);
+  eval.assign(b(), 4080);
+
+  BOOST_REQUIRE( eval.evaluate(a() ^ b()) );
+  BOOST_CHECK_EQUAL( eval.get_result<unsigned int>(), 61455 );
+}
+
+BOOST_AUTO_TEST_CASE ( shiftleft )
+{
+  Variable<unsigned> a;
+  Variable<unsigned> b;
+  Evaluator eval;
+
+  int count = 0;
+  while( ++count < 256) {
+
+    eval.assign(a, count);
+    eval.assign(b, count % (sizeof(unsigned) << 3u));
+
+    BOOST_CHECK( eval.evaluate(a << b) );
+    BOOST_CHECK_EQUAL( eval.get_result<unsigned>(), count << (count % (sizeof(unsigned) << 3u)) );
+  }
+}
+
+BOOST_AUTO_TEST_CASE ( shiftright )
+{
+  Variable<unsigned> a;
+  Variable<unsigned> b;
+  Evaluator eval;
+
+  int count = 0;
+  while ( 256 > ++count ) {
+
+    eval.assign(a, count + 256);
+    eval.assign(b, count % 8);
+
+    BOOST_CHECK( eval.evaluate(a >> b) );
+    BOOST_CHECK_EQUAL( eval.get_result<unsigned>(), (count + 256) >> (count % 8) );
+  }
+}
+
+BOOST_AUTO_TEST_CASE( plus_minus )
+{
+  Variable<unsigned int> a;
+  Variable<unsigned int> b;
+  Evaluator eval;
+
+  unsigned int cnt = 0;
+  while ( cnt++ < 300 ) {
+
+    eval.assign(a, cnt * cnt);
+    eval.assign(b, cnt + cnt);
+
+    BOOST_CHECK( eval.evaluate(a + b) );
+    BOOST_CHECK_EQUAL( eval.get_result<unsigned>(), (cnt * cnt) + (cnt + cnt) );
+
+    BOOST_CHECK( eval.evaluate(a - b) );
+    BOOST_CHECK_EQUAL( eval.get_result<unsigned>(), (cnt * cnt) - (cnt + cnt) );
+  }
+}
+
+BOOST_AUTO_TEST_CASE( mult_mod )
+{
+  randv<int> a(0);
+  randv<int> b(0);
+  Evaluator eval;
+
+  int cnt = 0;
+  for (int i = -3; i <= 3; i++) {
+    for (int j = -3; j <= 3; j++) {
+
+      eval.assign(a(), i);
+      eval.assign(b(), j);
+
+      BOOST_CHECK( eval.evaluate(a() * b() % 6u) );
+      BOOST_CHECK_EQUAL( eval.get_result<int>(), i * j % 6u );
+    }
+  }
+
+  eval.assign(b(), 0);
+
+  BOOST_CHECK( !eval.evaluate(a() % b()) );
+}
+
+BOOST_AUTO_TEST_CASE( divide )
+{
+  Variable<unsigned char> a;
+  Variable<unsigned char> b;
+  Evaluator eval;
+
+  unsigned int cnt = 1;
+  while ( cnt++ < 256 ) {
+
+    eval.assign(a, cnt * cnt);
+    eval.assign(b, cnt + cnt);
+
+    BOOST_CHECK( eval.evaluate(a / b) );
+    BOOST_CHECK_EQUAL( eval.get_result<unsigned>(), (cnt * cnt) / (cnt + cnt) );
+
+    BOOST_CHECK( eval.evaluate(a % b) );
+    BOOST_CHECK_EQUAL( eval.get_result<unsigned>(), (cnt * cnt) % (cnt + cnt) );
+  }
+
+  eval.assign(b, 0u);
+  BOOST_CHECK( !eval.evaluate(a / b) );
+}
 
 BOOST_AUTO_TEST_SUITE_END() // Evaluations
