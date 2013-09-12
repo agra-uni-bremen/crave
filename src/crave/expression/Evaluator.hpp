@@ -16,15 +16,11 @@ class Evaluator {
 public:
   Evaluator() : assignments_(), visitor_(assignments_) { }
 
-  template<typename value_type>
-  void assign(randv<value_type> const& var, value_type const& value) {
+  template<typename var_type, typename value_type>
+  void assign(var_type const& var, value_type const& value) {
     unsigned width = bitsize_traits<value_type>::value;
     bool sign = boost::is_signed<value_type>::value;
-    assignments_[var().id()] = Constant(value, width, sign);
-  }
-  template<typename value_type>
-  void assign(randv<value_type> const& var, long const value) {
-    assign(var, static_cast<value_type>(value));
+    assignments_[var.id()] = Constant(value, width, sign);
   }
 
   template<typename Expr>
