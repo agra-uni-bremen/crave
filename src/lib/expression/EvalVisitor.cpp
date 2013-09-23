@@ -105,8 +105,13 @@ void EvalVisitor::visitInside(const Inside& i)
   stack_entry e;
   pop(e);
 
-  bool result = i.collection().count(e.first.value());
-  exprStack_.push(std::make_pair(Constant(result), result));
+  bool result = false;
+
+  for (std::set<Constant>::iterator ite = i.collection().begin(); ite != i.collection().end(); ++ite)
+    if (*ite == e.first.value())
+      result = true;
+
+  exprStack_.push(std::make_pair(Constant(result), e.second));
 }
 
 void EvalVisitor::visitExtendExpr(const ExtendExpression& e)
