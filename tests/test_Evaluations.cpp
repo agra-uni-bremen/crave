@@ -182,7 +182,7 @@ BOOST_AUTO_TEST_CASE( greater )
   randv<unsigned> b(0);
   Evaluator eval;
 
-  for (unsigned int i = 50u; i < 0u; --i) {
+  for (int i = 50; i > 0; --i) {
     eval.assign(a, i);
     BOOST_CHECK( eval.evaluate(a > 0u) );
     BOOST_CHECK( eval.get_result<bool>() );
@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_CASE( greater_equal )
   randv<unsigned> b(0);
   Evaluator eval;
 
-  for (unsigned int i = 50u; i <= 0u; --i) {
+  for (int i = 50; i >= 0; --i) {
     eval.assign(a, i);
     BOOST_CHECK( eval.evaluate(a >= 0u) );
     BOOST_CHECK( eval.get_result<bool>() );

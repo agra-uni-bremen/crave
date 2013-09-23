@@ -50,7 +50,7 @@ private:
 
   struct LWGenerator {
     LWGenerator()
-      : vars_(), ctx_(vars_) { }
+      : ctx_(crave::variables) { }
 
     template<typename Expr>
     expression operator()(Expr expr) {
@@ -58,7 +58,6 @@ private:
     }
 
   private:
-    VariableContainer vars_;
     Context ctx_;
   };
 };

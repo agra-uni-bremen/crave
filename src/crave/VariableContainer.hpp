@@ -30,4 +30,6 @@ class VariableContainer {
   std::vector<WriteRefPair> write_references_;
 };
 
+static VariableContainer variables;
+
 } // end namespace crave

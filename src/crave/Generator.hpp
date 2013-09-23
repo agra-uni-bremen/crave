@@ -49,13 +49,13 @@ private:
 
 public:
   Generator()
-  : constraints_(), vector_constraints_(), vars_(), vectors_(), pre_hooks_(),
+  : constraints_(), vector_constraints_(), vars_(crave::variables), vectors_(), pre_hooks_(),
     ctx_(vars_), solver_(FactoryMetaSMT::getNewInstance()), constraint_id_(0) {
   }
 
   template<typename Expr>
   Generator(Expr expr)
-  : constraints_(), vector_constraints_(), vars_(), vectors_(), pre_hooks_(),
+  : constraints_(), vector_constraints_(), vars_(crave::variables), vectors_(), pre_hooks_(),
     ctx_(vars_), solver_(FactoryMetaSMT::getNewInstance()), constraint_id_(0) {
       (*this)(expr);
     }
@@ -462,7 +462,7 @@ private:
   VectorConstraintsMap vector_constraints_;
 
   // variables
-  VariableContainer vars_;
+  VariableContainer& vars_;
   std::map<int, __rand_vec_base*> vectors_;
   std::vector<boost::function0<bool> > pre_hooks_;
 
