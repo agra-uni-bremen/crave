@@ -311,7 +311,7 @@ BOOST_AUTO_TEST_CASE (xor_t2) {
 BOOST_AUTO_TEST_CASE ( shiftleft )
 {
   Variable<unsigned> a;
-  Variable<unsigned> b;
+  Variable<char> b;
   Evaluator eval;
 
   int count = 0;
@@ -328,7 +328,7 @@ BOOST_AUTO_TEST_CASE ( shiftleft )
 BOOST_AUTO_TEST_CASE ( shiftright )
 {
   Variable<unsigned> a;
-  Variable<unsigned> b;
+  Variable<char> b;
   Evaluator eval;
 
   int count = 0;
@@ -532,6 +532,60 @@ BOOST_AUTO_TEST_CASE ( element_not_inside )
 
     BOOST_REQUIRE( eval.evaluate(inside(x(), l)) );
     BOOST_REQUIRE( eval.get_result<bool>() );
+  }
+}
+
+BOOST_AUTO_TEST_CASE (if_then_else_t1) {
+  Variable<unsigned int> a;
+  randv<unsigned int> b(0);
+  Evaluator eval;
+  NodePtr expr(eval.get_expression(if_then_else(a < 5,
+                                                b() > 0 && b() <= 50,
+                                                b() > 50 && b() <= 100 )));
+
+  for (int i = 0; i < 10; ++i) {
+
+    eval.assign(a, i);
+    eval.assign(b(), 25);
+    BOOST_REQUIRE( eval.evaluate(*expr) );
+
+    if (i < 5) {
+      BOOST_REQUIRE(  eval.get_result<bool>() );
+    } else {
+      BOOST_REQUIRE( !eval.get_result<bool>() );
+    }
+    eval.assign(b(), 75);
+    BOOST_REQUIRE( eval.evaluate(*expr) );
+
+    if (i < 5) {
+      BOOST_REQUIRE( !eval.get_result<bool>() );
+    } else {
+      BOOST_REQUIRE(  eval.get_result<bool>() );
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE (if_then_t1) {
+  Variable<unsigned int> a;
+  randv<unsigned int> b(0);
+  Evaluator eval;
+  NodePtr expr(eval.get_expression(if_then(a < 5, b() > 0 && b() <= 100 )));
+
+  for (int i = 0; i < 10; ++i) {
+
+    eval.assign(a, i);
+    eval.assign(b(), 25u);
+    BOOST_REQUIRE( eval.evaluate(*expr) );
+    BOOST_REQUIRE( eval.get_result<bool>() );
+
+    eval.assign(b(), 705u);
+    BOOST_REQUIRE( eval.evaluate(*expr) );
+
+    if (i < 5) {
+      BOOST_REQUIRE( !eval.get_result<bool>() );
+    } else {
+      BOOST_REQUIRE(  eval.get_result<bool>() );
+    }
   }
 }
 
