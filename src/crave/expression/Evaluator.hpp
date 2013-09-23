@@ -18,8 +18,8 @@ public:
 
   template<typename var_type, typename value_type>
   void assign(var_type const& var, value_type const& value) {
-    unsigned width = bitsize_traits<value_type>::value;
-    bool sign = boost::is_signed<value_type>::value;
+    unsigned width = bitsize_traits<typename var_type::value_type>::value;
+    bool sign = boost::is_signed<typename var_type::value_type>::value;
     assignments_[var.id()] = Constant(value, width, sign);
   }
 

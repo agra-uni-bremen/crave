@@ -269,13 +269,24 @@ void EvalVisitor::visitDevideOpr(const DevideOpr& d)
   stack_entry lhs, rhs;
   evalBinExpr(d, lhs, rhs);
 
-  if (0 == rhs.first.value())
-    exprStack_.push(std::make_pair(Constant(), false));
-  else
-    exprStack_.push(std::make_pair(Constant(lhs.first.value() / rhs.first.value(),
-                                            lhs.first.bitsize(),
-                                            lhs.first.sign() || rhs.first.sign()),
-                                   lhs.second && rhs.second));
+  bool result;
+  Constant constant;
+
+
+  if (0 == rhs.first.value()) {
+    result = false;
+    constant = Constant();
+  } else {
+    result = lhs.second && rhs.second;
+
+    if (lhs.first.sign() || rhs.first.sign())
+      constant = Constant(static_cast<long>(lhs.first.value()) / static_cast<long>(rhs.first.value()),
+                          lhs.first.bitsize(), true);
+    else
+      constant = Constant(lhs.first.value() / rhs.first.value(),
+                          lhs.first.bitsize(), false);
+  }
+  exprStack_.push(std::make_pair(constant, result));
 }
 
 void EvalVisitor::visitModuloOpr(const ModuloOpr& m)
@@ -283,13 +294,23 @@ void EvalVisitor::visitModuloOpr(const ModuloOpr& m)
   stack_entry lhs, rhs;
   evalBinExpr(m, lhs, rhs);
 
-  if (0 == rhs.first.value())
-    exprStack_.push(std::make_pair(Constant(), false));
-  else
-    exprStack_.push(std::make_pair(Constant(lhs.first.value() % rhs.first.value(),
-                                            lhs.first.bitsize(),
-                                            lhs.first.sign() || rhs.first.sign()),
-                                   lhs.second && rhs.second));
+  bool result;
+  Constant constant;
+
+  if (0 == rhs.first.value()) {
+    result = false;
+    constant = Constant();
+  } else {
+    result = lhs.second && rhs.second;
+
+    if (lhs.first.sign() || rhs.first.sign())
+      constant = Constant(static_cast<long>(lhs.first.value()) % static_cast<long>(rhs.first.value()),
+                          lhs.first.bitsize(), true);
+    else
+      constant = Constant(lhs.first.value() % rhs.first.value(),
+                          lhs.first.bitsize(), false);
+  }
+  exprStack_.push(std::make_pair(constant, result));
 }
 
 void EvalVisitor::visitShiftLeftOpr(const ShiftLeftOpr& shl)

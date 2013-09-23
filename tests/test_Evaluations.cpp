@@ -375,8 +375,8 @@ BOOST_AUTO_TEST_CASE( mult_mod )
       eval.assign(a(), i);
       eval.assign(b(), j);
 
-      BOOST_CHECK( eval.evaluate(a() * b() % 6u) );
-      BOOST_CHECK_EQUAL( eval.get_result<int>(), i * j % 6u );
+      BOOST_CHECK( eval.evaluate(a() * b() % 6) );
+      BOOST_CHECK_EQUAL( eval.get_result<int>(), i * j % 6 );
     }
   }
 
@@ -387,8 +387,8 @@ BOOST_AUTO_TEST_CASE( mult_mod )
 
 BOOST_AUTO_TEST_CASE( divide )
 {
-  Variable<unsigned char> a;
-  Variable<unsigned char> b;
+  Variable<short> a;
+  Variable<short> b;
   Evaluator eval;
 
   unsigned int cnt = 1;
@@ -398,10 +398,10 @@ BOOST_AUTO_TEST_CASE( divide )
     eval.assign(b, cnt + cnt);
 
     BOOST_CHECK( eval.evaluate(a / b) );
-    BOOST_CHECK_EQUAL( eval.get_result<unsigned>(), (cnt * cnt) / (cnt + cnt) );
+    BOOST_CHECK_EQUAL( eval.get_result<short>(), (cnt * cnt) / (cnt + cnt) );
 
     BOOST_CHECK( eval.evaluate(a % b) );
-    BOOST_CHECK_EQUAL( eval.get_result<unsigned>(), (cnt * cnt) % (cnt + cnt) );
+    BOOST_CHECK_EQUAL( eval.get_result<short>(), (cnt * cnt) % (cnt + cnt) );
   }
 
   eval.assign(b, 0u);
