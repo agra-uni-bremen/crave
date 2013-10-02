@@ -26,7 +26,7 @@ class metaSMTVisitorImpl : public metaSMTVisitor {
 public:
   metaSMTVisitorImpl()
   : metaSMTVisitor(), solver_(), exprStack_(), terminals_(),
-    soft_(evaluate(solver_, preds::True)), has_soft(false), assumptions_(), pre_hooks_() { }
+    soft_(evaluate(solver_, preds::True)), assumptions_() { }
 
   virtual void visitNode( Node const & );
   virtual void visitTerminal( Terminal const & );
@@ -69,10 +69,9 @@ public:
   virtual void makeAssertion( Node const & );
   virtual void makeSoftAssertion( Node const & );
   virtual void makeAssumption( Node const & );
-  virtual void addPreHook( boost::function0<bool> );
   virtual std::vector<std::vector<unsigned int> > analyseContradiction(
                   std::map<unsigned int, boost::intrusive_ptr<Node> > const &);
-  virtual bool solve();
+  virtual bool solve( bool const );
   virtual bool read( Node const& var, AssignResult& );
 
 private: // typedefs
@@ -86,18 +85,13 @@ private: // methods
   void evalBinExpr( BinaryExpression const& expr,  stack_entry & fst, stack_entry & snd );
   void evalTernExpr( TernaryExpression const& expr,  stack_entry & fst, stack_entry & snd, stack_entry & trd );
 
-  bool preSolve();
-  void postSolveClear();
-
 private: // data
   SolverType solver_;
   std::stack<stack_entry> exprStack_;
   std::map<int, qf_bv::bitvector> terminals_;
   result_type soft_;
-  bool has_soft;
 
   std::vector<result_type> assumptions_;
-  std::vector<boost::function0<bool> > pre_hooks_;
 };
 
 template<typename SolverType>
@@ -605,7 +599,6 @@ void metaSMTVisitorImpl<SolverType>::makeAssertion(Node const &expr)
 template<typename SolverType>
 void metaSMTVisitorImpl<SolverType>::makeSoftAssertion( Node const &expr )
 {
-  has_soft = true;
   expr.visit(*this);
 
   stack_entry entry;
@@ -623,27 +616,6 @@ void metaSMTVisitorImpl<SolverType>::makeAssumption(Node const &expr)
   pop(entry);
 
   assumptions_.push_back(evaluate(solver_, preds::equal(entry.first, preds::True)));
-}
-
-template<typename SolverType>
-void metaSMTVisitorImpl<SolverType>::addPreHook( boost::function0<bool> f)
-{
-  pre_hooks_.push_back(f);
-}
-
-template<typename SolverType>
-bool metaSMTVisitorImpl<SolverType>::preSolve()
-{
-  for (typename std::vector<boost::function0<bool> >::const_iterator ite =
-       pre_hooks_.begin(); ite != pre_hooks_.end(); ++ite) {
-    if (!(*ite)()) return false;
-  }
-
-  for (typename std::vector<result_type>::const_iterator ite = assumptions_.begin();
-       ite != assumptions_.end(); ++ite) {
-    metaSMT::assumption(solver_, *ite);
-  }
-  return true;
 }
 
 template<typename SolverType>
@@ -671,29 +643,19 @@ std::vector<std::vector<unsigned int> > metaSMTVisitorImpl<SolverType>::analyseC
 }
 
 template<typename SolverType>
-bool metaSMTVisitorImpl<SolverType>::solve()
+bool metaSMTVisitorImpl<SolverType>::solve(bool const with_soft)
 {
-  // first run is for check if soft constrains are satisfiable
-  // second run will be executed if softconstrains aren't satisfiable
-  unsigned run = has_soft ? 0 : 1;
-  for ( ; run < 2; ++run ) {
-    if ( !preSolve() ) break;
-    if ( run == 0 ) metaSMT::assumption(solver_, soft_);
-
-    if ( metaSMT::solve(solver_) ) {
-      postSolveClear();
-      return true;
-    }
+  for (typename std::vector<result_type>::const_iterator ite = assumptions_.begin();
+       ite != assumptions_.end(); ++ite) {
+    metaSMT::assumption(solver_, *ite);
   }
-  postSolveClear();
-  return false;
-}
 
-template<typename SolverType>
-void metaSMTVisitorImpl<SolverType>::postSolveClear()
-{
+  if (with_soft)
+    metaSMT::assumption(solver_, soft_);
+
+  bool result = metaSMT::solve(solver_);
   assumptions_.clear();
-  pre_hooks_.clear();
+  return result;
 }
 
 template<typename SolverType>

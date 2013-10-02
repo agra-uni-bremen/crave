@@ -50,13 +50,13 @@ private:
 public:
   Generator()
   : constraints_(), vector_constraints_(), vars_(crave::variables), vectors_(), pre_hooks_(),
-    ctx_(vars_), solver_(FactoryMetaSMT::getNewInstance()), constraint_id_(0) {
+    ctx_(vars_), solver_(FactoryMetaSMT::getNewInstance()), constraint_id_(0), has_soft_(false) {
   }
 
   template<typename Expr>
   Generator(Expr expr)
   : constraints_(), vector_constraints_(), vars_(crave::variables), vectors_(), pre_hooks_(),
-    ctx_(vars_), solver_(FactoryMetaSMT::getNewInstance()), constraint_id_(0) {
+    ctx_(vars_), solver_(FactoryMetaSMT::getNewInstance()), constraint_id_(0), has_soft_(false) {
       (*this)(expr);
     }
 
@@ -312,6 +312,7 @@ private:
 
     // build solver for the current vector variable if the vector is changed
     if (vector_constraints_[vec().id()].is_changed()) {
+      has_soft_ = false;
       solver.reset(FactoryMetaSMT::getNewInstance());
 
       ConstraintSet::VectorElements& vec_elements
@@ -335,9 +336,10 @@ private:
             constraint.get_expression()->visit(replacer);
 
             if (replacer.okay()) {
-              if (constraint.is_soft())
+              if (constraint.is_soft()) {
+                has_soft_ = true;
                 solver->makeSoftAssertion(*replacer.result());
-              else
+              } else
                 solver->makeAssertion(*replacer.result());
             }
 
@@ -356,17 +358,23 @@ private:
       }
     }
     // TODO: substitute the known values
-    if (!solver->solve())
-      return false;
+    bool result = false;
+    if (has_soft_)
+      result = solver->solve(true);
 
-    unsigned int i = 0;
-    BOOST_FOREACH ( ConstraintSet::VariablePtr var,
-                    vector_constraints_[vec().id()].get_vec_vars() ) {
-      AssignResultImpl<Integral> ar_size;
-      solver->read(*var, ar_size);
-      vec[i++] = ar_size.value();
+    if (!result)
+      result = solver->solve(false);
+
+    if (result) {
+      unsigned int i = 0;
+      BOOST_FOREACH ( ConstraintSet::VariablePtr var,
+                      vector_constraints_[vec().id()].get_vec_vars() ) {
+        AssignResultImpl<Integral> ar_size;
+        solver->read(*var, ar_size);
+        vec[i++] = ar_size.value();
+      }
     }
-    return true;
+    return result;
   }
 
   #define _GEN_VEC(typename) if (!gen_vec_(static_cast<__rand_vec<typename>*>(vec_base), solver)) return false
@@ -402,23 +410,43 @@ private:
   }
   #undef _GEN_VEC
 
+  bool pre_solve_() {
+    BOOST_FOREACH(boost::function0<bool> f, pre_hooks_)
+      if (!f())
+        return false;
+
+    BOOST_FOREACH(VariableContainer::ReadRefPair pair, vars_.read_references_)
+      solver_->makeAssumption(*pair.second->expr());
+
+    return true;
+  }
+
 public:
   bool next() {
-    // pre_solve()
+
     if (constraints_.is_changed()) {
       reset();
       constraints_.set_synced();
     }
 
-    BOOST_FOREACH(boost::function0<bool> f, pre_hooks_) {
-      solver_->addPreHook(f);
-    }
-    BOOST_FOREACH(VariableContainer::ReadRefPair pair, vars_.read_references_) {
-      solver_->makeAssumption(*pair.second->expr());
-    }
+    if (!pre_solve_())
+      return false;
 
-    bool result = solver_->solve() &&
-                  solve_vectors_();
+    bool result = solver_->solve(true);
+
+    std::cout << "with softs: " << (result?"true":"false") << std::endl;
+
+    if (!result && pre_solve_())
+      result = solver_->solve(false);
+
+    std::cout << "without softs: " << (result?"true":"false") << std::endl;
+
+    if (!result)
+      return false;
+
+    std::cout << "solve true;" << std::endl;
+
+    result = solve_vectors_();
     if (result) {
       BOOST_FOREACH(VariableContainer::WriteRefPair pair, vars_.write_references_) {
         solver_->read(*vars_.variables_[pair.first], *pair.second);
@@ -473,6 +501,7 @@ private:
 
   // auxiliary-attributes
   mutable unsigned int constraint_id_;
+  mutable bool has_soft_;
 };
 
 template<typename Expr>
