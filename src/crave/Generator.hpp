@@ -190,6 +190,21 @@ public:
     return *this;
   }
 
+  template<typename Expr>
+  Generator & soft(std::string name, Expr e) {
+
+    BOOST_FOREACH (UserConstraint c, constraints_)
+      if (0 == c.get_name().compare(name))
+        throw std::runtime_error("Constraint already exists.");
+
+    NodePtr n(boost::proto::eval(FixWidth()(e), ctx_));
+    UserConstraint constraint(n, name, true);
+
+    constraints_.push_back(constraint);
+
+    return *this;
+  }
+
   /**
    * foreach
    **/
