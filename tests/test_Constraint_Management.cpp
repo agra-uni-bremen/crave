@@ -394,6 +394,37 @@ BOOST_AUTO_TEST_CASE(two_conflicts3)
 
 }
 
+BOOST_AUTO_TEST_CASE(conflict_with_softs)
+{
+  randv<int> a(0);
+  randv<int> b(0);
+  randv<int> c(0);
+
+  Generator gen;
+  gen
+    ("c1", a() < 10)
+    ("c2", b() >= 10)
+    ("c3", c() != a() && c() != b());
+  gen.soft(c() == a());
+
+  BOOST_CHECK(gen.next());
+
+  std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
+
+  print_vec_vec(std::cout, result);
+  std::cout << std::endl;
+
+  sort_results(result);
+
+  BOOST_REQUIRE_EQUAL(result.size(), 1);
+  BOOST_CHECK_EQUAL(result[0].size(), 2);
+
+  std::vector<std::string> expected;
+  expected = list_of ("c3")("constraint_0");
+  BOOST_REQUIRE_EQUAL_COLLECTIONS( result[0].begin(), result[0].end(), expected.begin(), expected.end());
+
+}
+
 BOOST_AUTO_TEST_SUITE_END() // Context
 
 //  vim: ft=cpp:ts=2:sw=2:expandtab
