@@ -19,20 +19,24 @@ struct UserConstraint {
   typedef boost::intrusive_ptr<Node> expression;
   typedef std::string string;
 
-  UserConstraint(expression const expr, string const& name)
+  UserConstraint(unsigned const id, expression const expr, string const& name)
   : expr_(expr), name_(name), soft_(false), enabled_(true) { }
-  UserConstraint(expression const expr, string const& name, bool const soft)
+  UserConstraint(unsigned const id, expression const expr, string const& name, bool const soft)
   : expr_(expr), name_(name), soft_(soft), enabled_(true) { }
-  UserConstraint(expression const expr, string const& name, bool const soft, bool const enabled)
+  UserConstraint(unsigned const id, expression const expr, string const& name, bool const soft, bool const enabled)
   : expr_(expr), name_(name), soft_(soft), enabled_(enabled) { }
   UserConstraint(UserConstraint const& other)
-  : expr_(other.get_expression()), name_(other.get_name()), soft_(other.is_soft()),
-    enabled_(other.is_enabled()) { }
+  : id_(other.id()), expr_(other.get_expression()), name_(other.get_name()),
+    soft_(other.is_soft()), enabled_(other.is_enabled()) { }
 
   template<typename ostream>
   friend ostream& operator<<(ostream& os, UserConstraint constr) {
     os << constr.name_ << " is " << (constr.soft_?"":"not") << " soft and " << (constr.enabled_?"enabled":"disabled");
     return os;
+  }
+
+  inline unsigned id() const {
+    return id_;
   }
 
   inline expression const & get_expression() const {
@@ -58,6 +62,7 @@ struct UserConstraint {
   }
 
  protected:
+  unsigned id_;
   expression expr_;
   string name_;
   bool soft_;

@@ -64,8 +64,8 @@ public:
   Generator & operator()(Expr expr) {
 
     NodePtr n(boost::proto::eval(FixWidth()(expr), ctx_));
-    std::string name("constraint_" + boost::lexical_cast<std::string>(constraint_id_++));
-    UserConstraint constraint(n, name);
+    std::string name("constraint_" + boost::lexical_cast<std::string>(constraint_id_));
+    UserConstraint constraint(constraint_id_++, n, name);
 
     constraints_.push_back(constraint);
 
@@ -80,7 +80,7 @@ public:
         throw std::runtime_error("Constraint already exists.");
 
     NodePtr n(boost::proto::eval(FixWidth()(expr), ctx_));
-    UserConstraint constraint(n, constraint_name);
+    UserConstraint constraint(constraint_id_++, n, constraint_name);
 
     constraints_.push_back(constraint);
 
@@ -182,8 +182,8 @@ public:
   Generator & soft(Expr e) {
 
     NodePtr n(boost::proto::eval(FixWidth()(e), ctx_));
-    std::string name("constraint_" + boost::lexical_cast<std::string>(constraint_id_++));
-    UserConstraint constraint(n, name, true);
+    std::string name("constraint_" + boost::lexical_cast<std::string>(constraint_id_));
+    UserConstraint constraint(constraint_id_++, n, name, true);
 
     constraints_.push_back(constraint);
 
@@ -198,7 +198,7 @@ public:
         throw std::runtime_error("Constraint already exists.");
 
     NodePtr n(boost::proto::eval(FixWidth()(e), ctx_));
-    UserConstraint constraint(n, name, true);
+    UserConstraint constraint(constraint_id_++, n, name, true);
 
     constraints_.push_back(constraint);
 
@@ -213,8 +213,8 @@ public:
                       const placeholder & p, Expr e) {
 
     NodePtr vec_expr(boost::proto::eval(FixWidth()(e), ctx_));
-    std::string name("constraint_" + boost::lexical_cast<std::string>(constraint_id_++));
-    UserConstraint constraint(vec_expr, name);
+    std::string name("constraint_" + boost::lexical_cast<std::string>(constraint_id_));
+    UserConstraint constraint(constraint_id_++, vec_expr, name);
 
     VectorConstraintsMap::iterator ite(vector_constraints_.lower_bound(v().id()));
     if (ite != vector_constraints_.end() && !(vector_constraints_.key_comp()(v().id(), ite->first))) {
@@ -237,8 +237,8 @@ public:
                            const placeholder & p, Expr e) {
 
     NodePtr vec_expr(boost::proto::eval(FixWidth()(e), ctx_));
-    std::string name("constraint_" + boost::lexical_cast<std::string>(constraint_id_++));
-    UserConstraint constraint(vec_expr, name, true);
+    std::string name("constraint_" + boost::lexical_cast<std::string>(constraint_id_));
+    UserConstraint constraint(constraint_id_++, vec_expr, name, true);
 
     VectorConstraintsMap::iterator ite(vector_constraints_.lower_bound(v().id()));
     if (ite != vector_constraints_.end() && !(vector_constraints_.key_comp()(v().id(), ite->first))) {
@@ -268,7 +268,7 @@ public:
     }
 
     NodePtr vec_expr(boost::proto::eval(FixWidth()(e), ctx_));
-    UserConstraint constraint(vec_expr, constraint_name);
+    UserConstraint constraint(constraint_id_++, vec_expr, constraint_name);
 
     VectorConstraintsMap::iterator ite(vector_constraints_.lower_bound(v().id()));
     if (ite != vector_constraints_.end() &&
