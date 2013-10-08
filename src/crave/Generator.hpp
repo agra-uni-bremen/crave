@@ -373,23 +373,17 @@ private:
       }
     }
     // TODO: substitute the known values
-    bool result = false;
-    if (has_soft_)
-      result = solver->solve(true);
+    if(!solver->solve())
+      return false;
 
-    if (!result)
-      result = solver->solve(false);
-
-    if (result) {
-      unsigned int i = 0;
-      BOOST_FOREACH ( ConstraintSet::VariablePtr var,
-                      vector_constraints_[vec().id()].get_vec_vars() ) {
-        AssignResultImpl<Integral> ar_size;
-        solver->read(*var, ar_size);
-        vec[i++] = ar_size.value();
-      }
+    unsigned int i = 0;
+    BOOST_FOREACH ( ConstraintSet::VariablePtr var,
+                    vector_constraints_[vec().id()].get_vec_vars() ) {
+      AssignResultImpl<Integral> ar_size;
+      solver->read(*var, ar_size);
+      vec[i++] = ar_size.value();
     }
-    return result;
+    return true;
   }
 
   #define _GEN_VEC(typename) if (!gen_vec_(static_cast<__rand_vec<typename>*>(vec_base), solver)) return false
@@ -447,34 +441,9 @@ public:
     if (!pre_solve_())
       return false;
 
-    bool result = solver_->solve(true);
+    bool result = solver_->solve() &&
+                  solve_vectors_();
 
-    if (!result && pre_solve_()) {
-      result = solver_->solve(false);
-
-      if (result) {
-        BOOST_FOREACH (UserConstraint& c, constraints_)
-          if (c.is_enabled() && c.is_soft())
-            c.disable();
-
-        BOOST_FOREACH (UserConstraint& c, constraints_) {
-          if (c.is_soft()) {
-
-            c.enable();
-            reset();
-            constraints_.set_synced();
-
-            if (!solver_->solve(true))
-              c.disable();
-          }
-        }
-      }
-    }
-
-    if (!result)
-      return false;
-
-    result = solve_vectors_();
     if (result) {
       BOOST_FOREACH(VariableContainer::WriteRefPair pair, vars_.write_references_) {
         solver_->read(*vars_.variables_[pair.first], *pair.second);

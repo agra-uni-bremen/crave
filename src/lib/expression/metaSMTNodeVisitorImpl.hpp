@@ -9,6 +9,7 @@
 #include <metaSMT/frontend/QF_BV.hpp>
 #include <metaSMT/DirectSolver_Context.hpp>
 #include <metaSMT/Priority_Context.hpp>
+#include <metaSMT/support/cardinality.hpp>
 #include <metaSMT/support/contradiction_analysis.hpp>
 
 #include <map>
@@ -26,7 +27,7 @@ class metaSMTVisitorImpl : public metaSMTVisitor {
 public:
   metaSMTVisitorImpl()
   : metaSMTVisitor(), solver_(), exprStack_(), terminals_(),
-    soft_(evaluate(solver_, preds::True)), assumptions_() { }
+    softs_(), assumptions_() { }
 
   virtual void visitNode( Node const & );
   virtual void visitTerminal( Terminal const & );
@@ -71,7 +72,7 @@ public:
   virtual void makeAssumption( Node const & );
   virtual std::vector<std::vector<unsigned int> > analyseContradiction(
                   std::map<unsigned int, boost::intrusive_ptr<Node> > const &);
-  virtual bool solve( bool const );
+  virtual bool solve();
   virtual bool read( Node const& var, AssignResult& );
 
 private: // typedefs
@@ -89,7 +90,7 @@ private: // data
   SolverType solver_;
   std::stack<stack_entry> exprStack_;
   std::map<int, qf_bv::bitvector> terminals_;
-  result_type soft_;
+  std::vector<result_type> softs_;
 
   std::vector<result_type> assumptions_;
 };
@@ -604,7 +605,10 @@ void metaSMTVisitorImpl<SolverType>::makeSoftAssertion( Node const &expr )
   stack_entry entry;
   pop(entry);
 
-  soft_ = evaluate(solver_, preds::And(soft_, entry.first));
+  result_type var = evaluate(solver_, preds::new_variable());
+  softs_.push_back(var);
+
+  metaSMT::assertion(solver_, preds::implies(var, entry.first));
 }
 
 template<typename SolverType>
@@ -643,17 +647,31 @@ std::vector<std::vector<unsigned int> > metaSMTVisitorImpl<SolverType>::analyseC
 }
 
 template<typename SolverType>
-bool metaSMTVisitorImpl<SolverType>::solve(bool const with_soft)
+bool metaSMTVisitorImpl<SolverType>::solve()
 {
-  for (typename std::vector<result_type>::const_iterator ite = assumptions_.begin();
-       ite != assumptions_.end(); ++ite) {
-    metaSMT::assumption(solver_, *ite);
+  bool result;
+  for (int i = softs_.size(); 0 < i; --i) {
+    for (typename std::vector<result_type>::const_iterator ite = assumptions_.begin();
+         ite != assumptions_.end(); ++ite) {
+      metaSMT::assumption(solver_, *ite);
+    }
+    metaSMT::assumption(solver_,
+                        preds::And(metaSMT::cardinality_eq(solver_, softs_, i),
+                                   metaSMT::evaluate(solver_, preds::True)));
+
+    result = metaSMT::solve(solver_);
+    if (result)
+      break;
   }
 
-  if (with_soft)
-    metaSMT::assumption(solver_, soft_);
+  if (!result) {
+    for (typename std::vector<result_type>::const_iterator ite = assumptions_.begin();
+         ite != assumptions_.end(); ++ite) {
+      metaSMT::assumption(solver_, *ite);
+    }
+    result = metaSMT::solve(solver_);
+  }
 
-  bool result = metaSMT::solve(solver_);
   assumptions_.clear();
   return result;
 }
