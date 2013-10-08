@@ -494,6 +494,17 @@ public:
     return result.value();
   }
 
+  std::vector<std::string> get_enabled_softs() const {
+
+    std::vector<std::string> results;
+
+    BOOST_FOREACH (UserConstraint const& c, constraints_)
+      if (c.is_enabled() && c.is_soft())
+        results.push_back(c.get_name());
+
+    return results;
+  }
+
   std::ostream& print_dot_graph(std::ostream& os, bool const with_softs = false) {
 
     os << "digraph AST {" << std::endl;
