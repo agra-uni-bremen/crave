@@ -449,17 +449,30 @@ public:
 
     bool result = solver_->solve(true);
 
-    std::cout << "with softs: " << (result?"true":"false") << std::endl;
-
-    if (!result && pre_solve_())
+    if (!result && pre_solve_()) {
       result = solver_->solve(false);
 
-    std::cout << "without softs: " << (result?"true":"false") << std::endl;
+      if (result) {
+        BOOST_FOREACH (UserConstraint& c, constraints_)
+          if (c.is_enabled() && c.is_soft())
+            c.disable();
+
+        BOOST_FOREACH (UserConstraint& c, constraints_) {
+          if (c.is_soft()) {
+
+            c.enable();
+            reset();
+            constraints_.set_synced();
+
+            if (!solver_->solve(true))
+              c.disable();
+          }
+        }
+      }
+    }
 
     if (!result)
       return false;
-
-    std::cout << "solve true;" << std::endl;
 
     result = solve_vectors_();
     if (result) {
