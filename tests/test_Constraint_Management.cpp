@@ -394,7 +394,7 @@ BOOST_AUTO_TEST_CASE(two_conflicts3)
 
 }
 
-BOOST_AUTO_TEST_CASE(conflict_with_softs)
+BOOST_AUTO_TEST_CASE(conflict_with_softs_t1)
 {
   randv<int> a(0);
   randv<int> b(0);
@@ -405,7 +405,7 @@ BOOST_AUTO_TEST_CASE(conflict_with_softs)
     ("c1", a() < 10)
     ("c2", b() >= 10)
     ("c3", c() != a() && c() != b());
-  gen.soft(c() == a());
+  gen.soft("c4", c() == a());
 
   BOOST_CHECK(gen.next());
 
@@ -420,9 +420,52 @@ BOOST_AUTO_TEST_CASE(conflict_with_softs)
   BOOST_CHECK_EQUAL(result[0].size(), 2);
 
   std::vector<std::string> expected;
-  expected = list_of ("c3")("constraint_0");
+  expected = list_of ("c3")("c4");
   BOOST_REQUIRE_EQUAL_COLLECTIONS( result[0].begin(), result[0].end(), expected.begin(), expected.end());
+}
 
+BOOST_AUTO_TEST_CASE(conflict_with_softs_t2)
+{
+  randv<unsigned int> a(0), b(0), c(0);
+
+  Generator gen;
+  gen("h1", a() >= 100)
+     ("h2", b() > 50 && b() <= 100)
+     ("h3", c() % a() == 0);
+  gen.soft("s1", a() == b());
+  gen.soft("s2", a() == c());
+  gen.soft("s3", b() != c());
+  gen.soft("s4", c() > 0 && c() < 100);
+
+  BOOST_REQUIRE(gen.next());
+
+  std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
+
+  print_vec_vec(std::cout, result);
+  std::cout << std::endl;
+
+  sort_results(result);
+
+  BOOST_CHECK_EQUAL(result.size(), 3);
+  BOOST_CHECK_EQUAL(result[0].size(), 3);
+  BOOST_CHECK_EQUAL(result[1].size(), 3);
+  BOOST_CHECK_EQUAL(result[2].size(), 3);
+
+  std::vector<std::string> expected;
+  expected = list_of("h1")("h3")("s4");
+  BOOST_CHECK_EQUAL_COLLECTIONS( result[0].begin(), result[0].end(), expected.begin(), expected.end());
+  expected = list_of("h1")("s2")("s4");
+  BOOST_CHECK_EQUAL_COLLECTIONS( result[1].begin(), result[1].end(), expected.begin(), expected.end());
+  expected = list_of("s1")("s2")("s3");
+  BOOST_CHECK_EQUAL_COLLECTIONS( result[2].begin(), result[2].end(), expected.begin(), expected.end());
+
+  result[0] = gen.get_enabled_softs();
+
+  BOOST_FOREACH (std::string str, result[0])
+    std::cout << str << " "; std::cout << std::endl;
+
+  expected = list_of("s1")("s2");
+  BOOST_CHECK_EQUAL_COLLECTIONS( result[0].begin(), result[0].end(), expected.begin(), expected.end());
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Context
