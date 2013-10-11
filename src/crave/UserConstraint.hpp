@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Context.hpp"
 #include "ConstrainedRandom.hpp"
 #include "expression/Node.hpp"
 #include "expression/ReplaceVisitor.hpp"
@@ -7,6 +8,7 @@
 #include <boost/intrusive_ptr.hpp>
 #include <boost/foreach.hpp>
 #include <boost/fusion/adapted/std_pair.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <ostream>
 #include <string>
@@ -31,7 +33,7 @@ struct UserConstraint {
 
   template<typename ostream>
   friend ostream& operator<<(ostream& os, UserConstraint constr) {
-    os << constr.name_ << " is " << (constr.soft_?"":"not") << " soft and " << (constr.enabled_?"enabled":"disabled");
+    os << constr.name_ << " is " << (constr.soft_?"soft":"hard") << " constraint and " << (constr.enabled_?"enabled":"disabled");
     return os;
   }
 
@@ -220,4 +222,36 @@ private:
   VectorElements vec_elements_;
 };
 
+namespace ConstraintBuilder {
+
+namespace {
+
+unsigned int contraintID = 0;
+
+}
+
+template<typename Expr>
+inline UserConstraint makeConstraint(std::string const& name, Expr e, Context& ctx,
+                                     bool const soft) {
+    NodePtr n(boost::proto::eval(FixWidth()(e), ctx));
+    return UserConstraint(contraintID++, n, name, soft);
+}
+
+template<typename Expr>
+inline UserConstraint makeConstraint(std::string const& name, Expr e, Context& ctx) {
+    return makeConstraint(name, e, ctx, false);
+}
+
+template<typename Expr>
+inline UserConstraint makeConstraint(Expr e, Context& ctx, bool const soft) {
+    return makeConstraint("constraint_" + boost::lexical_cast<std::string>(contraintID),
+                          e, ctx, soft);
+}
+
+template<typename Expr>
+inline UserConstraint makeConstraint(Expr e, Context& ctx) {
+    return makeConstraint(e, ctx, false);
+}
+
+} // end namespace ConstraintBuilder
 } // end namespace crave

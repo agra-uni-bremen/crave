@@ -11,7 +11,6 @@
 
 #include <boost/foreach.hpp>
 #include <boost/function.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -50,24 +49,20 @@ private:
 public:
   Generator()
   : constraints_(), vector_constraints_(), vars_(crave::variables), vectors_(), pre_hooks_(),
-    ctx_(vars_), solver_(FactoryMetaSMT::getNewInstance()), constraint_id_(0), has_soft_(false) {
+    ctx_(vars_), solver_(FactoryMetaSMT::getNewInstance()) {
   }
 
   template<typename Expr>
   Generator(Expr expr)
   : constraints_(), vector_constraints_(), vars_(crave::variables), vectors_(), pre_hooks_(),
-    ctx_(vars_), solver_(FactoryMetaSMT::getNewInstance()), constraint_id_(0), has_soft_(false) {
+    ctx_(vars_), solver_(FactoryMetaSMT::getNewInstance()) {
       (*this)(expr);
     }
 
   template<typename Expr>
   Generator & operator()(Expr expr) {
 
-    NodePtr n(boost::proto::eval(FixWidth()(expr), ctx_));
-    std::string name("constraint_" + boost::lexical_cast<std::string>(constraint_id_));
-    UserConstraint constraint(constraint_id_++, n, name);
-
-    constraints_.push_back(constraint);
+    constraints_.push_back(ConstraintBuilder::makeConstraint(expr, ctx_));
 
     return *this;
   }
@@ -79,10 +74,7 @@ public:
       if (0 == c.get_name().compare(constraint_name))
         throw std::runtime_error("Constraint already exists.");
 
-    NodePtr n(boost::proto::eval(FixWidth()(expr), ctx_));
-    UserConstraint constraint(constraint_id_++, n, constraint_name);
-
-    constraints_.push_back(constraint);
+    constraints_.push_back(ConstraintBuilder::makeConstraint(constraint_name, expr, ctx_));
 
     return *this;
   }
@@ -181,11 +173,7 @@ public:
   template<typename Expr>
   Generator & soft(Expr e) {
 
-    NodePtr n(boost::proto::eval(FixWidth()(e), ctx_));
-    std::string name("constraint_" + boost::lexical_cast<std::string>(constraint_id_));
-    UserConstraint constraint(constraint_id_++, n, name, true);
-
-    constraints_.push_back(constraint);
+    constraints_.push_back(ConstraintBuilder::makeConstraint(e, ctx_, true));
 
     return *this;
   }
@@ -197,10 +185,7 @@ public:
       if (0 == c.get_name().compare(name))
         throw std::runtime_error("Constraint already exists.");
 
-    NodePtr n(boost::proto::eval(FixWidth()(e), ctx_));
-    UserConstraint constraint(constraint_id_++, n, name, true);
-
-    constraints_.push_back(constraint);
+    constraints_.push_back(ConstraintBuilder::makeConstraint(name, e, ctx_, true));
 
     return *this;
   }
@@ -212,9 +197,7 @@ public:
   Generator & foreach(__rand_vec <value_type> & v,
                       const placeholder & p, Expr e) {
 
-    NodePtr vec_expr(boost::proto::eval(FixWidth()(e), ctx_));
-    std::string name("constraint_" + boost::lexical_cast<std::string>(constraint_id_));
-    UserConstraint constraint(constraint_id_++, vec_expr, name);
+    UserConstraint constraint(ConstraintBuilder::makeConstraint(e, ctx_));
 
     VectorConstraintsMap::iterator ite(vector_constraints_.lower_bound(v().id()));
     if (ite != vector_constraints_.end() && !(vector_constraints_.key_comp()(v().id(), ite->first))) {
@@ -236,9 +219,7 @@ public:
   Generator & soft_foreach(__rand_vec <value_type> & v,
                            const placeholder & p, Expr e) {
 
-    NodePtr vec_expr(boost::proto::eval(FixWidth()(e), ctx_));
-    std::string name("constraint_" + boost::lexical_cast<std::string>(constraint_id_));
-    UserConstraint constraint(constraint_id_++, vec_expr, name, true);
+    UserConstraint constraint(ConstraintBuilder::makeConstraint(e, ctx_, true));
 
     VectorConstraintsMap::iterator ite(vector_constraints_.lower_bound(v().id()));
     if (ite != vector_constraints_.end() && !(vector_constraints_.key_comp()(v().id(), ite->first))) {
@@ -267,8 +248,7 @@ public:
       }
     }
 
-    NodePtr vec_expr(boost::proto::eval(FixWidth()(e), ctx_));
-    UserConstraint constraint(constraint_id_++, vec_expr, constraint_name);
+    UserConstraint constraint(ConstraintBuilder::makeConstraint(constraint_name, e, ctx_));
 
     VectorConstraintsMap::iterator ite(vector_constraints_.lower_bound(v().id()));
     if (ite != vector_constraints_.end() &&
@@ -327,7 +307,6 @@ private:
 
     // build solver for the current vector variable if the vector is changed
     if (vector_constraints_[vec().id()].is_changed()) {
-      has_soft_ = false;
       solver.reset(FactoryMetaSMT::getNewInstance());
 
       ConstraintSet::VectorElements& vec_elements
@@ -352,7 +331,6 @@ private:
 
             if (replacer.okay()) {
               if (constraint.is_soft()) {
-                has_soft_ = true;
                 solver->makeSoftAssertion(*replacer.result());
               } else
                 solver->makeAssertion(*replacer.result());
@@ -507,9 +485,6 @@ private:
   boost::scoped_ptr<metaSMTVisitor> solver_;
   std::map<int, VectorSolverPtr> vector_solvers_;
 
-  // auxiliary-attributes
-  mutable unsigned int constraint_id_;
-  mutable bool has_soft_;
 };
 
 template<typename Expr>
