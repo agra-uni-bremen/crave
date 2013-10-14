@@ -70,6 +70,7 @@ public:
   virtual void makeAssertion( Node const & );
   virtual void makeSoftAssertion( Node const & );
   virtual void makeAssumption( Node const & );
+  virtual bool analyseSofts();
   virtual std::vector<std::vector<unsigned int> > analyseContradiction(
                   std::map<unsigned int, boost::intrusive_ptr<Node> > const &);
   virtual bool solve();
@@ -623,6 +624,26 @@ void metaSMTVisitorImpl<SolverType>::makeAssumption(Node const &expr)
 }
 
 template<typename SolverType>
+bool metaSMTVisitorImpl<SolverType>::analyseSofts()
+{
+  bool result;
+  for (int i = softs_.size(); 0 < i; --i) {
+    for (typename std::vector<result_type>::const_iterator ite = assumptions_.begin();
+         ite != assumptions_.end(); ++ite) {
+      metaSMT::assumption(solver_, *ite);
+    }
+    metaSMT::assumption(solver_,
+                        preds::And(metaSMT::cardinality_eq(solver_, softs_, i),
+                                   metaSMT::evaluate(solver_, preds::True)));
+
+    result = metaSMT::solve(solver_);
+    if (result)
+      break;
+  }
+  return result;
+}
+
+template<typename SolverType>
 std::vector<std::vector<unsigned int> > metaSMTVisitorImpl<SolverType>::analyseContradiction(
                                   std::map<unsigned int, boost::intrusive_ptr<Node> > const &s)
 {
@@ -649,28 +670,16 @@ std::vector<std::vector<unsigned int> > metaSMTVisitorImpl<SolverType>::analyseC
 template<typename SolverType>
 bool metaSMTVisitorImpl<SolverType>::solve()
 {
-  bool result;
-  for (int i = softs_.size(); 0 < i; --i) {
-    for (typename std::vector<result_type>::const_iterator ite = assumptions_.begin();
-         ite != assumptions_.end(); ++ite) {
-      metaSMT::assumption(solver_, *ite);
-    }
-    metaSMT::assumption(solver_,
-                        preds::And(metaSMT::cardinality_eq(solver_, softs_, i),
-                                   metaSMT::evaluate(solver_, preds::True)));
-
-    result = metaSMT::solve(solver_);
-    if (result)
-      break;
+  for (typename std::vector<result_type>::const_iterator ite = assumptions_.begin();
+       ite != assumptions_.end(); ++ite) {
+    metaSMT::assumption(solver_, *ite);
+  }
+  for (typename std::vector<result_type>::const_iterator ite = softs_.begin();
+       ite != softs_.end(); ++ite) {
+    metaSMT::assumption(solver_, *ite);
   }
 
-  if (!result) {
-    for (typename std::vector<result_type>::const_iterator ite = assumptions_.begin();
-         ite != assumptions_.end(); ++ite) {
-      metaSMT::assumption(solver_, *ite);
-    }
-    result = metaSMT::solve(solver_);
-  }
+  bool result = metaSMT::solve(solver_);
 
   assumptions_.clear();
   return result;

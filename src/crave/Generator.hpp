@@ -42,20 +42,20 @@ struct Generator {
 
 private:
   // typedefs
+  typedef boost::shared_ptr<metaSMTVisitor> SolverPtr;
   typedef std::vector<boost::intrusive_ptr<VariableExpr> > ElementsVector;
-  typedef boost::shared_ptr<metaSMTVisitor> VectorSolverPtr;
   typedef std::map<int, ConstraintSet> VectorConstraintsMap;
 
 public:
   Generator()
   : constraints_(), vector_constraints_(), vars_(crave::variables), vectors_(), pre_hooks_(),
-    ctx_(vars_), solver_(FactoryMetaSMT::getNewInstance()) {
+    ctx_(vars_), solver_(FactoryMetaSMT::getNewInstance()), exact_analyse_(false) {
   }
 
   template<typename Expr>
   Generator(Expr expr)
   : constraints_(), vector_constraints_(), vars_(crave::variables), vectors_(), pre_hooks_(),
-    ctx_(vars_), solver_(FactoryMetaSMT::getNewInstance()) {
+    ctx_(vars_), solver_(FactoryMetaSMT::getNewInstance()), exact_analyse_(false) {
       (*this)(expr);
     }
 
@@ -78,7 +78,6 @@ public:
 
     return *this;
   }
-
 private:
   void build_solver_() {
     BOOST_FOREACH (UserConstraint const& c, constraints_) {
@@ -290,8 +289,106 @@ public:
   }
 
 private:
+  void reset_vector_solver_(SolverPtr& solver, int const vec_id, unsigned int const size) {
+    solver.reset(FactoryMetaSMT::getNewInstance());
+    build_vector_solver_(solver, vec_id, size);
+  }
+
+  void build_vector_solver_(SolverPtr& solver, int const vec_id, unsigned int const size) {
+
+    ConstraintSet::VectorElements& vec_elements
+        = vector_constraints_[vec_id].get_vec_vars();
+
+    if (vec_elements.size() != size) {
+      unsigned int old_size = vec_elements.size();
+      vec_elements.resize(size);
+      for (unsigned int i = old_size; i < size; ++i)
+        vec_elements[i] = new VariableExpr(new_var_id(), 1u, true);
+    }
+
+    BOOST_FOREACH ( UserConstraint const& constraint, vector_constraints_[vec_id] ) {
+
+      if (constraint.is_enabled()) {
+
+        ReplaceVisitor replacer(vec_elements);
+        for (unsigned int i = 0u; i < size; ++i) {
+
+          replacer.set_vec_idx(i);
+          constraint.get_expression()->visit(replacer);
+
+          if (replacer.okay()) {
+            if (constraint.is_soft())
+              solver->makeSoftAssertion(*replacer.result());
+            else
+              solver->makeAssertion(*replacer.result());
+          }
+
+          replacer.reset();
+        }
+
+        if (vector_constraints_[vec_id].is_unique()) {
+          unsigned int i = 0;
+
+          for (ElementsVector::const_iterator var = vec_elements.begin();
+               var != vec_elements.end(); ++var, ++i)
+            for (unsigned int j = i + 1; j < vec_elements.size(); ++j)
+              solver->makeAssertion(*(new NotEqualOpr(vec_elements[i], vec_elements[j])));
+        }
+      }
+    }
+  }
+
+  // analyse_vector_softconstraints_ analyse the soft constraints and disable conflicting ones
+  bool analyse_vector_softconstraints_(SolverPtr& solver, unsigned int const vec_id,
+                                       unsigned int size, bool const exactAnalyse) {
+
+    if (exactAnalyse) {
+
+      if (!solver->analyseSofts())
+        return false;
+
+      // get solvable softs
+      return true;
+    }
+
+    if (solver->solve())
+      return true;
+
+    ConstraintSet& constraints = vector_constraints_[vec_id];
+
+    if (!constraints.has_soft())
+      return false;
+
+    BOOST_FOREACH (UserConstraint& c, constraints)
+      if (c.is_soft() && c.is_enabled())
+        c.disable();
+
+    reset_vector_solver_(solver, vec_id, size);
+    constraints.set_synced();
+    bool result = solver->solve();
+
+    if (!result)
+      return false;
+
+    BOOST_FOREACH (UserConstraint& c, constraints) {
+      if (c.is_soft()) {
+
+        c.enable();
+        reset_vector_solver_(solver, vec_id, size);
+        constraints.set_synced();
+
+        bool enable = solver->solve();
+        result |= enable;
+        if (!enable)
+          c.disable();
+      }
+    }
+
+    return result;
+  }
+
   template<typename Integral>
-  bool gen_vec_ (__rand_vec<Integral>* rvp, VectorSolverPtr solver) {
+  bool gen_vec_ (__rand_vec<Integral>* rvp, SolverPtr& solver) {
     __rand_vec<Integral>& vec = *rvp;
 
     // get size of vector
@@ -305,63 +402,30 @@ private:
       size = vec.size();
     }
 
+    bool result = false;
     // build solver for the current vector variable if the vector is changed
     if (vector_constraints_[vec().id()].is_changed()) {
-      solver.reset(FactoryMetaSMT::getNewInstance());
+      reset_vector_solver_(solver, vec().id(), size);
+      vector_constraints_[vec().id()].set_synced();
 
-      ConstraintSet::VectorElements& vec_elements
-          = vector_constraints_[vec().id()].get_vec_vars();
-
-      if (vec_elements.size() != size) {
-        unsigned int old_size = vec_elements.size();
-        vec_elements.resize(size);
-        for (unsigned int i = old_size; i < size; ++i)
-          vec_elements[i] = new VariableExpr(new_var_id(), 1u, true);
-      }
-
-      BOOST_FOREACH ( UserConstraint const& constraint, vector_constraints_[vec().id()] ) {
-
-        if (constraint.is_enabled()) {
-
-          ReplaceVisitor replacer(vec_elements);
-          for (unsigned int i = 0u; i < size; ++i) {
-
-            replacer.set_vec_idx(i);
-            constraint.get_expression()->visit(replacer);
-
-            if (replacer.okay()) {
-              if (constraint.is_soft()) {
-                solver->makeSoftAssertion(*replacer.result());
-              } else
-                solver->makeAssertion(*replacer.result());
-            }
-
-            replacer.reset();
-          }
-
-          if (vector_constraints_[vec().id()].is_unique()) {
-            unsigned int i = 0;
-
-            for (ElementsVector::const_iterator var = vec_elements.begin();
-                 var != vec_elements.end(); ++var, ++i)
-              for (unsigned int j = i + 1; j < vec_elements.size(); ++j)
-                solver->makeAssertion(*(new NotEqualOpr(vec_elements[i], vec_elements[j])));
-          }
-        }
-      }
+      result =
+      analyse_vector_softconstraints_(solver, vec().id(), size, exact_analyse_);
     }
+
     // TODO: substitute the known values
-    if(!solver->solve())
-      return false;
+    if (!result)
+      result = solver->solve();
 
-    unsigned int i = 0;
-    BOOST_FOREACH ( ConstraintSet::VariablePtr var,
-                    vector_constraints_[vec().id()].get_vec_vars() ) {
-      AssignResultImpl<Integral> ar_size;
-      solver->read(*var, ar_size);
-      vec[i++] = ar_size.value();
+    if (result) {
+      unsigned int i = 0;
+      BOOST_FOREACH ( ConstraintSet::VariablePtr var,
+                      vector_constraints_[vec().id()].get_vec_vars() ) {
+        AssignResultImpl<Integral> ar_size;
+        solver->read(*var, ar_size);
+        vec[i++] = ar_size.value();
+      }
     }
-    return true;
+    return result;
   }
 
   #define _GEN_VEC(typename) if (!gen_vec_(static_cast<__rand_vec<typename>*>(vec_base), solver)) return false
@@ -372,7 +436,7 @@ private:
 
       int vec_id = p.first;
       NodePtr vec_expr = p.second;
-      boost::shared_ptr<metaSMTVisitor> solver = vector_solvers_[vec_id];
+      SolverPtr& solver = vector_solvers_[vec_id];
       __rand_vec_base* vec_base = vectors_[vec_id];
 
       switch (vec_base->element_type()) {
@@ -408,19 +472,67 @@ private:
     return true;
   }
 
-public:
-  bool next() {
-
-    if (constraints_.is_changed()) {
-      reset();
-      constraints_.set_synced();
-    }
+  // analyse_softconstraints_ analyse the soft constraints and disable conflicting ones
+  bool analyse_softconstraints_(bool const exactAnalyse) {
 
     if (!pre_solve_())
       return false;
 
-    bool result = solver_->solve() &&
-                  solve_vectors_();
+    if (exactAnalyse) {
+
+      if (!solver_->analyseSofts())
+        return false;
+
+      // get solvable softs
+      return true;
+    }
+
+    if (solver_->solve())
+      return true;
+
+    if (!constraints_.has_soft())
+      return false;
+
+    BOOST_FOREACH (UserConstraint& c, constraints_)
+      if (c.is_soft() && c.is_enabled())
+        c.disable();
+
+    reset();
+    constraints_.set_synced();
+    bool result = pre_solve_() && solver_->solve();
+
+    if (!result)
+      return false;
+
+    BOOST_FOREACH (UserConstraint& c, constraints_) {
+      if (c.is_soft()) {
+
+        c.enable();
+        reset();
+        constraints_.set_synced();
+
+        bool enable = solver_->solve();
+        result |= enable;
+        if (!enable)
+          c.disable();
+      }
+    }
+
+    return result;
+  }
+
+  bool solve_() {
+
+    bool result = false;
+    if (constraints_.is_changed()) {
+      reset();
+      constraints_.set_synced();
+
+      result = analyse_softconstraints_(exact_analyse_);
+    }
+
+    if (!result && pre_solve_())
+      result = solver_->solve();
 
     if (result) {
       BOOST_FOREACH(VariableContainer::WriteRefPair pair, vars_.write_references_) {
@@ -428,6 +540,11 @@ public:
       }
     }
     return result;
+  }
+
+public:
+  bool next() {
+    return solve_() && solve_vectors_();
   }
 
   /**
@@ -482,9 +599,11 @@ private:
 
   // solver
   Context ctx_;
-  boost::scoped_ptr<metaSMTVisitor> solver_;
-  std::map<int, VectorSolverPtr> vector_solvers_;
+  SolverPtr solver_;
+  std::map<int, SolverPtr> vector_solvers_;
 
+  // auxiliary variables
+  bool const exact_analyse_;
 };
 
 template<typename Expr>

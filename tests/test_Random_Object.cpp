@@ -300,13 +300,14 @@ BOOST_AUTO_TEST_CASE ( item_with_vector )
   Item2 it;
   for (int i = 0; i < 20; i++) {
     BOOST_REQUIRE(it.next());
-    BOOST_REQUIRE(it.data.size() == 4);
+    BOOST_REQUIRE_EQUAL(it.data.size(), 4);
     std::cout << "@" << it.address << ": " << it.data[0] << " " << it.data[1] << " " << it.data[2] << " " << it.data[3] << std::endl;
-    BOOST_REQUIRE(it.address % 4 == 0);
-    BOOST_REQUIRE(it.address <= 1000);
+    BOOST_REQUIRE_EQUAL(it.address % 4, 0);
+    BOOST_REQUIRE_LE(it.address, 1000);
     for (uint i = 0; i < it.data.size(); i++) {
-      BOOST_REQUIRE(-50 <= it.data[i] && it.data[i] <= 50);
-      if (i > 0) BOOST_REQUIRE(it.data[i - 1] <= it.data[i]);
+      BOOST_REQUIRE_LE(-50, it.data[i]);
+      BOOST_REQUIRE_LE(it.data[i], 50);
+      if (i > 0) BOOST_REQUIRE_LE(it.data[i - 1], it.data[i]);
     }
   }
 }

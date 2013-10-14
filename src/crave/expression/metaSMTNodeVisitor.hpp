@@ -18,6 +18,7 @@ public:
   virtual void makeAssertion( Node const & ) = 0;
   virtual void makeSoftAssertion( Node const & ) = 0;
   virtual void makeAssumption( Node const & ) = 0;
+  virtual bool analyseSofts() = 0;
   virtual std::vector<std::vector<unsigned int> > analyseContradiction(
               std::map<unsigned int, boost::intrusive_ptr<Node> > const & ) = 0;
   virtual bool solve() = 0;

@@ -86,14 +86,14 @@ struct ConstraintSet {
   typedef std::vector<VariablePtr> VectorElements;
 
   ConstraintSet()
-  : constraints_(), changed_(false), unique_(false), vec_elements_() { }
+  : constraints_(), changed_(false), unique_(false), vec_elements_(), has_soft_(false) { }
 
   template<typename ostream>
   friend ostream& operator<<(ostream& os, ConstraintSet set) {
     os << "Set is " << (set.changed_?"":"not ") << "changed and " << (set.unique_?"":"not ") << "unique\n"; 
     os << "Size is " << set.constraints_.size() << "\n";
 
-    BOOST_FOREACH (UserConstraint item, set.constraints_) {
+    BOOST_FOREACH (value_type item, set.constraints_) {
       os << item << "\n";
     }
     os << std::flush;
@@ -132,6 +132,7 @@ struct ConstraintSet {
 
   void push_back(value_type const& value) {
     changed_ = true;
+    has_soft_ |= value.is_soft();
     constraints_.push_back(value);
   }
   void pop_back() {
@@ -141,6 +142,7 @@ struct ConstraintSet {
 
   iterator insert(iterator position, value_type const& value) {
     changed_ = true;
+    has_soft_ |= value.is_soft();
     return constraints_.insert(position, value);
   }
   template<typename InputIterator>
@@ -168,7 +170,7 @@ struct ConstraintSet {
   }
 
   bool enable_constraint(string const& key) {
-    BOOST_FOREACH (UserConstraint& c, constraints_) {
+    BOOST_FOREACH (value_type& c, constraints_) {
       if (0 == c.get_name().compare(key)) {
         c.enable();
         changed_ = true;
@@ -178,7 +180,7 @@ struct ConstraintSet {
     return false;
   }
   bool disable_constraint(string const& key) {
-    BOOST_FOREACH (UserConstraint& c, constraints_) {
+    BOOST_FOREACH (value_type& c, constraints_) {
       if (0 == c.get_name().compare(key)) {
         c.disable();
         changed_ = true;
@@ -188,7 +190,7 @@ struct ConstraintSet {
     return false;
   }
   bool is_constraint_enabled(string const& key) {
-    BOOST_FOREACH (UserConstraint const& c, constraints_)
+    BOOST_FOREACH (value_type const& c, constraints_)
       if (0 == c.get_name().compare(key))
         return c.is_enabled();
 
@@ -210,6 +212,10 @@ struct ConstraintSet {
     unique_ = val;
   }
 
+  bool has_soft() const {
+    return has_soft_;
+  }
+
   VectorElements& get_vec_vars() {
     return vec_elements_;
   }
@@ -218,6 +224,7 @@ private:
   ConstraintsVector constraints_;
   bool changed_;
   bool unique_;
+  bool has_soft_;
 
   VectorElements vec_elements_;
 };
