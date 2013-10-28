@@ -109,9 +109,9 @@ protected:
 public:
   virtual void visit( NodeVisitor& v ) const { v.visitUnaryExpr(*this); }
 
-  boost::intrusive_ptr<Node> child() const { return child_; }
+  NodePtr child() const { return child_; }
 private:
-  boost::intrusive_ptr<Node> child_;
+  NodePtr child_;
 };
 
 class UnaryOperator : public UnaryExpression {
@@ -183,11 +183,11 @@ protected:
 public:
   virtual void visit( NodeVisitor& v ) const { v.visitBinaryExpr(*this); }
 
-  boost::intrusive_ptr<Node> lhs() const { return lhs_; }
-  boost::intrusive_ptr<Node> rhs() const { return rhs_; }
+  NodePtr lhs() const { return lhs_; }
+  NodePtr rhs() const { return rhs_; }
 private:
-  boost::intrusive_ptr<Node> lhs_;
-  boost::intrusive_ptr<Node> rhs_;
+  NodePtr lhs_;
+  NodePtr rhs_;
 };
 
 class BinaryOperator : public BinaryExpression {
@@ -363,13 +363,13 @@ protected:
 public:
   virtual void visit( NodeVisitor& v ) const { v.visitTernaryExpr(*this); }
 
-  boost::intrusive_ptr<Node> a() const { return a_; }
-  boost::intrusive_ptr<Node> b() const { return b_; }
-  boost::intrusive_ptr<Node> c() const { return c_; }
+  NodePtr a() const { return a_; }
+  NodePtr b() const { return b_; }
+  NodePtr c() const { return c_; }
 private:
-  boost::intrusive_ptr<Node> a_;
-  boost::intrusive_ptr<Node> b_;
-  boost::intrusive_ptr<Node> c_;
+  NodePtr a_;
+  NodePtr b_;
+  NodePtr c_;
 };
 
 class IfThenElse : public TernaryExpression {

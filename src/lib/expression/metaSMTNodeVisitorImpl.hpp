@@ -72,7 +72,7 @@ public:
   virtual void makeAssumption( Node const & );
   virtual bool analyseSofts();
   virtual std::vector<std::vector<unsigned int> > analyseContradiction(
-                  std::map<unsigned int, boost::intrusive_ptr<Node> > const &);
+                  std::map<unsigned int, NodePtr > const &);
   virtual bool solve();
   virtual bool read( Node const& var, AssignResult& );
 
@@ -645,12 +645,12 @@ bool metaSMTVisitorImpl<SolverType>::analyseSofts()
 
 template<typename SolverType>
 std::vector<std::vector<unsigned int> > metaSMTVisitorImpl<SolverType>::analyseContradiction(
-                                  std::map<unsigned int, boost::intrusive_ptr<Node> > const &s)
+                                  std::map<unsigned int, NodePtr > const &s)
 {
   std::vector<std::vector<unsigned int> > results;
   std::map<unsigned int, result_type> result_map;
 
-  typedef std::pair<unsigned int, boost::intrusive_ptr<Node> > NodePair;
+  typedef std::pair<unsigned int, NodePtr > NodePair;
 
   BOOST_FOREACH (NodePair entry, s) {
     entry.second->visit(*this);

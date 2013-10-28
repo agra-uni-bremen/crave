@@ -18,7 +18,7 @@ namespace crave {
 
 struct UserConstraint {
 
-  typedef boost::intrusive_ptr<Node> expression;
+  typedef NodePtr expression;
   typedef std::string string;
 
   UserConstraint(unsigned const id, expression const expr, string const& name)

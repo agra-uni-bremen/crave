@@ -38,8 +38,6 @@ struct Soft_Generator {
 
 struct Soft;
 struct Generator {
-  typedef boost::intrusive_ptr<Node> NodePtr;
-
 private:
   // typedefs
   typedef boost::shared_ptr<metaSMTVisitor> SolverPtr;

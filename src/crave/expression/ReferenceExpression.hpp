@@ -13,7 +13,7 @@ namespace crave {
 
   struct ReferenceExpression {
   public:
-    typedef boost::intrusive_ptr<Node> result_type;
+    typedef NodePtr result_type;
     virtual ~ReferenceExpression() { }
     virtual result_type expr() const = 0;
   };
