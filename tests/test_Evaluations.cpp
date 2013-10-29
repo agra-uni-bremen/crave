@@ -368,7 +368,6 @@ BOOST_AUTO_TEST_CASE( mult_mod )
   randv<int> b(0);
   Evaluator eval;
 
-  int cnt = 0;
   for (int i = -3; i <= 3; i++) {
     for (int j = -3; j <= 3; j++) {
 

@@ -51,7 +51,11 @@ class ModuloOpr;
 // misc 
 class Inside;
 class IfThenElse;
+
+// vector
 class VectorAccess;
+class ForEach;
+class Unique;
 
 class NodeVisitor {
 protected:
@@ -95,6 +99,10 @@ public:
   virtual void visitShiftRightOpr( ShiftRightOpr const & ) = 0;
   virtual void visitVectorAccess( VectorAccess const & ) = 0;
   virtual void visitIfThenElse( IfThenElse const & ) = 0;
+
+  // TODO
+  virtual void visitForEach( ForEach const & ) { };
+  virtual void visitUnique( Unique const & ) { };
 };
 
 } // end namespace crave

@@ -17,6 +17,11 @@
 
 namespace crave {
 
+  extern boost::mt19937 rng;
+
+  void set_global_seed(unsigned int s);
+  void set_solver_backend(std::string const&);
+
   class rand_base
   {
     protected:
@@ -30,20 +35,21 @@ namespace crave {
   class rand_obj : public rand_base
   {
     public:
-      rand_obj(rand_obj* parent = 0) { if (parent != 0) parent->addChild(this); }
+      rand_obj(rand_obj* pr = 0) { parent = pr; if (parent != 0) { parent->addChild(this, true); } }
       virtual bool next() {
         return constraint.next();
       }
       bool enable_constraint(std::string name) { return constraint.enable_constraint(name); }
       bool disable_constraint(std::string name) { return constraint.disable_constraint(name); }
       bool is_constraint_enabled(std::string name) { return constraint.is_constraint_enabled(name); }
-      void addChild(rand_base* rb) {
+      void addChild(rand_base* rb, bool bindNext) {
         children.push_back(rb);
-        constraint.add_pre_hook(boost::bind<bool>(&rand_base::next, rb));
+        if (bindNext) constraint.add_pre_hook(boost::bind<bool>(&rand_base::next, rb));
       }
 
     protected:
       std::vector<rand_base*> children;
+      rand_obj* parent;
 
     public:
       Generator constraint;
@@ -59,16 +65,11 @@ namespace crave {
       CppType type() { return UNSUPPORTED; }
 
     protected:
-      randv_prim_base(rand_obj* parent) : var(value) { if (parent != 0) parent->addChild(this); }
+      randv_prim_base(rand_obj* parent) : var(value) { if (parent != 0) parent->addChild(this, true); }
       randv_prim_base(const randv_prim_base& other) : var(value), value(other.value) { }
       WriteReference<T> var;
       T value;
   };
-
-  extern boost::mt19937 rng;
-
-  void set_global_seed(unsigned int s);
-  void set_solver_backend(std::string const&);
 
   template<typename T>
   struct weighted_range
@@ -210,7 +211,7 @@ class randv<typename> : public randv_prim_base<typename>, public randomize_base<
   class rand_vec : public __rand_vec<T>, public rand_base
   {
     public:
-      rand_vec(rand_obj* parent) : __rand_vec<T>() { if (parent != 0) parent->addChild(this); }
+      rand_vec(rand_obj* parent) : __rand_vec<T>() { if (parent != 0) parent->addChild(this, true); }
 
       bool next() {
         static randv<unsigned> default_size(NULL);

@@ -312,7 +312,7 @@ void ReplaceVisitor::visitVectorAccess( VectorAccess const& v ) {
   int l_val, i;
   evalBinSubscript(l_val, i);
 
-  if (0 <= i && i < variables_.size()) {
+  if (0 <= i && i < (int) variables_.size()) {
 
     VectorExpr& vec = *static_cast<VectorExpr*>(lhs.get());
     VariableExpr& var = *static_cast<VariableExpr*>(variables_[i].get());

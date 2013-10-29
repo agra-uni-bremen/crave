@@ -27,6 +27,8 @@ public:
   static std::string solver_type;
 };
 
+typedef boost::shared_ptr<metaSMTVisitor> SolverPtr;
+
 } //end namespace crave
 
 #endif /* METASMTNODEVISITOR_HPP_ */

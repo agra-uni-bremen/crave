@@ -14,12 +14,14 @@ namespace crave {
 struct Context;
 class  EvalVisitor;
 struct Generator;
+struct VectorGenerator;
 
 class VariableContainer {
 
   friend struct Context;
   friend class  EvalVisitor;
   friend struct Generator;
+  friend struct VectorGenerator;
 
   typedef std::pair<int, boost::shared_ptr<crave::ReferenceExpression> > ReadRefPair;
   typedef std::pair<int, boost::shared_ptr<crave::AssignResult> > WriteRefPair;

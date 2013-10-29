@@ -27,11 +27,11 @@ BOOST_AUTO_TEST_CASE (logical_not_t2) {
   BOOST_REQUIRE( gen.next() );
   std::cout << "a =" << a << ", b = " << b << std::endl;
   if(a % 2 != 0) {
-    BOOST_REQUIRE_GT( b, 0 );
-    BOOST_REQUIRE_LE( b, 50 );
+    BOOST_REQUIRE_GT( b, 0u );
+    BOOST_REQUIRE_LE( b, 50u );
   } else {
-    BOOST_REQUIRE_GT( b, 50 );
-    BOOST_REQUIRE_LE( b, 100 );
+    BOOST_REQUIRE_GT( b, 50u );
+    BOOST_REQUIRE_LE( b, 100u );
   }
 }
 

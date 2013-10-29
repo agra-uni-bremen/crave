@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE ( randv_dist_t1 )
 
   std::map<int, int> s;
   int total = 500000;
-  for (uint i = 0; i < total; i++) {
+  for (int i = 0; i < total; i++) {
     BOOST_REQUIRE(v.next());
     BOOST_REQUIRE((0 <= v && v <= 10) || (50 <= v && v <= 75) || (100 <= v && v <= 200));
     ++s[v];
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE ( randv_dist_t3 )
   v.addWeightedRange(-50, -50, 30);
   int cnt1 = 0, cnt2 = 0, cnt3 = 0;
   int total = 500000;
-  for (uint i = 0; i < total; i++) {
+  for (int i = 0; i < total; i++) {
     BOOST_REQUIRE(v.next());
     BOOST_REQUIRE((1 <= v && v <= 5) || (10 <= v && v <= 20) || (v == -50));
     if (1 <= v && v <= 5) cnt1++;
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE ( randv_dist_t4 )
   v.resetDistribution();
   v.addRange(5000, 6000);
   int total = 100000;
-  for (uint i = 0; i < total; i++) {
+  for (int i = 0; i < total; i++) {
     BOOST_REQUIRE(v.next());
     BOOST_REQUIRE(5000 <= v && v <= 6000);
   }

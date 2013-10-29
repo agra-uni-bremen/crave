@@ -86,7 +86,7 @@ struct ConstraintSet {
   typedef std::vector<VariablePtr> VectorElements;
 
   ConstraintSet()
-  : constraints_(), changed_(false), unique_(false), vec_elements_(), has_soft_(false) { }
+  : constraints_(), changed_(false), unique_(false), has_soft_(false), vec_elements_() { }
 
   template<typename ostream>
   friend ostream& operator<<(ostream& os, ConstraintSet set) {

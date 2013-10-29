@@ -380,4 +380,21 @@ public:
   void visit( NodeVisitor& v ) const { v.visitIfThenElse(*this); }
 };
 
+class ForEach : public TernaryExpression {
+public:
+  ForEach( NodePtr a, NodePtr b, NodePtr c ) : TernaryExpression(a,b,c) { }
+  ForEach( ForEach const& t ) : TernaryExpression(t) { }
+
+  void visit( NodeVisitor& v ) const { v.visitForEach(*this); }
+};
+
+class Unique : public BinaryExpression {
+public:
+  Unique( NodePtr a, NodePtr b ) : BinaryExpression(a,b) { }
+  Unique( Unique const& t ) : BinaryExpression(t) { }
+
+  void visit( NodeVisitor& v ) const { v.visitUnique(*this); }
+};
+
+
 } // end namespace crave

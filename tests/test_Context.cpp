@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE ( randv_test )
     (4 <= a() && a() <= 6)
     (9 <= a() + b() && a() + b() <= 11)
     (b() % 2 == 0);
-  unsigned count=0;
+  int count=0;
   while( gen.next() ) {
     ++count;
     std::cout << "result: a = " <<  a << ", b = " << b << std::endl;
@@ -304,7 +304,7 @@ BOOST_AUTO_TEST_CASE ( mixed_bv_width_2 )
   gen( a() < 10 );
 
   std::set<signed char> generated;
-  for(unsigned iterations = 0; gen.next(); ++iterations) {
+  for(int iterations = 0; gen.next(); ++iterations) {
     generated.insert(a);
     gen( a() != a );
 
