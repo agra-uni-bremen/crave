@@ -13,7 +13,6 @@
 #include <boost/type_traits/is_signed.hpp>
 
 namespace crave {
-  namespace bproto = boost::proto;
 
   struct extend_tag {};
   template<typename Stream>
@@ -22,37 +21,37 @@ namespace crave {
   }
 
   struct BooleanResult
-  : bproto::or_<
+  : boost::proto::or_<
       // comparison
-      bproto::or_<
-        bproto::nary_expr< bproto::tag::less_equal, bproto::vararg< bproto::_> >
-      , bproto::nary_expr< bproto::tag::less, bproto::vararg< bproto::_> >
-      , bproto::nary_expr< bproto::tag::greater, bproto::vararg< bproto::_> >
-      , bproto::nary_expr< bproto::tag::greater_equal, bproto::vararg< bproto::_> >
-      , bproto::nary_expr< bproto::tag::equal_to, bproto::vararg< bproto::_> >
-      , bproto::nary_expr< bproto::tag::not_equal_to, bproto::vararg< bproto::_> >
+      boost::proto::or_<
+        boost::proto::nary_expr< boost::proto::tag::less_equal, boost::proto::vararg< boost::proto::_> >
+      , boost::proto::nary_expr< boost::proto::tag::less, boost::proto::vararg< boost::proto::_> >
+      , boost::proto::nary_expr< boost::proto::tag::greater, boost::proto::vararg< boost::proto::_> >
+      , boost::proto::nary_expr< boost::proto::tag::greater_equal, boost::proto::vararg< boost::proto::_> >
+      , boost::proto::nary_expr< boost::proto::tag::equal_to, boost::proto::vararg< boost::proto::_> >
+      , boost::proto::nary_expr< boost::proto::tag::not_equal_to, boost::proto::vararg< boost::proto::_> >
       >
       // logic
-    , bproto::or_<
-        bproto::nary_expr< bproto::tag::logical_and, bproto::vararg< bproto::_> >
-      , bproto::nary_expr< bproto::tag::logical_or, bproto::vararg< bproto::_> >
-      , bproto::nary_expr< bproto::tag::logical_not, bproto::vararg< bproto::_> >
+    , boost::proto::or_<
+        boost::proto::nary_expr< boost::proto::tag::logical_and, boost::proto::vararg< boost::proto::_> >
+      , boost::proto::nary_expr< boost::proto::tag::logical_or, boost::proto::vararg< boost::proto::_> >
+      , boost::proto::nary_expr< boost::proto::tag::logical_not, boost::proto::vararg< boost::proto::_> >
       >
   > {};
 
   struct ExpressionSize
-  : bproto::or_<
-    bproto::when<bproto::terminal<bproto::_>, bitsize_traits<bproto::_value>() >
-  , bproto::when<BooleanResult, boost::mpl::int_<1>() >
-  , bproto::when<bproto::subscript< bproto::_, bproto::_ >, ExpressionSize(bproto::_left) >
-  , bproto::when<bproto::binary_expr< extend_tag,  bproto::_, bproto::_ >,
+  : boost::proto::or_<
+    boost::proto::when<boost::proto::terminal<boost::proto::_>, bitsize_traits<boost::proto::_value>() >
+  , boost::proto::when<BooleanResult, boost::mpl::int_<1>() >
+  , boost::proto::when<boost::proto::subscript< boost::proto::_, boost::proto::_ >, ExpressionSize(boost::proto::_left) >
+  , boost::proto::when<boost::proto::binary_expr< extend_tag,  boost::proto::_, boost::proto::_ >,
       boost::mpl::int_<0>()
     >
-  , bproto::when<
-      bproto::nary_expr<bproto::_, bproto::vararg<bproto::_> >
-    , bproto::fold<bproto::_, boost::mpl::int_<0>(), boost::mpl::max<ExpressionSize, bproto::_state>()>
+  , boost::proto::when<
+      boost::proto::nary_expr<boost::proto::_, boost::proto::vararg<boost::proto::_> >
+    , boost::proto::fold<boost::proto::_, boost::mpl::int_<0>(), boost::mpl::max<ExpressionSize, boost::proto::_state>()>
     >
-  , bproto::when<bproto::_, boost::mpl::int_<0>() >
+  , boost::proto::when<boost::proto::_, boost::mpl::int_<0>() >
   > {};
 
   struct FixWidth;
@@ -65,55 +64,55 @@ namespace crave {
   };
 
   struct InjectExtend_
-  : bproto::when< bproto::_, bproto::binary_expr<extend_tag,
-      bproto::terminal< Minus< bproto::_state, bproto::_expr >::type ()
-          > (Minus< bproto::_state, bproto::_expr >::type () )
-      ,  bproto::_expr
+  : boost::proto::when< boost::proto::_, boost::proto::binary_expr<extend_tag,
+      boost::proto::terminal< Minus< boost::proto::_state, boost::proto::_expr >::type ()
+          > (Minus< boost::proto::_state, boost::proto::_expr >::type () )
+      ,  boost::proto::_expr
       >(
-         bproto::terminal< Minus< bproto::_state, bproto::_expr >::type ()
-            > ( Minus< bproto::_state, bproto::_expr >::type () )
-      ,  bproto::_expr
+         boost::proto::terminal< Minus< boost::proto::_state, boost::proto::_expr >::type ()
+            > ( Minus< boost::proto::_state, boost::proto::_expr >::type () )
+      ,  boost::proto::_expr
       )>
   {};
 
   struct FixFirstLarger
-  : bproto::and_<
-    bproto::binary_expr<bproto::_, bproto::_, bproto::_>
-  , bproto::if_< boost::mpl::less< ExpressionSize( bproto::_left),  ExpressionSize( bproto::_right) >() >
+  : boost::proto::and_<
+    boost::proto::binary_expr<boost::proto::_, boost::proto::_, boost::proto::_>
+  , boost::proto::if_< boost::mpl::less< ExpressionSize( boost::proto::_left),  ExpressionSize( boost::proto::_right) >() >
   // transform to:
-  , bproto::when<bproto::_, bproto::binary_expr<
-      bproto::tag_of< bproto::_expr >(),
-      InjectExtend_( FixWidth(bproto::_left), bproto::_right),
-      FixWidth(bproto::_right)
+  , boost::proto::when<boost::proto::_, boost::proto::binary_expr<
+      boost::proto::tag_of< boost::proto::_expr >(),
+      InjectExtend_( FixWidth(boost::proto::_left), boost::proto::_right),
+      FixWidth(boost::proto::_right)
     > (
-      InjectExtend_( FixWidth(bproto::_left), bproto::_right),
-      FixWidth(bproto::_right)
+      InjectExtend_( FixWidth(boost::proto::_left), boost::proto::_right),
+      FixWidth(boost::proto::_right)
     ) >
   >{};
 
 
   struct FixSecondLarger
-  : bproto::and_<
-    bproto::binary_expr<bproto::_, bproto::_, bproto::_>
-  , bproto::if_< boost::mpl::greater< ExpressionSize( bproto::_left),  ExpressionSize( bproto::_right) >() >
+  : boost::proto::and_<
+    boost::proto::binary_expr<boost::proto::_, boost::proto::_, boost::proto::_>
+  , boost::proto::if_< boost::mpl::greater< ExpressionSize( boost::proto::_left),  ExpressionSize( boost::proto::_right) >() >
   // transform to:
-  , bproto::when<bproto::_, bproto::binary_expr<
-      bproto::tag_of< bproto::_expr >(),
-      FixWidth(bproto::_left),
-      InjectExtend_( FixWidth(bproto::_right), bproto::_left)
+  , boost::proto::when<boost::proto::_, boost::proto::binary_expr<
+      boost::proto::tag_of< boost::proto::_expr >(),
+      FixWidth(boost::proto::_left),
+      InjectExtend_( FixWidth(boost::proto::_right), boost::proto::_left)
     > (
-      FixWidth(bproto::_left),
-      InjectExtend_( FixWidth(bproto::_right), bproto::_left)
+      FixWidth(boost::proto::_left),
+      InjectExtend_( FixWidth(boost::proto::_right), boost::proto::_left)
     ) >
   >{};
 
   struct FixWidth
-  : bproto::or_<
-     bproto::terminal<bproto::_>
-  ,  bproto::subscript<bproto::_, bproto::_>
+  : boost::proto::or_<
+     boost::proto::terminal<boost::proto::_>
+  ,  boost::proto::subscript<boost::proto::_, boost::proto::_>
   ,  FixFirstLarger
   ,  FixSecondLarger
-  ,  bproto::nary_expr<bproto::_, bproto::vararg<FixWidth> >
+  ,  boost::proto::nary_expr<boost::proto::_, boost::proto::vararg<FixWidth> >
   >{};
 
 /***************************************************************************/
@@ -121,30 +120,30 @@ namespace crave {
 /***************************************************************************/
 
   struct FixedUnsigned
-  : bproto::or_<
-      bproto::nary_expr< bproto::tag::less_equal, bproto::vararg< bproto::_> >
-    , bproto::nary_expr< bproto::tag::less, bproto::vararg< bproto::_> >
-    , bproto::nary_expr< bproto::tag::greater, bproto::vararg< bproto::_> >
-    , bproto::nary_expr< bproto::tag::greater_equal, bproto::vararg< bproto::_> >
-    , bproto::nary_expr< bproto::tag::equal_to, bproto::vararg< bproto::_> >
-    , bproto::nary_expr< bproto::tag::not_equal_to, bproto::vararg< bproto::_> >
+  : boost::proto::or_<
+      boost::proto::nary_expr< boost::proto::tag::less_equal, boost::proto::vararg< boost::proto::_> >
+    , boost::proto::nary_expr< boost::proto::tag::less, boost::proto::vararg< boost::proto::_> >
+    , boost::proto::nary_expr< boost::proto::tag::greater, boost::proto::vararg< boost::proto::_> >
+    , boost::proto::nary_expr< boost::proto::tag::greater_equal, boost::proto::vararg< boost::proto::_> >
+    , boost::proto::nary_expr< boost::proto::tag::equal_to, boost::proto::vararg< boost::proto::_> >
+    , boost::proto::nary_expr< boost::proto::tag::not_equal_to, boost::proto::vararg< boost::proto::_> >
   > {};
 
   struct IsSigned
-  : bproto::and_<
-      bproto::not_< FixedUnsigned >
-    , bproto::or_ <
-        bproto::and_<
-          bproto::terminal<bproto::_>
-        , bproto::if_< boost::is_signed< bproto::_value > () >
+  : boost::proto::and_<
+      boost::proto::not_< FixedUnsigned >
+    , boost::proto::or_ <
+        boost::proto::and_<
+          boost::proto::terminal<boost::proto::_>
+        , boost::proto::if_< boost::is_signed< boost::proto::_value > () >
         >
-      , bproto::subscript< IsSigned, bproto::_ >
-      , bproto::and_<
-          bproto::not_< bproto::subscript<bproto::_, bproto::_ > >
-        , bproto::when< bproto::binary_expr<bproto::_, bproto::_, bproto::_>
-        , bproto::or_<
-            IsSigned( bproto::_left )
-          , IsSigned( bproto::_right )
+      , boost::proto::subscript< IsSigned, boost::proto::_ >
+      , boost::proto::and_<
+          boost::proto::not_< boost::proto::subscript<boost::proto::_, boost::proto::_ > >
+        , boost::proto::when< boost::proto::binary_expr<boost::proto::_, boost::proto::_, boost::proto::_>
+        , boost::proto::or_<
+            IsSigned( boost::proto::_left )
+          , IsSigned( boost::proto::_right )
           >
         >
       >

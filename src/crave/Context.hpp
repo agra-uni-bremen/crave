@@ -25,7 +25,7 @@
 
 namespace crave {
 
-struct Context: bproto::callable_context<Context, bproto::null_context> {
+struct Context: boost::proto::callable_context<Context, boost::proto::null_context> {
 
 public:
   typedef Node expression;
@@ -41,7 +41,7 @@ public:
             read_references_(vars.read_references), write_references_(vars.write_references) { }
 
   template<typename value_type>
-  result_type operator()(bproto::tag::terminal, var_tag<value_type> const & tag) {
+  result_type operator()(boost::proto::tag::terminal, var_tag<value_type> const & tag) {
 
     std::map<int, result_type>::iterator ite(variables_.lower_bound(tag.id));
     if (ite == variables_.end() || tag.id < ite->first) {
@@ -58,7 +58,7 @@ public:
     }
   }
 
-  result_type operator()(bproto::tag::terminal, placeholder_tag const & tag) {
+  result_type operator()(boost::proto::tag::terminal, placeholder_tag const & tag) {
 
     std::map<int, result_type>::iterator ite(variables_.lower_bound(tag.id));
     if (ite == variables_.end() || tag.id < ite->first) {
@@ -73,7 +73,7 @@ public:
   }
 
   template<typename value_type>
-  result_type operator()(bproto::tag::terminal t, write_ref_tag<value_type> const & ref) {
+  result_type operator()(boost::proto::tag::terminal t, write_ref_tag<value_type> const & ref) {
 
     std::map<int, result_type>::const_iterator ite = variables_.find(ref.id);
     if ( ite != variables_.end() ) {
@@ -91,132 +91,132 @@ public:
   }
 
   template<typename Expr1, typename Expr2>
-  result_type operator()(bproto::tag::equal_to, Expr1 const & e1,
+  result_type operator()(boost::proto::tag::equal_to, Expr1 const & e1,
       Expr2 const & e2) {
-    return new EqualOpr(bproto::eval(e1, (*this)), bproto::eval(e2, (*this)));
+    return new EqualOpr(boost::proto::eval(e1, (*this)), boost::proto::eval(e2, (*this)));
   }
 
   template<typename Expr1, typename Expr2>
-  result_type operator()(bproto::tag::not_equal_to, Expr1 const & e1,
+  result_type operator()(boost::proto::tag::not_equal_to, Expr1 const & e1,
       Expr2 const & e2) {
-    return new NotEqualOpr(bproto::eval(e1, (*this)), bproto::eval(e2, (*this)));
+    return new NotEqualOpr(boost::proto::eval(e1, (*this)), boost::proto::eval(e2, (*this)));
   }
 
   template<typename Expr1, typename Expr2>
-  result_type operator()(bproto::tag::less_equal, Expr1 const & e1,
+  result_type operator()(boost::proto::tag::less_equal, Expr1 const & e1,
       Expr2 const & e2) {
-    return new LessEqualOpr(bproto::eval(e1, (*this)), bproto::eval(e2, (*this)));
+    return new LessEqualOpr(boost::proto::eval(e1, (*this)), boost::proto::eval(e2, (*this)));
   }
 
   template<typename Expr1, typename Expr2>
-  result_type operator()(bproto::tag::less, Expr1 const & e1, Expr2 const & e2) {
-    return new LessOpr(bproto::eval(e1, *this), bproto::eval(e2, *this));
+  result_type operator()(boost::proto::tag::less, Expr1 const & e1, Expr2 const & e2) {
+    return new LessOpr(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this));
   }
 
   template<typename Expr1, typename Expr2>
-  result_type operator()(bproto::tag::greater, Expr1 const & e1, Expr2 const & e2) {
-    return new GreaterOpr(bproto::eval(e1, *this), bproto::eval(e2, *this));
+  result_type operator()(boost::proto::tag::greater, Expr1 const & e1, Expr2 const & e2) {
+    return new GreaterOpr(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this));
   }
 
   template<typename Expr1, typename Expr2>
-  result_type operator()(bproto::tag::greater_equal, Expr1 const & e1, Expr2 const & e2) {
-    return new GreaterEqualOpr(bproto::eval(e1, *this), bproto::eval(e2, *this));
+  result_type operator()(boost::proto::tag::greater_equal, Expr1 const & e1, Expr2 const & e2) {
+    return new GreaterEqualOpr(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this));
   }
 
   template<typename Expr1, typename Expr2>
-  result_type operator()(bproto::tag::logical_and, Expr1 const & e1, Expr2 const & e2) {
-    return new LogicalAndOpr(bproto::eval(e1, *this), bproto::eval(e2, *this));
+  result_type operator()(boost::proto::tag::logical_and, Expr1 const & e1, Expr2 const & e2) {
+    return new LogicalAndOpr(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this));
   }
 
   template<typename Expr1, typename Expr2>
-  result_type operator()(bproto::tag::logical_or, Expr1 const & e1, Expr2 const & e2) {
-    return new LogicalOrOpr(bproto::eval(e1, *this), bproto::eval(e2, *this));
+  result_type operator()(boost::proto::tag::logical_or, Expr1 const & e1, Expr2 const & e2) {
+    return new LogicalOrOpr(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this));
   }
 
   template<typename Expr1, typename Expr2>
-  result_type operator()(bproto::tag::bitwise_and, Expr1 const & e1, Expr2 const & e2) {
-    return new AndOpr(bproto::eval(e1, *this), bproto::eval(e2, *this));
+  result_type operator()(boost::proto::tag::bitwise_and, Expr1 const & e1, Expr2 const & e2) {
+    return new AndOpr(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this));
   }
 
   template<typename Expr1, typename Expr2>
-  result_type operator()(bproto::tag::bitwise_or, Expr1 const & e1, Expr2 const & e2) {
-    return new OrOpr(bproto::eval(e1, *this), bproto::eval(e2, *this));
+  result_type operator()(boost::proto::tag::bitwise_or, Expr1 const & e1, Expr2 const & e2) {
+    return new OrOpr(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this));
   }
 
   template<typename Expr1, typename Expr2>
-  result_type operator()(bproto::tag::bitwise_xor, Expr1 const & e1, Expr2 const & e2) {
-    return new XorOpr(bproto::eval(e1, *this), bproto::eval(e2, *this));
+  result_type operator()(boost::proto::tag::bitwise_xor, Expr1 const & e1, Expr2 const & e2) {
+    return new XorOpr(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this));
   }
 
   template<typename Expr1, typename Expr2>
-  result_type operator()(bproto::tag::function f, bproto::terminal<operator_if_then>::type const& t,
+  result_type operator()(boost::proto::tag::function f, boost::proto::terminal<operator_if_then>::type const& t,
       Expr1 const & e1, Expr2 const & e2) {
-    return new IfThenElse(bproto::eval(e1, *this), bproto::eval(e2, *this), new Constant(true));
+    return new IfThenElse(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this), new Constant(true));
   }
 
   template<typename Expr1, typename Expr2, typename Expr3>
-  result_type operator()(bproto::tag::function, bproto::terminal<operator_if_then_else>::type const,
+  result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_if_then_else>::type const,
       Expr1 const & e1, Expr2 const & e2, Expr3 const & e3) {
-    return new IfThenElse(bproto::eval(e1, *this), bproto::eval(e2, *this), bproto::eval(e3, *this));
+    return new IfThenElse(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this), boost::proto::eval(e3, *this));
   }
 
   template<typename Expr>
-  result_type operator()(bproto::tag::negate, Expr const & e) {
-    return new NegOpr(bproto::eval(e, *this));
+  result_type operator()(boost::proto::tag::negate, Expr const & e) {
+    return new NegOpr(boost::proto::eval(e, *this));
   }
 
   template<typename Expr>
-  result_type operator()(bproto::tag::complement, Expr const & e) {
-    return new ComplementOpr(bproto::eval(e, *this));
+  result_type operator()(boost::proto::tag::complement, Expr const & e) {
+    return new ComplementOpr(boost::proto::eval(e, *this));
   }
 
   template<typename Expr>
-  result_type operator()(bproto::tag::logical_not, Expr const & e) {
-    return new NotOpr(bproto::eval(e, *this));
+  result_type operator()(boost::proto::tag::logical_not, Expr const & e) {
+    return new NotOpr(boost::proto::eval(e, *this));
   }
 
   template<typename Expr1, typename Expr2>
-  result_type operator()(bproto::tag::plus, Expr1 const & e1, Expr2 const & e2) {
-    return new PlusOpr(bproto::eval(e1, *this), bproto::eval(e2, *this));
+  result_type operator()(boost::proto::tag::plus, Expr1 const & e1, Expr2 const & e2) {
+    return new PlusOpr(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this));
   }
 
   template<typename Expr1, typename Expr2>
-  result_type operator()(bproto::tag::minus, Expr1 const & e1, Expr2 const & e2) {
-    return new MinusOpr(bproto::eval(e1, *this), bproto::eval(e2, *this));
+  result_type operator()(boost::proto::tag::minus, Expr1 const & e1, Expr2 const & e2) {
+    return new MinusOpr(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this));
   }
 
   template<typename Expr1, typename Expr2>
-  result_type operator()(bproto::tag::modulus, Expr1 const & e1, Expr2 const & e2) {
-    return new ModuloOpr(bproto::eval(e1, *this), bproto::eval(e2, *this));
+  result_type operator()(boost::proto::tag::modulus, Expr1 const & e1, Expr2 const & e2) {
+    return new ModuloOpr(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this));
   }
 
   template<typename Expr1, typename Expr2>
-  result_type operator()(bproto::tag::divides, Expr1 const & e1, Expr2 const & e2) {
-    return new DevideOpr(bproto::eval(e1, *this), bproto::eval(e2, *this));
+  result_type operator()(boost::proto::tag::divides, Expr1 const & e1, Expr2 const & e2) {
+    return new DevideOpr(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this));
   }
 
   template<typename Expr1, typename Expr2>
-  result_type operator()(bproto::tag::shift_left, Expr1 const & e1, Expr2 const & e2) {
-    return new ShiftLeftOpr(bproto::eval(e1, *this), bproto::eval(e2, *this));
+  result_type operator()(boost::proto::tag::shift_left, Expr1 const & e1, Expr2 const & e2) {
+    return new ShiftLeftOpr(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this));
   }
 
   template<typename Expr1, typename Expr2>
-  result_type operator()(bproto::tag::shift_right, Expr1 const & e1, Expr2 const & e2) {
-    return new ShiftRightOpr(bproto::eval(e1, *this), bproto::eval(e2, *this));
+  result_type operator()(boost::proto::tag::shift_right, Expr1 const & e1, Expr2 const & e2) {
+    return new ShiftRightOpr(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this));
   }
 
   template<typename Expr1, typename Expr2>
-  result_type operator()(bproto::tag::multiplies, Expr1 const & e1, Expr2 const & e2) {
-    return new MultipliesOpr(bproto::eval(e1, *this), bproto::eval(e2, *this));
+  result_type operator()(boost::proto::tag::multiplies, Expr1 const & e1, Expr2 const & e2) {
+    return new MultipliesOpr(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this));
   }
 
   template<typename Integral, typename Expr>
   result_type operator()(extend_tag, Integral const & by_width, Expr const & e) {
-    return new ExtendExpression(bproto::eval(e, *this), bproto::value(by_width).value);
+    return new ExtendExpression(boost::proto::eval(e, *this), boost::proto::value(by_width).value);
   }
 
   template<typename Integer>
-  result_type operator()(bproto::tag::terminal t, read_ref_tag<Integer> const & ref) {
+  result_type operator()(boost::proto::tag::terminal t, read_ref_tag<Integer> const & ref) {
 
     std::map<int, result_type>::const_iterator ite = variables_.find(ref.id);
     if ( ite != variables_.end() ) {
@@ -232,52 +232,60 @@ public:
   }
 
   template<typename Integer>
-  result_type operator()(bproto::tag::terminal, Integer const & i) {
+  result_type operator()(boost::proto::tag::terminal, Integer const & i) {
     unsigned width = bitsize_traits<Integer>::value;
     bool sign = boost::is_signed<Integer>::value;
     return new Constant(i, width, sign);
   }
 
   template<typename Value, typename CollectionTerm>
-  result_type operator()(bproto::tag::function,
-      bproto::terminal<operator_inside>::type const & tag,
+  result_type operator()(boost::proto::tag::function,
+      boost::proto::terminal<operator_inside>::type const & tag,
       Value const & value, CollectionTerm const & c) {
 
-    typedef typename bproto::result_of::value<CollectionTerm>::type Collection;
+    typedef typename boost::proto::result_of::value<CollectionTerm>::type Collection;
     typedef typename boost::range_value<Collection>::type CollectionEntry;
 
     std::set<Constant> constants;
-    BOOST_FOREACH( CollectionEntry const & i, bproto::value(c) ) {
+    BOOST_FOREACH( CollectionEntry const & i, boost::proto::value(c) ) {
 
       unsigned width = bitsize_traits<CollectionEntry>::value;
       bool sign = boost::is_signed<CollectionEntry>::value;
       constants.insert(Constant(i, width, sign));
     }
-    return new Inside(bproto::eval(value, *this), constants);
+    return new Inside(boost::proto::eval(value, *this), constants);
   }
 
   template<typename Var, typename Value>
-  result_type operator()(bproto::tag::function,
-      bproto::terminal<operator_dist>::type const & tag,
+  result_type operator()(boost::proto::tag::function,
+      boost::proto::terminal<operator_dist>::type const & tag,
       Var const & var_term, Value const & probability) {
 
-    result_type expr = bproto::eval(var_term, *this);
+    result_type expr = boost::proto::eval(var_term, *this);
     read_references_.push_back(std::make_pair(
-        bproto::value(var_term).id,
+        boost::proto::value(var_term).id,
         boost::shared_ptr<crave::ReferenceExpression>(
-            new DistReferenceExpr(bproto::value(probability), expr)
+            new DistReferenceExpr(boost::proto::value(probability), expr)
     )));
     return new Constant(true);
   }
 
   template<typename Expr1, typename Expr2>
-  result_type operator()(bproto::tag::subscript, Expr1 const & e1, Expr2 const & e2) {
+  result_type operator()(boost::proto::tag::function,
+      boost::proto::terminal<operator_foreach>::type const & tag,
+      Expr1 const & e1, placeholder const & p, Expr2 const & e2) {
+      
+    return new Constant(true);
+  }
+
+  template<typename Expr1, typename Expr2>
+  result_type operator()(boost::proto::tag::subscript, Expr1 const & e1, Expr2 const & e2) {
     // e1 should be a terminal vector_tag
     BOOST_STATIC_ASSERT(( boost::is_same<
-        typename bproto::tag_of<Expr1>::type,
-        bproto::tag::terminal >::value ));
+        typename boost::proto::tag_of<Expr1>::type,
+        boost::proto::tag::terminal >::value ));
 
-    int vec_id = bproto::value(e1).id;
+    int vec_id = boost::proto::value(e1).id;
 
     std::map<int, boost::intrusive_ptr<VectorExpr> >::const_iterator ite = vector_variables_.find(vec_id);
     boost::intrusive_ptr<VectorExpr> vec;
@@ -285,7 +293,7 @@ public:
         vec = ite->second;
     } else {
 
-      typedef typename bproto::result_of::value<Expr1>::type value_type;
+      typedef typename boost::proto::result_of::value<Expr1>::type value_type;
       unsigned width = bitsize_traits<value_type>::value;
       bool sign = boost::is_signed<value_type>::value;
 
@@ -293,7 +301,7 @@ public:
       vector_variables_.insert( std::make_pair(vec_id, vec) );
     }
 
-    return new VectorAccess(vec, bproto::eval(e2, *this));
+    return new VectorAccess(vec, boost::proto::eval(e2, *this));
   }
 
 private:

@@ -60,7 +60,7 @@ private:
 class VariableExpr : public Terminal {
 public:
   VariableExpr( unsigned int id, unsigned int bs, bool s ) : Terminal(bs, s), id_(id) { }
-  VariableExpr( VariableExpr const& v ) :Terminal(v.bitsize(), v.sign()), id_(v.id()) { }
+  VariableExpr( VariableExpr const& v ) : Terminal(v.bitsize(), v.sign()), id_(v.id()) { }
 
   void visit( NodeVisitor& v ) const { v.visitVariableExpr(*this); }
 
