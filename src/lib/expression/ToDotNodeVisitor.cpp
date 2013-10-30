@@ -412,4 +412,24 @@ void ToDotVisitor::visitIfThenElse(IfThenElse const &ite)
   visitTernaryExpr(ite);
 }
 
+void ToDotVisitor::visitForEach(ForEach const &fe)
+{
+  if ( putNode(&fe) )
+  {
+    visitNode(fe);
+    out_ << " [label=\"for_each \"]" << std::endl;
+  }
+  visitBinaryExpr(fe);
+}
+
+void ToDotVisitor::visitUnique(Unique const &u)
+{
+  if ( putNode(&u) )
+  {
+    visitNode(u);
+    out_ << " [label=\"unique \"]" << std::endl;
+  }
+  visitUnaryExpr(u);
+}
+
 } // end crave namespace
