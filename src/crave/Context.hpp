@@ -58,6 +58,22 @@ public:
     }
   }
 
+  template<typename value_type>
+  result_type operator()(boost::proto::tag::terminal, vector_tag<value_type> const & tag) {
+    std::map<int, result_type>::const_iterator ite = vector_variables_.find(tag.id);
+
+    if ( ite != vector_variables_.end() ) {
+        return ite->second;
+    } else {
+      unsigned width = bitsize_traits<value_type>::value;
+      bool sign = boost::is_signed<value_type>::value;
+
+      result_type vec = new VectorExpr(tag.id, width, sign);
+      vector_variables_.insert( std::make_pair(tag.id, vec) );
+      return vec;
+    }
+  }
+
   result_type operator()(boost::proto::tag::terminal, placeholder_tag const & tag) {
 
     std::map<int, result_type>::iterator ite(variables_.lower_bound(tag.id));
@@ -273,40 +289,24 @@ public:
   template<typename Expr1, typename Expr2>
   result_type operator()(boost::proto::tag::function,
       boost::proto::terminal<operator_foreach>::type const & tag,
-      Expr1 const & e1, placeholder const & p, Expr2 const & e2) {
-      
-    return new Constant(true);
+      Expr1 const & e1, Expr2 const & e2) {
+    return new ForEach(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this));
+  }
+
+  template<typename Expr>
+  result_type operator()(boost::proto::tag::function,
+      boost::proto::terminal<operator_unique>::type const & tag, Expr const & e) {
+    return new Unique(boost::proto::eval(e, *this));
   }
 
   template<typename Expr1, typename Expr2>
   result_type operator()(boost::proto::tag::subscript, Expr1 const & e1, Expr2 const & e2) {
-    // e1 should be a terminal vector_tag
-    BOOST_STATIC_ASSERT(( boost::is_same<
-        typename boost::proto::tag_of<Expr1>::type,
-        boost::proto::tag::terminal >::value ));
-
-    int vec_id = boost::proto::value(e1).id;
-
-    std::map<int, boost::intrusive_ptr<VectorExpr> >::const_iterator ite = vector_variables_.find(vec_id);
-    boost::intrusive_ptr<VectorExpr> vec;
-    if ( ite != vector_variables_.end() ) {
-        vec = ite->second;
-    } else {
-
-      typedef typename boost::proto::result_of::value<Expr1>::type value_type;
-      unsigned width = bitsize_traits<value_type>::value;
-      bool sign = boost::is_signed<value_type>::value;
-
-      vec = new VectorExpr(vec_id, width, sign);
-      vector_variables_.insert( std::make_pair(vec_id, vec) );
-    }
-
-    return new VectorAccess(vec, boost::proto::eval(e2, *this));
+    return new VectorAccess(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this));
   }
 
 private:
   std::map<int, result_type>& variables_;
-  std::map<int, boost::intrusive_ptr<VectorExpr> >& vector_variables_;
+  std::map<int, result_type>& vector_variables_;
   std::vector<ReadRefPair>& read_references_;
   std::vector<WriteRefPair>& write_references_;
 };

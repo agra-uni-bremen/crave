@@ -37,12 +37,15 @@ namespace crave {
       , boost::proto::nary_expr< boost::proto::tag::logical_or, boost::proto::vararg< boost::proto::_> >
       , boost::proto::nary_expr< boost::proto::tag::logical_not, boost::proto::vararg< boost::proto::_> >
       >
+      // special operators
+    , boost::proto::nary_expr< boost::proto::tag::function, boost::proto::terminal<crave::operator_foreach>, boost::proto::_, boost::proto::_ >
+    , boost::proto::nary_expr< boost::proto::tag::function, boost::proto::terminal<crave::operator_unique>, boost::proto::_ >
   > {};
 
   struct ExpressionSize
   : boost::proto::or_<
-    boost::proto::when<boost::proto::terminal<boost::proto::_>, bitsize_traits<boost::proto::_value>() >
-  , boost::proto::when<BooleanResult, boost::mpl::int_<1>() >
+    boost::proto::when<BooleanResult, boost::mpl::int_<1>() >
+  , boost::proto::when<boost::proto::terminal<boost::proto::_>, bitsize_traits<boost::proto::_value>() >
   , boost::proto::when<boost::proto::subscript< boost::proto::_, boost::proto::_ >, ExpressionSize(boost::proto::_left) >
   , boost::proto::when<boost::proto::binary_expr< extend_tag,  boost::proto::_, boost::proto::_ >,
       boost::mpl::int_<0>()
@@ -110,6 +113,7 @@ namespace crave {
   : boost::proto::or_<
      boost::proto::terminal<boost::proto::_>
   ,  boost::proto::subscript<boost::proto::_, boost::proto::_>
+  ,  boost::proto::nary_expr< boost::proto::tag::function, boost::proto::terminal<crave::operator_unique>, boost::proto::_ >
   ,  FixFirstLarger
   ,  FixSecondLarger
   ,  boost::proto::nary_expr<boost::proto::_, boost::proto::vararg<FixWidth> >

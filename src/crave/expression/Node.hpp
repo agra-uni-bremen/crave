@@ -380,18 +380,18 @@ public:
   void visit( NodeVisitor& v ) const { v.visitIfThenElse(*this); }
 };
 
-class ForEach : public TernaryExpression {
+class ForEach : public BinaryOperator {
 public:
-  ForEach( NodePtr a, NodePtr b, NodePtr c ) : TernaryExpression(a,b,c) { }
-  ForEach( ForEach const& t ) : TernaryExpression(t) { }
+  ForEach( NodePtr a, NodePtr b ) : BinaryOperator(a, b) { }
+  ForEach( ForEach const& fe ) : BinaryOperator(fe) { }
 
   void visit( NodeVisitor& v ) const { v.visitForEach(*this); }
 };
 
-class Unique : public BinaryExpression {
+class Unique : public UnaryOperator {
 public:
-  Unique( NodePtr a, NodePtr b ) : BinaryExpression(a,b) { }
-  Unique( Unique const& t ) : BinaryExpression(t) { }
+  Unique( NodePtr a ) : UnaryOperator(a) { }
+  Unique( Unique const& u ) : UnaryOperator(u) { }
 
   void visit( NodeVisitor& v ) const { v.visitUnique(*this); }
 };
