@@ -26,8 +26,8 @@ struct VectorGenerator {
 
   typedef std::map<int, ConstraintSet> VectorConstraintsMap;
   
-  VectorGenerator( VariableContainer& vars, SolverPtr& solver, bool exact_analyse) 
-  : vector_constraints_(), vectors_(), vars_(vars), solver_(solver), exact_analyse_(exact_analyse) {  }
+  VectorGenerator( VariableContainer& vars, SolverPtr& main_solver, bool exact_analyse) 
+  : vector_constraints_(), vectors_(), vcon_(vars), main_solver_(main_solver), exact_analyse_(exact_analyse) {  }
 
   bool enable_constraint(std::string const& name) {
     BOOST_FOREACH ( VectorConstraintsMap::value_type& c_pair , vector_constraints_ )
@@ -51,25 +51,16 @@ struct VectorGenerator {
   }
 
   template<typename value_type>
-  void addForEach(UserConstraint & constraint, __rand_vec <value_type> & v) {
-    BOOST_FOREACH ( VectorConstraintsMap::value_type const& c_pair, vector_constraints_ ) {
-      BOOST_FOREACH ( UserConstraint const& c, c_pair.second ) {
-        if (0 == c.get_name().compare(constraint.get_name()))
-          throw std::runtime_error("Constraint already exists.");
-      }
-    }
+  void addForEach(ConstraintPtr constraint, __rand_vec <value_type> & v) {
     VectorConstraintsMap::iterator ite(vector_constraints_.lower_bound(v().id()));
     if (ite != vector_constraints_.end() && !(vector_constraints_.key_comp()(v().id(), ite->first))) {
       // v already exists
       ite->second.push_back(constraint);
-
     } else {
-
       vector_constraints_[v().id()].push_back(constraint);
       vectors_[v().id()] = &v;
       vector_solvers_[v().id()] =
         boost::shared_ptr<metaSMTVisitor>(FactoryMetaSMT::getNewInstance());
-
     }
   }
 
@@ -95,18 +86,18 @@ struct VectorGenerator {
         vec_elements[i] = new VariableExpr(new_var_id(), 1u, true);
     }
 
-    BOOST_FOREACH ( UserConstraint const& constraint, vector_constraints_[vec_id] ) {
+    BOOST_FOREACH ( ConstraintPtr constraint, vector_constraints_[vec_id] ) {
 
-      if (constraint.is_enabled()) {
+      if (constraint->is_enabled()) {
 
         ReplaceVisitor replacer(vec_elements);
         for (unsigned int i = 0u; i < size; ++i) {
 
           replacer.set_vec_idx(i);
-          constraint.get_expression()->visit(replacer);
+          constraint->get_expression()->visit(replacer);
 
           if (replacer.okay()) {
-            if (constraint.is_soft())
+            if (constraint->is_soft())
               solver->makeSoftAssertion(*replacer.result());
             else
               solver->makeAssertion(*replacer.result());
@@ -145,9 +136,9 @@ struct VectorGenerator {
     if (!constraints.has_soft())
       return false;
 
-    BOOST_FOREACH (UserConstraint& c, constraints)
-      if (c.is_soft() && c.is_enabled())
-        c.disable();
+    BOOST_FOREACH (ConstraintPtr c, constraints)
+      if (c->is_soft() && c->is_enabled())
+        c->disable();
 
     reset_vector_solver_(solver, vec_id, size);
     constraints.set_synced();
@@ -156,17 +147,17 @@ struct VectorGenerator {
     if (!result)
       return false;
 
-    BOOST_FOREACH (UserConstraint& c, constraints) {
-      if (c.is_soft()) {
+    BOOST_FOREACH (ConstraintPtr c, constraints) {
+      if (c->is_soft()) {
 
-        c.enable();
+        c->enable();
         reset_vector_solver_(solver, vec_id, size);
         constraints.set_synced();
 
         bool enable = solver->solve();
         result |= enable;
         if (!enable)
-          c.disable();
+          c->disable();
       }
     }
 
@@ -179,9 +170,9 @@ struct VectorGenerator {
 
     // get size of vector
     unsigned int size;
-    if (vars_.variables_.find(vec().size().id()) != vars_.variables_.end()) {
+    if (vcon_.variables.find(vec().size().id()) != vcon_.variables.end()) {
       AssignResultImpl<unsigned int> ar_size;
-      solver_->read(*vars_.variables_[vec().size().id()], ar_size);
+      main_solver_->read(*vcon_.variables[vec().size().id()], ar_size);
       size = ar_size.value();
       vec.resize(size);
     } else {
@@ -217,7 +208,7 @@ struct VectorGenerator {
   bool solve_() {
 
     typedef std::pair<int, NodePtr> VectorVariablePair;
-    BOOST_FOREACH(VectorVariablePair p, vars_.vector_variables_) {
+    BOOST_FOREACH(VectorVariablePair p, vcon_.vector_variables) {
 
       int vec_id = p.first;
       NodePtr vec_expr = p.second;
@@ -248,8 +239,8 @@ struct VectorGenerator {
 
   void print_dot_graph(ToDotVisitor& visitor, bool const with_softs = false) {
     BOOST_FOREACH ( VectorConstraintsMap::value_type const& fp, vector_constraints_ )
-      BOOST_FOREACH ( UserConstraint const& c, fp.second )
-        c.get_expression()->visit(visitor);
+      BOOST_FOREACH ( ConstraintPtr c, fp.second )
+        c->get_expression()->visit(visitor);
   }
 
 private:
@@ -257,8 +248,8 @@ private:
   std::map<int, __rand_vec_base*> vectors_;
   std::map<int, SolverPtr> vector_solvers_;
 
-  VariableContainer& vars_;
-  SolverPtr& solver_;
+  VariableContainer& vcon_;
+  SolverPtr& main_solver_;
   bool const exact_analyse_;
 };
 

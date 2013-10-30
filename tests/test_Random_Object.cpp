@@ -317,12 +317,10 @@ class Constraint_base : public Generator {
     Constraint_base()
       : Generator()
       , constraint(*this)
-      , soft_constraint( constraint )
     {}
 
   protected:
     Generator & constraint;
-    Soft_Generator soft_constraint;
 };
 
 class Constraint1 : public Constraint_base {

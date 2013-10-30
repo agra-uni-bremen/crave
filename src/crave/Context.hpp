@@ -37,8 +37,8 @@ private:
 
 public:
   Context(VariableContainer& vars)
-          : variables_(vars.variables_), vector_variables_(vars.vector_variables_),
-            read_references_(vars.read_references_), write_references_(vars.write_references_) { }
+          : variables_(vars.variables), vector_variables_(vars.vector_variables),
+            read_references_(vars.read_references), write_references_(vars.write_references) { }
 
   template<typename value_type>
   result_type operator()(bproto::tag::terminal, var_tag<value_type> const & tag) {

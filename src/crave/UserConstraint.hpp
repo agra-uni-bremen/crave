@@ -6,6 +6,7 @@
 #include "expression/ReplaceVisitor.hpp"
 
 #include <boost/intrusive_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/foreach.hpp>
 #include <boost/fusion/adapted/std_pair.hpp>
 #include <boost/lexical_cast.hpp>
@@ -13,24 +14,27 @@
 #include <ostream>
 #include <string>
 #include <vector>
+#include <stdexcept>
 
 namespace crave {
 
+int new_constraint_id();
+
+struct ConstraintManager;
+struct UserConstraint;
+typedef boost::shared_ptr<UserConstraint> ConstraintPtr;
+
 struct UserConstraint {
 
+  friend struct ConstraintManager;
+
   typedef NodePtr expression;
-  typedef std::string string;
 
-  UserConstraint(unsigned const id, expression const expr, string const& name)
-  : expr_(expr), name_(name), soft_(false), enabled_(true) { }
-  UserConstraint(unsigned const id, expression const expr, string const& name, bool const soft)
-  : expr_(expr), name_(name), soft_(soft), enabled_(true) { }
-  UserConstraint(unsigned const id, expression const expr, string const& name, bool const soft, bool const enabled)
+private:
+  UserConstraint(unsigned const id, expression const expr, std::string const& name, bool const soft = false, bool const enabled = true)
   : expr_(expr), name_(name), soft_(soft), enabled_(enabled) { }
-  UserConstraint(UserConstraint const& other)
-  : id_(other.id()), expr_(other.get_expression()), name_(other.get_name()),
-    soft_(other.is_soft()), enabled_(other.is_enabled()) { }
 
+public:
   template<typename ostream>
   friend ostream& operator<<(ostream& os, UserConstraint constr) {
     os << constr.name_ << " is " << (constr.soft_?"soft":"hard") << " constraint and " << (constr.enabled_?"enabled":"disabled");
@@ -45,7 +49,7 @@ struct UserConstraint {
     return expr_;
   }
 
-  inline string get_name() const {
+  inline std::string get_name() const {
     return name_;
   }
 
@@ -66,15 +70,16 @@ struct UserConstraint {
  protected:
   unsigned id_;
   expression expr_;
-  string name_;
+  std::string name_;
   bool soft_;
   bool enabled_;
 };
 
+
+
 struct ConstraintSet {
 
-  typedef std::string string;
-  typedef std::vector<UserConstraint> ConstraintsVector;
+  typedef std::vector<ConstraintPtr> ConstraintsVector;
   typedef ConstraintsVector::iterator iterator;
   typedef ConstraintsVector::const_iterator const_iterator;
   typedef ConstraintsVector::reference reference;
@@ -132,7 +137,7 @@ struct ConstraintSet {
 
   void push_back(value_type const& value) {
     changed_ = true;
-    has_soft_ |= value.is_soft();
+    has_soft_ |= value->is_soft();
     constraints_.push_back(value);
   }
   void pop_back() {
@@ -142,7 +147,7 @@ struct ConstraintSet {
 
   iterator insert(iterator position, value_type const& value) {
     changed_ = true;
-    has_soft_ |= value.is_soft();
+    has_soft_ |= value->is_soft();
     return constraints_.insert(position, value);
   }
   template<typename InputIterator>
@@ -169,30 +174,30 @@ struct ConstraintSet {
     constraints_.clear();
   }
 
-  bool enable_constraint(string const& key) {
+  bool enable_constraint(std::string const& key) {
     BOOST_FOREACH (value_type& c, constraints_) {
-      if (0 == c.get_name().compare(key)) {
-        c.enable();
+      if (0 == c->get_name().compare(key)) {
+        c->enable();
         changed_ = true;
         return true;
       }
     }
     return false;
   }
-  bool disable_constraint(string const& key) {
+  bool disable_constraint(std::string const& key) {
     BOOST_FOREACH (value_type& c, constraints_) {
-      if (0 == c.get_name().compare(key)) {
-        c.disable();
+      if (0 == c->get_name().compare(key)) {
+        c->disable();
         changed_ = true;
         return true;
       }
     }
     return false;
   }
-  bool is_constraint_enabled(string const& key) {
+  bool is_constraint_enabled(std::string const& key) {
     BOOST_FOREACH (value_type const& c, constraints_)
-      if (0 == c.get_name().compare(key))
-        return c.is_enabled();
+      if (0 == c->get_name().compare(key))
+        return c->is_enabled();
 
     return false;
   }
@@ -229,36 +234,28 @@ private:
   VectorElements vec_elements_;
 };
 
-namespace ConstraintBuilder {
+struct ConstraintManager {
 
-namespace {
-
-unsigned int contraintID = 0;
-
+template<typename Expr>
+ConstraintPtr makeConstraint(std::string const& name, Expr e, Context& ctx,
+                                     bool const soft = false) {
+  if (constraintMap.find(name) != constraintMap.end()) 
+    throw std::runtime_error("Constraint already exists.");
+  NodePtr n(boost::proto::eval(FixWidth()(e), ctx));
+  ConstraintPtr c(new UserConstraint(new_constraint_id(), n, name, soft));
+  return constraintMap[name] = c;
 }
 
 template<typename Expr>
-inline UserConstraint makeConstraint(std::string const& name, Expr e, Context& ctx,
-                                     bool const soft) {
-    NodePtr n(boost::proto::eval(FixWidth()(e), ctx));
-    return UserConstraint(contraintID++, n, name, soft);
-}
-
-template<typename Expr>
-inline UserConstraint makeConstraint(std::string const& name, Expr e, Context& ctx) {
-    return makeConstraint(name, e, ctx, false);
-}
-
-template<typename Expr>
-inline UserConstraint makeConstraint(Expr e, Context& ctx, bool const soft) {
-    return makeConstraint("constraint_" + boost::lexical_cast<std::string>(contraintID),
+ConstraintPtr makeConstraint(Expr e, Context& ctx, bool const soft = false) {
+    return makeConstraint("constraint_" + boost::lexical_cast<std::string>(new_constraint_id()),
                           e, ctx, soft);
 }
 
-template<typename Expr>
-inline UserConstraint makeConstraint(Expr e, Context& ctx) {
-    return makeConstraint(e, ctx, false);
-}
+private:
+  std::map<std::string, ConstraintPtr> constraintMap;
+};
 
-} // end namespace ConstraintBuilder
+static ConstraintManager constraintManager;
+
 } // end namespace crave

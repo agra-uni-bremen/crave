@@ -5,7 +5,9 @@
 
 namespace crave {
 
-  int new_var_id() { static int _ID=0; return ++_ID;}
+  int new_var_id() { static int var_ID=0; return ++var_ID;}
+  
+  int new_constraint_id() { static int constraint_ID=0; return ++constraint_ID; }
 
   boost::mt19937 rng(std::time(0));
 

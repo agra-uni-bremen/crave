@@ -89,12 +89,12 @@ BOOST_AUTO_TEST_CASE ( soft_constraint_t )
   Generator gen;
   Variable<int> r;
   gen( r<6 );
-  soft(gen)( r == 2 );
+  gen.soft( r == 2 );
 
   BOOST_REQUIRE( gen.next() );
   BOOST_REQUIRE_EQUAL(gen[r], 2);
 
-  gen(soft)( r==3 );
+  gen.soft( r==3 );
 
   BOOST_REQUIRE( gen.next() );
 }
