@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Context.hpp"
+#include "Logger.hpp"
 #include "UserConstraint.hpp"
 #include "VariableContainer.hpp"
 #include "VectorGenerator.hpp"
@@ -199,7 +200,7 @@ private:
       if (!solver_->analyseSofts())
         return false;
 
-      // get solvable softs
+      // TODO get solvable softs
       return true;
     }
 
@@ -315,6 +316,7 @@ private:
 
   // auxiliary variables
   bool const exact_analyse_;
+  Logger logger_;
 
   // vectors
   VectorGenerator vector_gen_;
