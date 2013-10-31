@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Context.hpp"
+#include "Logger.hpp"
 #include "UserConstraint.hpp"
 #include "VariableContainer.hpp"
 #include "VectorConstraint.hpp"
@@ -49,13 +50,13 @@ private:
 public:
   Generator()
   : constraints_(), vector_constraints_(), vars_(crave::variables), vectors_(), pre_hooks_(),
-    ctx_(vars_), solver_(FactoryMetaSMT::getNewInstance()), exact_analyse_(false) {
+    ctx_(vars_), solver_(FactoryMetaSMT::getNewInstance()), exact_analyse_(false), logger_() {
   }
 
   template<typename Expr>
   Generator(Expr expr)
   : constraints_(), vector_constraints_(), vars_(crave::variables), vectors_(), pre_hooks_(),
-    ctx_(vars_), solver_(FactoryMetaSMT::getNewInstance()), exact_analyse_(false) {
+    ctx_(vars_), solver_(FactoryMetaSMT::getNewInstance()), exact_analyse_(false), logger_() {
       (*this)(expr);
     }
 
@@ -483,7 +484,7 @@ private:
       if (!solver_->analyseSofts())
         return false;
 
-      // get solvable softs
+      // TODO get solvable softs
       return true;
     }
 
@@ -604,6 +605,7 @@ private:
 
   // auxiliary variables
   bool const exact_analyse_;
+  Logger logger_;
 };
 
 template<typename Expr>
