@@ -24,7 +24,6 @@ struct ConstraintSet;
 
 struct UserConstraint;
 typedef boost::shared_ptr<UserConstraint> ConstraintPtr;
-typedef std::vector<ConstraintPtr> ConstraintVector;
 
 struct UserVectorConstraint;
 typedef boost::shared_ptr<UserVectorConstraint> VectorConstraintPtr;
@@ -111,6 +110,7 @@ protected:
 
 struct ConstraintSet {
   typedef std::map<std::string, ConstraintPtr> ConstraintMap;
+  typedef std::vector<ConstraintPtr> ConstraintVector;
   typedef ConstraintVector::iterator iterator;
   typedef ConstraintVector::const_iterator const_iterator;
   typedef ConstraintVector::reference reference;

@@ -23,7 +23,7 @@
 namespace crave {
 
 struct ConstraintBackend {
-  ConstraintVector constraints_;
+//  ConstraintVector constraints_;
   SolverPtr solver_;
   
   bool solve() {

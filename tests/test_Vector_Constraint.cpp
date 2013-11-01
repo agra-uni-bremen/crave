@@ -125,6 +125,18 @@ BOOST_AUTO_TEST_CASE ( unique_test_2 )
   std::cout << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE ( soft_unique_test )
+{
+  rand_vec<unsigned int> v(NULL);
+  placeholder idx;
+  Generator gen;
+  gen(v().size() == 7);
+  gen(foreach(v(), v()[idx] < 6));
+  gen.soft(unique(v()));
+  BOOST_REQUIRE(gen.next());
+}
+
+
 struct Item4 : public rand_obj {
   Item4() : _i(), v(this) {
     constraint(v().size() == 10);

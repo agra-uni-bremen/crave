@@ -28,15 +28,11 @@ struct VectorSolver {
   typedef std::vector<VariablePtr> VectorElements;
   
   VectorSolver(int vector_id, VariableContainer& vars, SolverPtr& main_solver, bool exact_analyse) 
-  : constraints_(), unique_(false), vector_id_(vector_id), solver_(FactoryMetaSMT::getNewInstance()), vec_elements()
+  : constraints_(), vector_id_(vector_id), solver_(FactoryMetaSMT::getNewInstance()), vec_elements()
   , vcon_(vars), main_solver_(main_solver), exact_analyse_(exact_analyse) {  }
 
-  void addForEach(VectorConstraintPtr vc) {
+  void addConstraint(VectorConstraintPtr vc) {
     constraints_.push_back(vc);
-  }
-
-  void setUnique(bool b) {
-    unique_ =  b;
   }
 
   void reset_solver_(unsigned int const size) {
@@ -53,9 +49,9 @@ struct VectorSolver {
         vec_elements[i] = new VariableExpr(new_var_id(), 1u, true);
     }
 
-    BOOST_FOREACH ( ConstraintPtr constraint, constraints_ ) {
+    BOOST_FOREACH ( VectorConstraintPtr constraint, constraints_ ) {
 
-      if (constraint->is_enabled()) {
+      if (!constraint->is_unique()) {
 
         ReplaceVisitor replacer(vec_elements);
         for (unsigned int i = 0u; i < size; ++i) {
@@ -73,14 +69,15 @@ struct VectorSolver {
           replacer.reset();
         }
       }
+      else {
+        for (uint i = 0; i < vec_elements.size(); i++)
+          for (uint j = i + 1; j < vec_elements.size(); ++j)
+            if (constraint->is_soft())
+              solver_->makeSoftAssertion(*(new NotEqualOpr(vec_elements[i], vec_elements[j])));
+            else   
+              solver_->makeAssertion(*(new NotEqualOpr(vec_elements[i], vec_elements[j])));
+      }
     }
-    
-    if (unique_) {
-      for (uint i = 0; i < vec_elements.size(); i++)
-        for (uint j = i + 1; j < vec_elements.size(); ++j)
-          solver_->makeAssertion(*(new NotEqualOpr(vec_elements[i], vec_elements[j])));
-    }
-    
   }
 
   template<typename Integral>
@@ -98,12 +95,8 @@ struct VectorSolver {
       size = vec.size();
     }
 
-    bool result = false;
     reset_solver_(size);
-
-    if (!result)
-      result = solver_->solve();
-
+    bool result = solver_->solve() ? true : solver_->solve(true);
     if (result) {
       unsigned int i = 0;
       BOOST_FOREACH ( VariablePtr var,
@@ -141,8 +134,7 @@ struct VectorSolver {
   #undef _GEN_VEC
 
 private:
-  ConstraintVector constraints_;
-  bool unique_;
+  std::vector<VectorConstraintPtr> constraints_;
   int vector_id_;
   SolverPtr solver_;
   VectorElements vec_elements;
@@ -163,23 +155,18 @@ struct VectorGenerator {
     int v_id = vc->get_vector_id();
     VectorSolverMap::iterator ite(vector_solvers_.lower_bound(v_id));
     if (ite != vector_solvers_.end() && !(vector_solvers_.key_comp()(v_id, ite->first))) {
-      if (vc->is_unique())
-        ite->second.setUnique(true);
-      else
-        ite->second.addForEach(vc);
+        ite->second.addConstraint(vc);
     } else {
       VectorSolver vs(v_id, vcon_, main_solver_, exact_analyse_);
-      if (vc->is_unique())
-        vs.setUnique(true);
-      else
-        vs.addForEach(vc);
+      vs.addConstraint(vc);
       vector_solvers_.insert( std::make_pair(v_id, vs) );
     }
   }
 
   bool solve_() {
-    BOOST_FOREACH ( VectorSolverMap::value_type& c_pair , vector_solvers_ )
-      if (!c_pair.second.solve_()) return false;
+    BOOST_FOREACH ( VectorSolverMap::value_type& c_pair , vector_solvers_ ) {
+      if (!c_pair.second.solve_()) return false;    
+    }
     return true;
   }
 

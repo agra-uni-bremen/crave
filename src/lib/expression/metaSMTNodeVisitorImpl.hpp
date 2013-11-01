@@ -74,7 +74,7 @@ public:
   virtual bool analyseSofts();
   virtual std::vector<std::vector<unsigned int> > analyseContradiction(
                   std::map<unsigned int, NodePtr > const &);
-  virtual bool solve();
+  virtual bool solve(bool ignoreSofts);
   virtual bool read( Node const& var, AssignResult& );
 
 private: // typedefs
@@ -668,16 +668,19 @@ std::vector<std::vector<unsigned int> > metaSMTVisitorImpl<SolverType>::analyseC
 }
 
 template<typename SolverType>
-bool metaSMTVisitorImpl<SolverType>::solve()
+bool metaSMTVisitorImpl<SolverType>::solve(bool ignoreSofts)
 {
   for (typename std::vector<result_type>::const_iterator ite = assumptions_.begin();
        ite != assumptions_.end(); ++ite) {
     metaSMT::assumption(solver_, *ite);
   }
-  for (typename std::vector<result_type>::const_iterator ite = softs_.begin();
-       ite != softs_.end(); ++ite) {
-    metaSMT::assumption(solver_, *ite);
-  }
+  
+  if (!ignoreSofts) {
+    for (typename std::vector<result_type>::const_iterator ite = softs_.begin();
+         ite != softs_.end(); ++ite) {
+      metaSMT::assumption(solver_, *ite);
+    }
+  }  
 
   bool result = metaSMT::solve(solver_);
 

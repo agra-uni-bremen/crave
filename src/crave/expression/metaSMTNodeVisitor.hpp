@@ -21,7 +21,7 @@ public:
   virtual bool analyseSofts() = 0;
   virtual std::vector<std::vector<unsigned int> > analyseContradiction(
               std::map<unsigned int, NodePtr > const & ) = 0;
-  virtual bool solve() = 0;
+  virtual bool solve(bool ignoreSofts = false) = 0;
   virtual bool read(Node const&, AssignResult&) = 0;
 
   static std::string solver_type;
