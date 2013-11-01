@@ -16,7 +16,6 @@
 #include <stack>
 #include <utility>
 
-
 namespace crave {
   namespace preds = metaSMT::logic;
   namespace qf_bv = metaSMT::logic::QF_BV;
@@ -65,6 +64,8 @@ public:
   virtual void visitShiftRightOpr( ShiftRightOpr const & );
   virtual void visitVectorAccess( VectorAccess const & );
   virtual void visitIfThenElse( IfThenElse const & );
+  virtual void visitForEach( ForEach const & );
+  virtual void visitUnique( Unique const & );
 
 
   virtual void makeAssertion( Node const & );
@@ -210,9 +211,6 @@ void metaSMTVisitorImpl<SolverType>::visitConstant( Constant const &c )
     );
   exprStack_.push( std::make_pair( result, c.sign() ) );
 }
-
-template<typename SolverType>
-void metaSMTVisitorImpl<SolverType>::visitVectorExpr( VectorExpr const &ve ) { }
 
 template<typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitNotOpr( NotOpr const &o )
@@ -570,12 +568,6 @@ void metaSMTVisitorImpl<SolverType>::visitShiftRightOpr( ShiftRightOpr const &o 
 }
 
 template<typename SolverType>
-void metaSMTVisitorImpl<SolverType>::visitVectorAccess( VectorAccess const &o )
-{
-
-}
-
-template<typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitIfThenElse( IfThenElse const &ite )
 {
   stack_entry fst, snd, trd;
@@ -586,6 +578,14 @@ void metaSMTVisitorImpl<SolverType>::visitIfThenElse( IfThenElse const &ite )
 }
 
 
+template<typename SolverType>
+void metaSMTVisitorImpl<SolverType>::visitVectorAccess( VectorAccess const &o ) { throw std::runtime_error("VectorAccess is not allowed in metaSMTNodeVisitor."); }
+template<typename SolverType>
+void metaSMTVisitorImpl<SolverType>::visitVectorExpr( VectorExpr const &ve ) { throw std::runtime_error("VectorExpr is not allowed in metaSMTNodeVisitor."); }
+template<typename SolverType>
+void metaSMTVisitorImpl<SolverType>::visitForEach( ForEach const &fe ) { throw std::runtime_error("ForEach is not allowed in metaSMTNodeVisitor."); }
+template<typename SolverType>
+void metaSMTVisitorImpl<SolverType>::visitUnique( Unique const &u ) { throw std::runtime_error("Unique is not allowed in metaSMTNodeVisitor."); }
 
 template<typename SolverType>
 void metaSMTVisitorImpl<SolverType>::makeAssertion(Node const &expr)

@@ -180,7 +180,7 @@ public:
     constraint(msg_length() > 2);
     constraint(src_addr() != dest_addr());
     constraint(msg().size() == msg_length());
-    constraint.foreach(msg, i_, msg()[i_] >= ' ' && msg()[i_] <= 'z');
+    constraint(foreach(msg(), msg()[i_] >= ' ' && msg()[i_] <= 'z'));
   }
 
   placeholder i_;

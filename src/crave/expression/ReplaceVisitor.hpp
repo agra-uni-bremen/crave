@@ -51,6 +51,8 @@ public:
   virtual void visitShiftRightOpr( ShiftRightOpr const & );
   virtual void visitVectorAccess( VectorAccess const & );
   virtual void visitIfThenElse( IfThenElse const & );
+  virtual void visitForEach( ForEach const & );
+  virtual void visitUnique( Unique const & );
 
   void reset();
   inline bool okay() {

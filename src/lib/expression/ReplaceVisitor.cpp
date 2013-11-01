@@ -336,6 +336,13 @@ void ReplaceVisitor::visitIfThenElse( IfThenElse const& i ) {
   subscript_stack_.push(a_val ? b_val : c_val);
 }
 
+void ReplaceVisitor::visitForEach( ForEach const& fe ) {
+  fe.rhs()->visit(*this);
+}
+
+void ReplaceVisitor::visitUnique( Unique const& u ) { throw std::runtime_error("Unique is not allowed in ReplaceVisitor."); }
+
+
 void ReplaceVisitor::updateResult() {
   result_ = aux_stack_.top();
 }

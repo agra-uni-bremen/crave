@@ -56,7 +56,8 @@ private:
   virtual void visitShiftRightOpr( ShiftRightOpr const & );
   virtual void visitVectorAccess( VectorAccess const & );
   virtual void visitIfThenElse( IfThenElse const & );
-
+  virtual void visitForEach( ForEach const & );
+  virtual void visitUnique( Unique const & );
   void pop(stack_entry&);
   void pop2(stack_entry&, stack_entry&);
   void pop3(stack_entry&, stack_entry&, stack_entry&);

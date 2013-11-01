@@ -22,8 +22,14 @@
 
 namespace crave {
 
-struct Generator;
-typedef Generator DefaultGenerator;
+struct ConstraintBackend {
+  ConstraintVector constraints_;
+  SolverPtr solver_;
+  
+  bool solve() {
+    return false;
+  }
+};
 
 struct Generator {
 
@@ -42,13 +48,25 @@ public:
 
   template<typename Expr>
   Generator & operator()(Expr expr) {
-    constraints_.push_back(constraintManager.makeConstraint(expr, ctx_));
+    constraints_.makeConstraint(expr, ctx_);
     return *this;
   }
 
   template<typename Expr>
   Generator & operator()(std::string constraint_name, Expr expr) {
-    constraints_.push_back(constraintManager.makeConstraint(constraint_name, expr, ctx_));
+    constraints_.makeConstraint(constraint_name, expr, ctx_);
+    return *this;
+  }
+
+  template<typename Expr>
+  Generator & soft(Expr e) {
+    constraints_.makeConstraint(e, ctx_, true);
+    return *this;
+  }
+
+  template<typename Expr>
+  Generator & soft(std::string name, Expr e) {
+    constraints_.makeConstraint(name, e, ctx_, true);
     return *this;
   }
 
@@ -56,7 +74,10 @@ private:
   void build_solver_() {
     BOOST_FOREACH (ConstraintPtr c, constraints_) {
       if (c->is_enabled()) {
-        if (c->is_soft()) {
+        if (c->is_vector_constraint()) {
+          vector_gen_.addConstraint(boost::static_pointer_cast<UserVectorConstraint>(c));
+        }
+        else if (c->is_soft()) {
           solver_->makeSoftAssertion(*c->get_expression());
         } else {
           solver_->makeAssertion(*c->get_expression());
@@ -68,6 +89,7 @@ private:
 public:
   void reset() {
     solver_.reset(FactoryMetaSMT::getNewInstance());
+    vector_gen_.reset();
     build_solver_();
   }
 
@@ -100,17 +122,9 @@ public:
     return str_vec;
   }
 
-  bool enable_constraint(std::string const& name) {
-    return constraints_.enable_constraint(name) || vector_gen_.enable_constraint(name);
-  }
-
-  bool disable_constraint(std::string const& name) {
-    return constraints_.disable_constraint(name) || vector_gen_.disable_constraint(name);
-  }
-
-  bool is_constraint_enabled(std::string const& name) {
-    return constraints_.is_constraint_enabled(name) || vector_gen_.is_constraint_enabled(name);
-  }
+  inline bool enable_constraint(std::string const& name) { return constraints_.enable_constraint(name); }
+  inline bool disable_constraint(std::string const& name) { return constraints_.disable_constraint(name); }
+  inline bool is_constraint_enabled(std::string const& name) { return constraints_.is_constraint_enabled(name); }
 
   void add_pre_hook(boost::function0<bool> f) {
     pre_hooks_.push_back(f);
@@ -122,57 +136,6 @@ public:
   Generator & operator()() {
     if (!next())
       throw std::runtime_error("Generator constraint unsatisfiable.");
-    return *this;
-  }
-
-  template<typename Expr>
-  Generator & soft(Expr e) {
-    constraints_.push_back(constraintManager.makeConstraint(e, ctx_, true));
-    return *this;
-  }
-
-  template<typename Expr>
-  Generator & soft(std::string name, Expr e) {
-    constraints_.push_back(constraintManager.makeConstraint(name, e, ctx_, true));
-    return *this;
-  }
-
-  /**
-   * foreach
-   **/
-  template<typename value_type, typename Expr>
-  Generator & foreach(__rand_vec <value_type> & v,
-                      const placeholder & p, Expr e) {
-    vector_gen_.addForEach(constraintManager.makeConstraint(e, ctx_), v);
-    return *this;
-  }
-
-  template<typename value_type, typename Expr>
-  Generator & soft_foreach(__rand_vec <value_type> & v,
-                           const placeholder & p, Expr e) {
-    vector_gen_.addForEach(constraintManager.makeConstraint(e, ctx_, true), v);
-    return *this;
-  }
-
-  template<typename value_type, typename Expr>
-  Generator & foreach(std::string constraint_name,
-      __rand_vec <value_type> & v, const placeholder & p, Expr e) {
-    vector_gen_.addForEach(constraintManager.makeConstraint(constraint_name, e, ctx_), v);
-    return *this;
-  }
-
-  /**
-   * unique & non_unique
-   **/
-  template<typename value_type>
-  Generator & unique(const __rand_vec <value_type> & v) {
-    vector_gen_.setUnique(v, true);
-    return *this;
-  }
-
-  template<typename value_type>
-  Generator & non_unique(const __rand_vec <value_type> & v) {
-    vector_gen_.setUnique(v, false);
     return *this;
   }
 
@@ -285,17 +248,18 @@ public:
     return results;
   }
 
-  std::ostream& print_dot_graph(std::ostream& os, bool const with_softs = false) {
+  std::ostream& print_dot_graph(std::ostream& os) {
 
     os << "digraph AST {" << std::endl;
     ToDotVisitor visitor(os);
 
     BOOST_FOREACH ( ConstraintPtr c , constraints_ ) {
-      if (c->is_enabled() && (!c->is_soft() || with_softs))
-        c->get_expression()->visit(visitor);
+      long a = reinterpret_cast<long>(&*c);
+      long b = reinterpret_cast<long>(&(*c->get_expression()));
+      os << "\t" << a << " [label=\"" << c->get_name() << (c->is_soft()?" soft":"") << (!c->is_enabled()?" disabled":"") << "\"]" << std::endl;
+      os << "\t" << a << " -> " << b << std::endl; 
+      c->get_expression()->visit(visitor);
     }
-
-    vector_gen_.print_dot_graph(visitor, with_softs);
 
     os << "}" << std::endl;
     return os;

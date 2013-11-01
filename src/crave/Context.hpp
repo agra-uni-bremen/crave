@@ -42,7 +42,8 @@ public:
 
   template<typename value_type>
   result_type operator()(boost::proto::tag::terminal, var_tag<value_type> const & tag) {
-
+    support_vars_.insert(tag.id);   
+    
     std::map<int, result_type>::iterator ite(variables_.lower_bound(tag.id));
     if (ite == variables_.end() || tag.id < ite->first) {
 
@@ -60,6 +61,8 @@ public:
 
   template<typename value_type>
   result_type operator()(boost::proto::tag::terminal, vector_tag<value_type> const & tag) {
+    support_vars_.insert(tag.id);   
+
     std::map<int, result_type>::const_iterator ite = vector_variables_.find(tag.id);
 
     if ( ite != vector_variables_.end() ) {
@@ -75,7 +78,7 @@ public:
   }
 
   result_type operator()(boost::proto::tag::terminal, placeholder_tag const & tag) {
-
+/*
     std::map<int, result_type>::iterator ite(variables_.lower_bound(tag.id));
     if (ite == variables_.end() || tag.id < ite->first) {
 
@@ -86,6 +89,8 @@ public:
     } else {
       return ite->second;
     }
+*/
+    return new Placeholder(tag.id);
   }
 
   template<typename value_type>
@@ -304,11 +309,16 @@ public:
     return new VectorAccess(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this));
   }
 
+  void reset_support_vars() {support_vars_.clear(); }
+  std::set<int>& support_vars() { return support_vars_; }
+
 private:
   std::map<int, result_type>& variables_;
   std::map<int, result_type>& vector_variables_;
   std::vector<ReadRefPair>& read_references_;
   std::vector<WriteRefPair>& write_references_;
+  
+  std::set<int> support_vars_;
 };
 // Context
 

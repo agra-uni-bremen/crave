@@ -335,10 +335,9 @@ void EvalVisitor::visitShiftRightOpr(const ShiftRightOpr& shr)
                                  lhs.second && rhs.second));
 }
 
-void EvalVisitor::visitVectorAccess(const VectorAccess& va)
-{
-
-}
+void EvalVisitor::visitVectorAccess(const VectorAccess& va) { throw std::runtime_error("VectorAccess is not allowed in EvalVisitor."); }
+void EvalVisitor::visitForEach(const ForEach& va) { throw std::runtime_error("ForEach is not allowed in EvalVisitor."); }
+void EvalVisitor::visitUnique(const Unique& va) { throw std::runtime_error("Unique is not allowed in EvalVisitor."); }
 
 void EvalVisitor::visitIfThenElse(const IfThenElse& ite)
 {
