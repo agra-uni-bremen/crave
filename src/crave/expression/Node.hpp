@@ -396,5 +396,22 @@ public:
   void visit( NodeVisitor& v ) const { v.visitUnique(*this); }
 };
 
+class Bitslice : public UnaryExpression {
+public:
+  Bitslice( NodePtr v, int r, int l, int expr_size ) 
+  : UnaryExpression(v), r_(r), l_(l), expr_size_(expr_size) { }
+
+  Bitslice( Bitslice const& b ) 
+  : UnaryExpression(b), r_(b.r_), l_(b.l_), expr_size_(b.expr_size_) { }
+
+  void visit( NodeVisitor& v ) const { v.visitBitslice(*this); }
+
+  int r() const { return r_; }
+  int l() const { return l_; }
+  int expr_size() const { return expr_size_; }
+
+private:
+  int r_, l_, expr_size_;
+};
 
 } // end namespace crave

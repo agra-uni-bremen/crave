@@ -311,6 +311,16 @@ public:
     return new VectorAccess(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this));
   }
 
+  template< typename Integer1, typename Integer2, typename Expr >
+  result_type operator() (boost::proto::tag::function,
+      boost::proto::terminal<operator_bitslice>::type const & tag, 
+      Integer1 const & r, Integer2 const & l, Expr const & e) { 
+      int rb = boost::proto::value(r);
+      int lb = boost::proto::value(l);
+      int es = ExpressionSize()(e);
+      return new Bitslice(boost::proto::eval(e, *this), rb, lb, es);
+  }
+
   void reset_support_vars() {support_vars_.clear(); }
   std::set<int>& support_vars() { return support_vars_; }
 

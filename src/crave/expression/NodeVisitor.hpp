@@ -41,6 +41,7 @@ class OrOpr;
 class XorOpr;
 class ShiftLeftOpr;
 class ShiftRightOpr;
+class Bitslice;
 
 // arithmetic
 class PlusOpr;
@@ -102,6 +103,7 @@ public:
   virtual void visitIfThenElse( IfThenElse const & ) = 0;
   virtual void visitForEach( ForEach const & ) = 0;
   virtual void visitUnique( Unique const & ) = 0;
+  virtual void visitBitslice( Bitslice const & ) = 0;
 };
 
 } // end namespace crave

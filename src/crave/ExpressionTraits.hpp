@@ -45,6 +45,7 @@ namespace crave {
   struct ExpressionSize
   : boost::proto::or_<
     boost::proto::when<BooleanResult, boost::mpl::int_<1>() >
+  , boost::proto::when<boost::proto::function< boost::proto::terminal<operator_bitslice> , boost::proto::_, boost::proto::_, boost::proto::_ > , ExpressionSize(boost::proto::_child_c<3>) >
   , boost::proto::when<boost::proto::terminal<boost::proto::_>, bitsize_traits<boost::proto::_value>() >
   , boost::proto::when<boost::proto::subscript< boost::proto::_, boost::proto::_ >, ExpressionSize(boost::proto::_left) >
   , boost::proto::when<boost::proto::binary_expr< extend_tag,  boost::proto::_, boost::proto::_ >,
@@ -131,6 +132,7 @@ namespace crave {
     , boost::proto::nary_expr< boost::proto::tag::greater_equal, boost::proto::vararg< boost::proto::_> >
     , boost::proto::nary_expr< boost::proto::tag::equal_to, boost::proto::vararg< boost::proto::_> >
     , boost::proto::nary_expr< boost::proto::tag::not_equal_to, boost::proto::vararg< boost::proto::_> >
+    , boost::proto::function< boost::proto::terminal<operator_bitslice> , boost::proto::_, boost::proto::_, boost::proto::_ > 
   > {};
 
   struct IsSigned

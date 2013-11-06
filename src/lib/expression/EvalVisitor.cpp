@@ -350,4 +350,19 @@ void EvalVisitor::visitIfThenElse(const IfThenElse& ite)
     exprStack_.push(c);
 }
 
+void EvalVisitor::visitBitslice(const Bitslice& b)
+{
+  visitUnaryExpr(b);
+
+  stack_entry entry;
+  pop(entry);
+
+  Constant const& child = entry.first;
+  unsigned long v = 0;
+  for (int i = b.l(); i <= b.r(); i++) v |= (1 << i);
+  Constant constant((v & child.value()) >> b.l(), b.r() - b.l() + 1, false);
+  exprStack_.push(std::make_pair(constant, false));
+}
+
+
 } // end namespace crave

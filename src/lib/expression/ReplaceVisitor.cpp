@@ -342,6 +342,15 @@ void ReplaceVisitor::visitForEach( ForEach const& fe ) {
 
 void ReplaceVisitor::visitUnique( Unique const& u ) { throw std::runtime_error("Unique is not allowed in ReplaceVisitor."); }
 
+void ReplaceVisitor::visitBitslice( Bitslice const& b ) {
+  NodePtr child;
+  evalUnaryExpr(b, child);
+  aux_stack_.push(new Bitslice(child, b.r(), b.l(), b.expr_size()));
+  updateResult();
+  int idx = subscript_stack_.top();
+  subscript_stack_.pop();
+  subscript_stack_.push(!idx);
+}
 
 void ReplaceVisitor::updateResult() {
   result_ = aux_stack_.top();

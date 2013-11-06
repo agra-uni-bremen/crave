@@ -53,6 +53,7 @@ public:
   virtual void visitIfThenElse( IfThenElse const & );
   virtual void visitForEach( ForEach const & );
   virtual void visitUnique( Unique const & );
+  virtual void visitBitslice( Bitslice const & );
 
   void reset();
   inline bool okay() {

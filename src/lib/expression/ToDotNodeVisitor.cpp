@@ -207,7 +207,7 @@ void ToDotVisitor::visitAndOpr(AndOpr const &o)
     visitNode(o);
     out_ << " [label=\"";
     visitBinaryOpr(o);
-    out_ << ": and (&&)\"]" << std::endl;
+    out_ << ": and (&)\"]" << std::endl;
   }
   visitBinaryExpr(o);
 }
@@ -219,7 +219,7 @@ void ToDotVisitor::visitOrOpr(OrOpr const &o)
     visitNode(o);
     out_ << " [label=\"";
     visitBinaryOpr(o);
-    out_ << ": or (||)\"]" << std::endl;
+    out_ << ": or (|)\"]" << std::endl;
   }
   visitBinaryExpr(o);
 }
@@ -351,7 +351,7 @@ void ToDotVisitor::visitDevideOpr(DevideOpr const &o)
     visitNode(o);
     out_ << " [label=\"";
     visitBinaryOpr(o);
-    out_ << ": devide (/)\"]" << std::endl;
+    out_ << ": divide (/)\"]" << std::endl;
   }
   visitBinaryExpr(o);
 }
@@ -431,5 +431,16 @@ void ToDotVisitor::visitUnique(Unique const &u)
   }
   visitUnaryExpr(u);
 }
+
+void ToDotVisitor::visitBitslice(Bitslice const &b)
+{
+  if ( putNode(&b) )
+  {
+    visitNode(b);
+    out_ << " [label=\"bitslice (" << b.r() << ":" << b.l() << ") \"]" << std::endl;
+  }
+  visitUnaryExpr(b);
+}
+
 
 } // end crave namespace
