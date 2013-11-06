@@ -175,7 +175,7 @@ BOOST_AUTO_TEST_CASE( Pythagoras )
 
 class ItemPacketBaseConstraint : public rand_obj {
 public:
-  ItemPacketBaseConstraint() : i_(), rand_obj(), msg_length(this), src_addr(this), dest_addr(this), msg(this) {
+  ItemPacketBaseConstraint() : rand_obj(), i_(), src_addr(this), dest_addr(this), msg_length(this), msg(this) {
     constraint(msg_length() < 80);
     constraint(msg_length() > 2);
     constraint(src_addr() != dest_addr());
@@ -251,14 +251,14 @@ BOOST_AUTO_TEST_CASE(one_conflict1)
   ;
 
  BOOST_REQUIRE(!gen.next());
-// gen.analyse_contradiction();
  std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
+ sort_results(result);
  print_vec_vec(std::cout, result);
  std::cout << std::endl;
- //sort_results(result);
 
  BOOST_REQUIRE_EQUAL(result.size(), 1);
  std::vector<std::string> expected = list_of ("a")("b")("c");
+ std::sort(result[0].begin(), result[0].end());
  BOOST_REQUIRE_EQUAL_COLLECTIONS( result[0].begin(), result[0].end(), expected.begin(), expected.end());
 
 }
@@ -275,15 +275,14 @@ BOOST_AUTO_TEST_CASE(one_conflict2)
  ;
 
  BOOST_REQUIRE(!gen.next());
- //gen.analyse_contradiction();
  std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
-
+ sort_results(result);
  print_vec_vec(std::cout, result);
  std::cout << std::endl;
- //sort_results(result);
 
  BOOST_REQUIRE_EQUAL(result.size(), 1);
  std::vector<std::string> expected = list_of ("a")("b");
+ std::sort(result[0].begin(), result[0].end());
  BOOST_REQUIRE_EQUAL_COLLECTIONS( result[0].begin(), result[0].end(), expected.begin(), expected.end());
 
 }
@@ -302,11 +301,10 @@ BOOST_AUTO_TEST_CASE(two_conflicts1)
  ;
 
  BOOST_REQUIRE(!gen.next());
- //gen.analyse_contradiction();
  std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
+ sort_results(result);
  print_vec_vec(std::cout, result);
  std::cout << std::endl;
- //sort_results(result);
 
  std::vector<std::string> expected;
  expected = list_of ("a")("b");
@@ -338,11 +336,8 @@ BOOST_AUTO_TEST_CASE(two_conflicts2)
     ;
 
   BOOST_REQUIRE(!gen.next());
-  //gen.analyse_contradiction();
   std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
-
   sort_results(result);
-
   print_vec_vec(std::cout, result);
   std::cout << std::endl;
 
@@ -375,11 +370,9 @@ BOOST_AUTO_TEST_CASE(two_conflicts3)
 
  BOOST_REQUIRE(!gen.next());
  std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
-
+ sort_results(result);
  print_vec_vec(std::cout, result);
  std::cout << std::endl;
-
- sort_results(result);
 
  BOOST_REQUIRE_EQUAL(result.size(), 2);
  BOOST_REQUIRE_EQUAL(result[0].size(), 2);
@@ -409,19 +402,16 @@ BOOST_AUTO_TEST_CASE(conflict_with_softs_t1)
 
   BOOST_CHECK(gen.next());
 
-  std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
-
-  print_vec_vec(std::cout, result);
+  std::vector<std::string> result = gen.get_inactive_softs();
+  std::sort(result.begin(), result.end());
+  print_vec(std::cout, result);
   std::cout << std::endl;
 
-  sort_results(result);
-
   BOOST_REQUIRE_EQUAL(result.size(), 1);
-  BOOST_CHECK_EQUAL(result[0].size(), 2);
 
   std::vector<std::string> expected;
-  expected = list_of ("c3")("c4");
-  BOOST_REQUIRE_EQUAL_COLLECTIONS( result[0].begin(), result[0].end(), expected.begin(), expected.end());
+  expected = list_of ("c4");
+  BOOST_REQUIRE_EQUAL_COLLECTIONS( result.begin(), result.end(), expected.begin(), expected.end());
 }
 
 BOOST_AUTO_TEST_CASE(conflict_with_softs_t2)
@@ -439,33 +429,14 @@ BOOST_AUTO_TEST_CASE(conflict_with_softs_t2)
 
   BOOST_REQUIRE(gen.next());
 
-  std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
-
-  print_vec_vec(std::cout, result);
+  std::vector<std::string> result = gen.get_inactive_softs();
+  std::sort(result.begin(), result.end());
+  print_vec(std::cout, result);
   std::cout << std::endl;
 
-  sort_results(result);
-
-  BOOST_CHECK_EQUAL(result.size(), 3);
-  BOOST_CHECK_EQUAL(result[0].size(), 3);
-  BOOST_CHECK_EQUAL(result[1].size(), 3);
-  BOOST_CHECK_EQUAL(result[2].size(), 3);
-
   std::vector<std::string> expected;
-  expected = list_of("h1")("h3")("s4");
-  BOOST_CHECK_EQUAL_COLLECTIONS( result[0].begin(), result[0].end(), expected.begin(), expected.end());
-  expected = list_of("h1")("s2")("s4");
-  BOOST_CHECK_EQUAL_COLLECTIONS( result[1].begin(), result[1].end(), expected.begin(), expected.end());
-  expected = list_of("s1")("s2")("s3");
-  BOOST_CHECK_EQUAL_COLLECTIONS( result[2].begin(), result[2].end(), expected.begin(), expected.end());
-
-  result[0] = gen.get_enabled_softs();
-
-  BOOST_FOREACH (std::string str, result[0])
-    std::cout << str << " "; std::cout << std::endl;
-
-  expected = list_of("s1")("s2");
-  BOOST_CHECK_EQUAL_COLLECTIONS( result[0].begin(), result[0].end(), expected.begin(), expected.end());
+  expected = list_of("s1")("s4");
+  BOOST_CHECK_EQUAL_COLLECTIONS( result.begin(), result.end(), expected.begin(), expected.end());
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Context

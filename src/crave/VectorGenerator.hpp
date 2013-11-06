@@ -1,10 +1,8 @@
 #pragma once
 
-#include "UserConstraint.hpp"
-#include "VariableContainer.hpp"
 #include "VectorConstraint.hpp"
+#include "VariableGenerator.hpp"
 #include "expression/ReplaceVisitor.hpp"
-#include "expression/ToDotNodeVisitor.hpp"
 #include "expression/FactoryMetaSMT.hpp"
 #include "expression/Node.hpp"
 
@@ -27,9 +25,9 @@ struct VectorSolver {
   typedef boost::intrusive_ptr<VariableExpr> VariablePtr;
   typedef std::vector<VariablePtr> VectorElements;
   
-  VectorSolver(int vector_id, VariableContainer& vars, SolverPtr& main_solver, bool exact_analyse) 
-  : constraints_(), vector_id_(vector_id), solver_(FactoryMetaSMT::getNewInstance()), vec_elements()
-  , vcon_(vars), main_solver_(main_solver), exact_analyse_(exact_analyse) {  }
+  VectorSolver(int vector_id, VariableGenerator& var_gen) 
+  : constraints_(), vector_id_(vector_id), solver_(FactoryMetaSMT::getNewInstance())
+  , vec_elements(), var_gen_(var_gen) {  }
 
   void addConstraint(VectorConstraintPtr vc) {
     constraints_.push_back(vc);
@@ -86,17 +84,12 @@ struct VectorSolver {
 
     // get size of vector
     unsigned int size;
-    if (vcon_.variables.find(vec().size().id()) != vcon_.variables.end()) {
-      AssignResultImpl<unsigned int> ar_size;
-      main_solver_->read(*vcon_.variables[vec().size().id()], ar_size);
-      size = ar_size.value();
-      vec.resize(size);
-    } else {
+    if (!var_gen_.read(vec().size(), size)) 
       size = vec.size();
-    }
+    vec.resize(size);
 
     reset_solver_(size);
-    bool result = solver_->solve() ? true : solver_->solve(true);
+    bool result = solver_->solve(false) ? true : solver_->solve(true);
     if (result) {
       unsigned int i = 0;
       BOOST_FOREACH ( VariablePtr var,
@@ -139,44 +132,45 @@ private:
   SolverPtr solver_;
   VectorElements vec_elements;
 
-  VariableContainer& vcon_;
-  SolverPtr& main_solver_;
-  bool const exact_analyse_;
+  VariableGenerator& var_gen_;
 };
 
 struct VectorGenerator {
 
   typedef std::map<int, VectorSolver> VectorSolverMap;
   
-  VectorGenerator( VariableContainer& vars, SolverPtr& main_solver, bool exact_analyse) 
-  : vector_solvers_(), vcon_(vars), main_solver_(main_solver), exact_analyse_(exact_analyse) {  }
+  VectorGenerator(VariableGenerator& var_gen) 
+  : vector_solvers_(), var_gen_(var_gen) {  }
 
-  void addConstraint(VectorConstraintPtr vc) {
-    int v_id = vc->get_vector_id();
-    VectorSolverMap::iterator ite(vector_solvers_.lower_bound(v_id));
-    if (ite != vector_solvers_.end() && !(vector_solvers_.key_comp()(v_id, ite->first))) {
-        ite->second.addConstraint(vc);
-    } else {
-      VectorSolver vs(v_id, vcon_, main_solver_, exact_analyse_);
-      vs.addConstraint(vc);
-      vector_solvers_.insert( std::make_pair(v_id, vs) );
-    }
-  }
-
-  bool solve_() {
+  bool solve() {
     BOOST_FOREACH ( VectorSolverMap::value_type& c_pair , vector_solvers_ ) {
       if (!c_pair.second.solve_()) return false;    
     }
     return true;
   }
 
-  void reset() { vector_solvers_.clear(); }
+  void reset(std::vector<VectorConstraintPtr>& v) { 
+    vector_solvers_.clear(); 
+    BOOST_FOREACH(VectorConstraintPtr vc, v) 
+      addConstraint(vc);
+  }
+
+private:
+  void addConstraint(VectorConstraintPtr vc) {
+    int v_id = vc->get_vector_id();
+    VectorSolverMap::iterator ite(vector_solvers_.lower_bound(v_id));
+    if (ite != vector_solvers_.end() && !(vector_solvers_.key_comp()(v_id, ite->first))) {
+        ite->second.addConstraint(vc);
+    } else {
+      VectorSolver vs(v_id, var_gen_);
+      vs.addConstraint(vc);
+      vector_solvers_.insert( std::make_pair(v_id, vs) );
+    }
+  }
 
 private:
   VectorSolverMap vector_solvers_;
-  VariableContainer& vcon_;
-  SolverPtr& main_solver_;
-  bool const exact_analyse_;
+  VariableGenerator& var_gen_;
 };
 
 } // namespace crave

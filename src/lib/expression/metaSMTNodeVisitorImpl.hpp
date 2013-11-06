@@ -71,7 +71,7 @@ public:
   virtual void makeAssertion( Node const & );
   virtual void makeSoftAssertion( Node const & );
   virtual void makeAssumption( Node const & );
-  virtual bool analyseSofts();
+  virtual std::vector<unsigned int> analyseSofts(bool exact);
   virtual std::vector<std::vector<unsigned int> > analyseContradiction(
                   std::map<unsigned int, NodePtr > const &);
   virtual bool solve(bool ignoreSofts);
@@ -624,22 +624,32 @@ void metaSMTVisitorImpl<SolverType>::makeAssumption(Node const &expr)
 }
 
 template<typename SolverType>
-bool metaSMTVisitorImpl<SolverType>::analyseSofts()
+std::vector<unsigned int> metaSMTVisitorImpl<SolverType>::analyseSofts(bool exact)
 {
-  bool result;
-  for (int i = softs_.size(); 0 < i; --i) {
-    for (typename std::vector<result_type>::const_iterator ite = assumptions_.begin();
-         ite != assumptions_.end(); ++ite) {
-      metaSMT::assumption(solver_, *ite);
+  std::vector<unsigned int> result;
+/*
+    // minimize the number of soft constraints to be deactivated
+    for (int i = softs_.size(); 0 < i; --i) {
+      metaSMT::assumption(solver_,
+                          preds::And(metaSMT::cardinality_eq(solver_, softs_, i),
+                                     metaSMT::evaluate(solver_, preds::True)));
+      if (metaSMT::solve(solver_)) {
+      }
     }
-    metaSMT::assumption(solver_,
-                        preds::And(metaSMT::cardinality_eq(solver_, softs_, i),
-                                   metaSMT::evaluate(solver_, preds::True)));
-
-    result = metaSMT::solve(solver_);
-    if (result)
-      break;
+*/
+  // implements soft constraint semantics of the HVL e
+  for (unsigned int i = 0; i < softs_.size(); i++) {
+    metaSMT::assumption(solver_, preds::equal(softs_[i], preds::True));
+    if (metaSMT::solve(solver_)) {
+      // accept
+      metaSMT::assertion(solver_, preds::equal(softs_[i], preds::True));
+    }
+    else {
+      // reject
+      result.push_back(i);
+    }
   }
+  softs_.clear();
   return result;
 }
 

@@ -4,8 +4,6 @@
 #include "UserConstraint.hpp"
 #include "VariableContainer.hpp"
 #include "VectorGenerator.hpp"
-#include "expression/ToDotNodeVisitor.hpp"
-#include "expression/FactoryMetaSMT.hpp"
 #include "expression/Node.hpp"
 
 #include <boost/foreach.hpp>
@@ -22,266 +20,114 @@
 
 namespace crave {
 
-struct ConstraintBackend {
-//  ConstraintVector constraints_;
-  SolverPtr solver_;
-  
-  bool solve() {
-    return false;
-  }
-};
-
 struct Generator {
 
 public:
   Generator()
-  : constraints_(), vcon_(crave::variables), pre_hooks_(),
-    ctx_(vcon_), solver_(FactoryMetaSMT::getNewInstance()), exact_analyse_(false), vector_gen_(vcon_, solver_, exact_analyse_) {
+  : pre_hooks_(), constr_mng_(), vcon_(crave::variables), ctx_(vcon_)
+  , var_gen_(vcon_)
+  , vec_gen_(var_gen_) {
   }
 
   template<typename Expr>
   Generator(Expr expr)
-  : constraints_(), vcon_(crave::variables), pre_hooks_(),
-    ctx_(vcon_), solver_(FactoryMetaSMT::getNewInstance()), exact_analyse_(false), vector_gen_(vcon_, solver_, exact_analyse_) {
-      (*this)(expr);
-    }
+  : pre_hooks_(), constr_mng_(), vcon_(crave::variables), ctx_(vcon_) 
+  , var_gen_(vcon_)
+  , vec_gen_(var_gen_) {
+    (*this)(expr);
+  }
 
   template<typename Expr>
   Generator & operator()(Expr expr) {
-    constraints_.makeConstraint(expr, ctx_);
+    constr_mng_.makeConstraint(expr, ctx_);
     return *this;
   }
 
   template<typename Expr>
   Generator & operator()(std::string constraint_name, Expr expr) {
-    constraints_.makeConstraint(constraint_name, expr, ctx_);
+    constr_mng_.makeConstraint(constraint_name, expr, ctx_);
     return *this;
   }
 
   template<typename Expr>
   Generator & soft(Expr e) {
-    constraints_.makeConstraint(e, ctx_, true);
+    constr_mng_.makeConstraint(e, ctx_, true);
     return *this;
   }
 
   template<typename Expr>
   Generator & soft(std::string name, Expr e) {
-    constraints_.makeConstraint(name, e, ctx_, true);
+    constr_mng_.makeConstraint(name, e, ctx_, true);
     return *this;
   }
 
-private:
-  void build_solver_() {
-    BOOST_FOREACH (ConstraintPtr c, constraints_) {
-      if (c->is_enabled()) {
-        if (c->is_vector_constraint()) {
-          vector_gen_.addConstraint(boost::static_pointer_cast<UserVectorConstraint>(c));
-        }
-        else if (c->is_soft()) {
-          solver_->makeSoftAssertion(*c->get_expression());
-        } else {
-          solver_->makeAssertion(*c->get_expression());
-        }
-      }
-    }
-  }
-
-public:
-  void reset() {
-    solver_.reset(FactoryMetaSMT::getNewInstance());
-    vector_gen_.reset();
-    build_solver_();
-  }
-
-  std::vector<std::vector<std::string> > analyse_contradiction() {
-
-    boost::scoped_ptr<metaSMTVisitor> solver(FactoryMetaSMT::getNewInstance());
-    std::vector<std::vector<std::string> > str_vec;
-
-    std::map<unsigned int, NodePtr> s;
-    std::vector<std::string> out;
-    std::vector<std::vector<unsigned int> > results;
-
-    BOOST_FOREACH(ConstraintPtr c, constraints_)
-    {
-      s.insert(std::make_pair(s.size(), c->get_expression()));
-      out.push_back(c->get_name());
-    }
-
-    results = solver->analyseContradiction(s);
-
-    BOOST_FOREACH(std::vector<unsigned int> result, results)
-    {
-      std::vector<std::string> vec;
-      BOOST_FOREACH(unsigned int i, result)
-      {
-        vec.push_back(out[i]);
-      }
-      str_vec.push_back(vec);
-    }
-    return str_vec;
-  }
-
-  inline bool enable_constraint(std::string const& name) { return constraints_.enable_constraint(name); }
-  inline bool disable_constraint(std::string const& name) { return constraints_.disable_constraint(name); }
-  inline bool is_constraint_enabled(std::string const& name) { return constraints_.is_constraint_enabled(name); }
+  inline bool enable_constraint(std::string const& name) { return constr_mng_.enable_constraint(name); }
+  inline bool disable_constraint(std::string const& name) { return constr_mng_.disable_constraint(name); }
+  inline bool is_constraint_enabled(std::string const& name) { return constr_mng_.is_constraint_enabled(name); }
 
   void add_pre_hook(boost::function0<bool> f) {
     pre_hooks_.push_back(f);
   }
 
-  /**
-   * generate a new assignment
-   **/
   Generator & operator()() {
     if (!next())
       throw std::runtime_error("Generator constraint unsatisfiable.");
     return *this;
   }
 
-private:
-  bool pre_solve_() {
+  void reset() {
+    constr_mng_.partition();
+    var_gen_.reset(constr_mng_.get_partitions());
+    vec_gen_.reset(constr_mng_.get_vector_constraints());
+  }
+
+  bool next() {
     BOOST_FOREACH(boost::function0<bool> f, pre_hooks_)
       if (!f())
         return false;
-
-    BOOST_FOREACH(VariableContainer::ReadRefPair pair, vcon_.read_references)
-      solver_->makeAssumption(*pair.second->expr());
-
-    return true;
-  }
-
-  // analyse_softconstraints_ analyse the soft constraints and disable conflicting ones
-  bool analyse_softconstraints_(bool const exactAnalyse) {
-
-    if (!pre_solve_())
-      return false;
-
-    if (exactAnalyse) {
-
-      if (!solver_->analyseSofts())
-        return false;
-
-      // get solvable softs
-      return true;
-    }
-
-    if (solver_->solve())
-      return true;
-
-    if (!constraints_.has_soft())
-      return false;
-
-    BOOST_FOREACH (ConstraintPtr c, constraints_)
-      if (c->is_soft() && c->is_enabled())
-        c->disable();
-
-    reset();
-    constraints_.set_synced();
-    bool result = pre_solve_() && solver_->solve();
-
-    if (!result)
-      return false;
-
-    BOOST_FOREACH (ConstraintPtr c, constraints_) {
-      if (c->is_soft()) {
-
-        c->enable();
-        reset();
-        constraints_.set_synced();
-
-        bool enable = solver_->solve();
-        result |= enable;
-        if (!enable)
-          c->disable();
-      }
-    }
-
-    return result;
-  }
-
-  bool solve_() {
-
-    bool result = false;
-    if (constraints_.is_changed()) {
+    if (constr_mng_.is_changed()) {
       reset();
-      constraints_.set_synced();
-
-      result = analyse_softconstraints_(exact_analyse_);
+      constr_mng_.set_synced();
     }
-
-    if (!result && pre_solve_())
-      result = solver_->solve();
-
-    if (result) {
-      BOOST_FOREACH(VariableContainer::WriteRefPair pair, vcon_.write_references) {
-        solver_->read(*vcon_.variables[pair.first], *pair.second);
-      }
-    }
-    return result;
+    return var_gen_.solve() && vec_gen_.solve();
   }
 
-public:
-  bool next() {
-    return solve_() && vector_gen_.solve_();
+  inline std::ostream& print_dot_graph(std::ostream& os) { 
+    return constr_mng_.print_dot_graph(os);  
   }
 
-  /**
-   * read variable "var"
-   **/
+  inline std::vector<std::vector<std::string> > analyse_contradiction() {
+    return var_gen_.analyse_contradiction();
+  }
+
+  inline std::vector<std::string> get_inactive_softs() {
+    return var_gen_.get_inactive_softs();
+  }
+
   template<typename T>
   T operator[](Variable<T> const &var) {
-
-    AssignResultImpl<T> result;
-    solver_->read(*vcon_.variables[var.id()], result);
-    return result.value();
-  }
-
-  std::vector<std::string> get_enabled_softs() const {
-
-    std::vector<std::string> results;
-
-    BOOST_FOREACH (ConstraintPtr c, constraints_)
-      if (c->is_enabled() && c->is_soft())
-        results.push_back(c->get_name());
-
-    return results;
-  }
-
-  std::ostream& print_dot_graph(std::ostream& os) {
-
-    os << "digraph AST {" << std::endl;
-    ToDotVisitor visitor(os);
-
-    BOOST_FOREACH ( ConstraintPtr c , constraints_ ) {
-      long a = reinterpret_cast<long>(&*c);
-      long b = reinterpret_cast<long>(&(*c->get_expression()));
-      os << "\t" << a << " [label=\"" << c->get_name() << (c->is_soft()?" soft":"") << (!c->is_enabled()?" disabled":"") << "\"]" << std::endl;
-      os << "\t" << a << " -> " << b << std::endl; 
-      c->get_expression()->visit(visitor);
+    T result;
+    if (!var_gen_.read(var, result)) {
+      throw std::runtime_error("Invalid variable read request.");
     }
-
-    os << "}" << std::endl;
-    return os;
-  }
+    return result;
+  }  
 
 private:
+  std::vector<boost::function0<bool> > pre_hooks_;
+
   // constraints
-  ConstraintSet constraints_;
+  ConstraintManager constr_mng_;
 
   // variables
   VariableContainer& vcon_;
-  std::vector<boost::function0<bool> > pre_hooks_;
 
-  // solver
+  // context
   Context ctx_;
-  SolverPtr solver_;
 
-  // auxiliary variables
-  bool const exact_analyse_;
-
-  // vectors
-  VectorGenerator vector_gen_;
+  // solvers
+  VariableGenerator var_gen_;
+  VectorGenerator vec_gen_;
 };
 
 } // namespace crave

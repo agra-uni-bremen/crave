@@ -95,6 +95,7 @@ public:
 
   template<typename value_type>
   result_type operator()(boost::proto::tag::terminal t, write_ref_tag<value_type> const & ref) {
+    support_vars_.insert(ref.id);   
 
     std::map<int, result_type>::const_iterator ite = variables_.find(ref.id);
     if ( ite != variables_.end() ) {
@@ -238,6 +239,7 @@ public:
 
   template<typename Integer>
   result_type operator()(boost::proto::tag::terminal t, read_ref_tag<Integer> const & ref) {
+    support_vars_.insert(ref.id);   
 
     std::map<int, result_type>::const_iterator ite = variables_.find(ref.id);
     if ( ite != variables_.end() ) {
