@@ -1,5 +1,9 @@
 #include <ctime>
 
+#include <boost/filesystem.hpp>
+
+#include <glog/logging.h>
+
 #include "../crave/expression/FactoryMetaSMT.hpp"
 #include "../crave/ConstrainedRandom.hpp"
 #include "../crave/Settings.hpp"
@@ -35,7 +39,18 @@ namespace crave {
     // set global seed
     set_global_seed(0);
 
+    // initalize glog
     LoggerSetting settings(cfg_file);
+    fLS::FLAGS_log_dir = settings.dirname();
+    fLI::FLAGS_max_log_size = settings.filesize();
+    fLB::FLAGS_logtostderr = false;
+
+    namespace fs = boost::filesystem;
+    fs::path fs_log_dir(settings.dirname());
+    if (!fs::exists(fs_log_dir))
+      fs::create_directory(fs_log_dir);
+
+    google::InitGoogleLogging(settings.filename().c_str());
 
     settings.save(cfg_file);
   }

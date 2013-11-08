@@ -30,7 +30,7 @@ SET( CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING
 
 set(Boost_NO_SYSTEM_PATHS true)
 set(Boost_ADDITIONAL_VERSIONS "1.50.0")
-find_package ( Boost REQUIRED COMPONENTS system thread)
+find_package ( Boost REQUIRED COMPONENTS system thread filesystem )
 
 find_package ( metaSMT REQUIRED )
 add_definitions( "${metaSMT_CXXFLAGS}" )
