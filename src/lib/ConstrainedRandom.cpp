@@ -11,7 +11,7 @@
 namespace crave {
 
   int new_var_id() { static int var_ID=0; return ++var_ID;}
-  
+
   int new_constraint_id() { static int constraint_ID=0; return ++constraint_ID; }
 
   boost::mt19937 rng(std::time(0));
@@ -19,7 +19,7 @@ namespace crave {
   void set_global_seed(unsigned int s) { rng.seed(s); };
 
   struct random_bit_gen {
-    random_bit_gen() : rnd(0, 1) {}
+    random_bit_gen() : rnd(0, 1) { }
 
     bool operator() () {
       return rnd(rng);
@@ -50,7 +50,11 @@ namespace crave {
     if (!fs::exists(fs_log_dir))
       fs::create_directory(fs_log_dir);
 
-    google::InitGoogleLogging(settings.filename().c_str());
+    static bool initialized = false;
+    if (!initialized) {
+      google::InitGoogleLogging(settings.filename().c_str());
+      initialized = true;
+    }
 
     settings.save(cfg_file);
   }

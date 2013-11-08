@@ -11,6 +11,8 @@
 #include <boost/fusion/adapted/std_pair.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include <glog/logging.h>
+
 #include <ostream>
 #include <string>
 #include <vector>
@@ -145,7 +147,7 @@ struct ConstraintPartition {
     os << "[ ";
     BOOST_FOREACH (ConstraintPtr c, cp) {
       os << c->get_name() << " ";
-    }      
+    }
     os << "]";
     os << std::flush;
     return os;
@@ -176,36 +178,37 @@ struct ConstraintManager {
   }
 
   bool enable_constraint(std::string const& key) {
-    std::clog << "Enable constraint " << key << " in set " << id_ << ": ";
+
+    LOG(INFO) << "Enable constraint " << key << " in set " << id_ << ": ";
     ConstraintMap::iterator ite = cMap_.find(key);
     if (ite != cMap_.end()) {
       if (!ite->second->is_enabled()) {
-        std::clog << "ok" << std::endl;
+        LOG(INFO) << "ok" << std::endl;
         ite->second->enable();
         changed_ = true;
       }
       else
-        std::clog << "already enabled" << std::endl;
+        LOG(INFO) << "already enabled" << std::endl;
       return true;
     }
-    std::clog << "not found" << std::endl;
+    LOG(INFO) << "not found" << std::endl;
     return false;
   }
 
   bool disable_constraint(std::string const& key) {
-    std::clog << "Disable constraint " << key << " in set " << id_ << ": ";
+    LOG(INFO) << "Disable constraint " << key << " in set " << id_ << ": ";
     ConstraintMap::iterator ite = cMap_.find(key);
     if (ite != cMap_.end()) {
       if (ite->second->is_enabled()) {
-        std::clog << "ok" << std::endl;
+        LOG(INFO) << "ok" << std::endl;
         ite->second->disable();
         changed_ = true;
       }
       else
-        std::clog << "already enabled" << std::endl;
+        LOG(INFO) << "already enabled" << std::endl;
       return true;
     }
-    std::clog << "not found" << std::endl;
+    LOG(INFO) << "not found" << std::endl;
     return false;
   }
 
@@ -226,8 +229,8 @@ struct ConstraintManager {
   ConstraintPtr makeConstraint(std::string const& name, int c_id, Expr e, Context& ctx,
                                      bool const soft = false) {
 
-    std::clog << "New " << (soft?"soft ":"") << "constraint " << name << " in set " << id_ << std::endl;
-                                     
+    LOG(INFO) << "New " << (soft?"soft ":"") << "constraint " << name << " in set " << id_ << std::endl;
+
     if (cMap_.find(name) != cMap_.end()) 
       throw std::runtime_error("Constraint already exists.");
 
@@ -241,7 +244,7 @@ struct ConstraintManager {
         ? new UserVectorConstraint(c_id, n, name, ctx.support_vars(), true, soft)
         : new UserConstraint(c_id, n, name, ctx.support_vars(), soft))
     );
-    
+
     changed_ = true;
     constraints_.push_back(c);
 
@@ -280,7 +283,7 @@ struct ConstraintManager {
   void partition() {
     partitions_.clear();
     vec_constraints_.clear();
-     
+
     std::list<ConstraintPtr> tmp;
     BOOST_FOREACH (ConstraintPtr c, constraints_) {
       if (c->is_enabled()) {
@@ -289,35 +292,35 @@ struct ConstraintManager {
         else 
           tmp.push_back(c);
       }
-    } 
-    
+    }
+
     while (!tmp.empty()) {
       ConstraintPartition cp;
       maximize_partition(cp, tmp);
       partitions_.push_back(cp);
-    }      
-    
-    std::clog << "Partition results of set " << id_ << ": " << std::endl;
+    }
 
-    std::clog << "  " << vec_constraints_.size() << " vector constraint(s):";
+    LOG(INFO) << "Partition results of set " << id_ << ": " << std::endl;
+
+    LOG(INFO) << "  " << vec_constraints_.size() << " vector constraint(s):";
     BOOST_FOREACH (VectorConstraintPtr c, vec_constraints_) {
-      std::clog << " " << c->get_name();
-    }      
-    std::clog << std::endl;
-    
-    std::clog << "  " << partitions_.size() << " constraint partition(s):" << std::endl; 
+      LOG(INFO) << " " << c->get_name();
+    }
+    LOG(INFO) << std::endl;
+
+    LOG(INFO) << "  " << partitions_.size() << " constraint partition(s):" << std::endl;
     uint cnt = 0;
     BOOST_FOREACH (ConstraintPartition& cp, partitions_) {
-      std::clog << "    #" << ++cnt << ": ";
-      std::clog << cp << std::endl;
+      LOG(INFO) << "    #" << ++cnt << ": ";
+      LOG(INFO) << cp << std::endl;
     }
-  }  
-  
+  }
+
   inline std::vector<ConstraintPartition>& get_partitions() { return partitions_; }
   inline std::vector<VectorConstraintPtr>& get_vector_constraints() { 
     return vec_constraints_; 
   }
-  
+
 private:
   void maximize_partition(ConstraintPartition& cp, std::list<ConstraintPtr>& lc) {
     ConstraintPtr c = lc.front();
