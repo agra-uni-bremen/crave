@@ -29,6 +29,20 @@ namespace crave {
     FactoryMetaSMT::setSolverType(type);
   }
 
+  void init() {
+
+    // set global seed
+    set_global_seed(0);
+
+  }
+
+  void init(std::string const& solver_type) {
+    // set solver backend
+    FactoryMetaSMT::setSolverType(solver_type);
+
+    init();
+  }
+
 } // namespace crave
 
 // vim: tabstop=2 shiftwidth=2 expandtab
