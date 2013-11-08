@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Context.hpp"
-#include "Logger.hpp"
 #include "UserConstraint.hpp"
 #include "VariableContainer.hpp"
 #include "VectorGenerator.hpp"
@@ -316,7 +315,6 @@ private:
 
   // auxiliary variables
   bool const exact_analyse_;
-  Logger logger_;
 
   // vectors
   VectorGenerator vector_gen_;
