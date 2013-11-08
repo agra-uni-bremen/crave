@@ -17,9 +17,12 @@ BOOST_FIXTURE_TEST_SUITE(Distribution_t, Context_Fixture )
 BOOST_AUTO_TEST_CASE ( randv_dist_t1 )
 {
   randv<int> v(NULL);
-  v.addRange(0, 10);
-  v.addRange(50, 75);
-  v.addRange(100, 200);
+  v.dist(
+    distribution<int>::create
+      (weighted_range<int>(0, 10))
+      (weighted_range<int>(50, 75))
+      (weighted_range<int>(100, 200))
+  );
 
   std::map<int, int> s;
   int total = 500000;
@@ -42,17 +45,25 @@ BOOST_AUTO_TEST_CASE ( randv_dist_t1 )
 BOOST_AUTO_TEST_CASE ( randv_dist_t2 )
 {
   randv<int> v(NULL);
-  v.addRange(0, 10);
-  v.addRange(50, 75);
-  BOOST_CHECK_THROW ( v.addRange(30, 51), std::runtime_error );
+  BOOST_CHECK_THROW ( 
+    v.dist(
+      distribution<int>::create
+        (weighted_range<int>(0, 10))
+        (weighted_range<int>(50, 75))
+        (weighted_range<int>(30, 51))
+    )
+  , std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE ( randv_dist_t3 )
 {
   randv<char> v(NULL);
-  v.addWeightedRange(1, 5, 50);
-  v.addWeightedRange(10, 20, 20);
-  v.addWeightedRange(-50, -50, 30);
+  v.dist(
+    distribution<char>::create
+      (weighted_range<char>(1, 5, 50))
+      (weighted_range<char>(10, 20, 20))
+      (weighted_range<char>(-50, -50, 30))
+  );
   int cnt1 = 0, cnt2 = 0, cnt3 = 0;
   int total = 500000;
   for (int i = 0; i < total; i++) {
@@ -70,11 +81,13 @@ BOOST_AUTO_TEST_CASE ( randv_dist_t3 )
 BOOST_AUTO_TEST_CASE ( randv_dist_t4 )
 {
   randv<int> v(NULL);
-  v.addRange(0, 10);
-  v.addRange(50, 75);
-  v.addRange(100, 200);
-  v.resetDistribution();
-  v.addRange(5000, 6000);
+  v.dist(
+    distribution<int>::create
+      (weighted_range<int>(0, 10))
+      (weighted_range<int>(50, 75))
+      (weighted_range<int>(100, 200))
+  );
+  v.range(5000, 6000);
   int total = 100000;
   for (int i = 0; i < total; i++) {
     BOOST_REQUIRE(v.next());

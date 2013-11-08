@@ -3,7 +3,7 @@
 #include "Context.hpp"
 #include "ConstrainedRandom.hpp"
 #include "expression/Node.hpp"
-#include "expression/ReplaceVisitor.hpp"
+#include "expression/ToDotNodeVisitor.hpp"
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/shared_ptr.hpp>
@@ -14,6 +14,7 @@
 #include <ostream>
 #include <string>
 #include <vector>
+#include <list>
 #include <stdexcept>
 
 namespace crave {
@@ -21,23 +22,32 @@ namespace crave {
 int new_constraint_id();
 
 struct ConstraintManager;
+
 struct UserConstraint;
 typedef boost::shared_ptr<UserConstraint> ConstraintPtr;
+typedef std::list<ConstraintPtr> ConstraintList;
+
+struct UserVectorConstraint;
+typedef boost::shared_ptr<UserVectorConstraint> VectorConstraintPtr;
 
 struct UserConstraint {
-
   friend struct ConstraintManager;
 
   typedef NodePtr expression;
 
-private:
-  UserConstraint(unsigned const id, expression const expr, std::string const& name, bool const soft = false, bool const enabled = true)
-  : expr_(expr), name_(name), soft_(soft), enabled_(enabled) { }
+protected:
+  UserConstraint(unsigned const id, expression const expr, std::string const& name, std::set<int> & support_vars, bool const soft = false, bool const enabled = true)
+  : id_(id), expr_(expr), name_(name), support_vars_(support_vars), soft_(soft), enabled_(enabled) { }
 
 public:
+  virtual ~UserConstraint() { }
+
   template<typename ostream>
-  friend ostream& operator<<(ostream& os, UserConstraint constr) {
-    os << constr.name_ << " is " << (constr.soft_?"soft":"hard") << " constraint and " << (constr.enabled_?"enabled":"disabled");
+  friend ostream& operator<<(ostream& os, const UserConstraint& constr) {
+    os << constr.name_ << " is a " << (constr.soft_?"soft":"hard") << " constraint and " << (constr.enabled_?"enabled":"disabled");
+    os << ", support vars =";
+    BOOST_FOREACH (int item, constr.support_vars_) 
+      os << " " << item;
     return os;
   }
 
@@ -67,195 +77,286 @@ public:
     enabled_ = false;
   }
 
+  virtual inline bool is_vector_constraint() { return false; }
+
  protected:
   unsigned id_;
   expression expr_;
   std::string name_;
+  std::set<int> support_vars_;
   bool soft_;
   bool enabled_;
 };
 
+struct UserVectorConstraint : UserConstraint {
+  friend struct ConstraintManager;
 
+protected:
+  UserVectorConstraint(unsigned const id, expression const expr, std::string const& name, std::set<int> & support_vars
+  , bool unique, bool const soft = false, bool const enabled = true)
+  : UserConstraint(id, expr, name, support_vars, soft, enabled), unique_(unique) { }
 
-struct ConstraintSet {
+public:
+  inline bool is_unique() { return unique_; }
+  inline int get_vector_id() { return *support_vars_.begin(); }
+  inline bool is_vector_constraint() { return true; }
 
-  typedef std::vector<ConstraintPtr> ConstraintsVector;
-  typedef ConstraintsVector::iterator iterator;
-  typedef ConstraintsVector::const_iterator const_iterator;
-  typedef ConstraintsVector::reference reference;
-  typedef ConstraintsVector::const_reference const_reference;
-  typedef ConstraintsVector::size_type size_type;
-  typedef ConstraintsVector::value_type value_type;
+protected:
+  bool unique_;
+};
 
-  typedef boost::intrusive_ptr<VariableExpr> VariablePtr;
-  typedef std::vector<VariablePtr> VectorElements;
+struct ConstraintPartition {
+  friend struct ConstraintManager;
 
-  ConstraintSet()
-  : constraints_(), changed_(false), unique_(false), has_soft_(false), vec_elements_() { }
+  ConstraintPartition() { }
 
-  template<typename ostream>
-  friend ostream& operator<<(ostream& os, ConstraintSet set) {
-    os << "Set is " << (set.changed_?"":"not ") << "changed and " << (set.unique_?"":"not ") << "unique\n"; 
-    os << "Size is " << set.constraints_.size() << "\n";
-
-    BOOST_FOREACH (value_type item, set.constraints_) {
-      os << item << "\n";
-    }
-    os << std::flush;
-    return os;
-  }
-
-  reference operator[](size_type n) {
-    changed_ = true;
-    return constraints_[n];
-  }
-  const_reference operator[](size_type n) const {
-    return constraints_[n];
-  }
-  reference at(size_type n) {
-    changed_ = true;
-    return constraints_.at(n);
-  }
-  const_reference at(size_type n) const {
-    return constraints_.at(n);
-  }
+  typedef ConstraintList::iterator iterator;
+  typedef ConstraintList::const_iterator const_iterator;
+  typedef ConstraintList::reference reference;
+  typedef ConstraintList::const_reference const_reference;
+  typedef ConstraintList::size_type size_type;
+  typedef ConstraintList::value_type value_type;
 
   iterator begin() {
-    changed_ = true;
     return constraints_.begin();
   }
   const_iterator begin() const {
     return constraints_.begin();
   }
   iterator end() {
-    changed_ = true;
     return constraints_.end();
   }
   const_iterator end() const {
     return constraints_.end();
   }
 
-  void push_back(value_type const& value) {
-    changed_ = true;
-    has_soft_ |= value->is_soft();
-    constraints_.push_back(value);
-  }
-  void pop_back() {
-    changed_ = true;
-    constraints_.pop_back();
+  void add(ConstraintPtr c) {
+    iterator ite = constraints_.begin();
+    while (ite != constraints_.end() && ((*ite)->id() > c->id())) ite++;
+    constraints_.insert(ite, c);
   }
 
-  iterator insert(iterator position, value_type const& value) {
-    changed_ = true;
-    has_soft_ |= value->is_soft();
-    return constraints_.insert(position, value);
-  }
-  template<typename InputIterator>
-  void insert(iterator position, InputIterator first, InputIterator last) {
-    changed_ = true;
-    constraints_.insert(position, first, last);
+  inline bool contains_var(int id) { 
+    return support_vars_.find(id) != support_vars_.end(); 
   }
 
-  iterator erase(iterator position) {
-    changed_ = true;
-    return constraints_.erase(position);
-  }
-  iterator erase(iterator first, iterator last) {
-    changed_ = true;
-    return constraints_.erase(first, last);
-  }
-
-  size_type size() const {
-    return constraints_.size();
+  template<typename ostream>
+  friend ostream& operator<<(ostream& os, const ConstraintPartition& cp) {
+    os << "[ ";
+    BOOST_FOREACH (ConstraintPtr c, cp) {
+      os << c->get_name() << " ";
+    }      
+    os << "]";
+    os << std::flush;
+    return os;
   }
 
-  void clear() {
-    changed_ = true;
-    constraints_.clear();
+
+private:
+  ConstraintList constraints_;
+  std::set<int> support_vars_;
+};
+
+struct ConstraintManager {
+  typedef std::map<std::string, ConstraintPtr> ConstraintMap;
+
+  ConstraintManager() : changed_(false) { 
+    static unsigned ID = 0;
+    id_ = ++ID;
+  }
+
+  template<typename ostream>
+  friend ostream& operator<<(ostream& os, const ConstraintManager& set) {
+    os << "Set " << set.id_ << " has " << set.constraints_.size() << " constraint(s) and has " << (set.changed_?"":"not ") << "changed" << std::endl; 
+    BOOST_FOREACH (ConstraintPtr item, set.constraints_) {
+      os << item << std::endl;
+    }
+    os << std::flush;
+    return os;
   }
 
   bool enable_constraint(std::string const& key) {
-    BOOST_FOREACH (value_type& c, constraints_) {
-      if (0 == c->get_name().compare(key)) {
-        c->enable();
+    std::clog << "Enable constraint " << key << " in set " << id_ << ": ";
+    ConstraintMap::iterator ite = cMap_.find(key);
+    if (ite != cMap_.end()) {
+      if (!ite->second->is_enabled()) {
+        std::clog << "ok" << std::endl;
+        ite->second->enable();
         changed_ = true;
-        return true;
       }
+      else
+        std::clog << "already enabled" << std::endl;
+      return true;
     }
+    std::clog << "not found" << std::endl;
     return false;
   }
-  bool disable_constraint(std::string const& key) {
-    BOOST_FOREACH (value_type& c, constraints_) {
-      if (0 == c->get_name().compare(key)) {
-        c->disable();
-        changed_ = true;
-        return true;
-      }
-    }
-    return false;
-  }
-  bool is_constraint_enabled(std::string const& key) {
-    BOOST_FOREACH (value_type const& c, constraints_)
-      if (0 == c->get_name().compare(key))
-        return c->is_enabled();
 
+  bool disable_constraint(std::string const& key) {
+    std::clog << "Disable constraint " << key << " in set " << id_ << ": ";
+    ConstraintMap::iterator ite = cMap_.find(key);
+    if (ite != cMap_.end()) {
+      if (ite->second->is_enabled()) {
+        std::clog << "ok" << std::endl;
+        ite->second->disable();
+        changed_ = true;
+      }
+      else
+        std::clog << "already enabled" << std::endl;
+      return true;
+    }
+    std::clog << "not found" << std::endl;
     return false;
+  }
+
+  bool is_constraint_enabled(std::string const& key) {
+    ConstraintMap::iterator ite = cMap_.find(key);
+    return ite != cMap_.end() && ite->second->is_enabled();
   }
 
   bool is_changed() const {
     return changed_;
   }
+
   void set_synced() {
     changed_ = false;
   }
 
-  bool is_unique() const {
-    return unique_;
-  }
-  void set_unique(bool const val) {
-    changed_ = true;
-    unique_ = val;
-  }
-
-  bool has_soft() const {
-    return has_soft_;
-  }
-
-  VectorElements& get_vec_vars() {
-    return vec_elements_;
-  }
-
-private:
-  ConstraintsVector constraints_;
-  bool changed_;
-  bool unique_;
-  bool has_soft_;
-
-  VectorElements vec_elements_;
-};
-
-struct ConstraintManager {
-
-template<typename Expr>
-ConstraintPtr makeConstraint(std::string const& name, Expr e, Context& ctx,
+  template<typename Expr>
+  ConstraintPtr makeConstraint(std::string const& name, int c_id, Expr e, Context& ctx,
                                      bool const soft = false) {
-  if (constraintMap.find(name) != constraintMap.end()) 
-    throw std::runtime_error("Constraint already exists.");
-  NodePtr n(boost::proto::eval(FixWidth()(e), ctx));
-  ConstraintPtr c(new UserConstraint(new_constraint_id(), n, name, soft));
-  return constraintMap[name] = c;
-}
 
-template<typename Expr>
-ConstraintPtr makeConstraint(Expr e, Context& ctx, bool const soft = false) {
-    return makeConstraint("constraint_" + boost::lexical_cast<std::string>(new_constraint_id()),
+    std::clog << "New " << (soft?"soft ":"") << "constraint " << name << " in set " << id_ << std::endl;
+                                     
+    if (cMap_.find(name) != cMap_.end()) 
+      throw std::runtime_error("Constraint already exists.");
+
+    ctx.reset_support_vars();
+    NodePtr n(boost::proto::eval(FixWidth()(e), ctx));
+
+    ConstraintPtr c(
+      boost::dynamic_pointer_cast<ForEach>(n) != 0
+      ? new UserVectorConstraint(c_id, n, name, ctx.support_vars(), false, soft)
+      : (boost::dynamic_pointer_cast<Unique>(n) != 0
+        ? new UserVectorConstraint(c_id, n, name, ctx.support_vars(), true, soft)
+        : new UserConstraint(c_id, n, name, ctx.support_vars(), soft))
+    );
+    
+    changed_ = true;
+    constraints_.push_back(c);
+
+    return cMap_[name] = c;
+  }
+
+  template<typename Expr>
+  ConstraintPtr makeConstraint(std::string const& name, Expr e, Context& ctx,
+                                     bool const soft = false) {
+    return makeConstraint(name, new_constraint_id(), e, ctx, soft);
+  }
+
+  template<typename Expr>
+  ConstraintPtr makeConstraint(Expr e, Context& ctx, bool const soft = false) {
+    int id = new_constraint_id();
+    return makeConstraint("constraint_" + boost::lexical_cast<std::string>(id), id,
                           e, ctx, soft);
-}
+  }
+
+  std::ostream& print_dot_graph(std::ostream& os) {
+    os << "digraph AST {" << std::endl;
+    ToDotVisitor visitor(os);
+
+    BOOST_FOREACH ( ConstraintPtr c , constraints_ ) {
+      long a = reinterpret_cast<long>(&*c);
+      long b = reinterpret_cast<long>(&(*c->get_expression()));
+      os << "\t" << a << " [label=\"" << c->get_name() << (c->is_soft()?" soft":"") << (!c->is_enabled()?" disabled":"") << "\"]" << std::endl;
+      os << "\t" << a << " -> " << b << std::endl; 
+      c->get_expression()->visit(visitor);
+    }
+
+    os << "}" << std::endl;
+    return os;
+  }
+
+  void partition() {
+    partitions_.clear();
+    vec_constraints_.clear();
+     
+    std::list<ConstraintPtr> tmp;
+    BOOST_FOREACH (ConstraintPtr c, constraints_) {
+      if (c->is_enabled()) {
+        if (c->is_vector_constraint())
+          vec_constraints_.push_back(boost::static_pointer_cast<UserVectorConstraint>(c));
+        else 
+          tmp.push_back(c);
+      }
+    } 
+    
+    while (!tmp.empty()) {
+      ConstraintPartition cp;
+      maximize_partition(cp, tmp);
+      partitions_.push_back(cp);
+    }      
+    
+    std::clog << "Partition results of set " << id_ << ": " << std::endl;
+
+    std::clog << "  " << vec_constraints_.size() << " vector constraint(s):";
+    BOOST_FOREACH (VectorConstraintPtr c, vec_constraints_) {
+      std::clog << " " << c->get_name();
+    }      
+    std::clog << std::endl;
+    
+    std::clog << "  " << partitions_.size() << " constraint partition(s):" << std::endl; 
+    uint cnt = 0;
+    BOOST_FOREACH (ConstraintPartition& cp, partitions_) {
+      std::clog << "    #" << ++cnt << ": ";
+      std::clog << cp << std::endl;
+    }
+  }  
+  
+  inline std::vector<ConstraintPartition>& get_partitions() { return partitions_; }
+  inline std::vector<VectorConstraintPtr>& get_vector_constraints() { 
+    return vec_constraints_; 
+  }
+  
+private:
+  void maximize_partition(ConstraintPartition& cp, std::list<ConstraintPtr>& lc) {
+    ConstraintPtr c = lc.front();
+    lc.pop_front();
+    cp.support_vars_ = c->support_vars_;
+    cp.add(c);
+
+    while (1) {
+      bool changed = false;
+      std::list<ConstraintPtr>::iterator ite = lc.begin();
+      while (ite != lc.end()) {
+        c = *ite;
+        std::vector<int> v_intersection;
+        std::set_intersection(cp.support_vars_.begin(), cp.support_vars_.end(),
+                          c->support_vars_.begin(), c->support_vars_.end(),
+                          std::back_inserter(v_intersection));
+        if (!v_intersection.empty()) {
+          changed = true;
+          cp.add(c);
+          cp.support_vars_.insert(c->support_vars_.begin(), c->support_vars_.end());
+          ite = lc.erase(ite);
+        }
+        else {
+          ++ite;
+        }
+      }
+      if (!changed) break;
+    }      
+  }
 
 private:
-  std::map<std::string, ConstraintPtr> constraintMap;
+  unsigned id_;
+  ConstraintMap cMap_;
+  ConstraintList constraints_;
+  bool changed_;
+  
+  // partition result
+  std::vector<ConstraintPartition> partitions_;
+  std::vector<VectorConstraintPtr> vec_constraints_;
 };
-
-static ConstraintManager constraintManager;
 
 } // end namespace crave

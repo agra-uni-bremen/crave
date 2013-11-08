@@ -60,7 +60,7 @@ private:
 class VariableExpr : public Terminal {
 public:
   VariableExpr( unsigned int id, unsigned int bs, bool s ) : Terminal(bs, s), id_(id) { }
-  VariableExpr( VariableExpr const& v ) :Terminal(v.bitsize(), v.sign()), id_(v.id()) { }
+  VariableExpr( VariableExpr const& v ) : Terminal(v.bitsize(), v.sign()), id_(v.id()) { }
 
   void visit( NodeVisitor& v ) const { v.visitVariableExpr(*this); }
 
@@ -380,21 +380,38 @@ public:
   void visit( NodeVisitor& v ) const { v.visitIfThenElse(*this); }
 };
 
-class ForEach : public TernaryExpression {
+class ForEach : public BinaryOperator {
 public:
-  ForEach( NodePtr a, NodePtr b, NodePtr c ) : TernaryExpression(a,b,c) { }
-  ForEach( ForEach const& t ) : TernaryExpression(t) { }
+  ForEach( NodePtr a, NodePtr b ) : BinaryOperator(a, b) { }
+  ForEach( ForEach const& fe ) : BinaryOperator(fe) { }
 
   void visit( NodeVisitor& v ) const { v.visitForEach(*this); }
 };
 
-class Unique : public BinaryExpression {
+class Unique : public UnaryOperator {
 public:
-  Unique( NodePtr a, NodePtr b ) : BinaryExpression(a,b) { }
-  Unique( Unique const& t ) : BinaryExpression(t) { }
+  Unique( NodePtr a ) : UnaryOperator(a) { }
+  Unique( Unique const& u ) : UnaryOperator(u) { }
 
   void visit( NodeVisitor& v ) const { v.visitUnique(*this); }
 };
 
+class Bitslice : public UnaryExpression {
+public:
+  Bitslice( NodePtr v, int r, int l, int expr_size ) 
+  : UnaryExpression(v), r_(r), l_(l), expr_size_(expr_size) { }
+
+  Bitslice( Bitslice const& b ) 
+  : UnaryExpression(b), r_(b.r_), l_(b.l_), expr_size_(b.expr_size_) { }
+
+  void visit( NodeVisitor& v ) const { v.visitBitslice(*this); }
+
+  int r() const { return r_; }
+  int l() const { return l_; }
+  int expr_size() const { return expr_size_; }
+
+private:
+  int r_, l_, expr_size_;
+};
 
 } // end namespace crave

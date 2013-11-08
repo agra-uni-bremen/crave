@@ -16,7 +16,6 @@
 #include <stack>
 #include <utility>
 
-
 namespace crave {
   namespace preds = metaSMT::logic;
   namespace qf_bv = metaSMT::logic::QF_BV;
@@ -65,15 +64,18 @@ public:
   virtual void visitShiftRightOpr( ShiftRightOpr const & );
   virtual void visitVectorAccess( VectorAccess const & );
   virtual void visitIfThenElse( IfThenElse const & );
+  virtual void visitForEach( ForEach const & );
+  virtual void visitUnique( Unique const & );
+  virtual void visitBitslice( Bitslice const & );
 
 
   virtual void makeAssertion( Node const & );
   virtual void makeSoftAssertion( Node const & );
   virtual void makeAssumption( Node const & );
-  virtual bool analyseSofts();
+  virtual std::vector<unsigned int> analyseSofts(bool exact);
   virtual std::vector<std::vector<unsigned int> > analyseContradiction(
                   std::map<unsigned int, NodePtr > const &);
-  virtual bool solve();
+  virtual bool solve(bool ignoreSofts);
   virtual bool read( Node const& var, AssignResult& );
 
 private: // typedefs
@@ -210,9 +212,6 @@ void metaSMTVisitorImpl<SolverType>::visitConstant( Constant const &c )
     );
   exprStack_.push( std::make_pair( result, c.sign() ) );
 }
-
-template<typename SolverType>
-void metaSMTVisitorImpl<SolverType>::visitVectorExpr( VectorExpr const &ve ) { }
 
 template<typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitNotOpr( NotOpr const &o )
@@ -570,12 +569,6 @@ void metaSMTVisitorImpl<SolverType>::visitShiftRightOpr( ShiftRightOpr const &o 
 }
 
 template<typename SolverType>
-void metaSMTVisitorImpl<SolverType>::visitVectorAccess( VectorAccess const &o )
-{
-
-}
-
-template<typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitIfThenElse( IfThenElse const &ite )
 {
   stack_entry fst, snd, trd;
@@ -585,7 +578,37 @@ void metaSMTVisitorImpl<SolverType>::visitIfThenElse( IfThenElse const &ite )
   exprStack_.push( std::make_pair( result, fst.second || snd.second || trd.second ) );
 }
 
+template<typename SolverType>
+void metaSMTVisitorImpl<SolverType>::visitBitslice( Bitslice const &b ) {
+  visitUnaryExpr(b);
 
+  stack_entry entry;
+  pop( entry );
+
+  int slice_size = b.r() - b.l() + 1;
+  if (slice_size <= 0 || slice_size > b.expr_size()) {
+    throw std::runtime_error("Invalid size of bit slice.");
+  }      
+
+  result_type result = 
+  evaluate(solver_, 
+            qf_bv::zero_extend( 
+              b.expr_size() - slice_size, 
+              qf_bv::extract(b.r(), b.l(), entry.first) 
+            )
+          );
+
+  exprStack_.push( std::make_pair( result, false ) );
+}
+
+template<typename SolverType>
+void metaSMTVisitorImpl<SolverType>::visitVectorAccess( VectorAccess const &o ) { throw std::runtime_error("VectorAccess is not allowed in metaSMTNodeVisitor."); }
+template<typename SolverType>
+void metaSMTVisitorImpl<SolverType>::visitVectorExpr( VectorExpr const &ve ) { throw std::runtime_error("VectorExpr is not allowed in metaSMTNodeVisitor."); }
+template<typename SolverType>
+void metaSMTVisitorImpl<SolverType>::visitForEach( ForEach const &fe ) { throw std::runtime_error("ForEach is not allowed in metaSMTNodeVisitor."); }
+template<typename SolverType>
+void metaSMTVisitorImpl<SolverType>::visitUnique( Unique const &u ) { throw std::runtime_error("Unique is not allowed in metaSMTNodeVisitor."); }
 
 template<typename SolverType>
 void metaSMTVisitorImpl<SolverType>::makeAssertion(Node const &expr)
@@ -624,22 +647,32 @@ void metaSMTVisitorImpl<SolverType>::makeAssumption(Node const &expr)
 }
 
 template<typename SolverType>
-bool metaSMTVisitorImpl<SolverType>::analyseSofts()
+std::vector<unsigned int> metaSMTVisitorImpl<SolverType>::analyseSofts(bool exact)
 {
-  bool result;
-  for (int i = softs_.size(); 0 < i; --i) {
-    for (typename std::vector<result_type>::const_iterator ite = assumptions_.begin();
-         ite != assumptions_.end(); ++ite) {
-      metaSMT::assumption(solver_, *ite);
+  std::vector<unsigned int> result;
+/*
+    // minimize the number of soft constraints to be deactivated
+    for (int i = softs_.size(); 0 < i; --i) {
+      metaSMT::assumption(solver_,
+                          preds::And(metaSMT::cardinality_eq(solver_, softs_, i),
+                                     metaSMT::evaluate(solver_, preds::True)));
+      if (metaSMT::solve(solver_)) {
+      }
     }
-    metaSMT::assumption(solver_,
-                        preds::And(metaSMT::cardinality_eq(solver_, softs_, i),
-                                   metaSMT::evaluate(solver_, preds::True)));
-
-    result = metaSMT::solve(solver_);
-    if (result)
-      break;
+*/
+  // implements soft constraint semantics of the HVL e
+  for (unsigned int i = 0; i < softs_.size(); i++) {
+    metaSMT::assumption(solver_, preds::equal(softs_[i], preds::True));
+    if (metaSMT::solve(solver_)) {
+      // accept
+      metaSMT::assertion(solver_, preds::equal(softs_[i], preds::True));
+    }
+    else {
+      // reject
+      result.push_back(i);
+    }
   }
+  softs_.clear();
   return result;
 }
 
@@ -668,16 +701,19 @@ std::vector<std::vector<unsigned int> > metaSMTVisitorImpl<SolverType>::analyseC
 }
 
 template<typename SolverType>
-bool metaSMTVisitorImpl<SolverType>::solve()
+bool metaSMTVisitorImpl<SolverType>::solve(bool ignoreSofts)
 {
   for (typename std::vector<result_type>::const_iterator ite = assumptions_.begin();
        ite != assumptions_.end(); ++ite) {
     metaSMT::assumption(solver_, *ite);
   }
-  for (typename std::vector<result_type>::const_iterator ite = softs_.begin();
-       ite != softs_.end(); ++ite) {
-    metaSMT::assumption(solver_, *ite);
-  }
+  
+  if (!ignoreSofts) {
+    for (typename std::vector<result_type>::const_iterator ite = softs_.begin();
+         ite != softs_.end(); ++ite) {
+      metaSMT::assumption(solver_, *ite);
+    }
+  }  
 
   bool result = metaSMT::solve(solver_);
 

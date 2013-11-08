@@ -48,6 +48,9 @@ public:
   void visitShiftRightOpr( ShiftRightOpr const & );
   void visitVectorAccess( VectorAccess const & );
   void visitIfThenElse( IfThenElse const & );
+  void visitForEach( ForEach const & );
+  void visitUnique( Unique const & );
+  void visitBitslice( Bitslice const & );
 
 private:
   bool putNode(Node const *);

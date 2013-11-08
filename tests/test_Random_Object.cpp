@@ -286,8 +286,8 @@ struct Item2 : public rand_obj {
     constraint(address() % 4 == 0);
     constraint(address() <= 1000u);
     constraint(data().size() == 4);
-    constraint.foreach(data, i, -50 <= data()[i] && data()[i] <= 50);
-    constraint.foreach(data, i, data()[i - 1] <= data()[i]);
+    constraint(foreach(data(), -50 <= data()[i] && data()[i] <= 50));
+    constraint(foreach(data(), data()[i - 1] <= data()[i]));
   }
 
   placeholder i;

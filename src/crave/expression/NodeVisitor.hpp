@@ -3,6 +3,7 @@
 #include <iosfwd>
 #include <ostream>
 #include <set>
+#include <stdexcept>
 
 namespace crave {
 
@@ -40,6 +41,7 @@ class OrOpr;
 class XorOpr;
 class ShiftLeftOpr;
 class ShiftRightOpr;
+class Bitslice;
 
 // arithmetic
 class PlusOpr;
@@ -99,10 +101,9 @@ public:
   virtual void visitShiftRightOpr( ShiftRightOpr const & ) = 0;
   virtual void visitVectorAccess( VectorAccess const & ) = 0;
   virtual void visitIfThenElse( IfThenElse const & ) = 0;
-
-  // TODO
-  virtual void visitForEach( ForEach const & ) { };
-  virtual void visitUnique( Unique const & ) { };
+  virtual void visitForEach( ForEach const & ) = 0;
+  virtual void visitUnique( Unique const & ) = 0;
+  virtual void visitBitslice( Bitslice const & ) = 0;
 };
 
 } // end namespace crave

@@ -2,6 +2,7 @@
 
 #include "Constraint.hpp"
 #include "Generator.hpp"
+#include "Distribution.hpp"
 
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -16,8 +17,6 @@
 #include <cstdarg>
 
 namespace crave {
-
-  extern boost::mt19937 rng;
 
   void set_global_seed(unsigned int s);
   void set_solver_backend(std::string const&);
@@ -75,65 +74,18 @@ namespace crave {
   };
 
   template<typename T>
-  struct weighted_range
-  {
-    weighted_range(T l, T r, unsigned long long w) : left(l), right(r), weight(w), accumWeight(0) { }
-    weighted_range(T l, T r) : left(l), right(r), weight(1LLU + r - l), accumWeight(0) { }
-
-    bool operator <(const weighted_range<T>& other) const {
-      if (left < other.left) return true;
-      if (left > other.left) return false;
-      if (right < other.right) return true;
-      return false;
-    }
-
-    bool overlap(const weighted_range<T>& other) const {
-      if (left < other.left) return right >= other.left;
-      if (left > other.left) return left <= other.right;
-      return false;
-    }
-
-    T left;
-    T right;
-    unsigned long long weight;
-    unsigned long long accumWeight;
-  };
-
-  template<typename T>
   class randomize_base
   {
     public:
-      void resetDistribution() { ranges.clear(); }
-      void addWeightedRange(T l, T r, unsigned long long w) { addRange(weighted_range<T>(l, r, w)); }
-      void addRange(T l, T r) { addRange(weighted_range<T>(l, r)); }
-      void range(T l, T r) { resetDistribution(); addRange(weighted_range<T>(l, r)); }
+      void dist(const distribution<T> & dist) { dist_ = dist; }
+      void range(T l, T r) { dist_.reset(); dist_(weighted_range<T>(l, r)); }
 
     protected:
       randomize_base() { }
+      T nextValue() { return dist_.nextValue(); }
 
-      T nextValue() {
-        if (ranges.empty())
-          return boost::uniform_int<T>(std::numeric_limits<T>::min(), std::numeric_limits<T>::max())(rng);
-        weighted_range<T> selected = ranges.back();
-        if (ranges.size() > 1) {
-          unsigned long long r = boost::uniform_int<unsigned long long>(0, selected.accumWeight - 1)(rng);
-          for (uint i = 0; i < ranges.size(); i++)
-            if (r < ranges[i].accumWeight) {
-              selected = ranges[i];
-              break;
-            }
-        }
-        return boost::uniform_int<T>(selected.left, selected.right)(rng);
-      }
-
-      void addRange(weighted_range<T> wr) {
-        for (uint i = 0; i < ranges.size(); i++)
-          if (ranges[i].overlap(wr)) throw std::runtime_error("Overlapping range exists.");
-        wr.accumWeight = (ranges.empty() ? 0 : ranges.back().accumWeight) + wr.weight;
-        ranges.push_back(wr);
-      }
-
-      std::vector< weighted_range<T> > ranges;
+    protected:
+      distribution<T> dist_;
   };
 
   template<>

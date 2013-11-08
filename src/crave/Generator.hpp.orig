@@ -85,7 +85,70 @@ public:
     BOOST_FOREACH(boost::function0<bool> f, pre_hooks_)
       if (!f())
         return false;
+<<<<<<< HEAD
+
+    BOOST_FOREACH(VariableContainer::ReadRefPair pair, vcon_.read_references)
+      solver_->makeAssumption(*pair.second->expr());
+
+    return true;
+  }
+
+  // analyse_softconstraints_ analyse the soft constraints and disable conflicting ones
+  bool analyse_softconstraints_(bool const exactAnalyse) {
+
+    if (!pre_solve_())
+      return false;
+
+    if (exactAnalyse) {
+
+      if (!solver_->analyseSofts())
+        return false;
+
+      // TODO get solvable softs
+      return true;
+    }
+
+    if (solver_->solve())
+      return true;
+
+    if (!constraints_.has_soft())
+      return false;
+
+    BOOST_FOREACH (ConstraintPtr c, constraints_)
+      if (c->is_soft() && c->is_enabled())
+        c->disable();
+
+    reset();
+    constraints_.set_synced();
+    bool result = pre_solve_() && solver_->solve();
+
+    if (!result)
+      return false;
+
+    BOOST_FOREACH (ConstraintPtr c, constraints_) {
+      if (c->is_soft()) {
+
+        c->enable();
+        reset();
+        constraints_.set_synced();
+
+        bool enable = solver_->solve();
+        result |= enable;
+        if (!enable)
+          c->disable();
+      }
+    }
+
+    return result;
+  }
+
+  bool solve_() {
+
+    bool result = false;
+    if (constraints_.is_changed()) {
+=======
     if (constr_mng_.is_changed()) {
+>>>>>>> expression-architecture
       reset();
       constr_mng_.set_synced();
     }
