@@ -2,6 +2,7 @@
 
 #include "../crave/expression/FactoryMetaSMT.hpp"
 #include "../crave/ConstrainedRandom.hpp"
+#include "../crave/Settings.hpp"
 
 namespace crave {
 
@@ -29,18 +30,21 @@ namespace crave {
     FactoryMetaSMT::setSolverType(type);
   }
 
-  void init() {
+  void init(std::string const& cfg_file) {
 
     // set global seed
     set_global_seed(0);
 
+    LoggerSetting settings(cfg_file);
+
+    settings.save(cfg_file);
   }
 
-  void init(std::string const& solver_type) {
+  void init(std::string const& solver_type, std::string const& cfg_file) {
     // set solver backend
     FactoryMetaSMT::setSolverType(solver_type);
 
-    init();
+    init(cfg_file);
   }
 
 } // namespace crave

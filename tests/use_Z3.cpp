@@ -5,7 +5,7 @@
 
 struct Context_Fixture {
   Context_Fixture () {
-    crave::init("Z3");
+    crave::init("Z3", "./crave.cfg");
   }
 };
 
