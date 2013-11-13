@@ -21,6 +21,9 @@ namespace crave {
   void set_global_seed(unsigned int s);
   void set_solver_backend(std::string const&);
 
+  void init(std::string const&);
+  void init(std::string const&, std::string const&);
+
   class rand_base
   {
     protected:

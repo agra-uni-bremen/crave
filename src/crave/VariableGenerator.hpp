@@ -21,39 +21,39 @@ namespace crave {
 
 struct VariableSolver {
   friend struct VariableGenerator;
-  
-  VariableSolver(VariableContainer& vcon, ConstraintPartition& cp) 
-  : vcon_(vcon), cp_(cp), solver_(FactoryMetaSMT::getNewInstance()) { 
 
-    std::clog << "Create solver for partition " << cp_ << std::endl;
+  VariableSolver(VariableContainer& vcon, ConstraintPartition& cp)
+  : vcon_(vcon), cp_(cp), solver_(FactoryMetaSMT::getNewInstance()) {
+
+    LOG(INFO) << "Create solver for partition " << cp_ << std::endl;
 
     BOOST_FOREACH(ConstraintPtr c, cp_) {
       if (c->is_soft()) {
         solver_->makeSoftAssertion(*c->get_expression());
       } else {
         solver_->makeAssertion(*c->get_expression());
-      }   
+      }
     }
     analyse_hards();
-    if (contradictions_.empty()) {   
+    if (contradictions_.empty()) {
       analyse_softs();
-      std::clog << "Partition is solvable with " << inactive_softs_.size() 
+      LOG(INFO) << "Partition is solvable with " << inactive_softs_.size()
                 << " soft constraint(s) deactivated:";
       BOOST_FOREACH(std::string& s, inactive_softs_) 
-        std::clog << " " << s;
-      std::clog << std::endl;  
+        LOG(INFO) << " " << s;
+      LOG(INFO) << std::endl;
     }
     else {
-      std::clog << "Partition has unsatisfiable hard constraints:" << std::endl;
+      LOG(INFO) << "Partition has unsatisfiable hard constraints:" << std::endl;
       BOOST_FOREACH(std::vector<std::string>& vs, contradictions_) {
-        std::clog << " ";
+        LOG(INFO) << " ";
         BOOST_FOREACH(std::string& s, vs)
-          std::clog << " " << s;
-        std::clog << std::endl;
+          LOG(INFO) << " " << s;
+        LOG(INFO) << std::endl;
       }
-    }    
+    }
   }
-  
+
   bool solve() {
     if (!contradictions_.empty()) 
       return false;
@@ -68,7 +68,7 @@ struct VariableSolver {
     }
     return false;
   }
-  
+
   template<typename T>
   bool read(Variable<T> const &var, T& value) {
     if (vcon_.variables.find(var.id()) == vcon_.variables.end()) return false;
@@ -104,7 +104,7 @@ private:
       contradictions_.push_back(vec);
     }
   }
-  
+
   void analyse_softs() {
     std::vector<unsigned int> result = solver_->analyseSofts();
     std::vector<unsigned int>::iterator ite = result.begin();
@@ -128,7 +128,7 @@ private:
   std::vector<std::string> get_inactive_softs() {
     return inactive_softs_;
   }
-  
+
 private:
   VariableContainer& vcon_;
   ConstraintPartition& cp_;
@@ -140,10 +140,10 @@ private:
 
 struct VariableGenerator {
   typedef boost::shared_ptr<VariableSolver> VarSolverPtr;
-  
+
   VariableGenerator(VariableContainer& vcon) 
   : vcon_(vcon), solvers_() { }
-  
+
   void reset(std::vector<ConstraintPartition>& partitions) {
     solvers_.clear();
     BOOST_FOREACH(ConstraintPartition& partition, partitions) {
@@ -151,18 +151,18 @@ struct VariableGenerator {
       solvers_.push_back(vs);
     }
   }
-  
+
   bool solve() {
     BOOST_FOREACH(VarSolverPtr vs, solvers_)
       if (!vs->solve()) return false;
-    return true;  
+    return true;
   }
-  
+
   template<typename T>
   bool read(Variable<T> const &var, T& value) {
     BOOST_FOREACH(VarSolverPtr vs, solvers_)
       if (vs->read(var, value)) return true;
-    return false;  
+    return false;
   }
 
   std::vector<std::vector<std::string> > analyse_contradiction() {
@@ -185,7 +185,6 @@ struct VariableGenerator {
     return str_vec;
   }
 
-  
 private:
   VariableContainer& vcon_;
   std::vector<VarSolverPtr> solvers_;

@@ -9,6 +9,7 @@ target_link_libraries (crave
   metaSMT
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_THREAD_LIBRARY}
+  ${Boost_FILESYSTEM_LIBRARY}
 )
 install(TARGETS crave
   EXPORT crave
