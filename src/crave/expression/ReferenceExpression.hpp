@@ -5,6 +5,7 @@
 #include <boost/random/uniform_01.hpp>
 
 #include "../bitsize_traits.hpp"
+#include "../Distribution.hpp"
 #include "Node.hpp"
 
 namespace crave {
@@ -50,4 +51,31 @@ namespace crave {
     float probability_;
     ReferenceExpression::result_type expr_;
   };
+/*
+  template<typename Integer>
+  struct InsideGenExpr : ReferenceExpression {
+    DistributionExpr(, ReferenceExpression::result_type expr)
+    : dist_(dist), expr_(expr) { }
+
+    virtual ReferenceExpression::result_type expr() const {
+      return new EqualOpr(expr_, new Constant(dist_.nextValue()));
+    }
+  private:
+    distribution<Integer> dist_;
+    ReferenceExpression::result_type expr_;
+  };  
+  
+  template<typename Integer>
+  struct DistGenExpr : ReferenceExpression {
+    DistributionExpr(distribution<Integer> dist, ReferenceExpression::result_type expr)
+    : dist_(dist), expr_(expr) { }
+
+    virtual ReferenceExpression::result_type expr() const {
+      return new EqualOpr(expr_, new Constant(dist_.nextValue()));
+    }
+  private:
+    distribution<Integer> dist_;
+    ReferenceExpression::result_type expr_;
+  };  
+*/  
 } /* namespace crave */

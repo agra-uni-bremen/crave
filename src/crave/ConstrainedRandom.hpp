@@ -75,7 +75,7 @@ namespace crave {
   {
     public:
       void dist(const distribution<T> & dist) { dist_ = dist; }
-      void range(T l, T r) { dist_.reset(); dist_(weighted_range<T>(l, r)); }
+      void range(T l, T r) { dist_.reset(); dist_(crave::range<T>(l, r)); }
 
     protected:
       randomize_base() { }
@@ -88,9 +88,15 @@ namespace crave {
   template<>
   class randomize_base<bool>
   {
+    public:
+      void dist(const distribution<bool> & dist) { dist_ = dist; }
+
     protected:
       randomize_base() { }
-      bool nextValue() { return boost::uniform_int<char>(0, 1)(rng); }
+      bool nextValue() { return dist_.nextValue(); }
+
+    protected:
+      distribution<bool> dist_;
   };
 
   template<typename T>

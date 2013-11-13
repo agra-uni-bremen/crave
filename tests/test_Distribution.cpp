@@ -19,9 +19,9 @@ BOOST_AUTO_TEST_CASE ( randv_dist_t1 )
   randv<int> v(NULL);
   v.dist(
     distribution<int>::create
-      (weighted_range<int>(0, 10))
-      (weighted_range<int>(50, 75))
-      (weighted_range<int>(100, 200))
+      (range<int>(0, 10))
+      (range<int>(50, 75))
+      (range<int>(100, 200))
   );
 
   std::map<int, int> s;
@@ -48,9 +48,9 @@ BOOST_AUTO_TEST_CASE ( randv_dist_t2 )
   BOOST_CHECK_THROW ( 
     v.dist(
       distribution<int>::create
-        (weighted_range<int>(0, 10))
-        (weighted_range<int>(50, 75))
-        (weighted_range<int>(30, 51))
+        (range<int>(0, 10))
+        (range<int>(50, 75))
+        (range<int>(30, 51))
     )
   , std::runtime_error);
 }
@@ -83,9 +83,9 @@ BOOST_AUTO_TEST_CASE ( randv_dist_t4 )
   randv<int> v(NULL);
   v.dist(
     distribution<int>::create
-      (weighted_range<int>(0, 10))
-      (weighted_range<int>(50, 75))
-      (weighted_range<int>(100, 200))
+      (range<int>(0, 10))
+      (range<int>(50, 75))
+      (range<int>(100, 200))
   );
   v.range(5000, 6000);
   int total = 100000;

@@ -279,19 +279,29 @@ public:
     return new Inside(boost::proto::eval(value, *this), constants);
   }
 
-  template<typename Var, typename Value>
+  template<typename Integer, typename XXX>
   result_type operator()(boost::proto::tag::function,
       boost::proto::terminal<operator_dist>::type const & tag,
-      Var const & var_term, Value const & probability) {
-
+      //WriteReference<Integer> const & var_term, distribution<Integer> const & probability) {
+      WriteReference<Integer> const & var_term, XXX const & probability) {
+/*
     result_type expr = boost::proto::eval(var_term, *this);
     read_references_.push_back(std::make_pair(
         boost::proto::value(var_term).id,
         boost::shared_ptr<crave::ReferenceExpression>(
             new DistReferenceExpr(boost::proto::value(probability), expr)
     )));
+*/    
     return new Constant(true);
   }
+
+/*
+  result_type operator()(boost::proto::tag::function,
+      boost::proto::terminal<operator_dist>::type const & tag,
+      WriteReference<bool> const & var_term, distribution<bool> const & probability) {
+    return new Constant(true);
+  }
+*/  
 
   template<typename Expr1, typename Expr2>
   result_type operator()(boost::proto::tag::function,

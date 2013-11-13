@@ -194,7 +194,7 @@ BOOST_AUTO_TEST_CASE (neg_t2) {
   randv<int> b(0);
   randv<int> c(0);
   randv<int> d(0);
-  Generator gen( dist(a(), 0.5) );
+  Generator gen( dist(a(), distribution<bool>::create(0.5)) );
   gen( b() == 1337 && c() == 42 );
   gen( if_then_else( a(), d() == -b(), d() == -c() ) );
 

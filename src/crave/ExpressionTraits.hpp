@@ -110,11 +110,16 @@ namespace crave {
     ) >
   >{};
 
+  template<typename T>
+  struct distribution;
+
   struct FixWidth
   : boost::proto::or_<
      boost::proto::terminal<boost::proto::_>
   ,  boost::proto::subscript<boost::proto::_, boost::proto::_>
   ,  boost::proto::nary_expr< boost::proto::tag::function, boost::proto::terminal<crave::operator_unique>, boost::proto::_ >
+  ,  boost::proto::nary_expr< boost::proto::tag::function, boost::proto::terminal<crave::operator_dist>, boost::proto::_,       
+                                                           boost::proto::terminal<crave::distribution<boost::proto::_> > >
   ,  FixFirstLarger
   ,  FixSecondLarger
   ,  boost::proto::nary_expr<boost::proto::_, boost::proto::vararg<FixWidth> >

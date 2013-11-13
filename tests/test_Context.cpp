@@ -408,7 +408,7 @@ BOOST_AUTO_TEST_CASE (dist_of_boolean25)
   int counter = 0;
 
   Generator gen;
-  gen ( dist(a(), 0.25) );
+  gen ( dist(a(), distribution<bool>::create(0.25)) );
   for (unsigned i = 0; i < 1000; i++) {
     BOOST_REQUIRE( gen.next() );
     if (a) {
@@ -428,7 +428,7 @@ BOOST_AUTO_TEST_CASE ( dist_of_boolean50 )
   int counter = 0;
 
   Generator gen;
-  gen ( dist(a(),0.5) );
+  gen ( dist(a(), distribution<bool>::create(0.5)) );
   for (unsigned i = 0; i < 1000; i++) {
     BOOST_REQUIRE( gen.next() );
     if (a) {
@@ -448,7 +448,7 @@ BOOST_AUTO_TEST_CASE (dist_of_boolean75)
   int counter = 0;
 
   Generator gen;
-  gen ( dist(a(),0.75) );
+  gen ( dist(a(), distribution<bool>::create(0.75)) );
   for (unsigned i = 0; i < 1000; i++) {
     BOOST_REQUIRE( gen.next() );
     if (a) {
