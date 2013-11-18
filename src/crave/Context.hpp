@@ -38,7 +38,7 @@ private:
 public:
   Context(VariableContainer& vars)
           : variables_(vars.variables), vector_variables_(vars.vector_variables),
-            read_references_(vars.read_references), write_references_(vars.write_references) { }
+            read_references_(vars.read_references), write_references_(vars.write_references), dist_references_(vars.dist_references) { }
 
   template<typename value_type>
   result_type operator()(boost::proto::tag::terminal, var_tag<value_type> const & tag) {
@@ -279,29 +279,26 @@ public:
     return new Inside(boost::proto::eval(value, *this), constants);
   }
 
-  template<typename Integer, typename XXX>
+  template<typename Integer, typename Expr>
   result_type operator()(boost::proto::tag::function,
       boost::proto::terminal<operator_dist>::type const & tag,
-      //WriteReference<Integer> const & var_term, distribution<Integer> const & probability) {
-      WriteReference<Integer> const & var_term, XXX const & probability) {
-/*
+      WriteReference<Integer> const & var_term, Expr const & dist_expr) {
     result_type expr = boost::proto::eval(var_term, *this);
-    read_references_.push_back(std::make_pair(
-        boost::proto::value(var_term).id,
-        boost::shared_ptr<crave::ReferenceExpression>(
-            new DistReferenceExpr(boost::proto::value(probability), expr)
-    )));
-*/    
+    result_type node = boost::proto::eval(dist_expr, *this);  
+    if (boost::dynamic_pointer_cast< distribution<Integer> >(node) != 0) {
+      distribution<Integer>& dist = *(boost::dynamic_pointer_cast< distribution<Integer> >(node));
+      boost::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<Integer>(dist, expr));
+      dist_references_.push_back(std::make_pair(boost::proto::value(var_term).id, ref_expr));
+    }
+    else 
+      throw std::runtime_error("Distribution and variable type not compatible");
     return new Constant(true);
   }
 
-/*
-  result_type operator()(boost::proto::tag::function,
-      boost::proto::terminal<operator_dist>::type const & tag,
-      WriteReference<bool> const & var_term, distribution<bool> const & probability) {
-    return new Constant(true);
+  template<typename Integer>
+  result_type operator()(boost::proto::tag::terminal, distribution<Integer> const & dist) {
+    return new distribution<Integer>(dist);
   }
-*/  
 
   template<typename Expr1, typename Expr2>
   result_type operator()(boost::proto::tag::function,
@@ -339,6 +336,7 @@ private:
   std::map<int, result_type>& vector_variables_;
   std::vector<ReadRefPair>& read_references_;
   std::vector<WriteRefPair>& write_references_;
+  std::vector<ReadRefPair>& dist_references_;
   
   std::set<int> support_vars_;
 };

@@ -110,7 +110,7 @@ namespace crave {
 
 #define _COMMON_INTERFACE(Typename) \
 public: \
-  randv(rand_obj* parent) : randv_prim_base<Typename>(parent) { } \
+  randv(rand_obj* parent = 0) : randv_prim_base<Typename>(parent) { } \
   randv(const randv& other) : randv_prim_base<Typename>(other) { } \
   bool next() { value = nextValue(); return true; } \
   randv<Typename>& operator=(const randv<Typename>& i) { value = i.value; return *this; } \

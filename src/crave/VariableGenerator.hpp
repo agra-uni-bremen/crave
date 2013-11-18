@@ -60,6 +60,9 @@ struct VariableSolver {
     BOOST_FOREACH(VariableContainer::ReadRefPair pair, vcon_.read_references)
       if (cp_.contains_var(pair.first))
         solver_->makeAssumption(*pair.second->expr());
+    BOOST_FOREACH(VariableContainer::ReadRefPair pair, vcon_.dist_references)
+      if (cp_.contains_var(pair.first))
+        solver_->makeSuggestion(*pair.second->expr());
     if (solver_->solve()) { 
       BOOST_FOREACH(VariableContainer::WriteRefPair pair, vcon_.write_references)
         if (cp_.contains_var(pair.first))

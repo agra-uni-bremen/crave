@@ -1,5 +1,7 @@
 #pragma once
 
+#include "expression/Node.hpp"
+
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/mersenne_twister.hpp>
@@ -50,7 +52,7 @@ namespace crave {
   };
 
   template<typename T>
-  struct distribution {
+  struct distribution : Node {
     distribution() : ranges_() { }
 
     distribution& operator()(const weighted_range<T>& range) { 
@@ -68,7 +70,7 @@ namespace crave {
 
     std::vector< weighted_range<T> >& ranges() { return ranges_; }
 
-    T nextValue() {
+    T nextValue() const {
       if (ranges_.empty())
         return boost::uniform_int<T>(std::numeric_limits<T>::min(), std::numeric_limits<T>::max())(rng);
       weighted_range<T> selected = ranges_.back();
@@ -96,7 +98,7 @@ namespace crave {
   };
 
   template<>
-  struct distribution<bool> {
+  struct distribution<bool> : Node {
     distribution(const double prob = 0.5) : prob_(prob) { }
 
     static distribution create(const double prob) { 
@@ -104,7 +106,7 @@ namespace crave {
       return dist;
     }
 
-    bool nextValue() {
+    bool nextValue() const {
       return boost::uniform_01<double>()(rng) <= prob_;
     }
     

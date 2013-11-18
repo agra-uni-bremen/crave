@@ -20,6 +20,7 @@ struct VariableContainer {
   std::map<int, NodePtr > vector_variables;
   std::vector<ReadRefPair> read_references;
   std::vector<WriteRefPair> write_references;
+  std::vector<ReadRefPair> dist_references;
 };
 
 static VariableContainer variables;
