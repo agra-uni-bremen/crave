@@ -17,6 +17,7 @@ class metaSMTVisitor : public NodeVisitor {
 public:
   virtual void makeAssertion( Node const & ) = 0;
   virtual void makeSoftAssertion( Node const & ) = 0;
+  virtual void makeSuggestion( Node const & ) = 0;
   virtual void makeAssumption( Node const & ) = 0;
   virtual std::vector<unsigned int> analyseSofts(bool exact = false) = 0;
   virtual std::vector<std::vector<unsigned int> > analyseContradiction(

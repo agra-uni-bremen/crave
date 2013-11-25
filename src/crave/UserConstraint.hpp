@@ -235,6 +235,7 @@ struct ConstraintManager {
       throw std::runtime_error("Constraint already exists.");
 
     ctx.reset_support_vars();
+    
     NodePtr n(boost::proto::eval(FixWidth()(e), ctx));
 
     ConstraintPtr c(

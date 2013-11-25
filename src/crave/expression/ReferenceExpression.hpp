@@ -5,6 +5,7 @@
 #include <boost/random/uniform_01.hpp>
 
 #include "../bitsize_traits.hpp"
+#include "../Distribution.hpp"
 #include "Node.hpp"
 
 namespace crave {
@@ -36,18 +37,19 @@ namespace crave {
     ReferenceExpression::result_type expr_;
   };
 
+  template<typename Integer>
   struct DistReferenceExpr : ReferenceExpression {
-    DistReferenceExpr(float prob, ReferenceExpression::result_type expr)
-    : value_(), probability_(prob), expr_(expr) { }
+    DistReferenceExpr(distribution<Integer> dist, ReferenceExpression::result_type expr)
+    : dist_(dist), expr_(expr) { }
 
     virtual ReferenceExpression::result_type expr() const {
-      float res = boost::uniform_01<float>()(rng);
-      value_ = res <= probability_;
-      return new EqualOpr(expr_, new Constant(value_));
+      unsigned width = bitsize_traits<Integer>::value;
+      bool sign = boost::is_signed<Integer>::value;
+      return new EqualOpr(expr_, new Constant(dist_.nextValue(), width, sign));
     }
   private:
-    mutable bool value_;
-    float probability_;
+    distribution<Integer> dist_;
     ReferenceExpression::result_type expr_;
-  };
+  };  
+
 } /* namespace crave */

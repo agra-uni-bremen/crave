@@ -4,6 +4,9 @@
 #include "../../crave/expression/metaSMTNodeVisitor.hpp"
 #include "../../crave/AssignResult.hpp"
 
+#include <boost/random/uniform_int.hpp>
+#include <boost/random/variate_generator.hpp>
+#include <boost/random/mersenne_twister.hpp>
 #include <boost/foreach.hpp>
 #include <boost/function.hpp>
 #include <metaSMT/frontend/QF_BV.hpp>
@@ -21,12 +24,18 @@ namespace crave {
   namespace qf_bv = metaSMT::logic::QF_BV;
   using metaSMT::evaluate;
 
+  extern boost::mt19937 rng;
+  struct RNG {
+    unsigned operator()(unsigned i) { return boost::uniform_int<>(0, i - 1)(rng); }
+  } rng_;
+
+
 template<typename SolverType>
 class metaSMTVisitorImpl : public metaSMTVisitor {
 public:
   metaSMTVisitorImpl()
   : metaSMTVisitor(), solver_(), exprStack_(), terminals_(),
-    softs_(), assumptions_() { }
+    softs_(), assumptions_(), suggestions_() { }
 
   virtual void visitNode( Node const & );
   virtual void visitTerminal( Terminal const & );
@@ -71,6 +80,7 @@ public:
 
   virtual void makeAssertion( Node const & );
   virtual void makeSoftAssertion( Node const & );
+  virtual void makeSuggestion( Node const & );
   virtual void makeAssumption( Node const & );
   virtual std::vector<unsigned int> analyseSofts(bool exact);
   virtual std::vector<std::vector<unsigned int> > analyseContradiction(
@@ -94,8 +104,8 @@ private: // data
   std::stack<stack_entry> exprStack_;
   std::map<int, qf_bv::bitvector> terminals_;
   std::vector<result_type> softs_;
-
   std::vector<result_type> assumptions_;
+  std::vector<result_type> suggestions_;
 };
 
 template<typename SolverType>
@@ -629,10 +639,18 @@ void metaSMTVisitorImpl<SolverType>::makeSoftAssertion( Node const &expr )
   stack_entry entry;
   pop(entry);
 
-  result_type var = evaluate(solver_, preds::new_variable());
-  softs_.push_back(var);
+  softs_.push_back(entry.first);
+}
 
-  metaSMT::assertion(solver_, preds::implies(var, entry.first));
+template<typename SolverType>
+void metaSMTVisitorImpl<SolverType>::makeSuggestion( Node const &expr )
+{
+  expr.visit(*this);
+
+  stack_entry entry;
+  pop(entry);
+
+  suggestions_.push_back(entry.first);
 }
 
 template<typename SolverType>
@@ -650,16 +668,6 @@ template<typename SolverType>
 std::vector<unsigned int> metaSMTVisitorImpl<SolverType>::analyseSofts(bool exact)
 {
   std::vector<unsigned int> result;
-/*
-    // minimize the number of soft constraints to be deactivated
-    for (int i = softs_.size(); 0 < i; --i) {
-      metaSMT::assumption(solver_,
-                          preds::And(metaSMT::cardinality_eq(solver_, softs_, i),
-                                     metaSMT::evaluate(solver_, preds::True)));
-      if (metaSMT::solve(solver_)) {
-      }
-    }
-*/
   // implements soft constraint semantics of the HVL e
   for (unsigned int i = 0; i < softs_.size(); i++) {
     metaSMT::assumption(solver_, preds::equal(softs_[i], preds::True));
@@ -703,21 +711,35 @@ std::vector<std::vector<unsigned int> > metaSMTVisitorImpl<SolverType>::analyseC
 template<typename SolverType>
 bool metaSMTVisitorImpl<SolverType>::solve(bool ignoreSofts)
 {
-  for (typename std::vector<result_type>::const_iterator ite = assumptions_.begin();
-       ite != assumptions_.end(); ++ite) {
-    metaSMT::assumption(solver_, *ite);
-  }
-  
-  if (!ignoreSofts) {
-    for (typename std::vector<result_type>::const_iterator ite = softs_.begin();
-         ite != softs_.end(); ++ite) {
+  bool result = false;
+
+  std::random_shuffle(assumptions_.begin(), assumptions_.end(), rng_);
+  std::random_shuffle(suggestions_.begin(), suggestions_.end(), rng_);
+
+  for (int k = suggestions_.size(); k >= 0; --k) {
+
+    for (typename std::vector<result_type>::const_iterator ite = assumptions_.begin();
+         ite != assumptions_.end(); ++ite) {
       metaSMT::assumption(solver_, *ite);
     }
-  }  
 
-  bool result = metaSMT::solve(solver_);
+    if (k > 0) 
+      metaSMT::assumption(solver_, metaSMT::cardinality_eq(solver_, suggestions_, k));
+  
+    if (!ignoreSofts) {
+      for (typename std::vector<result_type>::const_iterator ite = softs_.begin(); ite != softs_.end(); ++ite) 
+        metaSMT::assumption(solver_, preds::equal(*ite, preds::True));
+    }  
 
+    if (metaSMT::solve(solver_)) {
+      result = true;
+      break;
+    }
+  }
+  
   assumptions_.clear();
+  suggestions_.clear();
+  
   return result;
 }
 
