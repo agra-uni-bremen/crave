@@ -349,7 +349,7 @@ private:
         }
       }
       if (!changed) break;
-    }      
+    }
   }
 
 private:
@@ -357,7 +357,7 @@ private:
   ConstraintMap cMap_;
   ConstraintList constraints_;
   bool changed_;
-  
+
   // partition result
   std::vector<ConstraintPartition> partitions_;
   std::vector<VectorConstraintPtr> vec_constraints_;
