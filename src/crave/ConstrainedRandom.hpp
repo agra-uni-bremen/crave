@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Constraint.hpp"
+#include "VectorConstraint.hpp"
 #include "Generator.hpp"
 #include "Distribution.hpp"
 
@@ -32,14 +32,32 @@ namespace crave {
 
     public:
       virtual bool next() = 0;
+      virtual std::size_t numValues() const = 0;
+      virtual void gatherValues(std::vector<long>&) = 0;
+      virtual void gatherValues(std::vector<unsigned long>&) = 0;
   };
 
   class rand_obj : public rand_base
   {
     public:
       rand_obj(rand_obj* pr = 0) { parent = pr; if (parent != 0) { parent->addChild(this, true); } }
-      virtual bool next() {
-        return constraint.next();
+      virtual bool next() { return constraint.next(); }
+      virtual std::size_t numValues() const {
+        std::size_t num = 0;
+        for (std::vector<rand_base*>::const_iterator i = children.begin();
+             i != children.end(); ++i)
+          num += (*i)->numValues();
+        return num;
+      }
+      virtual void gatherValues(std::vector<long>& ch) {
+        for (std::vector<rand_base*>::const_iterator i = children.begin();
+             i != children.end(); ++i)
+          (*i)->gatherValues(ch);
+      }
+      virtual void gatherValues(std::vector<unsigned long>& ch) {
+        for (std::vector<rand_base*>::const_iterator i = children.begin();
+             i != children.end(); ++i)
+          (*i)->gatherValues(ch);
       }
       bool enable_constraint(std::string name) { return constraint.enable_constraint(name); }
       bool disable_constraint(std::string name) { return constraint.disable_constraint(name); }
@@ -65,6 +83,13 @@ namespace crave {
       friend ostream& operator<<(ostream& os, const randv_prim_base<T>& e) { os << e.value; return os; }
       WriteReference<T> const& operator()() const { return var; }
       CppType type() { return UNSUPPORTED; }
+      virtual void gatherValues(std::vector<long>& ch) {
+        ch.insert(ch.end(), static_cast<long>(value));
+      }
+      virtual void gatherValues(std::vector<unsigned long>& ch) {
+        ch.insert(ch.end(), static_cast<unsigned long>(value));
+      }
+      virtual std::size_t numValues() const { return 1; }
 
     protected:
       randv_prim_base(rand_obj* parent) : var(value) { if (parent != 0) parent->addChild(this, true); }
@@ -174,7 +199,7 @@ class randv<typename> : public randv_prim_base<typename>, public randomize_base<
     public:
       rand_vec(rand_obj* parent) : __rand_vec<T>() { if (parent != 0) parent->addChild(this, true); }
 
-      bool next() {
+      virtual bool next() {
         static randv<unsigned> default_size(NULL);
         default_size.range(5, 10);
         default_size.next();
@@ -186,7 +211,11 @@ class randv<typename> : public randv_prim_base<typename>, public randomize_base<
         }
         return true;
       }
-
+      virtual void gatherValues(std::vector<long>& ch) { }
+      virtual void gatherValues(std::vector<unsigned long>& ch) { }
+      virtual std::size_t numValues() const {
+        return 0;
+      }
   };
 
 } // namespace crave
