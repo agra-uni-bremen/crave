@@ -109,6 +109,8 @@ namespace crave {
     bool nextValue() const {
       return boost::uniform_01<double>()(rng) <= prob_;
     }
+
+    std::vector< weighted_range<bool> >& ranges() { static std::vector< weighted_range<bool> > v; return v; }
     
   private:  
     double prob_;

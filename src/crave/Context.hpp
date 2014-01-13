@@ -40,23 +40,22 @@ public:
           : variables_(vars.variables), vector_variables_(vars.vector_variables),
             read_references_(vars.read_references), write_references_(vars.write_references), dist_references_(vars.dist_references) { }
 
-  template<typename value_type>
-  result_type operator()(boost::proto::tag::terminal, var_tag<value_type> const & tag) {
-    support_vars_.insert(tag.id);   
-    
-    std::map<int, result_type>::iterator ite(variables_.lower_bound(tag.id));
-    if (ite == variables_.end() || tag.id < ite->first) {
+  inline result_type new_var(unsigned id, unsigned width, bool sign) {  return (variables_[id] = new VariableExpr(id, width, sign)); }
 
+  template<typename value_type>
+  result_type new_var(var_tag<value_type> const & tag) {
       unsigned width = bitsize_traits<value_type>::value;
       bool sign = boost::is_signed<value_type>::value;
+      return new_var(tag.id, width, sign);
+  }
 
-      result_type var = new VariableExpr(tag.id, width, sign);
-      variables_.insert(ite, std::make_pair(tag.id, var));
-      return var;
+  template<typename value_type>
+  result_type operator()(boost::proto::tag::terminal, var_tag<value_type> const & tag) { 
+    support_vars_.insert(tag.id);
 
-    } else {
-      return ite->second;
-    }
+    std::map<int, result_type>::iterator ite(variables_.find(tag.id));
+
+    return ite != variables_.end() ? ite->second : new_var(tag);
   }
 
   template<typename value_type>
@@ -77,31 +76,18 @@ public:
     }
   }
 
-  result_type operator()(boost::proto::tag::terminal, placeholder_tag const & tag) {
-/*
-    std::map<int, result_type>::iterator ite(variables_.lower_bound(tag.id));
-    if (ite == variables_.end() || tag.id < ite->first) {
-
-      result_type ph = new Placeholder(tag.id);
-      variables_.insert(ite, std::make_pair(tag.id, ph));
-      return ph;
-
-    } else {
-      return ite->second;
-    }
-*/
-    return new Placeholder(tag.id);
-  }
+  result_type operator()(boost::proto::tag::terminal, placeholder_tag const & tag) { return new Placeholder(tag.id); }
 
   template<typename value_type>
   result_type operator()(boost::proto::tag::terminal t, write_ref_tag<value_type> const & ref) {
     support_vars_.insert(ref.id);   
 
     std::map<int, result_type>::const_iterator ite = variables_.find(ref.id);
+
     if ( ite != variables_.end() ) {
       return ite->second;
     } else {
-      result_type var = (*this)(t, static_cast<var_tag<value_type> >(ref));
+      result_type var = new_var( static_cast<var_tag<value_type> >(ref) );
 
       write_references_.push_back( std::make_pair(
               ref.id, boost::shared_ptr<crave::AssignResult>(
@@ -242,10 +228,11 @@ public:
     support_vars_.insert(ref.id);   
 
     std::map<int, result_type>::const_iterator ite = variables_.find(ref.id);
+    
     if ( ite != variables_.end() ) {
       return ite->second;
     } else {
-      result_type var = (*this)(t, static_cast<var_tag<Integer> >(ref));
+      result_type var = new_var( static_cast<var_tag<Integer> >(ref) );
 
       boost::shared_ptr<crave::ReferenceExpression> refExpr(new ReferenceExpressionImpl<Integer>(ref.ref, var));
       read_references_.push_back(std::make_pair(ref.id, refExpr));
@@ -269,30 +256,61 @@ public:
     typedef typename boost::proto::result_of::value<CollectionTerm>::type Collection;
     typedef typename boost::range_value<Collection>::type CollectionEntry;
 
+    unsigned width = bitsize_traits<CollectionEntry>::value;
+    bool sign = boost::is_signed<CollectionEntry>::value;
+
     std::set<Constant> constants;
+    distribution<CollectionEntry> dist;
     BOOST_FOREACH( CollectionEntry const & i, boost::proto::value(c) ) {
-
-      unsigned width = bitsize_traits<CollectionEntry>::value;
-      bool sign = boost::is_signed<CollectionEntry>::value;
       constants.insert(Constant(i, width, sign));
+      dist(weighted_value<CollectionEntry>(i, 1));
     }
-    return new Inside(boost::proto::eval(value, *this), constants);
+          
+    unsigned id = new_var_id();          
+    support_vars_.insert(id);
+    result_type tmp_var = new_var(id, width, sign);
+    boost::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<CollectionEntry>(dist, tmp_var));
+    dist_references_.push_back(std::make_pair(id, ref_expr));
+    
+    result_type val_equal_tmp(new EqualOpr(boost::proto::eval(value, *this), tmp_var));
+    result_type tmp_inside(new Inside(tmp_var, constants));
+    return new LogicalAndOpr(val_equal_tmp, tmp_inside);
   }
-
+  
   template<typename Integer, typename Expr>
   result_type operator()(boost::proto::tag::function,
       boost::proto::terminal<operator_dist>::type const & tag,
       WriteReference<Integer> const & var_term, Expr const & dist_expr) {
-    result_type expr = boost::proto::eval(var_term, *this);
     result_type node = boost::proto::eval(dist_expr, *this);  
     if (boost::dynamic_pointer_cast< distribution<Integer> >(node) != 0) {
+
       distribution<Integer>& dist = *(boost::dynamic_pointer_cast< distribution<Integer> >(node));
-      boost::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<Integer>(dist, expr));
-      dist_references_.push_back(std::make_pair(boost::proto::value(var_term).id, ref_expr));
+
+      unsigned width = bitsize_traits<Integer>::value;
+      bool sign = boost::is_signed<Integer>::value;
+
+      unsigned id = new_var_id();          
+      support_vars_.insert(id);
+      result_type tmp_var = new_var(id, width, sign);
+      boost::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<Integer>(dist, tmp_var));
+      dist_references_.push_back(std::make_pair(id, ref_expr));
+
+      result_type in_ranges;
+      BOOST_FOREACH( weighted_range<Integer> const & r, dist.ranges() ) {
+        result_type left(new Constant(r.left, width, sign));
+        result_type right(new Constant(r.right, width, sign));
+        result_type left_cond(new LessEqualOpr(left, tmp_var));
+        result_type right_cond(new LessEqualOpr(tmp_var, right));
+        result_type in_range(new LogicalAndOpr(left_cond, right_cond));
+        result_type tmp(in_ranges != 0 ? new LogicalOrOpr(in_ranges, in_range) : in_range);
+        in_ranges = tmp;
+      }
+      
+      result_type var_equal_tmp(new EqualOpr(boost::proto::eval(var_term, *this), tmp_var));
+      return dist.ranges().size() > 0 ? new LogicalAndOpr(var_equal_tmp, in_ranges) : var_equal_tmp;
     }
     else 
       throw std::runtime_error("Distribution and variable type not compatible");
-    return new Constant(true);
   }
 
   template<typename Integer>

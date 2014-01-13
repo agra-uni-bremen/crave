@@ -439,6 +439,39 @@ BOOST_AUTO_TEST_CASE(conflict_with_softs_t2)
   BOOST_CHECK_EQUAL_COLLECTIONS( result.begin(), result.end(), expected.begin(), expected.end());
 }
 
+class Item2 : public rand_obj {
+public:
+  Item2() : rand_obj(), a(this), b(this) {
+    constraint("d1", dist(a(), distribution<uint>::create(range<uint>(10, 20))));
+    constraint("d2", dist(a(), distribution<uint>::create(range<uint>(30, 50))));
+    constraint(b() == a() * 5);
+  }
+  randv<uint> a;
+  randv<uint> b;
+
+  friend ostream& operator<<(ostream& os, const Item2& it) {
+    os << it.a << " " << it.b;
+    return os;
+  }
+};
+
+BOOST_AUTO_TEST_CASE( multi_distributions )
+{
+  Item2 it;
+
+  BOOST_REQUIRE(!it.next() );
+
+  BOOST_REQUIRE( it.disable_constraint("d1") );
+  BOOST_REQUIRE( it.next() );
+  BOOST_REQUIRE( 30 <= it.a && it.a <= 50 );
+
+  BOOST_REQUIRE( it.enable_constraint("d1") );
+  BOOST_REQUIRE( it.disable_constraint("d2") );
+  BOOST_REQUIRE( it.next() );
+  BOOST_REQUIRE( 10 <= it.a && it.a <= 20 );
+}
+
+
 BOOST_AUTO_TEST_SUITE_END() // Context
 
 //  vim: ft=cpp:ts=2:sw=2:expandtab
