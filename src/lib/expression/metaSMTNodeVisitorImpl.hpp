@@ -723,9 +723,12 @@ bool metaSMTVisitorImpl<SolverType>::solve(bool ignoreSofts)
       metaSMT::assumption(solver_, *ite);
     }
 
-    if (k > 0) 
-      metaSMT::assumption(solver_, metaSMT::cardinality_eq(solver_, suggestions_, k));
+//    if (k > 0) 
+//      metaSMT::assumption(solver_, metaSMT::cardinality_eq(solver_, suggestions_, k));
   
+    for (int i = 0; i < k; i++)
+      metaSMT::assumption(solver_, suggestions_[i]);
+
     if (!ignoreSofts) {
       for (typename std::vector<result_type>::const_iterator ite = softs_.begin(); ite != softs_.end(); ++ite) 
         metaSMT::assumption(solver_, preds::equal(*ite, preds::True));
