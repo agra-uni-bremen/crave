@@ -66,6 +66,12 @@ namespace crave {
       return dist;
     }
 
+    static distribution simple_range(T left, T right) { 
+      distribution dist;
+      dist(range<T>(left, right));
+      return dist;
+    }
+
     void reset() { ranges_.clear(); }
 
     std::vector< weighted_range<T> >& ranges() { return ranges_; }

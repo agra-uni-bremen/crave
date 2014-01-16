@@ -248,31 +248,31 @@ public:
     return new Constant(i, width, sign);
   }
 
-  template<typename Value, typename CollectionTerm>
+  template<typename Integer, typename CollectionTerm>
   result_type operator()(boost::proto::tag::function,
       boost::proto::terminal<operator_inside>::type const & tag,
-      Value const & value, CollectionTerm const & c) {
+      WriteReference<Integer> const & var_term, CollectionTerm const & c) {
 
     typedef typename boost::proto::result_of::value<CollectionTerm>::type Collection;
     typedef typename boost::range_value<Collection>::type CollectionEntry;
 
-    unsigned width = bitsize_traits<CollectionEntry>::value;
-    bool sign = boost::is_signed<CollectionEntry>::value;
+    unsigned width = bitsize_traits<Integer>::value;
+    bool sign = boost::is_signed<Integer>::value;
 
     std::set<Constant> constants;
-    distribution<CollectionEntry> dist;
+    distribution<Integer> dist;
     BOOST_FOREACH( CollectionEntry const & i, boost::proto::value(c) ) {
       constants.insert(Constant(i, width, sign));
-      dist(weighted_value<CollectionEntry>(i, 1));
+      dist(weighted_value<Integer>(i, 1));
     }
           
     unsigned id = new_var_id();          
     support_vars_.insert(id);
     result_type tmp_var = new_var(id, width, sign);
-    boost::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<CollectionEntry>(dist, tmp_var));
+    boost::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<Integer>(dist, tmp_var));
     dist_references_.push_back(std::make_pair(id, ref_expr));
     
-    result_type val_equal_tmp(new EqualOpr(boost::proto::eval(value, *this), tmp_var));
+    result_type val_equal_tmp(new EqualOpr(boost::proto::eval(var_term, *this), tmp_var));
     result_type tmp_inside(new Inside(tmp_var, constants));
     return new LogicalAndOpr(val_equal_tmp, tmp_inside);
   }
