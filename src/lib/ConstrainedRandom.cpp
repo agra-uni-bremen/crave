@@ -41,6 +41,8 @@ namespace crave {
 
     // initalize glog
     LoggerSetting settings(cfg_file);
+
+    settings.load();
     fLS::FLAGS_log_dir = settings.dirname();
     fLI::FLAGS_max_log_size = settings.filesize();
     fLB::FLAGS_logtostderr = false;
@@ -56,7 +58,7 @@ namespace crave {
       initialized = true;
     }
 
-    settings.save(cfg_file);
+    settings.save();
   }
 
   void init(std::string const& solver_type, std::string const& cfg_file) {
