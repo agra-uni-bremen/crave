@@ -6,7 +6,7 @@
 
 #include "../crave/expression/FactoryMetaSMT.hpp"
 #include "../crave/ConstrainedRandom.hpp"
-#include "../crave/Settings.hpp"
+#include "../crave/utils/Settings.hpp"
 
 namespace crave {
 
