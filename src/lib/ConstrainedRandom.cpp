@@ -16,8 +16,6 @@ namespace crave {
 
   boost::mt19937 rng(std::time(0));
 
-  void set_global_seed(unsigned int s) { rng.seed(s); };
-
   struct random_bit_gen {
     random_bit_gen() : rnd(0, 1) { }
 
@@ -30,14 +28,25 @@ namespace crave {
 
   boost::function0<bool> random_bit = random_bit_gen();
 
+  void set_global_seed(unsigned int s) { rng.seed(s); };
+
   void set_solver_backend(std::string const& type) {
     FactoryMetaSMT::setSolverType(type);
+  }
+
+  std::string config_file_name = "crave.cfg";
+  std::string const& get_config_file_name() { return config_file_name; }
+  void set_config_file_name(std::string const& str) { config_file_name = str; }
+
+  void init() {
+    init(get_config_file_name());
   }
 
   void init(std::string const& cfg_file) {
 
     // set global seed
     set_global_seed(0);
+    set_config_file_name(cfg_file);
 
     // initalize glog
     LoggerSetting settings(cfg_file);
