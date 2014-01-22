@@ -89,12 +89,14 @@ void rand_obj_gen<T>::print_bench_values() {
 
   unsigned int num_vars = obj_->numValues();
   std::size_t sum = 0,
-              min = std::numeric_limits<std::size_t>::max();
+              min = std::numeric_limits<std::size_t>::max(),
+              max = std::numeric_limits<std::size_t>::min();
   std::clock_t elapsed_gen_time = 0,
                elapsed_min = std::numeric_limits<std::clock_t>::max(),
                elapsed_max = std::numeric_limits<std::clock_t>::min();
   std::vector<std::size_t> sums(num_vars, 0),
-                           mins(num_vars, std::numeric_limits<std::size_t>::max());
+                           mins(num_vars, std::numeric_limits<std::size_t>::max()),
+                           maxs(num_vars, std::numeric_limits<std::size_t>::min());
 
   for (unsigned int i = 0; i < num_vars; ++i) {
 
@@ -108,15 +110,18 @@ void rand_obj_gen<T>::print_bench_values() {
         std::size_t distance = (solutions_[j][i] ^ solutions_[k][i]).count();
         sums[i] += distance;
         mins[i] = (mins[i] < distance)? mins[i]: distance;
+        maxs[i] = (maxs[i] > distance)? maxs[i]: distance;
       }
     }
 
     sum += sums[i];
     min = (min < mins[i])? min: mins[i];
-
+    max = (max > maxs[i])? max: maxs[i];
   }
-  std::cout << "Hamming Distance (avg):\t" << sum / ((num_vars - 1) * num_vars * number_ / 2) << std::endl;
+
+  std::cout << "Hamming Distance (avg):\t" << sum / ((number_ - 1) * number_ * double(num_vars) / 2) << std::endl;
   std::cout << "Hamming Distance (min):\t" << min << std::endl;
+  std::cout << "Hamming Distance (max):\t" << max << std::endl;
   std::cout << "Elapsed genenration time (min):\t" << elapsed_min / double(CLOCKS_PER_SEC) << std::endl;
   std::cout << "Elapsed genenration time (max):\t" << elapsed_max / double(CLOCKS_PER_SEC) << std::endl;
   std::cout << "Elapsed genenration time (sum):\t" << elapsed_gen_time / double(CLOCKS_PER_SEC) << std::endl;
