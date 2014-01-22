@@ -44,8 +44,11 @@ namespace crave {
 
   void init(std::string const& cfg_file) {
 
-    // set global seed
-    set_global_seed(0);
+    CraveSetting cSettings(cfg_file);
+    cSettings.load();
+
+    set_global_seed(cSettings.get_seed());
+    set_solver_backend(cSettings.get_backend());
     set_config_file_name(cfg_file);
 
     // initalize glog
@@ -67,6 +70,7 @@ namespace crave {
       initialized = true;
     }
 
+    cSettings.save();
     settings.save();
   }
 

@@ -13,9 +13,10 @@ class Setting {
 protected:
   typedef boost::property_tree::ptree ptree;
 
-public:
+protected:
   Setting(std::string const& filename) : filename_(filename) { }
 
+public:
   void load() {
     ptree tree = read_setting_file_();
     load_(tree);
@@ -57,16 +58,16 @@ public:
 
 private:
   virtual void load_(ptree& tree) {
-    file_ = tree.get(module_name_ + ".filename", "crave.log");
-    dir_ = tree.get(module_name_ + ".directory", "./logs");
-    s_level_ = tree.get(module_name_ + ".level", 0);
-    file_size_ = tree.get(module_name_ + ".filesize", 100);
+    file_ = tree.get(module_name_ + "." + FILE, "crave.log");
+    dir_ = tree.get(module_name_ + "." + DIR, "./logs");
+    s_level_ = tree.get(module_name_ + "." + S_LEVEL, 0);
+    file_size_ = tree.get(module_name_ + "." + FILE_SIZE, 100);
   }
   virtual void save_(ptree& tree) const {
-    tree.put(module_name_ + ".filename", file_);
-    tree.put(module_name_ + ".directory", dir_);
-    tree.put(module_name_ + ".level", s_level_);
-    tree.put(module_name_ + ".filesize", file_size_);
+    tree.put(module_name_ + "." + FILE, file_);
+    tree.put(module_name_ + "." + DIR, dir_);
+    tree.put(module_name_ + "." + S_LEVEL, s_level_);
+    tree.put(module_name_ + "." + FILE_SIZE, file_size_);
   }
 
 public:
@@ -84,6 +85,12 @@ public:
   }
 
 private:
+  std::string const FILE = "filename";
+  std::string const DIR = "directory";
+  std::string const S_LEVEL = "level";
+  std::string const FILE_SIZE = "filesize";
+  std::string const MODULES = "modules";
+private:
   std::string module_name_;
 private:
   std::string file_;              // log filename
@@ -93,28 +100,37 @@ private:
   std::set<std::string> modules_; // modules where logging is enabled
 };
 
-class RandObjGenSetting : public Setting {
+class CraveSetting : public Setting {
 public:
-  RandObjGenSetting(std::string const& filename)
-  : Setting(filename), module_name_("rand_obj_gen"), num_gens_() { }
+  CraveSetting(std::string const& filename)
+  : Setting(filename), module_name_("crave"), backend_(), seed_() { }
 
 private:
   virtual void load_(ptree& tree) {
-    num_gens_ = tree.get(module_name_ + ".num_generations", 1000);
+    backend_ = tree.get(module_name_ + "." + BACKEND, "Boolector");
+    seed_ = tree.get(module_name_ + "." + SEED, 42);
   }
   virtual void save_(ptree& tree) const {
-    tree.put(module_name_ + ".num_generations", num_gens_);
+    tree.put(module_name_ + "." + BACKEND, backend_);
+    tree.put(module_name_ + "." + SEED, seed_);
   }
 
 public:
-  unsigned int num_generations() const {
-    return num_gens_;
+  std::string const& get_backend() const {
+    return backend_;
+  }
+  unsigned int get_seed() const {
+    return seed_;
   }
 
 private:
+  std::string const BACKEND = "backend";
+  std::string const SEED = "seed";
+private:
   std::string module_name_;
 private:
-  unsigned int num_gens_;
+  std::string backend_;
+  unsigned int seed_;
 };
 
 } // end namespace crave

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Settings.hpp"
 #include "../ConstrainedRandom.hpp"
 
 #include <boost/foreach.hpp>
@@ -24,9 +23,7 @@ class rand_obj_gen {
   typedef std::vector<std::clock_t> Times;
 
 public:
-  rand_obj_gen(rand_obj*);
   rand_obj_gen(unsigned int, rand_obj*);
-  ~rand_obj_gen();
 
   bool generate();
 
@@ -39,33 +36,14 @@ private:
   Solutions solutions_;
   Times elapsed_gen_times_;
   bool values_generated_;
-  RandObjGenSetting settings_;
 };
 
 template<typename T>
-rand_obj_gen<T>::rand_obj_gen(rand_obj* obj)
-: number_(), obj_(obj), solutions_(), elapsed_gen_times_(), values_generated_(false),
-  settings_(get_config_file_name()) {
-
-  settings_.load();
-  number_ = settings_.num_generations();
-  solutions_.resize(number_);
-  elapsed_gen_times_.resize(number_);
-}
-
-template<typename T>
 rand_obj_gen<T>::rand_obj_gen(unsigned int num, rand_obj* obj)
-: number_(num), obj_(obj), solutions_(), elapsed_gen_times_(), values_generated_(false),
-  settings_(get_config_file_name()) {
+: number_(num), obj_(obj), solutions_(), elapsed_gen_times_(), values_generated_(false) {
 
-  settings_.load();
   solutions_.resize(num);
   elapsed_gen_times_.resize(num);
-}
-
-template<typename T>
-rand_obj_gen<T>::~rand_obj_gen() {
-  settings_.save();
 }
 
 template<typename T>
