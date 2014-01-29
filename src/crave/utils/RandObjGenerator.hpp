@@ -94,11 +94,6 @@ void rand_obj_gen<T>::print_bench_values() {
   std::clock_t elapsed_gen_time = 0,
                elapsed_min = std::numeric_limits<std::clock_t>::max(),
                elapsed_max = std::numeric_limits<std::clock_t>::min();
-  std::vector<std::size_t> sums(num_vars, 0),
-                           mins(num_vars, std::numeric_limits<std::size_t>::max()),
-                           maxs(num_vars, std::numeric_limits<std::size_t>::min());
-
-  for (unsigned int i = 0; i < num_vars; ++i) {
 
     for (unsigned int j = 0; j < number_; ++j) {
 
@@ -107,19 +102,28 @@ void rand_obj_gen<T>::print_bench_values() {
       elapsed_max = (elapsed_max > elapsed_gen_times_[j])? elapsed_max: elapsed_gen_times_[j];
 
       for (unsigned int k = j + 1; k < number_; ++k) {
-        std::size_t distance = (solutions_[j][i] ^ solutions_[k][i]).count();
-        sums[i] += distance;
-        mins[i] = (mins[i] < distance)? mins[i]: distance;
-        maxs[i] = (maxs[i] > distance)? maxs[i]: distance;
-      }
-    }
 
-    sum += sums[i];
-    min = (min < mins[i])? min: mins[i];
-    max = (max > maxs[i])? max: maxs[i];
+        std::size_t total_distance = 0;
+
+        for (unsigned int i = 0; i < num_vars; ++i) {
+
+          std::size_t distance = (solutions_[j][i] ^ solutions_[k][i]).count();
+          total_distance += distance;
+        }
+
+        sum += total_distance;
+        min = (min < total_distance)? min: total_distance;
+        max = (max > total_distance)? max: total_distance;
+      }
+      
+        for (unsigned int i = 0; i < num_vars; ++i) {
+          std::cout << solutions_[j][i] << " ";
+        }
+        std::cout << std::endl;
+
   }
 
-  std::cout << "Hamming Distance (avg):\t" << sum / ((number_ - 1) * number_ * double(num_vars) / 2) << std::endl;
+  std::cout << "Hamming Distance (avg):\t" << sum / ((number_ - 1) * number_ / 2) << std::endl;
   std::cout << "Hamming Distance (min):\t" << min << std::endl;
   std::cout << "Hamming Distance (max):\t" << max << std::endl;
   std::cout << "Elapsed genenration time (min):\t" << elapsed_min / double(CLOCKS_PER_SEC) << std::endl;
