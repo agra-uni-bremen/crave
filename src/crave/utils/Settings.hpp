@@ -54,7 +54,8 @@ private:
 class LoggerSetting : public Setting {
 public:
   LoggerSetting(std::string const& filename)
-  : Setting(filename), module_name_("logger"), file_(), dir_(), s_level_(), file_size_(), modules_() { }
+  : Setting(filename), module_name_("logger"), file_(), dir_(), s_level_(), file_size_(), modules_(),
+    FILE("filename"), DIR("directory"), S_LEVEL("level"), FILE_SIZE("filesize"), MODULES("modules") { }
 
 private:
   virtual void load_(ptree& tree) {
@@ -85,11 +86,11 @@ public:
   }
 
 private:
-  std::string const FILE = "filename";
-  std::string const DIR = "directory";
-  std::string const S_LEVEL = "level";
-  std::string const FILE_SIZE = "filesize";
-  std::string const MODULES = "modules";
+  std::string const FILE;
+  std::string const DIR;
+  std::string const S_LEVEL;
+  std::string const FILE_SIZE;
+  std::string const MODULES;
 private:
   std::string module_name_;
 private:
@@ -103,7 +104,8 @@ private:
 class CraveSetting : public Setting {
 public:
   CraveSetting(std::string const& filename)
-  : Setting(filename), module_name_("crave"), backend_(), seed_() { }
+  : Setting(filename), module_name_("crave"), backend_(), seed_(),
+    BACKEND("backend"), SEED("seed") { }
 
 private:
   virtual void load_(ptree& tree) {
@@ -124,8 +126,8 @@ public:
   }
 
 private:
-  std::string const BACKEND = "backend";
-  std::string const SEED = "seed";
+  std::string const BACKEND;
+  std::string const SEED;
 private:
   std::string module_name_;
 private:
