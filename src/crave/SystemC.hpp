@@ -5,7 +5,7 @@
 #include <sysc/datatypes/bit/sc_bv.h>
 
 #include "bitsize_traits.hpp"
-#include "ConstrainedRandom.hpp"
+#include "RandomBase.hpp"
 #include "VectorConstraint.hpp"
 
 namespace crave {
@@ -36,7 +36,7 @@ namespace crave {
       virtual std::size_t numValues() const { return 1; }
 
     protected:
-      randv_prim_base(rand_obj* parent) : var(value) { if (parent != 0) parent->addChild(this, true); }
+      randv_prim_base(rand_obj_base* parent) : var(value) { if (parent != 0) parent->addChild(this, true); }
       randv_prim_base(const randv_prim_base& other) : var(value), value(other.value) { }
       WriteReference<sc_bv> var;
       sc_bv value;
@@ -47,7 +47,7 @@ namespace crave {
   {
       typedef sc_dt::sc_bv<N> sc_bv;
     public:
-      rand_vec(rand_obj* parent) : __rand_vec<sc_bv>() { if (parent != 0) parent->addChild(this, true); }
+      rand_vec(rand_obj_base* parent) : __rand_vec<sc_bv>() { if (parent != 0) parent->addChild(this, true); }
 
       virtual bool next() {
         static randv<unsigned> default_size(NULL);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../ConstrainedRandom.hpp"
+#include "../RandomBase.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/type_traits/is_signed.hpp>
@@ -23,7 +23,7 @@ class rand_obj_gen {
   typedef std::vector<std::clock_t> Times;
 
 public:
-  rand_obj_gen(unsigned int, rand_obj*);
+  rand_obj_gen(unsigned int, rand_obj_base*);
 
   bool generate();
 
@@ -32,14 +32,14 @@ public:
 
 private:
   unsigned int number_;
-  rand_obj* obj_;
+  rand_obj_base* obj_;
   Solutions solutions_;
   Times elapsed_gen_times_;
   bool values_generated_;
 };
 
 template<typename T>
-rand_obj_gen<T>::rand_obj_gen(unsigned int num, rand_obj* obj)
+rand_obj_gen<T>::rand_obj_gen(unsigned int num, rand_obj_base* obj)
 : number_(num), obj_(obj), solutions_(), elapsed_gen_times_(), values_generated_(false) {
 
   solutions_.resize(num);
