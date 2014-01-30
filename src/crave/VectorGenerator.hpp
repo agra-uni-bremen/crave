@@ -99,22 +99,34 @@ struct VectorSolver {
   #define _GEN_VEC(typename) if (!gen_vec_(static_cast<__rand_vec<typename>*>(vector_))) return false
   bool solve_() {
     __rand_vec_base* vector_ = vectorBaseMap[vector_id_];
-    switch (vector_->element_type()) {
-      case BOOL: _GEN_VEC(bool); break;
-      case INT: _GEN_VEC(int); break;
-      case UINT: _GEN_VEC(unsigned int); break;
-      case CHAR: _GEN_VEC(char); break;
-      case SCHAR: _GEN_VEC(signed char); break;
-      case UCHAR: _GEN_VEC(unsigned char); break;
-      case SHORT: _GEN_VEC(short); break;
-      case USHORT: _GEN_VEC(unsigned short); break;
-      case LONG:  _GEN_VEC(long); break;
-      case ULONG:  _GEN_VEC(unsigned long); break;
-      case LLONG: _GEN_VEC(long long); break;
-      case ULLONG: _GEN_VEC(unsigned long long); break;
-      default:
-        assert(false && "not supported yet");
-        return false; // unknown vectors can not be generated
+
+    if (typeid(*vector_) == typeid(bool)) {
+      _GEN_VEC(bool);
+    } else if (typeid(*vector_) == typeid(int)) {
+      _GEN_VEC(int);
+    } else if (typeid(*vector_) == typeid(unsigned int)) {
+      _GEN_VEC(unsigned int);
+    } else if (typeid(*vector_) == typeid(char)) {
+      _GEN_VEC(char);
+    } else if (typeid(*vector_) == typeid(unsigned char)) {
+      _GEN_VEC(unsigned char);
+    } else if (typeid(*vector_) == typeid(signed char)) {
+      _GEN_VEC(signed char);
+    } else if (typeid(*vector_) == typeid(short)) {
+      _GEN_VEC(short);
+    } else if (typeid(*vector_) == typeid(unsigned short)) {
+      _GEN_VEC(short);
+    } else if (typeid(*vector_) == typeid(long)) {
+      _GEN_VEC(long);
+    } else if (typeid(*vector_) == typeid(unsigned long)) {
+      _GEN_VEC(unsigned long);
+    } else if (typeid(*vector_) == typeid(long long)) {
+      _GEN_VEC(long long);
+    } else if (typeid(*vector_) == typeid(unsigned long long)) {
+      _GEN_VEC(unsigned long long);
+    } else {
+      assert(false && "not supported yet");
+      return false; // unknown vectors can not be generated
     }
     return true;
   }

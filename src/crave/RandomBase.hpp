@@ -39,7 +39,6 @@ namespace crave {
     operator T() const { return value; }
     friend ostream& operator<<(ostream& os, const randv_prim_base<T>& e) { os << e.value; return os; }
     WriteReference<T> const& operator()() const { return var; }
-    CppType type() { return UNSUPPORTED; }
     virtual void gatherValues(std::vector<long>& ch) {
       ch.insert(ch.end(), static_cast<long>(value));
     }

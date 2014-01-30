@@ -11,55 +11,7 @@
 
 namespace crave {
 
-  enum CppType {
-      UNSUPPORTED
-    , BOOL
-    , INT
-    , UINT
-    , CHAR
-    , SCHAR
-    , UCHAR
-    , SHORT
-    , USHORT
-    , LONG
-    , ULONG
-    , LLONG
-    , ULLONG
-  };
-
-  template<typename T>
-  class TypeInfo {
-    public:
-      operator CppType() const { return UNSUPPORTED; }
-  };
-
-#define _DEF_TYPE(typename, cpptype) \
-template<> \
-class TypeInfo<typename> \
-{ \
-  public: \
-    operator CppType() const { return cpptype; } \
-}; \
-
-  _DEF_TYPE(bool, BOOL)
-  _DEF_TYPE(int, INT)
-  _DEF_TYPE(unsigned int, UINT)
-  _DEF_TYPE(char, CHAR)
-  _DEF_TYPE(signed char, SCHAR)
-  _DEF_TYPE(unsigned char, UCHAR)
-  _DEF_TYPE(short, SHORT)
-  _DEF_TYPE(unsigned short, USHORT)
-  _DEF_TYPE(long, LONG)
-  _DEF_TYPE(unsigned long, ULONG)
-  _DEF_TYPE(long long, LLONG)
-  _DEF_TYPE(unsigned long long, ULLONG)
-
-#undef  _DEF_TYPE
-
-  class __rand_vec_base {
-    public:
-      virtual CppType element_type() const { return UNSUPPORTED; }
-  };
+  class __rand_vec_base { };
 
   static std::map<int, __rand_vec_base*> vectorBaseMap;
 
@@ -69,8 +21,6 @@ class TypeInfo<typename> \
     public:
       __rand_vec_base1() { vectorBaseMap[sym_vec.id()] = this; }
       const Vector<T1>& operator()() const { return sym_vec; }
-
-      virtual CppType element_type() const { return TypeInfo<T1>(); }
 
       typename std::vector<T2>::size_type size() const { return real_vec.size(); }
       T1& operator[](const int& idx) const { return (T1&) real_vec[idx]; }

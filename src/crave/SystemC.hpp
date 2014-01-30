@@ -30,7 +30,6 @@ namespace crave {
       operator sc_bv() const { return value; }
       friend ostream& operator<<(ostream& os, const randv_prim_base<sc_bv>& e) { os << e.value; return os; }
       WriteReference<sc_bv> const& operator()() const { return var; }
-      CppType type() { return UNSUPPORTED; }
       virtual void gatherValues(std::vector<long>& ch) { ch.insert(ch.end(), value.to_long()); }
       virtual void gatherValues(std::vector<unsigned long>& ch) { ch.insert(ch.end(), value.to_ulong()); }
       virtual std::size_t numValues() const { return 1; }
