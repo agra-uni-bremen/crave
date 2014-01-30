@@ -2,7 +2,6 @@
 
 #include "../RandomBase.hpp"
 
-#include <boost/foreach.hpp>
 #include <boost/type_traits/is_signed.hpp>
 
 #include <algorithm>

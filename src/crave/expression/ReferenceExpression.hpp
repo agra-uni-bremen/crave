@@ -1,16 +1,12 @@
 #pragma once
 
-#include <boost/intrusive_ptr.hpp>
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_01.hpp>
-
-#include "../bitsize_traits.hpp"
 #include "../Distribution.hpp"
+#include "../bitsize_traits.hpp"
 #include "Node.hpp"
 
-namespace crave {
+#include <boost/type_traits/is_signed.hpp>
 
-  extern boost::mt19937 rng;
+namespace crave {
 
   struct ReferenceExpression {
   public:

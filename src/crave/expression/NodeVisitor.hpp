@@ -1,10 +1,5 @@
 #pragma once
 
-#include <iosfwd>
-#include <ostream>
-#include <set>
-#include <stdexcept>
-
 namespace crave {
 
 class Node;

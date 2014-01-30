@@ -1,6 +1,6 @@
-#ifndef TODOTNODEVISITOR_HPP_
-#define TODOTNODEVISITOR_HPP_
+#pragma once
 
+#include <ostream>
 #include <set>
 
 #include "Node.hpp"
@@ -61,5 +61,3 @@ private:
 };
 
 } //end namespace crave
-
-#endif /* TODOTNODEVISITOR_HPP_ */

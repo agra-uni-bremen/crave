@@ -3,7 +3,6 @@
 #include "NodeVisitor.hpp"
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/proto/eval.hpp>
 
 #include <ostream>
 #include <set>

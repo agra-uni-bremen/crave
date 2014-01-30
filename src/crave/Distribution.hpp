@@ -2,17 +2,10 @@
 
 #include "expression/Node.hpp"
 
-#include <boost/random/uniform_int.hpp>
-#include <boost/random/variate_generator.hpp>
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
-#include <boost/preprocessor/seq/for_each.hpp>
+#include <boost/random.hpp>
 
 #include <limits>
 #include <vector>
-#include <set>
-#include <cstdarg>
 
 namespace crave {
 
@@ -113,14 +106,15 @@ namespace crave {
     }
 
     bool nextValue() const {
-      return boost::uniform_01<double>()(rng) <= prob_;
+      boost::uniform_01<> dist;
+      return dist(rng) <= prob_;
     }
 
     std::vector< weighted_range<bool> >& ranges() { static std::vector< weighted_range<bool> > v; return v; }
-    
-  private:  
+
+  private:
     double prob_;
   };
-  
+
 } // namespace crave
 

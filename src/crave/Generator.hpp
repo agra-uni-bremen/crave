@@ -3,20 +3,16 @@
 #include "Context.hpp"
 #include "UserConstraint.hpp"
 #include "VariableContainer.hpp"
+#include "VariableContainer.hpp"
 #include "VectorGenerator.hpp"
-#include "expression/Node.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/function.hpp>
-#include <boost/scoped_ptr.hpp>
-#include <boost/shared_ptr.hpp>
 
-#include <map>
-#include <set>
-#include <vector>
-#include <string>
-#include <sstream>
+#include <ostream>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 namespace crave {
 

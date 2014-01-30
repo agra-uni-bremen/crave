@@ -1,5 +1,7 @@
 #include "../../crave/expression/EvalVisitor.hpp"
 
+#include <stdexcept>
+
 namespace crave {
 
 void EvalVisitor::visitNode(const Node&) { }

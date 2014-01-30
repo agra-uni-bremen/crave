@@ -1,10 +1,15 @@
 #pragma once
 
+#include "../bitsize_traits.hpp"
 #include "../Context.hpp"
-#include "../ConstrainedRandom.hpp"
+#include "../ExpressionTraits.hpp"
+#include "../RandomBase.hpp"
 #include "../VariableContainer.hpp"
 #include "EvalVisitor.hpp"
 #include "Node.hpp"
+
+#include <boost/proto/eval.hpp>
+#include <boost/type_traits/is_signed.hpp>
 
 namespace crave {
 

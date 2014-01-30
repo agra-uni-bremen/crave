@@ -2,10 +2,11 @@
 
 #include "Constraint.hpp"
 
-#include <map>
-#include <vector>
-#include <string>
 #include <iostream>
+#include <map>
+#include <string>
+#include <vector>
+
 #include <cassert>
 
 namespace crave {

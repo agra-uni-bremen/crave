@@ -6,7 +6,6 @@
 #include "expression/Node.hpp"
 
 #include <boost/foreach.hpp>
-#include <boost/function.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -14,7 +13,6 @@
 #include <set>
 #include <vector>
 #include <string>
-#include <sstream>
 #include <stdexcept>
 
 namespace crave {

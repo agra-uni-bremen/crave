@@ -7,16 +7,10 @@
 #include "expression/Node.hpp"
 
 #include <boost/foreach.hpp>
-#include <boost/function.hpp>
-#include <boost/scoped_ptr.hpp>
-#include <boost/shared_ptr.hpp>
+#include <boost/intrusive_ptr.hpp>
 
 #include <map>
-#include <set>
 #include <vector>
-#include <string>
-#include <sstream>
-#include <stdexcept>
 
 namespace crave {
 
@@ -138,7 +132,7 @@ private:
 struct VectorGenerator {
 
   typedef std::map<int, VectorSolver> VectorSolverMap;
-  
+
   VectorGenerator(VariableGenerator& var_gen) 
   : vector_solvers_(), var_gen_(var_gen) {  }
 

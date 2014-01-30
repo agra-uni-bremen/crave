@@ -1,10 +1,8 @@
 #pragma once
 
 #include "../AssignResult.hpp"
-#include "Node.hpp"
 
 #include <boost/function.hpp>
-#include <boost/intrusive_ptr.hpp>
 #include <boost/optional.hpp>
 #include <boost/type_traits/is_signed.hpp>
 

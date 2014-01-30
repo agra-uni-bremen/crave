@@ -1,5 +1,7 @@
 #include "../../crave/expression/ReplaceVisitor.hpp"
 
+#include <stdexcept>
+
 namespace crave {
 
 void ReplaceVisitor::evalUnaryExpr(UnaryExpression const& unary_expr, NodePtr& node) {

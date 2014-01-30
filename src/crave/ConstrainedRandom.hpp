@@ -4,17 +4,9 @@
 #include "Generator.hpp"
 #include "RandomBase.hpp"
 
-#include <boost/random/uniform_int.hpp>
-#include <boost/random/variate_generator.hpp>
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/function.hpp>
 #include <boost/bind.hpp>
-#include <boost/preprocessor/seq/for_each.hpp>
 
-#include <limits>
 #include <vector>
-#include <set>
-#include <cstdarg>
 
 namespace crave {
 

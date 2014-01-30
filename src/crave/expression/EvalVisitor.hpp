@@ -1,5 +1,4 @@
-#ifndef EVALVISITOR_HPP_
-#define EVALVISITOR_HPP_
+#pragma once
 
 #include "Node.hpp"
 #include "NodeVisitor.hpp"
@@ -124,4 +123,3 @@ inline void EvalVisitor::evalTernExpr(TernaryExpression const& tern, stack_entry
 }
 
 } // end namespace crave
-#endif
