@@ -1,5 +1,6 @@
 #pragma once
 
+#include "RandomBase.hpp"
 #include "VectorConstraint.hpp"
 #include "VariableGenerator.hpp"
 #include "expression/ReplaceVisitor.hpp"
@@ -99,30 +100,30 @@ struct VectorSolver {
   #define _GEN_VEC(typename) if (!gen_vec_(static_cast<__rand_vec<typename>*>(vector_))) return false
   bool solve_() {
     __rand_vec_base* vector_ = vectorBaseMap[vector_id_];
-
-    if (typeid(*vector_) == typeid(bool)) {
+    
+    if (typeid(*vector_) == typeid(rand_vec<bool>)) {
       _GEN_VEC(bool);
-    } else if (typeid(*vector_) == typeid(int)) {
+    } else if (typeid(*vector_) == typeid(rand_vec<int>)) {
       _GEN_VEC(int);
-    } else if (typeid(*vector_) == typeid(unsigned int)) {
+    } else if (typeid(*vector_) == typeid(rand_vec<unsigned int>)) {
       _GEN_VEC(unsigned int);
-    } else if (typeid(*vector_) == typeid(char)) {
+    } else if (typeid(*vector_) == typeid(rand_vec<char>)) {
       _GEN_VEC(char);
-    } else if (typeid(*vector_) == typeid(unsigned char)) {
+    } else if (typeid(*vector_) == typeid(rand_vec<unsigned char>)) {
       _GEN_VEC(unsigned char);
-    } else if (typeid(*vector_) == typeid(signed char)) {
+    } else if (typeid(*vector_) == typeid(rand_vec<signed char>)) {
       _GEN_VEC(signed char);
-    } else if (typeid(*vector_) == typeid(short)) {
+    } else if (typeid(*vector_) == typeid(rand_vec<short>)) {
       _GEN_VEC(short);
-    } else if (typeid(*vector_) == typeid(unsigned short)) {
+    } else if (typeid(*vector_) == typeid(rand_vec<unsigned short>)) {
       _GEN_VEC(short);
-    } else if (typeid(*vector_) == typeid(long)) {
+    } else if (typeid(*vector_) == typeid(rand_vec<long>)) {
       _GEN_VEC(long);
-    } else if (typeid(*vector_) == typeid(unsigned long)) {
+    } else if (typeid(*vector_) == typeid(rand_vec<unsigned long>)) {
       _GEN_VEC(unsigned long);
-    } else if (typeid(*vector_) == typeid(long long)) {
+    } else if (typeid(*vector_) == typeid(rand_vec<long long>)) {
       _GEN_VEC(long long);
-    } else if (typeid(*vector_) == typeid(unsigned long long)) {
+    } else if (typeid(*vector_) == typeid(rand_vec<unsigned long long>)) {
       _GEN_VEC(unsigned long long);
     } else {
       assert(false && "not supported yet");

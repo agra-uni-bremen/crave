@@ -11,7 +11,10 @@
 
 namespace crave {
 
-  class __rand_vec_base { };
+  class __rand_vec_base { 
+    public:
+      virtual ~__rand_vec_base() { }
+  };
 
   static std::map<int, __rand_vec_base*> vectorBaseMap;
 
