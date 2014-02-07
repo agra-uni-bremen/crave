@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Constraint.hpp"
+#include "expression/AssignResultImpl.hpp"
 
 #include <iostream>
 #include <map>
@@ -11,9 +12,13 @@
 
 namespace crave {
 
-  class __rand_vec_base { 
-    public:
-      virtual ~__rand_vec_base() { }
+  class __rand_vec_base {
+  public:
+    virtual ~__rand_vec_base() { }
+    virtual void resize(std::size_t) = 0;
+    virtual void set_value(unsigned int, std::string) = 0;
+    virtual Variable<unsigned int> const& size_var() const = 0;
+    virtual std::size_t size() const = 0;
   };
 
   static std::map<int, __rand_vec_base*> vectorBaseMap;
@@ -25,9 +30,7 @@ namespace crave {
       __rand_vec_base1() { vectorBaseMap[sym_vec.id()] = this; }
       const Vector<T1>& operator()() const { return sym_vec; }
 
-      typename std::vector<T2>::size_type size() const { return real_vec.size(); }
       T1& operator[](const int& idx) const { return (T1&) real_vec[idx]; }
-      void resize(typename std::vector<T2>::size_type n) { real_vec.resize(n); }
       void push_back(const T1& x) { real_vec.push_back(x); }
       void clear() { real_vec.clear(); }
 
@@ -36,6 +39,21 @@ namespace crave {
         for (uint i = 0; i < real_vec.size(); i++)
           std::cout << real_vec[i] << ", ";
         std::cout << std::endl;
+      }
+
+      virtual void resize(std::size_t n) {
+        real_vec.resize(n);
+      }
+      virtual std::size_t size() const {
+        return real_vec.size();
+      }
+      virtual Variable<unsigned int> const& size_var() const {
+        return sym_vec.size();
+      }
+      virtual void set_value(unsigned int position, std::string value) {
+        AssignResultImpl<T2> result;
+        result.set_value(value);
+        real_vec[position] = result.value();
       }
 
     protected:

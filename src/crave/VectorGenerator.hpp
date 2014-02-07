@@ -1,7 +1,6 @@
 #pragma once
 
 #include "RandomBase.hpp"
-#include "VectorConstraint.hpp"
 #include "VariableGenerator.hpp"
 #include "expression/ReplaceVisitor.hpp"
 #include "expression/FactoryMetaSMT.hpp"
@@ -51,7 +50,7 @@ struct VectorSolver {
 
           replacer.set_vec_idx(i);
           constraint->get_expression()->visit(replacer);
-  
+
           if (replacer.okay()) {
             if (constraint->is_soft())
               solver_->makeSoftAssertion(*replacer.result());
@@ -84,7 +83,7 @@ struct VectorSolver {
     vec.resize(size);
 
     reset_solver_(size);
-    bool result = solver_->solve(false) ? true : solver_->solve(true);
+    bool result = solver_->solve(false) || solver_->solve(true);
     if (result) {
       unsigned int i = 0;
       BOOST_FOREACH ( VariablePtr var,
@@ -97,41 +96,21 @@ struct VectorSolver {
     return result;
   }
 
-  #define _GEN_VEC(typename) if (!gen_vec_(static_cast<__rand_vec<typename>*>(vector_))) return false
   bool solve_() {
-    __rand_vec_base* vector_ = vectorBaseMap[vector_id_];
-    
-    if (typeid(*vector_) == typeid(rand_vec<bool>)) {
-      _GEN_VEC(bool);
-    } else if (typeid(*vector_) == typeid(rand_vec<int>)) {
-      _GEN_VEC(int);
-    } else if (typeid(*vector_) == typeid(rand_vec<unsigned int>)) {
-      _GEN_VEC(unsigned int);
-    } else if (typeid(*vector_) == typeid(rand_vec<char>)) {
-      _GEN_VEC(char);
-    } else if (typeid(*vector_) == typeid(rand_vec<unsigned char>)) {
-      _GEN_VEC(unsigned char);
-    } else if (typeid(*vector_) == typeid(rand_vec<signed char>)) {
-      _GEN_VEC(signed char);
-    } else if (typeid(*vector_) == typeid(rand_vec<short>)) {
-      _GEN_VEC(short);
-    } else if (typeid(*vector_) == typeid(rand_vec<unsigned short>)) {
-      _GEN_VEC(short);
-    } else if (typeid(*vector_) == typeid(rand_vec<long>)) {
-      _GEN_VEC(long);
-    } else if (typeid(*vector_) == typeid(rand_vec<unsigned long>)) {
-      _GEN_VEC(unsigned long);
-    } else if (typeid(*vector_) == typeid(rand_vec<long long>)) {
-      _GEN_VEC(long long);
-    } else if (typeid(*vector_) == typeid(rand_vec<unsigned long long>)) {
-      _GEN_VEC(unsigned long long);
-    } else {
-      assert(false && "not supported yet");
-      return false; // unknown vectors can not be generated
-    }
-    return true;
+    __rand_vec_base* vector = vectorBaseMap[vector_id_];
+
+    unsigned int size;
+    if (!var_gen_.read(vector->size_var(), size))
+      size = vector->size();
+    vector->resize(size);
+
+    reset_solver_(size);
+    bool result = solver_->solve(false) || solver_->solve(true);
+    if (result)
+      solver_->readVector(vec_elements, *vector);
+
+    return result;
   }
-  #undef _GEN_VEC
 
 private:
   std::vector<VectorConstraintPtr> constraints_;
