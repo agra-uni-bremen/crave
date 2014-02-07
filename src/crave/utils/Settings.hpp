@@ -86,12 +86,6 @@ public:
   }
 
 private:
-  std::string const FILE;
-  std::string const DIR;
-  std::string const S_LEVEL;
-  std::string const FILE_SIZE;
-  std::string const MODULES;
-private:
   std::string module_name_;
 private:
   std::string file_;              // log filename
@@ -99,6 +93,12 @@ private:
   int s_level_;                   // severity level
   int file_size_;                 // maximum size of logfile
   std::set<std::string> modules_; // modules where logging is enabled
+private:
+  std::string const FILE;
+  std::string const DIR;
+  std::string const S_LEVEL;
+  std::string const FILE_SIZE;
+  std::string const MODULES;
 };
 
 class CraveSetting : public Setting {
@@ -126,13 +126,13 @@ public:
   }
 
 private:
-  std::string const BACKEND;
-  std::string const SEED;
-private:
   std::string module_name_;
 private:
   std::string backend_;
   unsigned int seed_;
+private:
+  std::string const BACKEND;
+  std::string const SEED;
 };
 
 } // end namespace crave
