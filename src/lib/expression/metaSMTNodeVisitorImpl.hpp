@@ -3,6 +3,7 @@
 
 #include "../../crave/expression/metaSMTNodeVisitor.hpp"
 #include "../../crave/AssignResult.hpp"
+#include "../../crave/VectorConstraint.hpp"
 
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -18,6 +19,7 @@
 #include <map>
 #include <stack>
 #include <utility>
+#include <vector>
 
 namespace crave {
   namespace preds = metaSMT::logic;
@@ -87,6 +89,7 @@ public:
                   std::map<unsigned int, NodePtr > const &);
   virtual bool solve(bool ignoreSofts);
   virtual bool read( Node const& var, AssignResult& );
+  virtual bool readVector( std::vector<VariablePtr>& vec, __rand_vec_base& rand_vec );
 
 private: // typedefs
   typedef typename SolverType::result_type result_type;
@@ -725,24 +728,24 @@ bool metaSMTVisitorImpl<SolverType>::solve(bool ignoreSofts)
 
 //    if (k > 0) 
 //      metaSMT::assumption(solver_, metaSMT::cardinality_eq(solver_, suggestions_, k));
-  
+
     for (int i = 0; i < k; i++)
       metaSMT::assumption(solver_, suggestions_[i]);
 
     if (!ignoreSofts) {
-      for (typename std::vector<result_type>::const_iterator ite = softs_.begin(); ite != softs_.end(); ++ite) 
-        metaSMT::assumption(solver_, preds::equal(*ite, preds::True));
-    }  
+      BOOST_FOREACH (typename std::vector<result_type>::value_type const& item, softs_)
+        metaSMT::assumption(solver_, preds::equal(item, preds::True));
+    }
 
     if (metaSMT::solve(solver_)) {
       result = true;
       break;
     }
   }
-  
+
   assumptions_.clear();
   suggestions_.clear();
-  
+
   return result;
 }
 
@@ -759,6 +762,22 @@ bool metaSMTVisitorImpl<SolverType>::read(Node const& v, AssignResult& assign)
   std::string res = metaSMT::read_value( solver_, var_expr );
   assign.set_value( res );
 
+  return true;
+}
+
+template<typename SolverType>
+bool metaSMTVisitorImpl<SolverType>::readVector( std::vector<VariablePtr>& vec, __rand_vec_base& rand_vec ) {
+
+  unsigned int i = 0;
+  BOOST_FOREACH ( VariablePtr var, vec ) {
+
+    std::map<int, qf_bv::bitvector>::const_iterator ite(terminals_.find(var->id()));
+    if (ite == terminals_.end())
+      return false;
+
+    qf_bv::bitvector var_expr = ite->second;
+    rand_vec.set_value(i++, metaSMT::read_value( solver_, var_expr ));
+  }
   return true;
 }
 
