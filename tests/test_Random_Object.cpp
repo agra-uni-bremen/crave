@@ -160,12 +160,12 @@ BOOST_AUTO_TEST_CASE( t4 )
 class obj : public rand_obj {
 public:
   obj(rand_obj* parent) : rand_obj(parent), a(this), b(this), c(this), d(this), e(this), f(this) {
-    a.range(-20, -10);
-    b.range(10, 20);
-    c.range(-20, -10);
-    d.range(10, 20);
-    e.range('a', 'z');
-    f.range('A', 'Z');
+    constraint(dist(a(), distribution<int>::simple_range(-20, -10)));
+    constraint(dist(b(), distribution<unsigned int>::simple_range(10, 20)));
+    constraint(dist(c(), distribution<short>::simple_range(-20, -10)));
+    constraint(dist(d(), distribution<unsigned short>::simple_range(10, 20)));
+    constraint("e", dist(e(), distribution<char>::simple_range('a', 'z')));
+    constraint("f", dist(f(), distribution<unsigned char>::simple_range('A', 'Z')));
   }
   randv<int> a;
   randv<unsigned int> b;
@@ -183,18 +183,20 @@ public:
 class obj1 : public obj {
 public:
   obj1(rand_obj* parent) : obj(parent) {
-    e.range('A', 'Z');
-    f.range('a', 'z');
+    disable_constraint("e");
+    disable_constraint("f");
+    constraint(dist(e(), distribution<char>::simple_range('A', 'Z')));
+    constraint(dist(f(), distribution<unsigned char>::simple_range('a', 'z')));
   }
 };
 
 class obj2 : public rand_obj {
 public:
   obj2(rand_obj* parent) : rand_obj(parent), g(this), h(this), i(this), j(this), k(this), l(this) {
-    g.range(-20, -10);
-    h.range(10, 20);
-    i.range(-20, -10);
-    j.range(10, 20);
+    constraint(dist(g(), distribution<long>::simple_range(-20, -10)));
+    constraint(dist(h(), distribution<unsigned long>::simple_range(10, 20)));
+    constraint(dist(i(), distribution<long long>::simple_range(-20, -10)));
+    constraint(dist(j(), distribution<unsigned long long>::simple_range(10, 20)));
   }
   randv<long> g;
   randv<unsigned long> h;
@@ -213,7 +215,7 @@ BOOST_AUTO_TEST_CASE( t5 )
 {
   obj it(0);
   for (int i = 0; i < 20; i++) {
-    it.next();
+    BOOST_REQUIRE(it.next());
     BOOST_REQUIRE(-20 <= it.a && it.a <= -10);
     BOOST_REQUIRE(10 <= it.b && it.b <= 20);
     BOOST_REQUIRE(-20 <= it.c && it.c <= -10);
@@ -224,7 +226,7 @@ BOOST_AUTO_TEST_CASE( t5 )
 
   obj1 it1(0);
   for (int i = 0; i < 20; i++) {
-    it1.next();
+    BOOST_REQUIRE(it1.next());
     BOOST_REQUIRE(-20 <= it1.a && it1.a <= -10);
     BOOST_REQUIRE(10 <= it1.b && it1.b <= 20);
     BOOST_REQUIRE(-20 <= it1.c && it1.c <= -10);
@@ -235,7 +237,7 @@ BOOST_AUTO_TEST_CASE( t5 )
 
   obj2 it2(0);
   for (int i = 0; i < 20; i++) {
-    it2.next();
+    BOOST_REQUIRE(it2.next());
     BOOST_REQUIRE(-20 <= it2.g && it2.g <= -10);
     BOOST_REQUIRE(10 <= it2.h && it2.h <= 20);
     BOOST_REQUIRE(-20 <= it2.i && it2.i <= -10);

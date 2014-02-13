@@ -49,12 +49,9 @@ namespace crave {
       rand_vec(rand_obj_base* parent) : __rand_vec<sc_bv>() { if (parent != 0) parent->addChild(this, true); }
 
       virtual bool next() {
-        static randv<unsigned> default_size(NULL);
-        default_size.range(5, 10);
-        default_size.next();
         static randv<sc_bv> r(NULL);
         this->clear();
-        for (uint i = 0; i < default_size; i++) {
+        for (uint i = 0; i < default_rand_vec_size(); i++) {
             r.next();
             this->push_back(r);
         }

@@ -55,34 +55,7 @@ namespace crave {
   };
 
   template<typename T>
-  class randomize_base {
-  public:
-    void dist(const distribution<T> & dist) { dist_ = dist; }
-    void range(T l, T r) { dist_.reset(); dist_(crave::range<T>(l, r)); }
-
-  protected:
-    randomize_base() { }
-    T nextValue() { return dist_.nextValue(); }
-
-  protected:
-    distribution<T> dist_;
-  };
-
-  template<>
-  class randomize_base<bool> {
-  public:
-    void dist(const distribution<bool> & dist) { dist_ = dist; }
-
-  protected:
-    randomize_base() { }
-    bool nextValue() { return dist_.nextValue(); }
-
-  protected:
-    distribution<bool> dist_;
-  };
-
-  template<typename T>
-  class randv : public randv_prim_base<T>, public randomize_base<T> {
+  class randv : public randv_prim_base<T> {
   public:
     randv(rand_obj_base* parent) : randv_prim_base<T>(parent) { }
     randv(const randv& other) : randv_prim_base<T>(other) { }
@@ -93,7 +66,7 @@ namespace crave {
 public: \
   randv(rand_obj_base* parent = 0) : randv_prim_base<Typename>(parent) { } \
   randv(const randv& other) : randv_prim_base<Typename>(other) { } \
-  bool next() { value = nextValue(); return true; } \
+  bool next() { static distribution<Typename> dist; value = dist.nextValue(); return true; } \
   randv<Typename>& operator=(const randv<Typename>& i) { value = i.value; return *this; } \
   randv<Typename>& operator=(Typename i) { value = i; return *this; } \
 
@@ -116,14 +89,14 @@ public: \
 
 // bool
   template<>
-  class randv<bool> : public randv_prim_base<bool>, public randomize_base<bool> {
+  class randv<bool> : public randv_prim_base<bool> {
     _COMMON_INTERFACE(bool)
   };
 
 // for all C/C++ built-in integer types
 #define _INTEGER_TYPE(typename) \
 template<> \
-class randv<typename> : public randv_prim_base<typename>, public randomize_base<typename> { \
+class randv<typename> : public randv_prim_base<typename> { \
   _COMMON_INTERFACE(typename) \
   _INTEGER_INTERFACE(typename) \
 }; \
