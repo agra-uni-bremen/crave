@@ -72,30 +72,6 @@ struct VectorSolver {
     }
   }
 
-  template<typename Integral>
-  bool gen_vec_ (__rand_vec<Integral>* rvp) {
-    __rand_vec<Integral>& vec = *rvp;
-
-    // get size of vector
-    unsigned int size;
-    if (!var_gen_.read(vec().size(), size)) 
-      size = vec.size();
-    vec.resize(size);
-
-    reset_solver_(size);
-    bool result = solver_->solve(false) || solver_->solve(true);
-    if (result) {
-      unsigned int i = 0;
-      BOOST_FOREACH ( VariablePtr var,
-                      vec_elements ) {
-        AssignResultImpl<Integral> val;
-        solver_->read(*var, val);
-        vec[i++] = val.value();
-      }
-    }
-    return result;
-  }
-
   bool solve_() {
     __rand_vec_base* vector = vectorBaseMap[vector_id_];
 
