@@ -14,6 +14,8 @@ namespace crave {
 
   int new_constraint_id() { static int constraint_ID=0; return ++constraint_ID; }
 
+  unsigned int default_rand_vec_size() { return 5; }
+
   boost::mt19937 rng(std::time(0));
 
   struct random_bit_gen {

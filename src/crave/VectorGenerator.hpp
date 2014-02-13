@@ -75,11 +75,9 @@ struct VectorSolver {
   bool solve_() {
     __rand_vec_base* vector = vectorBaseMap[vector_id_];
 
-    unsigned int size;
+    unsigned int size = default_rand_vec_size();
     if (!var_gen_.read(vector->size_var(), size))
-      size = vector->size();
-    vector->resize(size);
-
+      LOG(INFO) << "Use default size for vector " << vector_id_ << std::endl;
     reset_solver_(size);
     bool result = solver_->solve(false) || solver_->solve(true);
     if (result)

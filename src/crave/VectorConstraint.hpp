@@ -12,13 +12,13 @@
 
 namespace crave {
 
+  unsigned int default_rand_vec_size();
+
   class __rand_vec_base {
   public:
     virtual ~__rand_vec_base() { }
-    virtual void resize(std::size_t) = 0;
-    virtual void set_value(unsigned int, std::string) = 0;
+    virtual void set_values(std::vector<std::string>& ) = 0;
     virtual Variable<unsigned int> const& size_var() const = 0;
-    virtual std::size_t size() const = 0;
   };
 
   static std::map<int, __rand_vec_base*> vectorBaseMap;
@@ -33,6 +33,7 @@ namespace crave {
       T1& operator[](const int& idx) const { return (T1&) real_vec[idx]; }
       void push_back(const T1& x) { real_vec.push_back(x); }
       void clear() { real_vec.clear(); }
+      std::size_t size() { return real_vec.size(); }
 
       void print() {
         std::cout << "vector " << sym_vec.id() << ": ";
@@ -41,19 +42,14 @@ namespace crave {
         std::cout << std::endl;
       }
 
-      virtual void resize(std::size_t n) {
-        real_vec.resize(n);
-      }
-      virtual std::size_t size() const {
-        return real_vec.size();
-      }
-      virtual Variable<unsigned int> const& size_var() const {
-        return sym_vec.size();
-      }
-      virtual void set_value(unsigned int position, std::string value) {
+      virtual Variable<unsigned int> const& size_var() const { return sym_vec.size(); }
+      virtual void set_values(std::vector<std::string> & values) {
         AssignResultImpl<T2> result;
-        result.set_value(value);
-        real_vec[position] = result.value();
+        real_vec.clear();
+        for (uint i = 0; i < values.size(); i++) {
+          result.set_value(values[i]);
+          real_vec.push_back(result.value());
+        }
       }
 
     protected:

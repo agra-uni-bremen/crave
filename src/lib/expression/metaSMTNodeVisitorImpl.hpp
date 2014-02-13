@@ -769,6 +769,7 @@ template<typename SolverType>
 bool metaSMTVisitorImpl<SolverType>::readVector( std::vector<VariablePtr>& vec, __rand_vec_base& rand_vec ) {
 
   unsigned int i = 0;
+  std::vector<std::string> sv;
   BOOST_FOREACH ( VariablePtr var, vec ) {
 
     std::map<int, qf_bv::bitvector>::const_iterator ite(terminals_.find(var->id()));
@@ -776,8 +777,11 @@ bool metaSMTVisitorImpl<SolverType>::readVector( std::vector<VariablePtr>& vec, 
       return false;
 
     qf_bv::bitvector var_expr = ite->second;
-    rand_vec.set_value(i++, metaSMT::read_value( solver_, var_expr ));
+    sv.push_back(metaSMT::read_value( solver_, var_expr ));
   }
+  
+  rand_vec.set_values(sv);
+  
   return true;
 }
 
