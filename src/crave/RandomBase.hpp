@@ -18,13 +18,10 @@ namespace crave {
 
   public:
     virtual bool next() = 0;
-    virtual std::size_t numValues() const = 0;
     virtual void gatherValues(std::vector<long>&) = 0;
-    virtual void gatherValues(std::vector<unsigned long>&) = 0;
   };
 
   class rand_obj_base : public rand_base {
-
   public:
     virtual void addChild(rand_base*, bool bindNext) = 0;
 
@@ -39,13 +36,8 @@ namespace crave {
     operator T() const { return value; }
     friend ostream& operator<<(ostream& os, const randv_prim_base<T>& e) { os << e.value; return os; }
     WriteReference<T> const& operator()() const { return var; }
-    virtual void gatherValues(std::vector<long>& ch) {
-      ch.insert(ch.end(), static_cast<long>(value));
-    }
-    virtual void gatherValues(std::vector<unsigned long>& ch) {
-      ch.insert(ch.end(), static_cast<unsigned long>(value));
-    }
-    virtual std::size_t numValues() const { return 1; }
+
+    virtual void gatherValues(std::vector<long>& ch) { ch.push_back(static_cast<long>(value)); }
 
   protected:
     randv_prim_base(rand_obj_base* parent) : var(value) { if (parent != 0) parent->addChild(this, true); }
@@ -131,11 +123,8 @@ class randv<typename> : public randv_prim_base<typename> { \
       }
       return true;
     }
+
     virtual void gatherValues(std::vector<long>& ch) { }
-    virtual void gatherValues(std::vector<unsigned long>& ch) { }
-    virtual std::size_t numValues() const {
-      return 0;
-    }
   };
 
 } // namespace crave
