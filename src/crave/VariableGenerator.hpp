@@ -23,7 +23,7 @@ struct VariableSolver {
   VariableSolver(VariableContainer& vcon, ConstraintPartition& cp)
   : vcon_(vcon), cp_(cp), solver_(FactoryMetaSMT::getNewInstance()) {
 
-    LOG(INFO) << "Create solver for partition " << cp_ << std::endl;
+    LOG(INFO) << "Create solver for partition " << cp_;
 
     BOOST_FOREACH(ConstraintPtr c, cp_) {
       if (c->is_soft()) {
@@ -39,15 +39,14 @@ struct VariableSolver {
                 << " soft constraint(s) deactivated:";
       BOOST_FOREACH(std::string& s, inactive_softs_) 
         LOG(INFO) << " " << s;
-      LOG(INFO) << std::endl;
     }
     else {
-      LOG(INFO) << "Partition has unsatisfiable hard constraints:" << std::endl;
+      LOG(INFO) << "Partition has unsatisfiable hard constraints:";
+      uint cnt = 0;
       BOOST_FOREACH(std::vector<std::string>& vs, contradictions_) {
-        LOG(INFO) << " ";
+        LOG(INFO) << "  set #" << ++cnt;
         BOOST_FOREACH(std::string& s, vs)
-          LOG(INFO) << " " << s;
-        LOG(INFO) << std::endl;
+          LOG(INFO) << "   " << s;
       }
     }
   }

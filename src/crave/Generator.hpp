@@ -20,14 +20,14 @@ struct Generator {
 
 public:
   Generator()
-  : pre_hooks_(), constr_mng_(), vcon_(crave::variables), ctx_(vcon_)
+  : constr_mng_(), vcon_(crave::variables), ctx_(vcon_)
   , var_gen_(vcon_)
   , vec_gen_(var_gen_) {
   }
 
   template<typename Expr>
   Generator(Expr expr)
-  : pre_hooks_(), constr_mng_(), vcon_(crave::variables), ctx_(vcon_) 
+  : constr_mng_(), vcon_(crave::variables), ctx_(vcon_) 
   , var_gen_(vcon_)
   , vec_gen_(var_gen_) {
     (*this)(expr);
@@ -61,10 +61,6 @@ public:
   inline bool disable_constraint(std::string const& name) { return constr_mng_.disable_constraint(name); }
   inline bool is_constraint_enabled(std::string const& name) { return constr_mng_.is_constraint_enabled(name); }
 
-  void add_pre_hook(boost::function0<bool> f) {
-    pre_hooks_.push_back(f);
-  }
-
   Generator & operator()() {
     if (!next())
       throw std::runtime_error("Generator constraint unsatisfiable.");
@@ -72,15 +68,14 @@ public:
   }
 
   void reset() {
-    constr_mng_.partition();
-    var_gen_.reset(constr_mng_.get_partitions());
-    vec_gen_.reset(constr_mng_.get_vector_constraints());
+    cp.reset();
+    cp.addConstraintManager(constr_mng_);
+    cp.partition();
+    var_gen_.reset(cp.get_partitions());
+    vec_gen_.reset(cp.get_vector_constraints());
   }
 
   bool next() {
-    BOOST_FOREACH(boost::function0<bool> f, pre_hooks_)
-      if (!f())
-        return false;
     if (constr_mng_.is_changed()) {
       reset();
       constr_mng_.set_synced();
@@ -110,10 +105,9 @@ public:
   }  
 
 private:
-  std::vector<boost::function0<bool> > pre_hooks_;
-
   // constraints
   ConstraintManager constr_mng_;
+  ConstraintPartitioner cp;
 
   // variables
   VariableContainer& vcon_;

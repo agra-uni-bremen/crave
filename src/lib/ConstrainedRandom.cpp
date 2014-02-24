@@ -57,9 +57,11 @@ namespace crave {
     LoggerSetting settings(cfg_file);
 
     settings.load();
-    fLS::FLAGS_log_dir = settings.dirname();
-    fLI::FLAGS_max_log_size = settings.filesize();
-    fLB::FLAGS_logtostderr = false;
+    FLAGS_log_dir = settings.dirname();
+    FLAGS_max_log_size = settings.filesize();
+    FLAGS_minloglevel = settings.s_level();
+    FLAGS_logtostderr = false;
+    FLAGS_logbufsecs = 0;
 
     namespace fs = boost::filesystem;
     fs::path fs_log_dir(settings.dirname());
@@ -81,6 +83,22 @@ namespace crave {
     FactoryMetaSMT::setSolverType(solver_type);
 
     init(cfg_file);
+  }
+
+  std::ostream& print_dot_graph_(std::ostream& os, ConstraintList& constraints)  {
+    os << "digraph AST {" << std::endl;
+    ToDotVisitor visitor(os);
+
+    BOOST_FOREACH ( ConstraintPtr c , constraints ) {
+      long a = reinterpret_cast<long>(&*c);
+      long b = reinterpret_cast<long>(&(*c->get_expression()));
+      os << "\t" << a << " [label=\"" << c->get_name() << (c->is_soft()?" soft":"") << (!c->is_enabled()?" disabled":"") << "\"]" << std::endl;
+      os << "\t" << a << " -> " << b << std::endl; 
+      c->get_expression()->visit(visitor);
+    }
+
+    os << "}" << std::endl;
+    return os;
   }
 
 } // namespace crave
