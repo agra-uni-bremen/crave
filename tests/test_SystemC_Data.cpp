@@ -12,11 +12,12 @@ using boost::format;
 
 int sc_main( int argc, char** argv) { return 1; }
 
-//using namespace std;
 using namespace crave;
 
-class SystemC_Data_Fixture {
-  protected:
+struct SystemC_Data_Fixture {
+  SystemC_Data_Fixture () {
+    crave::init("Boolector", "./crave.cfg");
+  }
 };
 
 BOOST_FIXTURE_TEST_SUITE(SystemC_Data, SystemC_Data_Fixture )
@@ -54,7 +55,6 @@ BOOST_AUTO_TEST_CASE( sc_uint_t )
     sc_uint<w> jv = gen[j];
     sc_uint<w> kv = gen[k];
 
-  //std::cout << format("iv: %d, jv: %d, kv: %d\n") %iv%jv%kv;
     sc_uint<w> rv = iv+jv;
 
 
@@ -87,6 +87,27 @@ BOOST_AUTO_TEST_CASE( sc_int_t )
 
   BOOST_CHECK_LT(iv, jv);
   BOOST_CHECK_EQUAL( rv, kv );
+}
+
+BOOST_AUTO_TEST_CASE( randv_sc_dt_t )
+{
+  using namespace sc_dt;
+
+  randv< sc_uint<4> > a, b, c;
+  randv< sc_uint<8> > d;
+
+  Generator gen;
+  gen(a() == 15);
+  gen(b() == 15);
+  gen(c() == a() + b());
+  gen(d() == a() + b());
+
+  BOOST_REQUIRE(gen.next());
+  BOOST_CHECK_EQUAL( ++a, sc_uint<4>(16) );
+  b = ((sc_uint<4>)b) + 1;
+  BOOST_CHECK_EQUAL( b, sc_uint<4>(16) );
+  BOOST_CHECK_EQUAL( c, sc_uint<4>(14) );
+  BOOST_CHECK_EQUAL( d, sc_uint<8>(30) );
 }
 
 BOOST_AUTO_TEST_SUITE_END() // SystemC_Data
