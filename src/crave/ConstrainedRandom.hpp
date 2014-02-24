@@ -21,8 +21,13 @@ namespace crave {
 
   class rand_obj : public rand_obj_base {
   public:
-    rand_obj(rand_obj* pr = 0) { parent = pr; if (parent != 0) { parent->addChild(this, true); } }
-    virtual bool next() { return constraint.next(); }
+    rand_obj(rand_obj* parent = 0) { if (parent != 0) { parent->addChild(this); } }
+
+    virtual bool next() { 
+      for (uint i = 0; i < children.size(); i++)
+        if (!children[i]->next()) return false;
+      return constraint.next(); 
+    }
 
     virtual void gatherValues(std::vector<long>& ch) {
       for (std::vector<rand_base*>::const_iterator i = children.begin();
@@ -30,10 +35,7 @@ namespace crave {
         (*i)->gatherValues(ch);
     }
 
-    virtual void addChild(rand_base* rb, bool bindNext) {
-      children.push_back(rb);
-      if (bindNext) constraint.add_pre_hook(boost::bind<bool>(&rand_base::next, rb));
-    }
+    virtual void addChild(rand_base* rb) { children.push_back(rb); }
 
     bool enable_constraint(std::string name) { return constraint.enable_constraint(name); }
     bool disable_constraint(std::string name) { return constraint.disable_constraint(name); }
@@ -41,6 +43,9 @@ namespace crave {
 
   public:
     Generator constraint;
+
+  protected:
+    std::vector<rand_base*> children;
   };
 
 } // end namespace crave
