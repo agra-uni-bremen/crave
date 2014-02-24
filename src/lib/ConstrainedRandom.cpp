@@ -59,6 +59,7 @@ namespace crave {
     settings.load();
     FLAGS_log_dir = settings.dirname();
     FLAGS_max_log_size = settings.filesize();
+    FLAGS_minloglevel = settings.s_level();
     FLAGS_logtostderr = false;
     FLAGS_logbufsecs = 0;
 

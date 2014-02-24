@@ -61,7 +61,7 @@ private:
   virtual void load_(ptree& tree) {
     file_ = tree.get(module_name_ + "." + FILE, "crave");
     dir_ = tree.get(module_name_ + "." + DIR, "./logs");
-    s_level_ = tree.get(module_name_ + "." + S_LEVEL, 0);
+    s_level_ = tree.get(module_name_ + "." + S_LEVEL, 2);
     file_size_ = tree.get(module_name_ + "." + FILE_SIZE, 100);
   }
   virtual void save_(ptree& tree) const {
