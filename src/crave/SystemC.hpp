@@ -4,6 +4,7 @@
 #include <sysc/datatypes/int/sc_uint.h>
 #include <sysc/datatypes/bit/sc_bv.h>
 
+#include "expression/ReferenceExpression.hpp"
 #include "bitsize_traits.hpp"
 #include "Distribution.hpp"
 #include "RandomBase.hpp"
