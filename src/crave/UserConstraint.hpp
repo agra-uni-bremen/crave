@@ -23,6 +23,7 @@ namespace crave {
 int new_constraint_id();
 
 struct ConstraintManager;
+struct ConstraintPartitioner;
 
 struct UserConstraint;
 typedef boost::shared_ptr<UserConstraint> ConstraintPtr;
@@ -31,8 +32,14 @@ typedef std::list<ConstraintPtr> ConstraintList;
 struct UserVectorConstraint;
 typedef boost::shared_ptr<UserVectorConstraint> VectorConstraintPtr;
 
+std::ostream& print_dot_graph_(std::ostream& os, ConstraintList& constraints);
+
+/**
+ *
+ */
 struct UserConstraint {
   friend struct ConstraintManager;
+  friend struct ConstraintPartitioner;
 
   typedef NodePtr expression;
 
@@ -89,8 +96,13 @@ public:
   bool enabled_;
 };
 
+
+/**
+ *
+ */
 struct UserVectorConstraint : UserConstraint {
   friend struct ConstraintManager;
+  friend struct ConstraintPartitioner;
 
 protected:
   UserVectorConstraint(unsigned const id, expression const expr, std::string const& name, std::set<int> & support_vars
@@ -106,8 +118,11 @@ protected:
   bool unique_;
 };
 
+/**
+ *
+ */
 struct ConstraintPartition {
-  friend struct ConstraintManager;
+  friend struct ConstraintPartitioner;
 
   ConstraintPartition() { }
 
@@ -158,7 +173,13 @@ private:
   std::set<int> support_vars_;
 };
 
+
+/**
+ *
+ */
 struct ConstraintManager {
+  friend struct ConstraintPartitioner;
+
   typedef std::map<std::string, ConstraintPtr> ConstraintMap;
 
   ConstraintManager() : changed_(false) { 
@@ -177,20 +198,19 @@ struct ConstraintManager {
   }
 
   bool enable_constraint(std::string const& key) {
-
     LOG(INFO) << "Enable constraint " << key << " in set " << id_ << ": ";
     ConstraintMap::iterator ite = cMap_.find(key);
     if (ite != cMap_.end()) {
       if (!ite->second->is_enabled()) {
-        LOG(INFO) << "ok" << std::endl;
+        LOG(INFO) << "  ok";
         ite->second->enable();
         changed_ = true;
       }
       else
-        LOG(INFO) << "already enabled" << std::endl;
+        LOG(INFO) << "  already enabled";
       return true;
     }
-    LOG(INFO) << "not found" << std::endl;
+    LOG(INFO) << "not found";
     return false;
   }
 
@@ -199,15 +219,15 @@ struct ConstraintManager {
     ConstraintMap::iterator ite = cMap_.find(key);
     if (ite != cMap_.end()) {
       if (ite->second->is_enabled()) {
-        LOG(INFO) << "ok" << std::endl;
+        LOG(INFO) << "  ok";
         ite->second->disable();
         changed_ = true;
       }
       else
-        LOG(INFO) << "already enabled" << std::endl;
+        LOG(INFO) << "  already enabled";
       return true;
     }
-    LOG(INFO) << "not found" << std::endl;
+    LOG(INFO) << "  not found";
     return false;
   }
 
@@ -228,7 +248,7 @@ struct ConstraintManager {
   ConstraintPtr makeConstraint(std::string const& name, int c_id, Expr e, Context& ctx,
                                      bool const soft = false) {
 
-    LOG(INFO) << "New " << (soft?"soft ":"") << "constraint " << name << " in set " << id_ << std::endl;
+    LOG(INFO) << "New " << (soft?"soft ":"") << "constraint " << name << " in set " << id_;
 
     if (cMap_.find(name) != cMap_.end()) 
       throw std::runtime_error("Constraint already exists.");
@@ -264,55 +284,62 @@ struct ConstraintManager {
                           e, ctx, soft);
   }
 
-  std::ostream& print_dot_graph(std::ostream& os) {
-    os << "digraph AST {" << std::endl;
-    ToDotVisitor visitor(os);
+  std::ostream& print_dot_graph(std::ostream& os) { return print_dot_graph_(os, constraints_); }
 
-    BOOST_FOREACH ( ConstraintPtr c , constraints_ ) {
-      long a = reinterpret_cast<long>(&*c);
-      long b = reinterpret_cast<long>(&(*c->get_expression()));
-      os << "\t" << a << " [label=\"" << c->get_name() << (c->is_soft()?" soft":"") << (!c->is_enabled()?" disabled":"") << "\"]" << std::endl;
-      os << "\t" << a << " -> " << b << std::endl; 
-      c->get_expression()->visit(visitor);
-    }
+private:
+  unsigned id_;
+  ConstraintMap cMap_;
+  ConstraintList constraints_;
+  bool changed_;
+};
 
-    os << "}" << std::endl;
-    return os;
-  }
 
-  void partition() {
+/**
+ *
+ */
+struct ConstraintPartitioner {
+
+  void reset() { 
+    constr_mngs_.clear();
+    constraints_.clear();
     partitions_.clear();
     vec_constraints_.clear();
+  }
 
-    std::list<ConstraintPtr> tmp;
-    BOOST_FOREACH (ConstraintPtr c, constraints_) {
+  void addConstraintManager(ConstraintManager& mng) {
+    constr_mngs_.insert(mng.id_);
+    BOOST_FOREACH (ConstraintPtr c, mng.constraints_) {
       if (c->is_enabled()) {
         if (c->is_vector_constraint())
           vec_constraints_.push_back(boost::static_pointer_cast<UserVectorConstraint>(c));
         else 
-          tmp.push_back(c);
+          constraints_.push_back(c);
       }
     }
+  }
 
-    while (!tmp.empty()) {
+  std::ostream& print_dot_graph(std::ostream& os) { return print_dot_graph_(os, constraints_); }
+
+  void partition() {
+    while (!constraints_.empty()) {
       ConstraintPartition cp;
-      maximize_partition(cp, tmp);
+      maximize_partition(cp, constraints_);
       partitions_.push_back(cp);
     }
-
-    LOG(INFO) << "Partition results of set " << id_ << ": " << std::endl;
+    LOG(INFO) << "Partition results of set(s)"; 
+    BOOST_FOREACH (unsigned id, constr_mngs_) 
+      LOG(INFO) << " " << id;
+    LOG(INFO) << ": ";
 
     LOG(INFO) << "  " << vec_constraints_.size() << " vector constraint(s):";
     BOOST_FOREACH (VectorConstraintPtr c, vec_constraints_) {
-      LOG(INFO) << " " << c->get_name();
+      LOG(INFO) << "   " << c->get_name();
     }
-    LOG(INFO) << std::endl;
 
-    LOG(INFO) << "  " << partitions_.size() << " constraint partition(s):" << std::endl;
+    LOG(INFO) << "  " << partitions_.size() << " constraint partition(s):";
     uint cnt = 0;
     BOOST_FOREACH (ConstraintPartition& cp, partitions_) {
-      LOG(INFO) << "    #" << ++cnt << ": ";
-      LOG(INFO) << cp << std::endl;
+      LOG(INFO) << "    #" << ++cnt << ": " << cp;
     }
   }
 
@@ -322,15 +349,15 @@ struct ConstraintManager {
   }
 
 private:
-  void maximize_partition(ConstraintPartition& cp, std::list<ConstraintPtr>& lc) {
+  void maximize_partition(ConstraintPartition& cp, ConstraintList& lc) {
     ConstraintPtr c = lc.front();
     lc.pop_front();
     cp.support_vars_ = c->support_vars_;
     cp.add(c);
-
-    while (1) {
+    while (true) {
       bool changed = false;
-      std::list<ConstraintPtr>::iterator ite = lc.begin();
+      ConstraintList::iterator ite = lc.begin();
+
       while (ite != lc.end()) {
         c = *ite;
         std::vector<int> v_intersection;
@@ -352,14 +379,12 @@ private:
   }
 
 private:
-  unsigned id_;
-  ConstraintMap cMap_;
+  std::set<unsigned> constr_mngs_;
   ConstraintList constraints_;
-  bool changed_;
-
-  // partition result
+  // results
   std::vector<ConstraintPartition> partitions_;
-  std::vector<VectorConstraintPtr> vec_constraints_;
+  std::vector<VectorConstraintPtr> vec_constraints_;  
 };
+
 
 } // end namespace crave

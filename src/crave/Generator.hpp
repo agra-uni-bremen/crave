@@ -68,9 +68,11 @@ public:
   }
 
   void reset() {
-    constr_mng_.partition();
-    var_gen_.reset(constr_mng_.get_partitions());
-    vec_gen_.reset(constr_mng_.get_vector_constraints());
+    cp.reset();
+    cp.addConstraintManager(constr_mng_);
+    cp.partition();
+    var_gen_.reset(cp.get_partitions());
+    vec_gen_.reset(cp.get_vector_constraints());
   }
 
   bool next() {
@@ -105,6 +107,7 @@ public:
 private:
   // constraints
   ConstraintManager constr_mng_;
+  ConstraintPartitioner cp;
 
   // variables
   VariableContainer& vcon_;
