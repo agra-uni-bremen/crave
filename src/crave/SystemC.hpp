@@ -5,7 +5,14 @@
 #include <sysc/datatypes/bit/sc_bv.h>
 
 #include "bitsize_traits.hpp"
+#include "Distribution.hpp"
 #include "RandomBase.hpp"
+
+namespace boost {
+  template <int N> struct is_signed< sc_dt::sc_bv<N> >: boost::mpl::false_ {};
+  template <int N> struct is_signed< sc_dt::sc_int<N> >: boost::mpl::true_ {};
+  template <int N> struct is_signed< sc_dt::sc_uint<N> >: boost::mpl::false_ {};
+}
 
 namespace crave {
   template <typename T, int N=0> struct is_sysc_dt: boost::mpl::false_ {};
@@ -21,47 +28,55 @@ namespace crave {
   : sc_dt_width<T>
   {};
 
+#define RANDV_SCDT_INTERFACE(Typename) \
+public: \
+  void gatherValues(std::vector<long>& ch) { ch.insert(ch.end(), this->value.to_long()); } \
+  bool next() { static distribution<long> dist; this->value = dist.nextValue(); return true; } \
+
+#define RANDV_SCDT_REF_EXPR(Typename) \
+  template<int N> \
+  struct ReferenceExpressionImpl< randv< Typename <N> > > : public ReferenceExpression { \
+  public: \
+    ReferenceExpressionImpl(randv< Typename <N> > const& value, ReferenceExpression::result_type expr ) : value_(value), expr_(expr) { } \
+    virtual ~ReferenceExpressionImpl() { } \
+    virtual ReferenceExpression::result_type expr() const { \
+      return new EqualOpr(expr_, new Constant(((Typename <N>) value_).to_ulong(), N, boost::is_signed< Typename <N> >::value)); \
+    } \
+  private: \
+    randv< Typename <N> > const & value_; \
+    ReferenceExpression::result_type expr_; \
+  }; \
+
   template<int N>
-  class randv_base<sc_dt::sc_bv<N> > : public rand_base
+  class randv<sc_dt::sc_bv<N> > : public randv_base<sc_dt::sc_bv<N> >
   {
-      typedef sc_dt::sc_bv<N> sc_bv;
-    public:
-      operator sc_bv() const { return value; }
-      friend ostream& operator<<(ostream& os, const randv_base<sc_bv>& e) { os << e.value; return os; }
-      WriteReference<sc_bv> const& operator()() const { return var; }
-      virtual void gatherValues(std::vector<long>& ch) { ch.insert(ch.end(), value.to_long()); }
-      virtual void gatherValues(std::vector<unsigned long>& ch) { ch.insert(ch.end(), value.to_ulong()); }
-      virtual std::size_t numValues() const { return 1; }
-
-    protected:
-      randv_base(rand_obj_base* parent) : var(value) { if (parent != 0) parent->addChild(this, true); }
-      randv_base(const randv_base& other) : var(value), value(other.value) { }
-      WriteReference<sc_bv> var;
-      sc_bv value;
+    typedef sc_dt::sc_bv<N> sc_bv;
+    RANDV_COMMON_INTERFACE(sc_bv)
+    RANDV_SCDT_INTERFACE(sc_bv)
   };
+  RANDV_SCDT_REF_EXPR(sc_dt::sc_bv)
 
   template<int N>
-  class rand_vec<sc_dt::sc_bv<N> > : public __rand_vec<sc_dt::sc_bv<N> >, public rand_base
+  class randv<sc_dt::sc_int<N> > : public randv_base<sc_dt::sc_int<N> >
   {
-      typedef sc_dt::sc_bv<N> sc_bv;
-    public:
-      rand_vec(rand_obj_base* parent) : __rand_vec<sc_bv>() { if (parent != 0) parent->addChild(this, true); }
-
-      virtual bool next() {
-        static randv<sc_bv> r(NULL);
-        this->clear();
-        for (uint i = 0; i < default_rand_vec_size(); i++) {
-            r.next();
-            this->push_back(r);
-        }
-        return true;
-      }
-      virtual void gatherValues(std::vector<long>& ch) { }
-      virtual void gatherValues(std::vector<unsigned long>& ch) { }
-      virtual std::size_t numValues() {
-         return 0;
-      }
+    typedef sc_dt::sc_int<N> sc_int;
+    RANDV_COMMON_INTERFACE(sc_int)
+    RANDV_SCDT_INTERFACE(sc_int)
+    RANDV_ARITHMETIC_INTERFACE(sc_int)
+    RANDV_BITWISE_INTERFACE(sc_int)
   };
+  RANDV_SCDT_REF_EXPR(sc_dt::sc_int)
+
+  template<int N>
+  class randv<sc_dt::sc_uint<N> > : public randv_base<sc_dt::sc_uint<N> >
+  {
+    typedef sc_dt::sc_uint<N> sc_uint;
+    RANDV_COMMON_INTERFACE(sc_uint)
+    RANDV_SCDT_INTERFACE(sc_uint)
+    RANDV_ARITHMETIC_INTERFACE(sc_uint)
+    RANDV_BITWISE_INTERFACE(sc_uint)
+  };
+  RANDV_SCDT_REF_EXPR(sc_dt::sc_uint)
 
 } // namespace crave
 

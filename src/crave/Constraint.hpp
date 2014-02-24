@@ -198,16 +198,15 @@ namespace crave {
     int id() const {  return boost::proto::value(*this).id; };
   };
 
-      template<typename T>
-      typename boost::proto::result_of::make_expr<
-          boost::proto::tag::terminal
-        , Constraint_Domain
-        , read_ref_tag<T>
-      > ::type
-      reference( T const &  ref )
-      {
-        return boost::proto::make_expr< boost::proto::tag::terminal, Constraint_Domain >( read_ref_tag<T>( new_var_id(), ref )) ;
-      }
+  template<typename T>
+  typename boost::proto::result_of::make_expr<
+      boost::proto::tag::terminal
+      , Constraint_Domain
+      , read_ref_tag<T>
+    > ::type
+  reference( T const &  ref ) {
+    return boost::proto::make_expr< boost::proto::tag::terminal, Constraint_Domain >( read_ref_tag<T>( new_var_id(), ref )) ;
+  }
 
   // special operators
   struct operator_inside {};

@@ -36,10 +36,6 @@ namespace crave {
     friend ostream& operator<<(ostream& os, const randv_base<T>& e) { os << e.value; return os; }
     WriteReference<T> const& operator()() const { return var; }
 
-    virtual void gatherValues(std::vector<long>& ch) { ch.push_back(static_cast<long>(value)); }
-
-    virtual bool next() { static distribution<T> dist; value = dist.nextValue(); return true; }
-
   protected:
     randv_base(rand_obj_base* parent) : var(value) { if (parent != 0) parent->addChild(this, true); }
     randv_base(const randv_base& other) : var(value), value(other.value) { }
@@ -47,42 +43,42 @@ namespace crave {
     T value;
   };
 
-
-  template<typename T>
-  class randv : public randv_base<T> {
-  public:
-    randv(rand_obj_base* parent = 0) : randv_base<T>(parent) { } \
-    randv(const randv& other) : randv_base<T>(other) { } \
-  };
-
 #define RANDV_COMMON_INTERFACE(Typename) \
 public: \
   randv(rand_obj_base* parent = 0) : randv_base<Typename>(parent) { } \
   randv(const randv& other) : randv_base<Typename>(other) { } \
-  randv<Typename>& operator=(const randv<Typename>& i) { value = i.value; return *this; } \
-  randv<Typename>& operator=(Typename i) { value = i; return *this; } \
+  randv<Typename>& operator=(const randv<Typename>& i) { this->value = i.value; return *this; } \
+  randv<Typename>& operator=(Typename i) { this->value = i; return *this; } \
 
-
-#define RANDV_INTEGER_INTERFACE(Typename) \
+#define RANDV_ARITHMETIC_INTERFACE(Typename) \
 public: \
-  randv<Typename>& operator++() { ++value;  return *this; } \
-  Typename operator++(int) { Typename tmp = value; ++value; return tmp; } \
-  randv<Typename>& operator--() { --value;  return *this; } \
-  Typename operator--(int) { Typename tmp = value; --value; return tmp; } \
-  randv<Typename>& operator+=(Typename i) { value += i;  return *this; } \
-  randv<Typename>& operator-=(Typename i) { value -= i;  return *this; } \
-  randv<Typename>& operator*=(Typename i) { value *= i;  return *this; } \
-  randv<Typename>& operator/=(Typename i) { value /= i;  return *this; } \
-  randv<Typename>& operator%=(Typename i) { value %= i;  return *this; } \
-  randv<Typename>& operator&=(Typename i) { value &= i;  return *this; } \
-  randv<Typename>& operator|=(Typename i) { value |= i;  return *this; } \
-  randv<Typename>& operator^=(Typename i) { value ^= i;  return *this; } \
-  randv<Typename>& operator<<=(Typename i) { value <<= i;  return *this; } \
-  randv<Typename>& operator>>=(Typename i) { value >>= i;  return *this; } \
+  randv<Typename>& operator++() { ++(this->value);  return *this; } \
+  Typename operator++(int) { Typename tmp = this->value; ++(this->value); return tmp; } \
+  randv<Typename>& operator--() { --(this->value);  return *this; } \
+  Typename operator--(int) { Typename tmp = this->value; --(this->value); return tmp; } \
+  randv<Typename>& operator+=(Typename i) { this->value += i;  return *this; } \
+  randv<Typename>& operator-=(Typename i) { this->value -= i;  return *this; } \
+  randv<Typename>& operator*=(Typename i) { this->value *= i;  return *this; } \
+  randv<Typename>& operator/=(Typename i) { this->value /= i;  return *this; } \
+  randv<Typename>& operator%=(Typename i) { this->value %= i;  return *this; } \
+
+#define RANDV_BITWISE_INTERFACE(Typename) \
+  randv<Typename>& operator&=(Typename i) { this->value &= i;  return *this; } \
+  randv<Typename>& operator|=(Typename i) { this->value |= i;  return *this; } \
+  randv<Typename>& operator^=(Typename i) { this->value ^= i;  return *this; } \
+  randv<Typename>& operator<<=(Typename i) { this->value <<= i;  return *this; } \
+  randv<Typename>& operator>>=(Typename i) { this->value >>= i;  return *this; } \
+
+#define RANDV_PRIM_INTERFACE(Typename) \
+public: \
+  void gatherValues(std::vector<long>& ch) { ch.push_back(static_cast<long>(value)); } \
+  bool next() { static distribution<Typename> dist; value = dist.nextValue(); return true; } \
 
   template<>
   class randv<bool> : public randv_base<bool> {
     RANDV_COMMON_INTERFACE(bool)
+    RANDV_PRIM_INTERFACE(bool)
+    RANDV_BITWISE_INTERFACE(bool)
   };
 
 // for all C/C++ built-in integer types
@@ -90,7 +86,9 @@ public: \
 template<> \
 class randv<typename> : public randv_base<typename> { \
   RANDV_COMMON_INTERFACE(typename) \
-  RANDV_INTEGER_INTERFACE(typename) \
+  RANDV_PRIM_INTERFACE(typename) \
+  RANDV_ARITHMETIC_INTERFACE(typename) \
+  RANDV_BITWISE_INTERFACE(typename) \
 }; \
 
   RANDV_INTEGER_TYPE(int)
