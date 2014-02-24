@@ -1,10 +1,10 @@
 #ifndef METASMTNODEVISITOR_HPP_
 #define METASMTNODEVISITOR_HPP_
 
+#include "../RandomBase.hpp"
 #include "../AssignResult.hpp"
 #include "Node.hpp"
 #include "NodeVisitor.hpp"
-#include "../VectorConstraint.hpp"
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/shared_ptr.hpp>

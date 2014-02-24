@@ -1,6 +1,5 @@
 #pragma once
 
-#include "VectorConstraint.hpp"
 #include "Generator.hpp"
 #include "RandomBase.hpp"
 

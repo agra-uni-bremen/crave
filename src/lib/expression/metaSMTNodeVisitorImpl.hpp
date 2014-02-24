@@ -3,7 +3,7 @@
 
 #include "../../crave/expression/metaSMTNodeVisitor.hpp"
 #include "../../crave/AssignResult.hpp"
-#include "../../crave/VectorConstraint.hpp"
+#include "../../crave/RandomBase.hpp"
 
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/variate_generator.hpp>

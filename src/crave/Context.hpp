@@ -2,7 +2,6 @@
 
 #include "bitsize_traits.hpp"
 #include "Constraint.hpp"
-#include "VectorConstraint.hpp"
 #include "ExpressionTraits.hpp"
 #include "VariableContainer.hpp"
 #include "expression/Node.hpp"

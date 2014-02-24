@@ -6,7 +6,6 @@
 
 #include "bitsize_traits.hpp"
 #include "RandomBase.hpp"
-#include "VectorConstraint.hpp"
 
 namespace crave {
   template <typename T, int N=0> struct is_sysc_dt: boost::mpl::false_ {};
@@ -23,20 +22,20 @@ namespace crave {
   {};
 
   template<int N>
-  class randv_prim_base<sc_dt::sc_bv<N> > : public rand_base
+  class randv_base<sc_dt::sc_bv<N> > : public rand_base
   {
       typedef sc_dt::sc_bv<N> sc_bv;
     public:
       operator sc_bv() const { return value; }
-      friend ostream& operator<<(ostream& os, const randv_prim_base<sc_bv>& e) { os << e.value; return os; }
+      friend ostream& operator<<(ostream& os, const randv_base<sc_bv>& e) { os << e.value; return os; }
       WriteReference<sc_bv> const& operator()() const { return var; }
       virtual void gatherValues(std::vector<long>& ch) { ch.insert(ch.end(), value.to_long()); }
       virtual void gatherValues(std::vector<unsigned long>& ch) { ch.insert(ch.end(), value.to_ulong()); }
       virtual std::size_t numValues() const { return 1; }
 
     protected:
-      randv_prim_base(rand_obj_base* parent) : var(value) { if (parent != 0) parent->addChild(this, true); }
-      randv_prim_base(const randv_prim_base& other) : var(value), value(other.value) { }
+      randv_base(rand_obj_base* parent) : var(value) { if (parent != 0) parent->addChild(this, true); }
+      randv_base(const randv_base& other) : var(value), value(other.value) { }
       WriteReference<sc_bv> var;
       sc_bv value;
   };

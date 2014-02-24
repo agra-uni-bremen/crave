@@ -2,12 +2,11 @@
 
 #include "Constraint.hpp"
 #include "Distribution.hpp"
-#include "VectorConstraint.hpp"
 
-#include <boost/preprocessor/seq/for_each.hpp>
+#include "expression/AssignResultImpl.hpp"
 
 #include <vector>
-#include <set>
+#include <map>
 
 namespace crave {
 
@@ -31,38 +30,40 @@ namespace crave {
   };
 
   template<typename T>
-  class randv_prim_base : public rand_base {
+  class randv_base : public rand_base {
   public:
     operator T() const { return value; }
-    friend ostream& operator<<(ostream& os, const randv_prim_base<T>& e) { os << e.value; return os; }
+    friend ostream& operator<<(ostream& os, const randv_base<T>& e) { os << e.value; return os; }
     WriteReference<T> const& operator()() const { return var; }
 
     virtual void gatherValues(std::vector<long>& ch) { ch.push_back(static_cast<long>(value)); }
 
+    virtual bool next() { static distribution<T> dist; value = dist.nextValue(); return true; }
+
   protected:
-    randv_prim_base(rand_obj_base* parent) : var(value) { if (parent != 0) parent->addChild(this, true); }
-    randv_prim_base(const randv_prim_base& other) : var(value), value(other.value) { }
+    randv_base(rand_obj_base* parent) : var(value) { if (parent != 0) parent->addChild(this, true); }
+    randv_base(const randv_base& other) : var(value), value(other.value) { }
     WriteReference<T> var;
     T value;
   };
 
+
   template<typename T>
-  class randv : public randv_prim_base<T> {
+  class randv : public randv_base<T> {
   public:
-    randv(rand_obj_base* parent) : randv_prim_base<T>(parent) { }
-    randv(const randv& other) : randv_prim_base<T>(other) { }
-    bool next() { return true; }
+    randv(rand_obj_base* parent = 0) : randv_base<T>(parent) { } \
+    randv(const randv& other) : randv_base<T>(other) { } \
   };
 
-#define _COMMON_INTERFACE(Typename) \
+#define RANDV_COMMON_INTERFACE(Typename) \
 public: \
-  randv(rand_obj_base* parent = 0) : randv_prim_base<Typename>(parent) { } \
-  randv(const randv& other) : randv_prim_base<Typename>(other) { } \
-  bool next() { static distribution<Typename> dist; value = dist.nextValue(); return true; } \
+  randv(rand_obj_base* parent = 0) : randv_base<Typename>(parent) { } \
+  randv(const randv& other) : randv_base<Typename>(other) { } \
   randv<Typename>& operator=(const randv<Typename>& i) { value = i.value; return *this; } \
   randv<Typename>& operator=(Typename i) { value = i; return *this; } \
 
-#define _INTEGER_INTERFACE(Typename) \
+
+#define RANDV_INTEGER_INTERFACE(Typename) \
 public: \
   randv<Typename>& operator++() { ++value;  return *this; } \
   Typename operator++(int) { Typename tmp = value; ++value; return tmp; } \
@@ -79,35 +80,82 @@ public: \
   randv<Typename>& operator<<=(Typename i) { value <<= i;  return *this; } \
   randv<Typename>& operator>>=(Typename i) { value >>= i;  return *this; } \
 
-// bool
   template<>
-  class randv<bool> : public randv_prim_base<bool> {
-    _COMMON_INTERFACE(bool)
+  class randv<bool> : public randv_base<bool> {
+    RANDV_COMMON_INTERFACE(bool)
   };
 
 // for all C/C++ built-in integer types
-#define _INTEGER_TYPE(typename) \
+#define RANDV_INTEGER_TYPE(typename) \
 template<> \
-class randv<typename> : public randv_prim_base<typename> { \
-  _COMMON_INTERFACE(typename) \
-  _INTEGER_INTERFACE(typename) \
+class randv<typename> : public randv_base<typename> { \
+  RANDV_COMMON_INTERFACE(typename) \
+  RANDV_INTEGER_INTERFACE(typename) \
 }; \
 
-  _INTEGER_TYPE(int)
-  _INTEGER_TYPE(unsigned int)
-  _INTEGER_TYPE(char)
-  _INTEGER_TYPE(signed char)
-  _INTEGER_TYPE(unsigned char)
-  _INTEGER_TYPE(short)
-  _INTEGER_TYPE(unsigned short)
-  _INTEGER_TYPE(long)
-  _INTEGER_TYPE(unsigned long)
-  _INTEGER_TYPE(long long)
-  _INTEGER_TYPE(unsigned long long)
+  RANDV_INTEGER_TYPE(int)
+  RANDV_INTEGER_TYPE(unsigned int)
+  RANDV_INTEGER_TYPE(char)
+  RANDV_INTEGER_TYPE(signed char)
+  RANDV_INTEGER_TYPE(unsigned char)
+  RANDV_INTEGER_TYPE(short)
+  RANDV_INTEGER_TYPE(unsigned short)
+  RANDV_INTEGER_TYPE(long)
+  RANDV_INTEGER_TYPE(unsigned long)
+  RANDV_INTEGER_TYPE(long long)
+  RANDV_INTEGER_TYPE(unsigned long long)
 
-#undef _COMMON_INTERFACE
-#undef _INTEGER_INTERFACE
-#undef _INTEGER_TYPE
+  unsigned int default_rand_vec_size();
+
+  class __rand_vec_base {
+  public:
+    virtual ~__rand_vec_base() { }
+    virtual void set_values(std::vector<std::string>& ) = 0;
+    virtual Variable<unsigned int> const& size_var() const = 0;
+  };
+
+  static std::map<int, __rand_vec_base*> vectorBaseMap;
+
+  template<typename T1, typename T2>
+  class __rand_vec_base1 : public __rand_vec_base
+  {
+    public:
+      __rand_vec_base1() { vectorBaseMap[sym_vec.id()] = this; }
+      const Vector<T1>& operator()() const { return sym_vec; }
+
+      T1& operator[](const int& idx) const { return (T1&) real_vec[idx]; }
+      void push_back(const T1& x) { real_vec.push_back(x); }
+      void clear() { real_vec.clear(); }
+      std::size_t size() { return real_vec.size(); }
+
+      void print() {
+        std::cout << "vector " << sym_vec.id() << ": ";
+        for (uint i = 0; i < real_vec.size(); i++)
+          std::cout << real_vec[i] << ", ";
+        std::cout << std::endl;
+      }
+
+      virtual Variable<unsigned int> const& size_var() const { return sym_vec.size(); }
+      virtual void set_values(std::vector<std::string> & values) {
+        AssignResultImpl<T2> result;
+        real_vec.clear();
+        for (uint i = 0; i < values.size(); i++) {
+          result.set_value(values[i]);
+          real_vec.push_back(result.value());
+        }
+      }
+
+    protected:
+      Vector<T1> sym_vec;
+      std::vector<T2> real_vec;
+  };
+
+  template<typename T>
+  class __rand_vec : public __rand_vec_base1<T, T> { };
+
+  template<>
+  class __rand_vec<bool> : public __rand_vec_base1<bool, char> { };
+
 
   template<typename T>
   class rand_vec : public __rand_vec<T>, public rand_base {
