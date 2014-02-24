@@ -154,11 +154,10 @@ class randv<typename> : public randv_base<typename> { \
   template<>
   class __rand_vec<bool> : public __rand_vec_base1<bool, char> { };
 
-
   template<typename T>
   class rand_vec : public __rand_vec<T>, public rand_base {
   public:
-    rand_vec(rand_obj_base* parent) : __rand_vec<T>() { if (parent != 0) parent->addChild(this, true); }
+    rand_vec(rand_obj_base* parent = 0) : __rand_vec<T>() { if (parent != 0) parent->addChild(this, true); }
 
     virtual bool next() {
       static randv<T> r(NULL);
@@ -170,7 +169,7 @@ class randv<typename> : public randv_base<typename> { \
       return true;
     }
 
-    virtual void gatherValues(std::vector<long>& ch) { }
+    virtual void gatherValues(std::vector<long>& ch) { ch.push_back(this->size()); }
   };
 
 } // namespace crave
