@@ -181,6 +181,21 @@ void EvalVisitor::visitXorOpr(const XorOpr& x)
 
 void EvalVisitor::visitEqualOpr(const EqualOpr& eq)
 {
+  // include tmp variable for inside operation
+  VariableExpr* v1 = static_cast<VariableExpr*>(eq.lhs().get());
+  VariableExpr* v2 = static_cast<VariableExpr*>(eq.rhs().get());
+
+  if (v1->id() != 0 && v2->id() != 0) {
+
+    eval_map::iterator ite = evalMap_.lower_bound(v1->id());
+    if (ite != evalMap_.end() && v1->id() >= ite->first) {
+      evalMap_.insert(std::make_pair(v2->id(), ite->second));
+    } else {
+      evalMap_.insert(ite, std::make_pair(v1->id(), evalMap_.at(v2->id())));
+    }
+  }
+
+  // regular evaluation
   stack_entry lhs, rhs;
   evalBinExpr(eq, lhs, rhs);
 
