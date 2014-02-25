@@ -109,9 +109,6 @@ BOOST_AUTO_TEST_CASE (equal_t1) {
 
   eval.assign(a(), 65535);
 
-  Generator gen(a() == 65535);
-  gen(b() == a());
-
   BOOST_REQUIRE( eval.evaluate(a()) );
   BOOST_CHECK_EQUAL( eval.get_result<unsigned int>(), 65535 );
   BOOST_REQUIRE( eval.evaluate(a() == 65535) );
@@ -587,5 +584,32 @@ BOOST_AUTO_TEST_CASE (if_then_t1) {
     }
   }
 }
+
+BOOST_AUTO_TEST_CASE (equal_t2) {
+  randv<unsigned int> a(0);
+  randv<unsigned int> b(0);
+  Evaluator eval;
+
+  eval.assign(a(), 1);
+  eval.assign(b(), 2);
+
+  BOOST_REQUIRE( eval.evaluate(a() == b()));
+  BOOST_CHECK( !eval.get_result<bool>() );
+}
+
+BOOST_AUTO_TEST_CASE (equal_t3) {
+  randv<unsigned int> a(0);
+  randv<unsigned int> b(0);
+  randv<unsigned int> c(0);
+  Evaluator eval;
+
+  eval.assign(a(), 1);
+  eval.assign(b(), 2);
+  eval.assign(c(), 3);
+
+  BOOST_REQUIRE( eval.evaluate(a() + b() == c() ));
+  BOOST_CHECK( eval.get_result<bool>() );
+}
+
 
 BOOST_AUTO_TEST_SUITE_END() // Evaluations
