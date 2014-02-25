@@ -21,31 +21,82 @@ namespace crave {
 
   class rand_obj : public rand_obj_base {
   public:
-    rand_obj(rand_obj* parent = 0) { if (parent != 0) { parent->addChild(this); } }
+    rand_obj(rand_obj* parent_ = 0) : parent(parent_), rebuild(false) { if (parent != 0) parent->add_obj_child(this); }
 
     virtual bool next() { 
-      for (uint i = 0; i < children.size(); i++)
-        if (!children[i]->next()) return false;
-      return constraint.next(); 
+      if (!gen_base_children()) return false;
+      if (rebuild) {
+        constraint.reset();
+        gather_constraints(constraint);
+        constraint.rebuild();
+        rebuild = false;
+      }
+      return constraint.next();
     }
 
-    virtual void gatherValues(std::vector<long>& ch) {
-      for (std::vector<rand_base*>::const_iterator i = children.begin();
-           i != children.end(); ++i)
-        (*i)->gatherValues(ch);
+    virtual void gather_values(std::vector<long>& ch) {
+      for (std::vector<rand_base*>::const_iterator i = baseChildren.begin();
+           i != baseChildren.end(); ++i)
+        (*i)->gather_values(ch);
+      for (std::vector<rand_obj*>::const_iterator i = objChildren.begin();
+           i != objChildren.end(); ++i)
+        (*i)->gather_values(ch);
     }
 
-    virtual void addChild(rand_base* rb) { children.push_back(rb); }
+    virtual void add_base_child(rand_base* rb) { baseChildren.push_back(rb); }
 
-    bool enable_constraint(std::string name) { return constraint.enable_constraint(name); }
-    bool disable_constraint(std::string name) { return constraint.disable_constraint(name); }
+    void request_rebuild() { rebuild = true; if (parent != 0) parent->request_rebuild(); }
+
+    void add_obj_child(rand_obj* ro) { objChildren.push_back(ro); request_rebuild(); }
+
+    bool enable_constraint(std::string name) { 
+      bool res = constraint.enable_constraint(name); 
+      if (constraint.is_changed()) request_rebuild();
+      return res;
+    }
+    
+    bool disable_constraint(std::string name) {
+      bool res = constraint.disable_constraint(name);
+      if (constraint.is_changed()) request_rebuild();
+      return res;
+    }
+    
     bool is_constraint_enabled(std::string name) { return constraint.is_constraint_enabled(name); }
+
+    std::ostream& print_dot_graph(std::ostream& os, bool root = true) { 
+      if (root)
+        os << "digraph AST {" << std::endl;
+      for (uint i = 0; i < objChildren.size(); i++)
+        objChildren[i]->print_dot_graph(os, false);
+      constraint.print_dot_graph(os, false);  
+      if (root)
+       os << "}" << std::endl;
+      return os;
+    }
+
+  protected:
+    bool gen_base_children() {
+      for (uint i = 0; i < baseChildren.size(); i++)
+        if (!baseChildren[i]->next()) return false;
+      for (uint i = 0; i < objChildren.size(); i++)
+        if (!objChildren[i]->gen_base_children()) return false;
+      return true;  
+    }
+
+    void gather_constraints(Generator& gen) {
+      for (uint i = 0; i < objChildren.size(); i++)
+        objChildren[i]->gather_constraints(gen);
+      gen.merge(constraint);
+    }
 
   public:
     Generator constraint;
 
   protected:
-    std::vector<rand_base*> children;
+    std::vector<rand_base*> baseChildren;
+    std::vector<rand_obj*> objChildren;
+    rand_obj* parent;
+    bool rebuild;
   };
 
 } // end namespace crave

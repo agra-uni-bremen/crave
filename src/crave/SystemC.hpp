@@ -31,7 +31,7 @@ namespace crave {
 
 #define RANDV_SCDT_INTERFACE(Typename) \
 public: \
-  void gatherValues(std::vector<long>& ch) { ch.insert(ch.end(), this->value.to_long()); } \
+  void gather_values(std::vector<long>& ch) { ch.insert(ch.end(), this->value.to_long()); } \
   bool next() { static distribution<long> dist; this->value = dist.nextValue(); return true; } \
 
 #define RANDV_SCDT_REF_EXPR(Typename) \

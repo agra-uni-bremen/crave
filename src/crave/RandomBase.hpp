@@ -17,12 +17,12 @@ namespace crave {
 
   public:
     virtual bool next() = 0;
-    virtual void gatherValues(std::vector<long>&) = 0;
+    virtual void gather_values(std::vector<long>&) = 0;
   };
 
   class rand_obj_base : public rand_base {
   public:
-    virtual void addChild(rand_base*) = 0;
+    virtual void add_base_child(rand_base*) = 0;
   };
 
   template<typename T>
@@ -33,7 +33,7 @@ namespace crave {
     WriteReference<T> const& operator()() const { return var; }
 
   protected:
-    randv_base(rand_obj_base* parent) : var(value) { if (parent != 0) parent->addChild(this); }
+    randv_base(rand_obj_base* parent) : var(value) { if (parent != 0) parent->add_base_child(this); }
     randv_base(const randv_base& other) : var(value), value(other.value) { }
     WriteReference<T> var;
     T value;
@@ -67,7 +67,7 @@ public: \
 
 #define RANDV_PRIM_INTERFACE(Typename) \
 public: \
-  void gatherValues(std::vector<long>& ch) { ch.push_back(static_cast<long>(value)); } \
+  void gather_values(std::vector<long>& ch) { ch.push_back(static_cast<long>(value)); } \
   bool next() { static distribution<Typename> dist; value = dist.nextValue(); return true; } \
 
   template<>
@@ -153,7 +153,7 @@ class randv<typename> : public randv_base<typename> { \
   template<typename T>
   class rand_vec : public __rand_vec<T>, public rand_base {
   public:
-    rand_vec(rand_obj_base* parent = 0) : __rand_vec<T>() { if (parent != 0) parent->addChild(this); }
+    rand_vec(rand_obj_base* parent = 0) : __rand_vec<T>() { if (parent != 0) parent->add_base_child(this); }
 
     virtual bool next() {
       static randv<T> r(NULL);
@@ -165,7 +165,7 @@ class randv<typename> : public randv_base<typename> { \
       return true;
     }
 
-    virtual void gatherValues(std::vector<long>& ch) { ch.push_back(this->size()); }
+    virtual void gather_values(std::vector<long>& ch) { ch.push_back(this->size()); }
   };
 
 } // namespace crave

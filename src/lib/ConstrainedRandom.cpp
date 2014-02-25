@@ -85,22 +85,6 @@ namespace crave {
     init(cfg_file);
   }
 
-  std::ostream& print_dot_graph_(std::ostream& os, ConstraintList& constraints)  {
-    os << "digraph AST {" << std::endl;
-    ToDotVisitor visitor(os);
-
-    BOOST_FOREACH ( ConstraintPtr c , constraints ) {
-      long a = reinterpret_cast<long>(&*c);
-      long b = reinterpret_cast<long>(&(*c->get_expression()));
-      os << "\t" << a << " [label=\"" << c->get_name() << (c->is_soft()?" soft":"") << (!c->is_enabled()?" disabled":"") << "\"]" << std::endl;
-      os << "\t" << a << " -> " << b << std::endl; 
-      c->get_expression()->visit(visitor);
-    }
-
-    os << "}" << std::endl;
-    return os;
-  }
-
 } // namespace crave
 
 // vim: tabstop=2 shiftwidth=2 expandtab

@@ -60,6 +60,7 @@ public:
   inline bool enable_constraint(std::string const& name) { return constr_mng_.enable_constraint(name); }
   inline bool disable_constraint(std::string const& name) { return constr_mng_.disable_constraint(name); }
   inline bool is_constraint_enabled(std::string const& name) { return constr_mng_.is_constraint_enabled(name); }
+  inline bool is_changed() { return constr_mng_.is_changed(); }
 
   Generator & operator()() {
     if (!next())
@@ -67,9 +68,15 @@ public:
     return *this;
   }
 
+  inline void merge(Generator& other) { cp.mergeConstraints(other.constr_mng_); }
+
   void reset() {
+    constr_mng_.set_synced();
     cp.reset();
-    cp.addConstraintManager(constr_mng_);
+  }
+
+  void rebuild(bool selfInclude = false) {
+    if (selfInclude) merge(*this);
     cp.partition();
     var_gen_.reset(cp.get_partitions());
     vec_gen_.reset(cp.get_vector_constraints());
@@ -78,13 +85,18 @@ public:
   bool next() {
     if (constr_mng_.is_changed()) {
       reset();
-      constr_mng_.set_synced();
+      rebuild(true);
     }
     return var_gen_.solve() && vec_gen_.solve();
   }
 
-  inline std::ostream& print_dot_graph(std::ostream& os) { 
-    return constr_mng_.print_dot_graph(os);  
+  inline std::ostream& print_dot_graph(std::ostream& os, bool root = true) { 
+    if (root)
+      os << "digraph AST {" << std::endl;
+    constr_mng_.print_dot_graph_(os);
+    if (root)
+      os << "}" << std::endl;
+    return os;
   }
 
   inline std::vector<std::vector<std::string> > analyse_contradiction() {

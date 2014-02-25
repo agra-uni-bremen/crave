@@ -32,8 +32,6 @@ typedef std::list<ConstraintPtr> ConstraintList;
 struct UserVectorConstraint;
 typedef boost::shared_ptr<UserVectorConstraint> VectorConstraintPtr;
 
-std::ostream& print_dot_graph_(std::ostream& os, ConstraintList& constraints);
-
 /**
  *
  */
@@ -284,7 +282,17 @@ struct ConstraintManager {
                           e, ctx, soft);
   }
 
-  std::ostream& print_dot_graph(std::ostream& os) { return print_dot_graph_(os, constraints_); }
+  std::ostream& print_dot_graph_(std::ostream& os)  {
+    ToDotVisitor visitor(os);
+    BOOST_FOREACH ( ConstraintPtr c , constraints_ ) {
+      long a = reinterpret_cast<long>(&*c);
+      long b = reinterpret_cast<long>(&(*c->get_expression()));
+      os << "\t" << a << " [label=\"" << c->get_name() << (c->is_soft()?" soft":"") << (!c->is_enabled()?" disabled":"") << "\"]" << std::endl;
+      os << "\t" << a << " -> " << b << std::endl; 
+      c->get_expression()->visit(visitor);
+    }
+    return os;
+  }
 
 private:
   unsigned id_;
@@ -306,7 +314,10 @@ struct ConstraintPartitioner {
     vec_constraints_.clear();
   }
 
-  void addConstraintManager(ConstraintManager& mng) {
+  void mergeConstraints(ConstraintManager& mng) {
+    LOG(INFO) << "Merge set " << mng.id_ << " with set(s)"; 
+    BOOST_FOREACH (unsigned id, constr_mngs_) 
+      LOG(INFO) << " " << id;
     constr_mngs_.insert(mng.id_);
     BOOST_FOREACH (ConstraintPtr c, mng.constraints_) {
       if (c->is_enabled()) {
@@ -317,8 +328,6 @@ struct ConstraintPartitioner {
       }
     }
   }
-
-  std::ostream& print_dot_graph(std::ostream& os) { return print_dot_graph_(os, constraints_); }
 
   void partition() {
     while (!constraints_.empty()) {
