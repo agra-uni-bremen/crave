@@ -198,8 +198,8 @@ public:
   constraint(
     ( (src_addr() > (dest_addr() + 0x100000))  &&
     (src_addr() < (dest_addr() + 0x200000)) ) ||
-    ( (src_addr() < (dest_addr() - 0x10000 )) ) &&
-    (src_addr() > (dest_addr() - 0xfffff ))  );
+    ( (src_addr() < (dest_addr() - 0x10000 )) &&
+    (src_addr() > (dest_addr() - 0xfffff )) ) );
   }
   randv<uint>dest_min;
   randv<uint>dest_max;
@@ -471,6 +471,51 @@ BOOST_AUTO_TEST_CASE( multi_distributions )
   BOOST_REQUIRE( 10 <= it.a && it.a <= 20 );
 }
 
+class Item3 : public rand_obj {
+public:
+  Item3(rand_obj* parent) : rand_obj(parent), a(this), b(this) {
+    constraint(a() == b());
+    constraint(a() <= 5);
+    constraint("c1", b() != 5);
+  }
+  randv<uint> a;
+  randv<uint> b;
+};
+
+class Item4 : public rand_obj {
+public:
+  Item4(rand_obj* parent = 0) : rand_obj(parent), item(this), c(this) {
+    constraint(c() >= 5);
+    constraint("c2", item.a() == c());
+  }
+  Item3 item;
+  randv<uint> c;
+};
+
+
+BOOST_AUTO_TEST_CASE( hier_constr_t )
+{
+  Item4 it;
+
+  BOOST_REQUIRE(!it.next() );
+
+  BOOST_REQUIRE( it.disable_constraint("c2") );
+  BOOST_REQUIRE( it.next() );
+  BOOST_REQUIRE( it.c >= 5 );
+  BOOST_REQUIRE( it.item.a <= 5 );
+  BOOST_REQUIRE( it.item.a == it.item.b );
+  BOOST_REQUIRE( it.item.b != 5 );
+
+  BOOST_REQUIRE( it.enable_constraint("c2") );
+  BOOST_REQUIRE( it.item.disable_constraint("c1") );
+  BOOST_REQUIRE( it.next() );
+  BOOST_REQUIRE( it.c == 5 );
+  BOOST_REQUIRE( it.item.a == 5 );
+  BOOST_REQUIRE( it.item.b == 5 );
+  
+  BOOST_REQUIRE( it.item.enable_constraint("c1") );
+  BOOST_REQUIRE(!it.next() );  
+}
 
 BOOST_AUTO_TEST_SUITE_END() // Context
 
