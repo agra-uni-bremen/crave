@@ -47,10 +47,10 @@ include_directories( ${GLOG_INCLUDE_DIRS} )
 add_subdirectory(src)
 
 enable_testing ()
-set(${PROJECT_NAME}_LIBS ${CMAKE_INSTALL_PREFIX}/lib/lib${PROJECT_NAME}.a ${metaSMT_LIBRARIES} )
-set(${PROJECT_NAME}_INCLUDE ${CMAKE_INSTALL_PREFIX}/include ${metaSMT_INCLUDE_DIR} )
+set(${PROJECT_NAME}_LIBS ${CMAKE_INSTALL_PREFIX}/lib/lib${PROJECT_NAME}.a ${metaSMT_LIBRARIES} ${GLOG_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY})
+set(${PROJECT_NAME}_INCLUDE ${CMAKE_INSTALL_PREFIX}/include ${metaSMT_INCLUDE_DIR} ${GLOG_INCLUDE_DIRS})
 
-## create metaSMT CMake config file
+## create CRAVE CMake config file
 file(WRITE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
 "set(${PROJECT_NAME}_FOUND 1)
 set(${PROJECT_NAME}_INCLUDE_DIR ${${PROJECT_NAME}_INCLUDE})
