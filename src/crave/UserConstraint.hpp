@@ -253,7 +253,9 @@ struct ConstraintManager {
 
     ctx.reset_support_vars();
     
-    NodePtr n(boost::proto::eval(FixWidth()(e), ctx));
+//    NodePtr n(boost::proto::eval(FixWidth()(e), ctx));
+    NodePtr n(boost::proto::eval(e, ctx));
+    // TODO FixWidthVisitor
 
     ConstraintPtr c(
       boost::dynamic_pointer_cast<ForEach>(n) != 0

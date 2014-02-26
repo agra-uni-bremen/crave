@@ -244,6 +244,7 @@ public:
   result_type operator()(boost::proto::tag::terminal, Integer const & i) {
     unsigned width = bitsize_traits<Integer>::value;
     bool sign = boost::is_signed<Integer>::value;
+    // TODO minimize width
     return new Constant(i, width, sign);
   }
 
