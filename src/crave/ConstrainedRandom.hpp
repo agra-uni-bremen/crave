@@ -17,7 +17,6 @@ namespace crave {
 
   void init();
   void init(std::string const&);
-  void init(std::string const&, std::string const&);
 
   class rand_obj : public rand_obj_base {
   public:

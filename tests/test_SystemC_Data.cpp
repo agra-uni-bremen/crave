@@ -16,7 +16,7 @@ using namespace crave;
 
 struct SystemC_Data_Fixture {
   SystemC_Data_Fixture () {
-    crave::init("Boolector", "./crave.cfg");
+    crave::set_solver_backend("Boolector");
   }
 };
 
