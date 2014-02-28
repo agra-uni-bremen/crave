@@ -78,13 +78,6 @@ namespace crave {
     settings.save();
   }
 
-  void init(std::string const& solver_type, std::string const& cfg_file) {
-    // set solver backend
-    FactoryMetaSMT::setSolverType(solver_type);
-
-    init(cfg_file);
-  }
-
 } // namespace crave
 
 // vim: tabstop=2 shiftwidth=2 expandtab

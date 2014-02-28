@@ -5,7 +5,7 @@
 
 struct Context_Fixture {
   Context_Fixture () {
-    crave::init("Cudd", "./crave.cfg");
+    crave::set_solver_backend("Cudd");
   }
 };
 

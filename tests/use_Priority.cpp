@@ -5,7 +5,7 @@
 
 struct Context_Fixture {
   Context_Fixture () {
-    crave::init("Priority", "./crave.cfg");
+    crave::set_solver_backend("Priority");
   }
 };
 
