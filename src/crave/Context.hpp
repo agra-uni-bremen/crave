@@ -245,14 +245,14 @@ public:
   result_type operator()(boost::proto::tag::terminal, Integer const & i) {
     unsigned width = bitsize_traits<Integer>::value;
     bool sign = boost::is_signed<Integer>::value;
-
-    long aux = i & std::numeric_limits<Integer>::max();
-    unsigned int cnt = 0;
-    for (int j = 0; j < width; ++j, ++cnt)
-      if ((aux >> j) == 0)
-        break;
-
-    return new Constant(i, cnt + sign, sign);
+/*
+    if (!sign) {
+      for (int j = 1; j < width; ++j)
+        if ((i >> j) == 0)
+          return new Constant(i, j, false);
+    }
+*/    
+    return new Constant(i, width, sign); 
   }
 
   template<typename Integer, typename CollectionTerm>
