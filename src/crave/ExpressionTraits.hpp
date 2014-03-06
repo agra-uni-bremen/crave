@@ -125,42 +125,6 @@ namespace crave {
   ,  boost::proto::nary_expr<boost::proto::_, boost::proto::vararg<FixWidth> >
   >{};
 
-/***************************************************************************/
-/*********** Sign of the expression ****************************************/
-/***************************************************************************/
-
-  struct FixedUnsigned
-  : boost::proto::or_<
-      boost::proto::nary_expr< boost::proto::tag::less_equal, boost::proto::vararg< boost::proto::_> >
-    , boost::proto::nary_expr< boost::proto::tag::less, boost::proto::vararg< boost::proto::_> >
-    , boost::proto::nary_expr< boost::proto::tag::greater, boost::proto::vararg< boost::proto::_> >
-    , boost::proto::nary_expr< boost::proto::tag::greater_equal, boost::proto::vararg< boost::proto::_> >
-    , boost::proto::nary_expr< boost::proto::tag::equal_to, boost::proto::vararg< boost::proto::_> >
-    , boost::proto::nary_expr< boost::proto::tag::not_equal_to, boost::proto::vararg< boost::proto::_> >
-    , boost::proto::function< boost::proto::terminal<operator_bitslice> , boost::proto::_, boost::proto::_, boost::proto::_ > 
-  > {};
-
-  struct IsSigned
-  : boost::proto::and_<
-      boost::proto::not_< FixedUnsigned >
-    , boost::proto::or_ <
-        boost::proto::and_<
-          boost::proto::terminal<boost::proto::_>
-        , boost::proto::if_< boost::is_signed< boost::proto::_value > () >
-        >
-      , boost::proto::subscript< IsSigned, boost::proto::_ >
-      , boost::proto::and_<
-          boost::proto::not_< boost::proto::subscript<boost::proto::_, boost::proto::_ > >
-        , boost::proto::when< boost::proto::binary_expr<boost::proto::_, boost::proto::_, boost::proto::_>
-        , boost::proto::or_<
-            IsSigned( boost::proto::_left )
-          , IsSigned( boost::proto::_right )
-          >
-        >
-      >
-    >
-  > {};
-
 } /* crave */
 
 // vim: tabstop=2 shiftwidth=2 expandtab
