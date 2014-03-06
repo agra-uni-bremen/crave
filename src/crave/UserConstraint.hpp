@@ -2,6 +2,7 @@
 
 #include "Context.hpp"
 #include "expression/Node.hpp"
+#include "expression/FixWidthVisitor.hpp"
 #include "expression/ToDotNodeVisitor.hpp"
 
 #include <boost/intrusive_ptr.hpp>
@@ -151,7 +152,7 @@ struct ConstraintPartition {
   }
 
   inline bool contains_var(int id) { 
-    return support_vars_.find(id) != support_vars_.end(); 
+    return support_vars_.find(id) != support_vars_.end();
   }
 
   template<typename ostream>
@@ -187,7 +188,7 @@ struct ConstraintManager {
 
   template<typename ostream>
   friend ostream& operator<<(ostream& os, const ConstraintManager& set) {
-    os << "Set " << set.id_ << " has " << set.constraints_.size() << " constraint(s) and has " << (set.changed_?"":"not ") << "changed" << std::endl; 
+    os << "Set " << set.id_ << " has " << set.constraints_.size() << " constraint(s) and has " << (set.changed_?"":"not ") << "changed" << std::endl;
     BOOST_FOREACH (ConstraintPtr item, set.constraints_) {
       os << item << std::endl;
     }
@@ -244,7 +245,7 @@ struct ConstraintManager {
 
   template<typename Expr>
   ConstraintPtr makeConstraint(std::string const& name, int c_id, Expr e, Context& ctx,
-                                     bool const soft = false) {
+                               bool const soft = false) {
 
     LOG(INFO) << "New " << (soft?"soft ":"") << "constraint " << name << " in set " << id_;
 
@@ -252,10 +253,9 @@ struct ConstraintManager {
       throw std::runtime_error("Constraint already exists.");
 
     ctx.reset_support_vars();
-    
-//    NodePtr n(boost::proto::eval(FixWidth()(e), ctx));
-    NodePtr n(boost::proto::eval(e, ctx));
-    // TODO FixWidthVisitor
+
+    FixWidthVisitor vis;
+    NodePtr n(vis.fix_width(*boost::proto::eval(e, ctx)));
 
     ConstraintPtr c(
       boost::dynamic_pointer_cast<ForEach>(n) != 0
@@ -317,8 +317,8 @@ struct ConstraintPartitioner {
   }
 
   void mergeConstraints(ConstraintManager& mng) {
-    LOG(INFO) << "Merge set " << mng.id_ << " with set(s)"; 
-    BOOST_FOREACH (unsigned id, constr_mngs_) 
+    LOG(INFO) << "Merge set " << mng.id_ << " with set(s)";
+    BOOST_FOREACH (unsigned id, constr_mngs_)
       LOG(INFO) << " " << id;
     constr_mngs_.insert(mng.id_);
     BOOST_FOREACH (ConstraintPtr c, mng.constraints_) {
@@ -337,8 +337,8 @@ struct ConstraintPartitioner {
       maximize_partition(cp, constraints_);
       partitions_.push_back(cp);
     }
-    LOG(INFO) << "Partition results of set(s)"; 
-    BOOST_FOREACH (unsigned id, constr_mngs_) 
+    LOG(INFO) << "Partition results of set(s)";
+    BOOST_FOREACH (unsigned id, constr_mngs_)
       LOG(INFO) << " " << id;
     LOG(INFO) << ": ";
 
@@ -355,7 +355,7 @@ struct ConstraintPartitioner {
   }
 
   inline std::vector<ConstraintPartition>& get_partitions() { return partitions_; }
-  inline std::vector<VectorConstraintPtr>& get_vector_constraints() { 
+  inline std::vector<VectorConstraintPtr>& get_vector_constraints() {
     return vec_constraints_; 
   }
 
@@ -394,7 +394,7 @@ private:
   ConstraintList constraints_;
   // results
   std::vector<ConstraintPartition> partitions_;
-  std::vector<VectorConstraintPtr> vec_constraints_;  
+  std::vector<VectorConstraintPtr> vec_constraints_;
 };
 
 

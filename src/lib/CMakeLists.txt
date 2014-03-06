@@ -1,6 +1,7 @@
 add_library (crave
   ConstrainedRandom.cpp
   expression/EvalVisitor.cpp
+  expression/FixWidthVisitor.cpp
   expression/metaSMTNodeVisitor.cpp
   expression/ReplaceVisitor.cpp
   expression/ToDotNodeVisitor.cpp
