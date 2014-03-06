@@ -61,7 +61,7 @@ private:
   void pop(stack_entry&);
   void pop2(stack_entry&, stack_entry&);
   void pop3(stack_entry&, stack_entry&, stack_entry&);
-  void evalBinExpr( BinaryExpression const&, stack_entry&, stack_entry& );
+  void evalBinExpr( BinaryExpression const&, stack_entry&, stack_entry&, bool );
   void evalTernExpr( TernaryExpression const&, stack_entry&, stack_entry&, stack_entry& );
 
 public:
@@ -102,15 +102,15 @@ inline void FixWidthVisitor::pop3(stack_entry& fst, stack_entry& snd, stack_entr
   trd = exprStack_.top();
   exprStack_.pop();
 }
-inline void FixWidthVisitor::evalBinExpr(BinaryExpression const& bin, stack_entry& fst, stack_entry& snd)
+inline void FixWidthVisitor::evalBinExpr(BinaryExpression const& bin, stack_entry& fst, stack_entry& snd, bool fixWidth = true)
 {
   visitBinaryExpr(bin);
   pop2(snd, fst);
-
+  if (!fixWidth) return;
   if (fst.second < snd.second) {
     unsigned int diff = snd.second - fst.second;
     fst.first = result_type(new ExtendExpression(fst.first.get(), diff));
-    fst.first = snd.first;
+    fst.second = snd.second;
   } else if (fst.second > snd.second) {
     unsigned int diff = fst.second - snd.second;
     snd.first = result_type(new ExtendExpression(snd.first.get(), diff));

@@ -36,7 +36,7 @@ void FixWidthVisitor::visitTernaryExpr(const TernaryExpression& t)
 
 void FixWidthVisitor::visitPlaceholder(const Placeholder& pl)
 {
-  exprStack_.push(std::make_pair(new Placeholder(pl), -1));
+  exprStack_.push(std::make_pair(new Placeholder(pl), 32));
 }
 
 void FixWidthVisitor::visitVariableExpr(const VariableExpr& v) {
@@ -122,7 +122,7 @@ void FixWidthVisitor::visitLogicalAndOpr(const LogicalAndOpr& la)
   stack_entry lhs, rhs;
   evalBinExpr(la, lhs, rhs);
 
-  exprStack_.push(std::make_pair(new LogicalAndOpr(lhs.first, rhs.first), lhs.second));
+  exprStack_.push(std::make_pair(new LogicalAndOpr(lhs.first, rhs.first), 1));
 }
 
 void FixWidthVisitor::visitLogicalOrOpr(const LogicalOrOpr& lo)
@@ -130,7 +130,7 @@ void FixWidthVisitor::visitLogicalOrOpr(const LogicalOrOpr& lo)
   stack_entry lhs, rhs;
   evalBinExpr(lo, lhs, rhs);
 
-  exprStack_.push(std::make_pair(new LogicalAndOpr(lhs.first, rhs.first), lhs.second));
+  exprStack_.push(std::make_pair(new LogicalOrOpr(lhs.first, rhs.first), 1));
 }
 
 void FixWidthVisitor::visitXorOpr(const XorOpr& x)
@@ -146,7 +146,7 @@ void FixWidthVisitor::visitEqualOpr(const EqualOpr& eq)
   stack_entry lhs, rhs;
   evalBinExpr(eq, lhs, rhs);
 
-  exprStack_.push(std::make_pair(new EqualOpr(lhs.first, rhs.first), lhs.second));
+  exprStack_.push(std::make_pair(new EqualOpr(lhs.first, rhs.first), 1));
 }
 
 void FixWidthVisitor::visitNotEqualOpr(const NotEqualOpr& neq)
@@ -154,7 +154,7 @@ void FixWidthVisitor::visitNotEqualOpr(const NotEqualOpr& neq)
   stack_entry lhs, rhs;
   evalBinExpr(neq, lhs, rhs);
 
-  exprStack_.push(std::make_pair(new NotEqualOpr(lhs.first, rhs.first), lhs.second));
+  exprStack_.push(std::make_pair(new NotEqualOpr(lhs.first, rhs.first), 1));
 }
 
 void FixWidthVisitor::visitLessOpr(const LessOpr& l)
@@ -162,7 +162,7 @@ void FixWidthVisitor::visitLessOpr(const LessOpr& l)
   stack_entry lhs, rhs;
   evalBinExpr(l, lhs, rhs);
 
-  exprStack_.push(std::make_pair(new LessOpr(lhs.first, rhs.first), lhs.second));
+  exprStack_.push(std::make_pair(new LessOpr(lhs.first, rhs.first), 1));
 }
 
 void FixWidthVisitor::visitLessEqualOpr(const LessEqualOpr& le)
@@ -170,7 +170,7 @@ void FixWidthVisitor::visitLessEqualOpr(const LessEqualOpr& le)
   stack_entry lhs, rhs;
   evalBinExpr(le, lhs, rhs);
 
-  exprStack_.push(std::make_pair(new LessEqualOpr(lhs.first, rhs.first), lhs.second));
+  exprStack_.push(std::make_pair(new LessEqualOpr(lhs.first, rhs.first), 1));
 }
 
 void FixWidthVisitor::visitGreaterOpr(const GreaterOpr& g)
@@ -178,7 +178,7 @@ void FixWidthVisitor::visitGreaterOpr(const GreaterOpr& g)
   stack_entry lhs, rhs;
   evalBinExpr(g, lhs, rhs);
 
-  exprStack_.push(std::make_pair(new GreaterOpr(lhs.first, rhs.first), lhs.second));
+  exprStack_.push(std::make_pair(new GreaterOpr(lhs.first, rhs.first), 1));
 }
 
 void FixWidthVisitor::visitGreaterEqualOpr(const GreaterEqualOpr& ge)
@@ -186,7 +186,7 @@ void FixWidthVisitor::visitGreaterEqualOpr(const GreaterEqualOpr& ge)
   stack_entry lhs, rhs;
   evalBinExpr(ge, lhs, rhs);
 
-  exprStack_.push(std::make_pair(new GreaterEqualOpr(lhs.first, rhs.first), lhs.second));
+  exprStack_.push(std::make_pair(new GreaterEqualOpr(lhs.first, rhs.first), 1));
 }
 
 void FixWidthVisitor::visitPlusOpr(const PlusOpr& p)
@@ -245,9 +245,31 @@ void FixWidthVisitor::visitShiftRightOpr(const ShiftRightOpr& shr)
   exprStack_.push(std::make_pair(new ShiftRightOpr(lhs.first, rhs.first), lhs.second));
 }
 
-void FixWidthVisitor::visitVectorAccess(const VectorAccess& va) { throw std::runtime_error("VectorAccess is not allowed in FixWidthVisitor."); }
-void FixWidthVisitor::visitForEach(const ForEach& va) { throw std::runtime_error("ForEach is not allowed in FixWidthVisitor."); }
-void FixWidthVisitor::visitUnique(const Unique& va) { throw std::runtime_error("Unique is not allowed in FixWidthVisitor."); }
+void FixWidthVisitor::visitVectorAccess(const VectorAccess& va) 
+{ 
+  stack_entry lhs, rhs;
+  evalBinExpr(va, lhs, rhs, false);
+
+  exprStack_.push(std::make_pair(new VectorAccess(lhs.first, rhs.first), lhs.second));
+}
+
+void FixWidthVisitor::visitForEach(const ForEach& fe) 
+{ 
+  stack_entry lhs, rhs;
+  evalBinExpr(fe, lhs, rhs, false);
+
+  exprStack_.push(std::make_pair(new ForEach(lhs.first, rhs.first), 1));
+}
+
+void FixWidthVisitor::visitUnique(const Unique& u) 
+{ 
+  visitUnaryExpr(u);
+
+  stack_entry e;
+  pop(e);
+
+  exprStack_.push(std::make_pair(new Unique(e.first), e.second));
+}
 
 void FixWidthVisitor::visitIfThenElse(const IfThenElse& ite)
 {
