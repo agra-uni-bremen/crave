@@ -36,7 +36,7 @@ void FixWidthVisitor::visitTernaryExpr(const TernaryExpression& t)
 
 void FixWidthVisitor::visitPlaceholder(const Placeholder& pl)
 {
-  exprStack_.push(std::make_pair(new Placeholder(pl), 32));
+  exprStack_.push(std::make_pair(new Placeholder(pl), placeholder_bitsize()));
 }
 
 void FixWidthVisitor::visitVariableExpr(const VariableExpr& v) {

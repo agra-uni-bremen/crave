@@ -72,7 +72,7 @@ void ReplaceVisitor::visitPlaceholder( Placeholder const& p ) {
     // v already exists
     aux_stack_.push(ite->second);
   } else {
-    aux_stack_.push(new Constant(vec_idx_, 32, false));
+    aux_stack_.push(new Constant(vec_idx_, placeholder_bitsize(), false));
     terminals_.insert(std::make_pair(p.id(), aux_stack_.top()));
   }
   updateResult();

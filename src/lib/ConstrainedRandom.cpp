@@ -16,6 +16,8 @@ namespace crave {
 
   unsigned int default_rand_vec_size() { return 5; }
 
+  unsigned int placeholder_bitsize() { return 32; }
+
   boost::mt19937 rng(std::time(0));
 
   struct random_bit_gen {
