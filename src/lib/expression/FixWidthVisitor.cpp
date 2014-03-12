@@ -88,7 +88,7 @@ void FixWidthVisitor::visitInside(const Inside& i)
   stack_entry e;
   pop(e);
 
-  exprStack_.push(std::make_pair(new Inside(e.first, i.collection()), e.second));
+  exprStack_.push(std::make_pair(new Inside(e.first, i.collection()), 1));
 }
 
 void FixWidthVisitor::visitExtendExpr(const ExtendExpression& e)
