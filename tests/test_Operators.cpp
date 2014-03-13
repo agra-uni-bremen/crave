@@ -650,13 +650,8 @@ BOOST_AUTO_TEST_CASE (bitslice_t) {
   BOOST_REQUIRE( gen.next() );
   BOOST_REQUIRE( x == (0xFF << 3) );
   
-  Generator gen1;
-  gen1(bitslice(16, 3, x()) == 0xFF);
-  BOOST_CHECK_THROW ( gen1.next(), std::runtime_error );  
-
-  Generator gen2;
-  gen2(bitslice(3, 10, x()) == 0xFF);
-  BOOST_CHECK_THROW ( gen2.next(), std::runtime_error );  
+  BOOST_CHECK_THROW ( gen(bitslice(3, 10, x()) == 0xFF), std::runtime_error );  
+  BOOST_CHECK_THROW ( gen(bitslice(16, 3, x()) == 0xFF), std::runtime_error );  
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Context

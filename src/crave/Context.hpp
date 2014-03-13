@@ -341,7 +341,7 @@ public:
       Integer1 const & r, Integer2 const & l, WriteReference<Integer3> const & var_term) { 
       int rb = boost::proto::value(r);
       int lb = boost::proto::value(l);
-      if ((rb < lb) ||(rb > bitsize_traits<Integer3>::value))
+      if ((rb < lb) ||(rb >= bitsize_traits<Integer3>::value))
         throw std::runtime_error("Invalid range of bitslice");
       return new Bitslice(boost::proto::eval(var_term, *this), rb, lb);
   }
