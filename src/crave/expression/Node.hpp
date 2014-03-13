@@ -51,6 +51,7 @@ public:
 
   unsigned int bitsize() const { return bitsize_; }
   bool sign() const { return sign_; }
+  bool isBool() const { return bitsize() == 1 && sign(); }
 private:
   unsigned int bitsize_;
   bool sign_;
@@ -80,7 +81,6 @@ public:
   operator unsigned long() const { return value_; }
 
   unsigned long value() const { return value_; }
-  bool isBool() const { return bitsize() == 1 && sign(); }
 private:
   unsigned long value_;
 };

@@ -94,6 +94,7 @@ public:
 private: // typedefs
   typedef typename SolverType::result_type result_type;
   typedef std::pair<result_type, bool> stack_entry;
+  typedef std::map<int, result_type> result_map;
 
 private: // methods
   inline void pop( stack_entry & fst );
@@ -105,7 +106,7 @@ private: // methods
 private: // data
   SolverType solver_;
   std::stack<stack_entry> exprStack_;
-  std::map<int, qf_bv::bitvector> terminals_;
+  result_map terminals_;
   std::vector<result_type> softs_;
   std::vector<result_type> assumptions_;
   std::vector<result_type> suggestions_;
@@ -194,20 +195,22 @@ void metaSMTVisitorImpl<SolverType>::visitPlaceholder( Placeholder const & ) { }
 template<typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitVariableExpr( VariableExpr const &ve )
 {
-  std::map<int, qf_bv::bitvector>::iterator ite(terminals_.lower_bound(ve.id()));
+  typename result_map::iterator ite(terminals_.lower_bound(ve.id()));
 
-  qf_bv::bitvector bit_vec;
+  result_type result;
   if (ite != terminals_.end() && !(terminals_.key_comp()(ve.id(), ite->first))) {
     // &t already exists
-    bit_vec = ite->second;
+    result = ite->second;
   }
   else
   {
-    bit_vec = qf_bv::new_bitvector( ve.bitsize() );
-    terminals_.insert( ite, std::make_pair(ve.id(), bit_vec) );
+    if (ve.isBool())
+      result = evaluate( solver_, preds::new_variable() );
+    else
+      result = evaluate( solver_, qf_bv::new_bitvector(ve.bitsize()) );      
+    terminals_.insert( ite, std::make_pair(ve.id(), result) );
   }
 
-  result_type result = evaluate( solver_, bit_vec );
   exprStack_.push( std::make_pair( result, ve.sign() ) );
 }
 
@@ -754,11 +757,11 @@ bool metaSMTVisitorImpl<SolverType>::read(Node const& v, AssignResult& assign)
 {
   // assert(static_cast<VariableExpr const *>(&var) != 0);
   VariableExpr const& var = *static_cast<VariableExpr const*>(&v);
-  std::map<int, qf_bv::bitvector>::const_iterator ite(terminals_.find(var.id()));
+  typename result_map::const_iterator ite(terminals_.find(var.id()));
   if (ite == terminals_.end())
     return false;
 
-  qf_bv::bitvector var_expr = ite->second;
+  result_type var_expr = ite->second;
   std::string res = metaSMT::read_value( solver_, var_expr );
   assign.set_value( res );
 
@@ -772,11 +775,11 @@ bool metaSMTVisitorImpl<SolverType>::readVector( std::vector<VariablePtr>& vec, 
   std::vector<std::string> sv;
   BOOST_FOREACH ( VariablePtr var, vec ) {
 
-    std::map<int, qf_bv::bitvector>::const_iterator ite(terminals_.find(var->id()));
+    typename result_map::const_iterator ite(terminals_.find(var->id()));
     if (ite == terminals_.end())
       return false;
 
-    qf_bv::bitvector var_expr = ite->second;
+    result_type var_expr = ite->second;
     sv.push_back(metaSMT::read_value( solver_, var_expr ));
   }
   
