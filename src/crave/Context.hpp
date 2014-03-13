@@ -45,7 +45,7 @@ public:
   template<typename value_type>
   result_type new_var(var_tag<value_type> const & tag) {
       unsigned width = bitsize_traits<value_type>::value;
-      bool sign = boost::is_signed<value_type>::value;
+      bool sign = crave::is_signed<value_type>::value;
       return new_var(tag.id, width, sign);
   }
 
@@ -68,7 +68,7 @@ public:
         return ite->second;
     } else {
       unsigned width = bitsize_traits<value_type>::value;
-      bool sign = boost::is_signed<value_type>::value;
+      bool sign = crave::is_signed<value_type>::value;
 
       result_type vec = new VectorExpr(tag.id, width, sign);
       vector_variables_.insert( std::make_pair(tag.id, vec) );
@@ -244,7 +244,7 @@ public:
   template<typename Integer>
   result_type operator()(boost::proto::tag::terminal, Integer const & i) {
     unsigned width = bitsize_traits<Integer>::value;
-    bool sign = boost::is_signed<Integer>::value;
+    bool sign = crave::is_signed<Integer>::value;
     if (i >= 0) {
       for (int j = 1; j < width; ++j)
         if ((i >> j) == 0)
@@ -262,7 +262,7 @@ public:
     typedef typename boost::range_value<Collection>::type CollectionEntry;
 
     unsigned width = bitsize_traits<Integer>::value;
-    bool sign = boost::is_signed<Integer>::value;
+    bool sign = crave::is_signed<Integer>::value;
 
     std::set<Constant> constants;
     distribution<Integer> dist;
@@ -292,7 +292,7 @@ public:
       distribution<Integer>& dist = *(boost::dynamic_pointer_cast< distribution<Integer> >(node));
 
       unsigned width = bitsize_traits<Integer>::value;
-      bool sign = boost::is_signed<Integer>::value;
+      bool sign = crave::is_signed<Integer>::value;
 
       unsigned id = new_var_id();
       support_vars_.insert(id);

@@ -24,7 +24,7 @@ namespace crave {
   public:
     virtual ReferenceExpression::result_type expr() const {
       unsigned width = bitsize_traits<Integer>::value;
-      bool sign = boost::is_signed<Integer>::value;
+      bool sign = crave::is_signed<Integer>::value;
       return new EqualOpr(expr_, new Constant(value_, width, sign));
     }
 
@@ -40,7 +40,7 @@ namespace crave {
 
     virtual ReferenceExpression::result_type expr() const {
       unsigned width = bitsize_traits<Integer>::value;
-      bool sign = boost::is_signed<Integer>::value;
+      bool sign = crave::is_signed<Integer>::value;
       return new EqualOpr(expr_, new Constant(dist_.nextValue(), width, sign));
     }
   private:

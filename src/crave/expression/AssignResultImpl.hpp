@@ -1,10 +1,10 @@
 #pragma once
 
 #include "../AssignResult.hpp"
+#include "../bitsize_traits.hpp"
 
 #include <boost/function.hpp>
 #include <boost/optional.hpp>
-#include <boost/type_traits/is_signed.hpp>
 
 #include <string>
 
@@ -30,7 +30,7 @@ namespace crave {
     };
     virtual void set_value( std::string const& str )
     {
-      value_ = ((boost::is_signed<T>::value && str[0] == '1') ? -1: 0);
+      value_ = ((crave::is_signed<T>::value && str[0] == '1') ? -1: 0);
       for (std::string::const_iterator ite = str.begin(); ite != str.end(); ++ite)
       {
         value_ <<= 1;
@@ -72,7 +72,7 @@ namespace crave {
     };
     virtual void set_value( std::string const& str )
     {
-      value_ = ((boost::is_signed<T>::value && str[0] == '1') ? -1: 0);
+      value_ = ((crave::is_signed<T>::value && str[0] == '1') ? -1: 0);
       for (std::string::const_iterator ite = str.begin(); ite != str.end(); ++ite)
       {
         value_ <<= 1;

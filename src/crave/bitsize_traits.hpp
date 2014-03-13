@@ -64,21 +64,23 @@ namespace crave {
   template <typename T> struct is_crave_variable< randv<T> >: boost::mpl::true_ {};
   template <typename T> struct is_crave_variable< write_ref_tag<T> >: boost::mpl::true_ {};
 
-} // namespace crave
+  template<typename T> 
+  struct is_signed : public boost::is_signed<T> {};
+  template<> 
+  struct is_signed<bool> : public boost::is_signed<int> {};
+  template<typename T>
+  struct is_signed< crave::randv<T> > : public crave::is_signed<T> {};
+  template<typename T>
+  struct is_signed< crave::Variable<T> > : public crave::is_signed<T> {};
+  template<typename T>
+  struct is_signed< crave::var_tag<T> > : public crave::is_signed<T> {};
+  template<typename T>
+  struct is_signed< crave::write_ref_tag<T> > : public crave::is_signed<T> {};
+  template<typename T>
+  struct is_signed< crave::read_ref_tag<T> > : public crave::is_signed<T> {};
+  template<typename T>
+  struct is_signed< crave::vector_tag<T> > : public crave::is_signed<T> {};
 
-namespace boost {
-  template<typename T>
-  struct is_signed< crave::randv<T> > : public is_signed<T> {};
-  template<typename T>
-  struct is_signed< crave::Variable<T> > : public is_signed<T> {};
-  template<typename T>
-  struct is_signed< crave::var_tag<T> > : public is_signed<T> {};
-  template<typename T>
-  struct is_signed< crave::write_ref_tag<T> > : public is_signed<T> {};
-  template<typename T>
-  struct is_signed< crave::read_ref_tag<T> > : public is_signed<T> {};
-  template<typename T>
-  struct is_signed< crave::vector_tag<T> > : public is_signed<T> {};
-}
+} // namespace crave
 
 //  vim: ft=cpp:ts=2:sw=2:expandtab

@@ -41,7 +41,7 @@ public: \
     ReferenceExpressionImpl(randv< Typename <N> > const& value, ReferenceExpression::result_type expr ) : value_(value), expr_(expr) { } \
     virtual ~ReferenceExpressionImpl() { } \
     virtual ReferenceExpression::result_type expr() const { \
-      return new EqualOpr(expr_, new Constant(((Typename <N>) value_).to_ulong(), N, boost::is_signed< Typename <N> >::value)); \
+      return new EqualOpr(expr_, new Constant(((Typename <N>) value_).to_ulong(), N, crave::is_signed< Typename <N> >::value)); \
     } \
   private: \
     randv< Typename <N> > const & value_; \
