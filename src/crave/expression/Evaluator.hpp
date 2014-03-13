@@ -2,7 +2,6 @@
 
 #include "../bitsize_traits.hpp"
 #include "../Context.hpp"
-#include "../ExpressionTraits.hpp"
 #include "../RandomBase.hpp"
 #include "../VariableContainer.hpp"
 #include "EvalVisitor.hpp"
@@ -59,7 +58,7 @@ private:
 
     template<typename Expr>
     expression operator()(Expr expr) {
-      return boost::proto::eval(FixWidth()(expr), ctx_);
+      return boost::proto::eval(expr, ctx_);
     }
 
   private:
