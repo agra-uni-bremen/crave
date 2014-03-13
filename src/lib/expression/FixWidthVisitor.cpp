@@ -286,7 +286,7 @@ void FixWidthVisitor::visitBitslice(const Bitslice& b)
   stack_entry e;
   pop(e);
 
-  exprStack_.push(std::make_pair(new Bitslice(e.first, b.l(), b.r(), b.expr_size()), e.second));
+  exprStack_.push(std::make_pair(new Bitslice(e.first, b.r(), b.l()), b.r() - b.l() + 1));
 }
 
 } // end namespace crave

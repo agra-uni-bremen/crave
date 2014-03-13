@@ -347,7 +347,7 @@ void ReplaceVisitor::visitUnique( Unique const& u ) { throw std::runtime_error("
 void ReplaceVisitor::visitBitslice( Bitslice const& b ) {
   NodePtr child;
   evalUnaryExpr(b, child);
-  aux_stack_.push(new Bitslice(child, b.r(), b.l(), b.expr_size()));
+  aux_stack_.push(new Bitslice(child, b.r(), b.l()));
   updateResult();
   int idx = subscript_stack_.top();
   subscript_stack_.pop();

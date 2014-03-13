@@ -2,7 +2,6 @@
 
 #include "bitsize_traits.hpp"
 #include "Constraint.hpp"
-#include "ExpressionTraits.hpp"
 #include "VariableContainer.hpp"
 #include "expression/Node.hpp"
 #include "expression/AssignResultImpl.hpp"
@@ -218,11 +217,6 @@ public:
     return new MultipliesOpr(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this));
   }
 
-  template<typename Integral, typename Expr>
-  result_type operator()(extend_tag, Integral const & by_width, Expr const & e) {
-    return new ExtendExpression(boost::proto::eval(e, *this), boost::proto::value(by_width).value);
-  }
-
   template<typename Integer>
   result_type operator()(boost::proto::tag::terminal t, read_ref_tag<Integer> const & ref) {
     support_vars_.insert(ref.id);   
@@ -341,14 +335,15 @@ public:
     return new VectorAccess(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this));
   }
 
-  template< typename Integer1, typename Integer2, typename Expr >
+  template< typename Integer1, typename Integer2, typename Integer3 >
   result_type operator() (boost::proto::tag::function,
       boost::proto::terminal<operator_bitslice>::type const & tag, 
-      Integer1 const & r, Integer2 const & l, Expr const & e) { 
+      Integer1 const & r, Integer2 const & l, WriteReference<Integer3> const & var_term) { 
       int rb = boost::proto::value(r);
       int lb = boost::proto::value(l);
-      int es = ExpressionSize()(e);
-      return new Bitslice(boost::proto::eval(e, *this), rb, lb, es);
+      if ((rb < lb) ||(rb > bitsize_traits<Integer3>::value))
+        throw std::runtime_error("Invalid range of bitslice");
+      return new Bitslice(boost::proto::eval(var_term, *this), rb, lb);
   }
 
   void reset_support_vars() {support_vars_.clear(); }

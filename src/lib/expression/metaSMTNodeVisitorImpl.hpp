@@ -601,18 +601,8 @@ void metaSMTVisitorImpl<SolverType>::visitBitslice( Bitslice const &b ) {
   stack_entry entry;
   pop( entry );
 
-  int slice_size = b.r() - b.l() + 1;
-  if (slice_size <= 0 || slice_size > b.expr_size()) {
-    throw std::runtime_error("Invalid size of bit slice.");
-  }      
-
   result_type result = 
-  evaluate(solver_, 
-            qf_bv::zero_extend( 
-              b.expr_size() - slice_size, 
-              qf_bv::extract(b.r(), b.l(), entry.first) 
-            )
-          );
+  evaluate(solver_, qf_bv::extract(b.r(), b.l(), entry.first) );
 
   exprStack_.push( std::make_pair( result, false ) );
 }
