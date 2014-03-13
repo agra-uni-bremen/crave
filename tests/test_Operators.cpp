@@ -642,4 +642,21 @@ BOOST_AUTO_TEST_CASE (if_then_t1) {
   }
 }
 
+BOOST_AUTO_TEST_CASE (bitslice_t) {
+  randv<short> x(0);
+
+  Generator gen;
+  gen(bitslice(10, 3, x()) == 0xFF);
+  BOOST_REQUIRE( gen.next() );
+  BOOST_REQUIRE( x == (0xFF << 3) );
+  
+  Generator gen1;
+  gen1(bitslice(16, 3, x()) == 0xFF);
+  BOOST_CHECK_THROW ( gen1.next(), std::runtime_error );  
+
+  Generator gen2;
+  gen2(bitslice(3, 10, x()) == 0xFF);
+  BOOST_CHECK_THROW ( gen2.next(), std::runtime_error );  
+}
+
 BOOST_AUTO_TEST_SUITE_END() // Context
