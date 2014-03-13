@@ -257,14 +257,14 @@ BOOST_AUTO_TEST_CASE (xor_t1) {
   gen(c() == (a() ^ b()));
 
   BOOST_REQUIRE( gen.next() );
-  BOOST_CHECK_EQUAL( c, false );
+  BOOST_CHECK_EQUAL( c != 0, false );
 
   Generator gen2(a() == false);
   gen2(b() == true);
   gen2(c() == (a() ^ b()));
 
   BOOST_REQUIRE( gen2.next() );
-  BOOST_CHECK_EQUAL( c, true );
+  BOOST_CHECK_EQUAL( c != 0, true );
 }
 
 BOOST_AUTO_TEST_CASE (xor_t2) {
