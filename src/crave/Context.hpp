@@ -17,9 +17,10 @@
 #include <boost/range/value_type.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <limits>
 #include <map>
-#include <utility>
 #include <set>
+#include <utility>
 #include <vector>
 
 namespace crave {
@@ -227,7 +228,7 @@ public:
     support_vars_.insert(ref.id);   
 
     std::map<int, result_type>::const_iterator ite = variables_.find(ref.id);
-    
+
     if ( ite != variables_.end() ) {
       return ite->second;
     } else {
@@ -244,7 +245,12 @@ public:
   result_type operator()(boost::proto::tag::terminal, Integer const & i) {
     unsigned width = bitsize_traits<Integer>::value;
     bool sign = boost::is_signed<Integer>::value;
-    return new Constant(i, width, sign);
+    if (i >= 0) {
+      for (int j = 1; j < width; ++j)
+        if ((i >> j) == 0)
+          return new Constant(i, j, false);
+    }
+    return new Constant(i, width, sign); 
   }
 
   template<typename Integer, typename CollectionTerm>
@@ -264,18 +270,18 @@ public:
       constants.insert(Constant(i, width, sign));
       dist(weighted_value<Integer>(i, 1));
     }
-          
-    unsigned id = new_var_id();          
+
+    unsigned id = new_var_id();
     support_vars_.insert(id);
     result_type tmp_var = new_var(id, width, sign);
     boost::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<Integer>(dist, tmp_var));
     dist_references_.push_back(std::make_pair(id, ref_expr));
-    
+
     result_type val_equal_tmp(new EqualOpr(boost::proto::eval(var_term, *this), tmp_var));
     result_type tmp_inside(new Inside(tmp_var, constants));
     return new LogicalAndOpr(val_equal_tmp, tmp_inside);
   }
-  
+
   template<typename Integer, typename Expr>
   result_type operator()(boost::proto::tag::function,
       boost::proto::terminal<operator_dist>::type const & tag,
@@ -288,7 +294,7 @@ public:
       unsigned width = bitsize_traits<Integer>::value;
       bool sign = boost::is_signed<Integer>::value;
 
-      unsigned id = new_var_id();          
+      unsigned id = new_var_id();
       support_vars_.insert(id);
       result_type tmp_var = new_var(id, width, sign);
       boost::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<Integer>(dist, tmp_var));
@@ -304,7 +310,7 @@ public:
         result_type tmp(in_ranges != 0 ? new LogicalOrOpr(in_ranges, in_range) : in_range);
         in_ranges = tmp;
       }
-      
+
       result_type var_equal_tmp(new EqualOpr(boost::proto::eval(var_term, *this), tmp_var));
       return dist.ranges().size() > 0 ? new LogicalAndOpr(var_equal_tmp, in_ranges) : var_equal_tmp;
     }
@@ -354,7 +360,7 @@ private:
   std::vector<ReadRefPair>& read_references_;
   std::vector<WriteRefPair>& write_references_;
   std::vector<ReadRefPair>& dist_references_;
-  
+
   std::set<int> support_vars_;
 };
 // Context

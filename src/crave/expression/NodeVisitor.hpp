@@ -101,4 +101,6 @@ public:
   virtual void visitBitslice( Bitslice const & ) = 0;
 };
 
+unsigned int placeholder_bitsize();
+
 } // end namespace crave
