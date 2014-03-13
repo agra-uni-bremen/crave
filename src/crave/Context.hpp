@@ -245,13 +245,11 @@ public:
   result_type operator()(boost::proto::tag::terminal, Integer const & i) {
     unsigned width = bitsize_traits<Integer>::value;
     bool sign = boost::is_signed<Integer>::value;
-
-    if (!sign) {
+    if (i >= 0) {
       for (int j = 1; j < width; ++j)
         if ((i >> j) == 0)
           return new Constant(i, j, false);
     }
-
     return new Constant(i, width, sign); 
   }
 
