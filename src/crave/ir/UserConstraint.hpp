@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Context.hpp"
-#include "expression/Node.hpp"
-#include "expression/FixWidthVisitor.hpp"
-#include "expression/ToDotNodeVisitor.hpp"
+#include "Node.hpp"
+#include "visitor/FixWidthVisitor.hpp"
+#include "visitor/ToDotNodeVisitor.hpp"
 
 #include <boost/intrusive_ptr.hpp>
 #include <boost/shared_ptr.hpp>

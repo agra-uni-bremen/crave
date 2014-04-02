@@ -3,7 +3,7 @@
 #include <ostream>
 #include <set>
 
-#include "Node.hpp"
+#include "../Node.hpp"
 #include "NodeVisitor.hpp"
 
 namespace crave {

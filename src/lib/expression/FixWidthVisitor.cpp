@@ -1,4 +1,4 @@
-#include "../../crave/expression/FixWidthVisitor.hpp"
+#include "../../crave/ir/visitor/FixWidthVisitor.hpp"
 
 #include <stdexcept>
 

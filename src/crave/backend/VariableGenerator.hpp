@@ -1,9 +1,9 @@
 #pragma once
 
-#include "UserConstraint.hpp"
-#include "VariableContainer.hpp"
-#include "expression/FactoryMetaSMT.hpp"
-#include "expression/Node.hpp"
+#include "../ir/Node.hpp"
+#include "../ir/UserConstraint.hpp"
+#include "../ir/VariableContainer.hpp"
+#include "FactoryMetaSMT.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/scoped_ptr.hpp>

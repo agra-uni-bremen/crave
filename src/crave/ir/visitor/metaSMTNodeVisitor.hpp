@@ -1,9 +1,9 @@
 #ifndef METASMTNODEVISITOR_HPP_
 #define METASMTNODEVISITOR_HPP_
 
-#include "../RandomBase.hpp"
-#include "../AssignResult.hpp"
-#include "Node.hpp"
+#include "../../frontend/RandomBase.hpp"
+#include "../../frontend/AssignResult.hpp"
+#include "../Node.hpp"
 #include "NodeVisitor.hpp"
 
 #include <boost/intrusive_ptr.hpp>

@@ -1,6 +1,6 @@
 #include <boost/test/unit_test.hpp>
 
-#include <crave/expression/Evaluator.hpp>
+#include <crave/utils/Evaluator.hpp>
 
 #include <set>
 #include <iostream>

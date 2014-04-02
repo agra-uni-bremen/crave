@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Generator.hpp"
-#include "RandomBase.hpp"
+#include "backend/Generator.hpp"
+#include "frontend/RandomBase.hpp"
 
 #include <boost/bind.hpp>
 

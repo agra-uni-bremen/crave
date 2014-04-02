@@ -1,24 +1,20 @@
 #pragma once
 
-#include "Node.hpp"
+#include "../Node.hpp"
 #include "NodeVisitor.hpp"
 
-#include <boost/intrusive_ptr.hpp>
-
+#include <map>
 #include <stack>
-#include <utility>
+#include <vector>
 
 namespace crave {
 
-class FixWidthVisitor : NodeVisitor {
-
-  typedef boost::intrusive_ptr<Node> result_type;
-  typedef std::pair<result_type, int> stack_entry;
-
+class ReplaceVisitor : public NodeVisitor {
 public:
-  FixWidthVisitor() : NodeVisitor(), exprStack_() { }
+  ReplaceVisitor(std::vector<boost::intrusive_ptr<VariableExpr> >& vars)
+  : vec_idx_(), okay_(true), result_(), aux_stack_(), subscript_stack_(),
+    variables_(vars), terminals_() { }
 
-private:
   virtual void visitNode( Node const & );
   virtual void visitTerminal( Terminal const & );
   virtual void visitUnaryExpr( UnaryExpression const & );
@@ -58,71 +54,33 @@ private:
   virtual void visitForEach( ForEach const & );
   virtual void visitUnique( Unique const & );
   virtual void visitBitslice( Bitslice const & );
-  void pop(stack_entry&);
-  void pop2(stack_entry&, stack_entry&);
-  void pop3(stack_entry&, stack_entry&, stack_entry&);
-  void evalBinExpr( BinaryExpression const&, stack_entry&, stack_entry&, bool );
-  void evalTernExpr( TernaryExpression const&, stack_entry&, stack_entry&, stack_entry& );
 
-public:
-  result_type fix_width(Node const& expr) {
-
-    expr.visit(*this);
-    stack_entry entry;
-    pop(entry);
-
-    return entry.first;
+  void reset();
+  inline bool okay() {
+    return okay_;
   }
+  inline NodePtr result() {
+    return result_;
+  }
+  inline void set_vec_idx(unsigned int const idx) {
+    vec_idx_ = idx;
+  }
+private:
+  void updateResult();
+  void evalUnaryExpr(UnaryExpression const&, NodePtr&);
+  void evalBinExpr(BinaryExpression const&, NodePtr&, NodePtr&);
+  void evalTernExpr(TernaryExpression const&, NodePtr&, NodePtr&, NodePtr&);
+  void evalBinSubscript(int&, int&);
+  void evalTernSubscript(int&, int&, int&);
 
 private:
-  std::stack<stack_entry> exprStack_;
+  unsigned int vec_idx_;
+  bool okay_;
+  NodePtr result_;
+  std::stack<NodePtr> aux_stack_;
+  std::stack<int> subscript_stack_;
+  std::vector<boost::intrusive_ptr<VariableExpr> >& variables_;
+  std::map<int, NodePtr> terminals_;
 };
-
-inline void FixWidthVisitor::pop(stack_entry& fst)
-{
-  assert( exprStack_.size() >= 1 );
-  fst = exprStack_.top();
-  exprStack_.pop();
-}
-inline void FixWidthVisitor::pop2(stack_entry& fst, stack_entry& snd)
-{
-  assert( exprStack_.size() >= 2 );
-  fst = exprStack_.top();
-  exprStack_.pop();
-  snd = exprStack_.top();
-  exprStack_.pop();
-}
-inline void FixWidthVisitor::pop3(stack_entry& fst, stack_entry& snd, stack_entry& trd)
-{
-  assert( exprStack_.size() >= 3 );
-  fst = exprStack_.top();
-  exprStack_.pop();
-  snd = exprStack_.top();
-  exprStack_.pop();
-  trd = exprStack_.top();
-  exprStack_.pop();
-}
-inline void FixWidthVisitor::evalBinExpr(BinaryExpression const& bin, stack_entry& fst, stack_entry& snd, bool fixWidth = true)
-{
-  visitBinaryExpr(bin);
-  pop2(snd, fst);
-  if (!fixWidth) return;
-  if (fst.second < snd.second) {
-    unsigned int diff = snd.second - fst.second;
-    fst.first = result_type(new ExtendExpression(fst.first.get(), diff));
-    fst.second = snd.second;
-  } else if (fst.second > snd.second) {
-    unsigned int diff = fst.second - snd.second;
-    snd.first = result_type(new ExtendExpression(snd.first.get(), diff));
-    snd.second = fst.second;
-  }
-}
-inline void FixWidthVisitor::evalTernExpr(TernaryExpression const& tern, stack_entry& fst,
-                                          stack_entry& snd, stack_entry& trd )
-{
-  visitTernaryExpr(tern);
-  pop3(trd, snd, fst);
-}
-
 
 } // end namespace crave

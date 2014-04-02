@@ -3,7 +3,7 @@
 #include "Constraint.hpp"
 #include "Distribution.hpp"
 
-#include "expression/AssignResultImpl.hpp"
+#include "AssignResultImpl.hpp"
 
 #include <vector>
 #include <map>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../RandomBase.hpp"
+#include "../frontend/RandomBase.hpp"
 
 #include <algorithm>
 #include <bitset>

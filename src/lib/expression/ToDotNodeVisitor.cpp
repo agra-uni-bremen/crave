@@ -1,6 +1,6 @@
 #include <boost/foreach.hpp>
 
-#include "../../crave/expression/ToDotNodeVisitor.hpp"
+#include "../../crave/ir/visitor/ToDotNodeVisitor.hpp"
 
 namespace crave {
 

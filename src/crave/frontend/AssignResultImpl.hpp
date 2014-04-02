@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../AssignResult.hpp"
-#include "../bitsize_traits.hpp"
+#include "AssignResult.hpp"
+#include "bitsize_traits.hpp"
 
 #include <boost/function.hpp>
 #include <boost/optional.hpp>

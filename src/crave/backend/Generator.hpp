@@ -1,10 +1,9 @@
 #pragma once
 
-#include "Context.hpp"
-#include "UserConstraint.hpp"
-#include "VariableContainer.hpp"
-#include "VariableContainer.hpp"
-#include "VectorGenerator.hpp"
+#include "../ir/Context.hpp"
+#include "../ir/UserConstraint.hpp"
+#include "../ir/VariableContainer.hpp"
+#include "../backend/VectorGenerator.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/function.hpp>

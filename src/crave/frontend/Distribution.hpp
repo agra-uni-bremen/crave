@@ -1,6 +1,6 @@
 #pragma once
 
-#include "expression/Node.hpp"
+#include "../ir/Node.hpp"
 
 #include <boost/random.hpp>
 

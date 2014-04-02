@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Distribution.hpp"
-#include "../bitsize_traits.hpp"
+#include "../frontend/Distribution.hpp"
+#include "../frontend/bitsize_traits.hpp"
 #include "Node.hpp"
 
 #include <boost/type_traits/is_signed.hpp>

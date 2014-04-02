@@ -1,11 +1,11 @@
 #pragma once
 
-#include "bitsize_traits.hpp"
-#include "Constraint.hpp"
+#include "../frontend/bitsize_traits.hpp"
+#include "../frontend/Constraint.hpp"
+#include "../frontend/AssignResultImpl.hpp"
 #include "VariableContainer.hpp"
-#include "expression/Node.hpp"
-#include "expression/AssignResultImpl.hpp"
-#include "expression/ReferenceExpression.hpp"
+#include "Node.hpp"
+#include "ReferenceExpression.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/intrusive_ptr.hpp>

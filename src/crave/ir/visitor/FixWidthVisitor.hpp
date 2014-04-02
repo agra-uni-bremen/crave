@@ -1,22 +1,22 @@
 #pragma once
 
-#include "Node.hpp"
+#include "../Node.hpp"
 #include "NodeVisitor.hpp"
 
-#include <map>
+#include <boost/intrusive_ptr.hpp>
+
 #include <stack>
 #include <utility>
 
 namespace crave {
 
-class EvalVisitor : NodeVisitor {
+class FixWidthVisitor : NodeVisitor {
 
-  typedef std::pair<Constant, bool> stack_entry;
+  typedef boost::intrusive_ptr<Node> result_type;
+  typedef std::pair<result_type, int> stack_entry;
 
 public:
-  typedef std::map<int, Constant> eval_map;
-
-  EvalVisitor(eval_map& m) : NodeVisitor(), exprStack_(), evalMap_(m), result_() { }
+  FixWidthVisitor() : NodeVisitor(), exprStack_() { }
 
 private:
   virtual void visitNode( Node const & );
@@ -61,38 +61,30 @@ private:
   void pop(stack_entry&);
   void pop2(stack_entry&, stack_entry&);
   void pop3(stack_entry&, stack_entry&, stack_entry&);
-  void evalBinExpr( BinaryExpression const&, stack_entry&, stack_entry& );
+  void evalBinExpr( BinaryExpression const&, stack_entry&, stack_entry&, bool );
   void evalTernExpr( TernaryExpression const&, stack_entry&, stack_entry&, stack_entry& );
 
 public:
-  Constant get_result() const {
-    return result_;
-  }
-
-  bool evaluate(Node const& expr) {
+  result_type fix_width(Node const& expr) {
 
     expr.visit(*this);
     stack_entry entry;
     pop(entry);
 
-    result_ = entry.first;
-    return entry.second;
+    return entry.first;
   }
 
 private:
   std::stack<stack_entry> exprStack_;
-  eval_map& evalMap_;
-
-  Constant result_;
 };
 
-inline void EvalVisitor::pop(stack_entry& fst)
+inline void FixWidthVisitor::pop(stack_entry& fst)
 {
   assert( exprStack_.size() >= 1 );
   fst = exprStack_.top();
   exprStack_.pop();
 }
-inline void EvalVisitor::pop2(stack_entry& fst, stack_entry& snd)
+inline void FixWidthVisitor::pop2(stack_entry& fst, stack_entry& snd)
 {
   assert( exprStack_.size() >= 2 );
   fst = exprStack_.top();
@@ -100,7 +92,7 @@ inline void EvalVisitor::pop2(stack_entry& fst, stack_entry& snd)
   snd = exprStack_.top();
   exprStack_.pop();
 }
-inline void EvalVisitor::pop3(stack_entry& fst, stack_entry& snd, stack_entry& trd)
+inline void FixWidthVisitor::pop3(stack_entry& fst, stack_entry& snd, stack_entry& trd)
 {
   assert( exprStack_.size() >= 3 );
   fst = exprStack_.top();
@@ -110,16 +102,27 @@ inline void EvalVisitor::pop3(stack_entry& fst, stack_entry& snd, stack_entry& t
   trd = exprStack_.top();
   exprStack_.pop();
 }
-inline void EvalVisitor::evalBinExpr(BinaryExpression const& bin, stack_entry& fst, stack_entry& snd)
+inline void FixWidthVisitor::evalBinExpr(BinaryExpression const& bin, stack_entry& fst, stack_entry& snd, bool fixWidth = true)
 {
   visitBinaryExpr(bin);
   pop2(snd, fst);
+  if (!fixWidth) return;
+  if (fst.second < snd.second) {
+    unsigned int diff = snd.second - fst.second;
+    fst.first = result_type(new ExtendExpression(fst.first.get(), diff));
+    fst.second = snd.second;
+  } else if (fst.second > snd.second) {
+    unsigned int diff = fst.second - snd.second;
+    snd.first = result_type(new ExtendExpression(snd.first.get(), diff));
+    snd.second = fst.second;
+  }
 }
-inline void EvalVisitor::evalTernExpr(TernaryExpression const& tern, stack_entry& fst,
-                                      stack_entry& snd, stack_entry& trd )
+inline void FixWidthVisitor::evalTernExpr(TernaryExpression const& tern, stack_entry& fst,
+                                          stack_entry& snd, stack_entry& trd )
 {
   visitTernaryExpr(tern);
   pop3(trd, snd, fst);
 }
+
 
 } // end namespace crave

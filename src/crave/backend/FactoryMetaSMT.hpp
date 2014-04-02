@@ -1,6 +1,6 @@
 #pragma once
 
-#include "metaSMTNodeVisitor.hpp"
+#include "../ir/visitor/metaSMTNodeVisitor.hpp"
 
 #include <string>
 

@@ -4,7 +4,7 @@
 
 #include <glog/logging.h>
 
-#include "../crave/expression/FactoryMetaSMT.hpp"
+#include "../crave/backend/FactoryMetaSMT.hpp"
 #include "../crave/ConstrainedRandom.hpp"
 #include "../crave/utils/Settings.hpp"
 

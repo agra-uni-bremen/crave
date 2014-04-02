@@ -1,9 +1,9 @@
 #ifndef METASMTNODEVISITORIMPL_H
 #define METASMTNODEVISITORIMPL_H
 
-#include "../../crave/expression/metaSMTNodeVisitor.hpp"
-#include "../../crave/AssignResult.hpp"
-#include "../../crave/RandomBase.hpp"
+#include "../../crave/ir/visitor/metaSMTNodeVisitor.hpp"
+#include "../../crave/frontend/AssignResult.hpp"
+#include "../../crave/frontend/RandomBase.hpp"
 
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/variate_generator.hpp>

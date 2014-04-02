@@ -1,6 +1,6 @@
 #include <boost/test/unit_test.hpp>
 
-#include <crave/Generator.hpp>
+#include <crave/backend/Generator.hpp>
 
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>

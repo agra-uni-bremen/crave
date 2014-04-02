@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../bitsize_traits.hpp"
-#include "../Context.hpp"
-#include "../RandomBase.hpp"
-#include "../VariableContainer.hpp"
-#include "EvalVisitor.hpp"
-#include "Node.hpp"
+#include "../frontend/bitsize_traits.hpp"
+#include "../frontend/RandomBase.hpp"
+#include "../ir/Context.hpp"
+#include "../ir/Node.hpp"
+#include "../ir/VariableContainer.hpp"
+#include "../ir/visitor/EvalVisitor.hpp"
 
 #include <boost/proto/eval.hpp>
 #include <boost/type_traits/is_signed.hpp>

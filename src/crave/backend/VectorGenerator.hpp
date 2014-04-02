@@ -1,10 +1,10 @@
 #pragma once
 
-#include "RandomBase.hpp"
+#include "../frontend/RandomBase.hpp"
+#include "../ir/Node.hpp"
+#include "../ir/visitor/ReplaceVisitor.hpp"
+#include "FactoryMetaSMT.hpp"
 #include "VariableGenerator.hpp"
-#include "expression/ReplaceVisitor.hpp"
-#include "expression/FactoryMetaSMT.hpp"
-#include "expression/Node.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/intrusive_ptr.hpp>

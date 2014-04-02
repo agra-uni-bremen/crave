@@ -1,6 +1,6 @@
 #pragma once
 
-#include "NodeVisitor.hpp"
+#include "visitor/NodeVisitor.hpp"
 
 #include <boost/intrusive_ptr.hpp>
 
