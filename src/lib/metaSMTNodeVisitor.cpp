@@ -1,5 +1,5 @@
-#include "../../crave/ir/visitor/metaSMTNodeVisitor.hpp"
-#include "../../crave/backend/FactoryMetaSMT.hpp"
+#include "../crave/ir/visitor/metaSMTNodeVisitor.hpp"
+#include "../crave/backend/FactoryMetaSMT.hpp"
 #include "metaSMTNodeVisitorImpl.hpp"
 
 #include <metaSMT/BitBlast.hpp>

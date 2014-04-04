@@ -1,4 +1,4 @@
-#include "../../crave/ir/visitor/EvalVisitor.hpp"
+#include "../crave/ir/visitor/EvalVisitor.hpp"
 
 #include <stdexcept>
 
