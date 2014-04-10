@@ -2,7 +2,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <crave/ConstrainedRandom.hpp>
-#include <crave/SystemC.hpp>
+#include <crave/frontend/SystemC.hpp>
 
 #include <systemc.h>
 
