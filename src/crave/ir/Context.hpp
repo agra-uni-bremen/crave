@@ -97,6 +97,13 @@ public:
     }
   }
 
+#if GCC_VERSION < 40600
+  template<typename value_type>
+  result_type operator()(boost::proto::tag::terminal t, WriteReference<value_type> const & ref) {
+    return operator()(t, boost::proto::value(ref));
+  }
+#endif
+
   template<typename Expr1, typename Expr2>
   result_type operator()(boost::proto::tag::equal_to, Expr1 const & e1,
       Expr2 const & e2) {
