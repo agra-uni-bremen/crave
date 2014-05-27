@@ -63,11 +63,13 @@ struct VectorSolver {
       }
       else {
         for (uint i = 0; i < vec_elements.size(); i++)
-          for (uint j = i + 1; j < vec_elements.size(); ++j)
+          for (uint j = i + 1; j < vec_elements.size(); ++j) {
+            NotEqualOpr neOp(vec_elements[i], vec_elements[j]);
             if (constraint->is_soft())
-              solver_->makeSoftAssertion(*(new NotEqualOpr(vec_elements[i], vec_elements[j])));
+              solver_->makeSoftAssertion(neOp);
             else   
-              solver_->makeAssertion(*(new NotEqualOpr(vec_elements[i], vec_elements[j])));
+              solver_->makeAssertion(neOp);
+          }
       }
     }
   }
