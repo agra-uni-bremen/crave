@@ -29,10 +29,13 @@ namespace crave {
   : sc_dt_width<T>
   {};
 
+// XXX last 2 lines are necessary workaround for old compilers such as gcc 4.1.x
 #define RANDV_SCDT_INTERFACE(Typename) \
 public: \
   void gather_values(std::vector<long>& ch) { ch.insert(ch.end(), this->value.to_long()); } \
   bool next() { static distribution<long> dist; this->value = dist.nextValue(); return true; } \
+  randv<Typename>& operator=(unsigned int i) { this->value = i; return *this; } \
+  randv<Typename>& operator=(int i) { this->value = i; return *this; } \
 
 #define RANDV_SCDT_REF_EXPR(Typename) \
   template<int N> \
