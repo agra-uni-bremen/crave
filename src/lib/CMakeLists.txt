@@ -5,6 +5,8 @@ add_library (crave
   metaSMTNodeVisitor.cpp
   ReplaceVisitor.cpp
   ToDotNodeVisitor.cpp
+  graph/Graph.cpp
+  graph/GraphVisitor.cpp	
 )
 target_link_libraries (crave
   metaSMT
