@@ -80,6 +80,7 @@ struct RuleContext : proto::callable_context<RuleContext, proto::null_context> {
   void root(rule_type & r); 
   void print_dot_graph(rule_type & r, std::ostream & out);
   void to_dot_file(rule_type & r, const char* filename);
+  void display_graph(rule_type & r);
 
 private:
   node_map m_named_nodes;

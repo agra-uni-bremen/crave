@@ -80,6 +80,25 @@ namespace crave {
     settings.save();
   }
 
+  std::ostream& rand_obj::print_dot_graph(std::ostream& os, bool root = true) { 
+    if (root)
+      os << "digraph AST {" << std::endl;
+    for (uint i = 0; i < objChildren.size(); i++)
+      objChildren[i]->print_dot_graph(os, false);
+    constraint.print_dot_graph(os, false);  
+    if (root)
+     os << "}" << std::endl;
+    return os;
+  }
+
+  void rand_obj::display_constraints() {
+    std::fstream fs;
+    fs.open ("temp.dot", std::fstream::out);
+    print_dot_graph(fs);
+    fs.close();  
+    system("dot -Txlib temp.dot");    
+  }
+
 } // namespace crave
 
 // vim: tabstop=2 shiftwidth=2 expandtab

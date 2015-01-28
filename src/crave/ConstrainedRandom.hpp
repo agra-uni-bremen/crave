@@ -62,16 +62,8 @@ namespace crave {
     
     bool is_constraint_enabled(std::string name) { return constraint.is_constraint_enabled(name); }
 
-    std::ostream& print_dot_graph(std::ostream& os, bool root = true) { 
-      if (root)
-        os << "digraph AST {" << std::endl;
-      for (uint i = 0; i < objChildren.size(); i++)
-        objChildren[i]->print_dot_graph(os, false);
-      constraint.print_dot_graph(os, false);  
-      if (root)
-       os << "}" << std::endl;
-      return os;
-    }
+    std::ostream& print_dot_graph(std::ostream&, bool);
+    void display_constraints();
 
   protected:
     bool gen_base_children() {
