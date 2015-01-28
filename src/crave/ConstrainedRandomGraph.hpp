@@ -3,17 +3,36 @@
 #include <string>
 #include <set>
 
+#include <boost/function.hpp>
 #include <boost/proto/proto.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/assert.hpp>
 
-#include "Rule.hpp"
-#include "Node.hpp"
+#include "graph/Node.hpp"
+
+#define NAMED_RULE(name) crave::graph::rule_type name = { crave::graph::Rule(#name) };
 
 namespace crave {
 
 namespace graph {
 
 namespace proto = boost::proto;
+
+struct Rule;
+typedef boost::shared_ptr<Rule> RulePtr;
+typedef proto::terminal<Rule>::type rule_type;
+
+struct Rule {
+  boost::function<void()> entry;
+  boost::function<void()> exit;
+
+  Rule(const char* name) : m_name(name), entry(0), exit(0) { }
+
+  const char* name() const { return m_name; }
+
+private:
+  const char* m_name;
+};
 
 struct RuleContext : proto::callable_context<RuleContext, proto::null_context> {
   typedef NodePtr result_type;

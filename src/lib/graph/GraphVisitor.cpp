@@ -1,4 +1,4 @@
-#include "../../crave/graph/Graph.hpp"
+#include "../../crave/graph/Node.hpp"
 #include "../../crave/graph/GraphVisitor.hpp"
 
 #include <boost/foreach.hpp>

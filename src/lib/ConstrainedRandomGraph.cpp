@@ -1,7 +1,7 @@
 #include <fstream>
 
-#include "../../crave/graph/Graph.hpp"
-#include "../../crave/graph/GraphVisitor.hpp"
+#include "../crave/ConstrainedRandomGraph.hpp"
+#include "../crave/graph/GraphVisitor.hpp"
 
 namespace crave {
 
