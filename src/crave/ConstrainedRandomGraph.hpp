@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <string>
 #include <set>
 
@@ -9,6 +10,8 @@
 #include <boost/assert.hpp>
 
 #include "graph/Node.hpp"
+
+#include "ConstrainedRandom.hpp"
 
 #define NAMED_RULE(name) crave::graph::rule_type name = { crave::graph::Rule(#name) };
 
@@ -21,12 +24,26 @@ namespace proto = boost::proto;
 struct Rule;
 typedef boost::shared_ptr<Rule> RulePtr;
 typedef proto::terminal<Rule>::type rule_type;
+typedef std::map<std::string, Rule*> rule_map;
+typedef boost::function<void()> action_type;
+
+extern rule_map global_rule_map;
+
+static void print(const char* s1, const char* s2) {
+  std::cout << s1 << "::" << s2 << " -> ";
+}
 
 struct Rule {
-  boost::function<void()> entry;
-  boost::function<void()> exit;
+  action_type entry;
+  action_type main;
+  action_type exit;
 
-  Rule(const char* name) : m_name(name), entry(0), exit(0) { }
+  Rule(const char* name) : m_name(name) { 
+    entry = boost::bind(print, name, "entry");
+    main = boost::bind(print, name, "main");
+    exit = boost::bind(print, name, "exit");
+    global_rule_map[name] = this;
+  }
 
   const char* name() const { return m_name; }
 
@@ -47,7 +64,6 @@ struct RuleContext : proto::callable_context<RuleContext, proto::null_context> {
     if (m_named_nodes.find(r.name()) != m_named_nodes.end())
       return m_named_nodes[r.name()];
     return m_named_nodes[r.name()] = NodePtr(new Terminal(r.name()));
-    return NodePtr(new Terminal(r.name()));
   }
 
   template<typename Expr1, typename Expr2>
@@ -85,6 +101,7 @@ struct RuleContext : proto::callable_context<RuleContext, proto::null_context> {
 private:
   node_map m_named_nodes;
   std::set<std::string> m_assigned_nodes;
+  NodePtr m_root;
 };
 
 };

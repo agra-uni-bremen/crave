@@ -46,6 +46,7 @@ private:
   void visitNonTerminal(NonTerminal& nt);
 };
 
+
 struct ToDotVisitor : NodeVisitor {
   typedef std::pair<int, int> result_type;
 

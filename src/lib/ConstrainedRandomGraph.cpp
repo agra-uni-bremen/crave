@@ -1,5 +1,8 @@
 #include <fstream>
 
+#include <boost/foreach.hpp>
+#include <boost/assert.hpp>
+
 #include "../crave/ConstrainedRandomGraph.hpp"
 #include "../crave/graph/GraphVisitor.hpp"
 
@@ -7,16 +10,143 @@ namespace crave {
 
 namespace graph {
 
+rule_map global_rule_map;
+
 void Terminal::accept(NodeVisitor& v) { v.visitTerminal(*this); }
 
 void Selector::accept(NodeVisitor& v) { v.visitSelector(*this); }
 
 void Sequence::accept(NodeVisitor& v) { v.visitSequence(*this); }
 
+struct Executor : NodeVisitor {
+  Executor(NodePtr r) : m_root(r), m_rules(global_rule_map), m_id(0), m_stack() { }
+  
+  virtual void visitTerminal(Terminal& );  
+  virtual void visitSelector(Selector& );  
+  virtual void visitSequence(Sequence& );
+  
+private:
+  typedef std::pair<int, int> result_type;
+
+  Rule* getRule(Node& n) {
+    if (n.name() && m_rules.find(n.name()) != m_rules.end()) {
+      return m_rules[n.name()];
+    }
+    return NULL;  
+  }
+  
+  void make_edge(int s, int d) { m_adj[s].push_back(d); }  
+
+  void check_root(Node&);  
+  void dfs(int);
+
+  NodePtr m_root;
+  rule_map& m_rules;
+  int m_id;
+  std::stack<result_type> m_stack;
+  std::map<int, std::vector<int> > m_adj;
+  std::map<int, action_type> m_actions;
+  std::vector<int> path;
+};
+
+void Executor::check_root(Node& n) {
+  if (&n != m_root.get()) 
+    return;
+  dfs(0);
+}
+
+void Executor::dfs(int v) {
+  path.push_back(v);
+  if (m_adj.find(v) == m_adj.end()) {
+    BOOST_ASSERT_MSG(v == 2, "Invalid end of unfolded sequence");
+    BOOST_FOREACH(int i, path) {
+      if (m_actions.find(i) != m_actions.end())
+        m_actions[i]();
+    }
+    std::cout << "END" << std::endl << std::endl;
+  }
+  else {
+    std::vector<int>& adj = m_adj[v];
+    BOOST_FOREACH(int i, adj)
+      dfs(i);
+  }      
+  path.pop_back();
+}
+
+void Executor::visitTerminal(Terminal& t) {
+  Rule* r = getRule(t);
+  BOOST_ASSERT_MSG(r, "A named rule could not be found");
+  m_actions.insert(std::make_pair(m_id, r->entry));
+  m_actions.insert(std::make_pair(m_id + 1, r->main));
+  m_actions.insert(std::make_pair(m_id + 2, r->exit));
+  make_edge(m_id, m_id + 1);
+  make_edge(m_id + 1, m_id + 2);  
+  m_stack.push(result_type(m_id, m_id + 2));
+  m_id += 3;
+  check_root(t);
+}
+
+void Executor::visitSelector(Selector& nt) { 
+  int start = m_id;
+  int end = m_id + 2;
+  m_id += 3;
+  m_stack.push(result_type(start, end)); 
+
+  Rule* r = getRule(nt);
+  if (r) {
+    m_actions.insert(std::make_pair(start, r->entry));
+    m_actions.insert(std::make_pair(start + 1, r->main));
+    m_actions.insert(std::make_pair(end, r->exit));
+  }
+
+  make_edge(start, start + 1);
+
+  BOOST_FOREACH(NodePtr n, nt.children) {
+    n->accept(*this);
+    result_type& r = m_stack.top();
+    m_stack.pop();
+    make_edge(start + 1, r.first);
+    make_edge(r.second, end);
+  }
+  
+  check_root(nt);
+}
+
+void Executor::visitSequence(Sequence& nt) { 
+  int start = m_id;
+  int end = m_id + 2;
+  m_id += 3;
+  m_stack.push(result_type(start, end)); 
+
+  Rule* r = getRule(nt);
+  if (r) {
+    m_actions.insert(std::make_pair(start, r->entry));
+    m_actions.insert(std::make_pair(start + 1, r->main));
+    m_actions.insert(std::make_pair(end, r->exit));
+  }
+
+  make_edge(start, start + 1);
+
+  int last = start + 1;
+  BOOST_FOREACH(NodePtr n, nt.children) {
+    n->accept(*this);
+    result_type& r = m_stack.top();
+    m_stack.pop();
+    make_edge(last, r.first);
+    last = r.second;
+  }
+
+  make_edge(last, end);
+
+  check_root(nt);
+}
+
 void RuleContext::root(rule_type & r) {
-  NodePtr n = proto::eval(r, *this);
+  m_root = proto::eval(r, *this);
   UpdateVisitor uv(m_named_nodes);
-  n->accept(uv);
+  m_root->accept(uv);
+  Executor exec(m_root);
+  m_root->accept(exec);
 }
   
 void RuleContext::print_dot_graph(rule_type & r, std::ostream & out) {
