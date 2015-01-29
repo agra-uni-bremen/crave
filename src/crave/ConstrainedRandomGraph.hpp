@@ -29,19 +29,12 @@ typedef boost::function<void()> action_type;
 
 extern rule_map global_rule_map;
 
-static void print(const char* s1, const char* s2) {
-  std::cout << s1 << "::" << s2 << " -> ";
-}
-
 struct Rule {
   action_type entry;
   action_type main;
   action_type exit;
 
-  Rule(const char* name) : m_name(name) { 
-    entry = boost::bind(print, name, "entry");
-    main = boost::bind(print, name, "main");
-    exit = boost::bind(print, name, "exit");
+  Rule(const char* name) : m_name(name), entry(), main(), exit() { 
     global_rule_map[name] = this;
   }
 
@@ -58,6 +51,10 @@ struct RuleContext : proto::callable_context<RuleContext, proto::null_context> {
   RuleContext & operator()(Expr expr) {
     BOOST_ASSERT( proto::eval(expr, *this) );
     return *this;
+  }
+  
+  Rule& operator[](rule_type & r) {
+    return proto::value(r);
   }
 
   result_type operator()(proto::tag::terminal, Rule & r) { 

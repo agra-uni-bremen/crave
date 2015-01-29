@@ -60,10 +60,9 @@ void Executor::dfs(int v) {
   if (m_adj.find(v) == m_adj.end()) {
     BOOST_ASSERT_MSG(v == 2, "Invalid end of unfolded sequence");
     BOOST_FOREACH(int i, path) {
-      if (m_actions.find(i) != m_actions.end())
+      if (m_actions.find(i) != m_actions.end() && m_actions[i])
         m_actions[i]();
     }
-    std::cout << "END" << std::endl << std::endl;
   }
   else {
     std::vector<int>& adj = m_adj[v];
