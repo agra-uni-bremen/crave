@@ -39,8 +39,13 @@ struct Rule {
   }
 
   const char* name() const { return m_name; }
+  void bind_rand_obj(rand_obj* obj) {
+    m_rand_obj = obj;
+    main = boost::bind(&rand_obj::next, obj);
+  }
 
 private:
+  rand_obj* m_rand_obj;
   const char* m_name;
 };
 
