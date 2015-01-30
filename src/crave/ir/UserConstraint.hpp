@@ -110,8 +110,8 @@ struct UserVectorConstraint : UserConstraint {
 
 protected:
   UserVectorConstraint(unsigned const id, expression const expr, std::string const& name, std::set<int> & support_vars
-  , bool unique, bool const soft = false, bool const enabled = true)
-  : UserConstraint(id, expr, name, support_vars, soft, enabled), unique_(unique) { }
+  , bool unique, bool const soft = false, bool const cover = false, bool const enabled = true)
+  : UserConstraint(id, expr, name, support_vars, soft, cover, enabled), unique_(unique) { }
 
 public:
   inline bool is_unique() { return unique_; }
@@ -251,7 +251,6 @@ struct ConstraintManager {
   template<typename Expr>
   ConstraintPtr makeConstraint(std::string const& name, int c_id, Expr e, Context& ctx,
                                bool const soft = false, bool const cover = false) {
-
     LOG(INFO) << "New " << (soft?"soft ":"") << (cover?"cover ":"") << "constraint " << name << " in set " << id_;
 
     if (cMap_.find(name) != cMap_.end()) 
@@ -269,6 +268,9 @@ struct ConstraintManager {
         ? new UserVectorConstraint(c_id, n, name, ctx.support_vars(), true, soft, cover)
         : new UserConstraint(c_id, n, name, ctx.support_vars(), soft, cover))
     );
+
+    assert(!c->is_soft() || !c->is_cover())); // soft cover constraint not defined/supported yet
+    assert(!c->is_vector_constraint() || !c->ccover())); // cover vector constraint not defined/supported yet
 
     changed_ = true;
     constraints_.push_back(c);
