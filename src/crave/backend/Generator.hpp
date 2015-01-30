@@ -56,6 +56,18 @@ public:
     return *this;
   }
 
+  template<typename Expr>
+  Generator & cover(Expr e) {
+    constr_mng_.makeConstraint(e, ctx_, false, true);
+    return *this;
+  }
+
+  template<typename Expr>
+  Generator & cover(std::string name, Expr e) {
+    constr_mng_.makeConstraint(name, e, ctx_, false, true);
+    return *this;
+  }
+
   inline bool enable_constraint(std::string const& name) { return constr_mng_.enable_constraint(name); }
   inline bool disable_constraint(std::string const& name) { return constr_mng_.disable_constraint(name); }
   inline bool is_constraint_enabled(std::string const& name) { return constr_mng_.is_constraint_enabled(name); }

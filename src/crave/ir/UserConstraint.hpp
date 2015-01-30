@@ -43,8 +43,8 @@ struct UserConstraint {
   typedef NodePtr expression;
 
 protected:
-  UserConstraint(unsigned const id, expression const expr, std::string const& name, std::set<int> & support_vars, bool const soft = false, bool const enabled = true)
-  : id_(id), expr_(expr), name_(name), support_vars_(support_vars), soft_(soft), enabled_(enabled) { }
+  UserConstraint(unsigned const id, expression const expr, std::string const& name, std::set<int> & support_vars, bool const soft = false, bool const cover = false, bool const enabled = true)
+  : id_(id), expr_(expr), name_(name), support_vars_(support_vars), soft_(soft), cover_(cover), enabled_(enabled) { }
 
 public:
   virtual ~UserConstraint() { }
@@ -74,6 +74,10 @@ public:
     return soft_;
   }
 
+  inline bool is_cover() const {
+    return cover_;
+  }
+
   inline bool is_enabled() const {
     return enabled_;
   }
@@ -92,6 +96,7 @@ public:
   std::string name_;
   std::set<int> support_vars_;
   bool soft_;
+  bool cover_;
   bool enabled_;
 };
 
@@ -245,9 +250,9 @@ struct ConstraintManager {
 
   template<typename Expr>
   ConstraintPtr makeConstraint(std::string const& name, int c_id, Expr e, Context& ctx,
-                               bool const soft = false) {
+                               bool const soft = false, bool const cover = false) {
 
-    LOG(INFO) << "New " << (soft?"soft ":"") << "constraint " << name << " in set " << id_;
+    LOG(INFO) << "New " << (soft?"soft ":"") << (cover?"cover ":"") << "constraint " << name << " in set " << id_;
 
     if (cMap_.find(name) != cMap_.end()) 
       throw std::runtime_error("Constraint already exists.");
@@ -259,10 +264,10 @@ struct ConstraintManager {
 
     ConstraintPtr c(
       boost::dynamic_pointer_cast<ForEach>(n) != 0
-      ? new UserVectorConstraint(c_id, n, name, ctx.support_vars(), false, soft)
+      ? new UserVectorConstraint(c_id, n, name, ctx.support_vars(), false, soft, cover)
       : (boost::dynamic_pointer_cast<Unique>(n) != 0
-        ? new UserVectorConstraint(c_id, n, name, ctx.support_vars(), true, soft)
-        : new UserConstraint(c_id, n, name, ctx.support_vars(), soft))
+        ? new UserVectorConstraint(c_id, n, name, ctx.support_vars(), true, soft, cover)
+        : new UserConstraint(c_id, n, name, ctx.support_vars(), soft, cover))
     );
 
     changed_ = true;
@@ -273,15 +278,15 @@ struct ConstraintManager {
 
   template<typename Expr>
   ConstraintPtr makeConstraint(std::string const& name, Expr e, Context& ctx,
-                                     bool const soft = false) {
-    return makeConstraint(name, new_constraint_id(), e, ctx, soft);
+                                     bool const soft = false, bool const cover = false) {
+    return makeConstraint(name, new_constraint_id(), e, ctx, soft, cover);
   }
 
   template<typename Expr>
-  ConstraintPtr makeConstraint(Expr e, Context& ctx, bool const soft = false) {
+  ConstraintPtr makeConstraint(Expr e, Context& ctx, bool const soft = false, bool const cover = false) {
     int id = new_constraint_id();
     return makeConstraint("constraint_" + boost::lexical_cast<std::string>(id), id,
-                          e, ctx, soft);
+                          e, ctx, soft, cover);
   }
 
   std::ostream& print_dot_graph_(std::ostream& os)  {
@@ -289,7 +294,7 @@ struct ConstraintManager {
     BOOST_FOREACH ( ConstraintPtr c , constraints_ ) {
       long a = reinterpret_cast<long>(&*c);
       long b = reinterpret_cast<long>(&(*c->get_expression()));
-      os << "\t" << a << " [label=\"" << c->get_name() << (c->is_soft()?" soft":"") << (!c->is_enabled()?" disabled":"") << "\"]" << std::endl;
+      os << "\t" << a << " [label=\"" << c->get_name() << (c->is_soft()?" soft":"") << (c->is_cover()?" cover":"") << (!c->is_enabled()?" disabled":"") << "\"]" << std::endl;
       os << "\t" << a << " -> " << b << std::endl; 
       c->get_expression()->visit(visitor);
     }
