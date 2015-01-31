@@ -21,11 +21,47 @@ struct VariableSolver {
   friend struct VariableGenerator;
 
   VariableSolver(VariableContainer& vcon, ConstraintPartition& cp)
-  : vcon_(vcon), cp_(cp), solver_(FactoryMetaSMT::getNewInstance()) {
+  : vcon_(vcon), cp_(cp), solver_(FactoryMetaSMT::getNewInstance()) {  }
+
+  virtual bool solve() = 0;
+
+  template<typename T>
+  bool read(Variable<T> const &var, T& value) {
+    if (vcon_.variables.find(var.id()) == vcon_.variables.end()) return false;
+    if (!cp_.contains_var(var.id())) return false;
+    AssignResultImpl<T> result;
+    solver_->read(*vcon_.variables[var.id()], result);
+    value = result.value();
+    return true;
+  }
+
+  std::vector<std::vector<std::string> > analyse_contradiction() {
+    return contradictions_;
+  }
+
+  std::vector<std::string> get_inactive_softs() {
+    return inactive_softs_;
+  }
+
+protected:
+  VariableContainer& vcon_;
+  ConstraintPartition& cp_;
+  SolverPtr solver_;
+
+  std::vector<std::vector<std::string> > contradictions_;
+  std::vector<std::string> inactive_softs_;
+};
+
+
+struct VariableDefaultSolver : VariableSolver {
+
+  VariableDefaultSolver(VariableContainer& vcon, ConstraintPartition& cp)
+  : VariableSolver(vcon, cp) {
 
     LOG(INFO) << "Create solver for partition " << cp_;
 
     BOOST_FOREACH(ConstraintPtr c, cp_) {
+      if (c->is_cover()) continue; // default solver ignores cover constraints
       if (c->is_soft()) {
         solver_->makeSoftAssertion(*c->get_expression());
       } else {
@@ -51,7 +87,7 @@ struct VariableSolver {
     }
   }
 
-  bool solve() {
+  virtual bool solve() {
     if (!contradictions_.empty()) 
       return false;
     BOOST_FOREACH(VariableContainer::ReadRefPair pair, vcon_.read_references)
@@ -69,16 +105,6 @@ struct VariableSolver {
     return false;
   }
 
-  template<typename T>
-  bool read(Variable<T> const &var, T& value) {
-    if (vcon_.variables.find(var.id()) == vcon_.variables.end()) return false;
-    if (!cp_.contains_var(var.id())) return false;
-    AssignResultImpl<T> result;
-    solver_->read(*vcon_.variables[var.id()], result);
-    value = result.value();
-    return true;
-  }
-
 private:
   void analyse_hards() {
     boost::scoped_ptr<metaSMTVisitor> solver(FactoryMetaSMT::getNewInstance());
@@ -88,7 +114,7 @@ private:
     std::vector<std::vector<unsigned int> > results;
 
     BOOST_FOREACH(ConstraintPtr c, cp_)
-      if (!c->is_soft()) {
+      if (!c->is_soft() && !c->is_cover()) {
         s.insert(std::make_pair(s.size(), c->get_expression()));
         out.push_back(c->get_name());
       }
@@ -121,38 +147,65 @@ private:
     }
   }
 
-  std::vector<std::vector<std::string> > analyse_contradiction() {
-    return contradictions_;
+};
+
+struct VariableCoverageSolver : VariableSolver {
+
+  VariableCoverageSolver(VariableContainer& vcon, ConstraintPartition& cp)
+  : VariableSolver(vcon, cp) {
+
+    LOG(INFO) << "Create coverage solver for partition " << cp_;
+
+    BOOST_FOREACH(ConstraintPtr c, cp_) {
+      if (c->is_soft()) continue; // coverage solver ignores soft constraints for now
+      if (!c->is_cover())
+        solver_->makeAssertion(*c->get_expression());
+    }
   }
 
-  std::vector<std::string> get_inactive_softs() {
-    return inactive_softs_;
+  virtual bool solve() {
+    BOOST_FOREACH(ConstraintPtr c, cp_) {
+      if (!c->is_cover()) continue;
+      if (covered_.find(c->get_name()) != covered_.end()) continue; // alread covered
+      // try solve
+      BOOST_FOREACH(VariableContainer::ReadRefPair pair, vcon_.read_references)
+        if (cp_.contains_var(pair.first))
+          solver_->makeAssumption(*pair.second->expr());
+      solver_->makeAssumption(*c->get_expression());
+      if (solver_->solve()) { 
+        LOG(INFO) << "Solve partition " << cp_ << " hitting constraint " << c->get_name();
+        covered_.insert(c->get_name());
+        BOOST_FOREACH(VariableContainer::WriteRefPair pair, vcon_.write_references)
+          if (cp_.contains_var(pair.first))
+            solver_->read(*vcon_.variables[pair.first], *pair.second);        
+        return true;
+      }
+    }
+    return false;
   }
 
 private:
-  VariableContainer& vcon_;
-  ConstraintPartition& cp_;
-  SolverPtr solver_;
-
-  std::vector<std::vector<std::string> > contradictions_;
-  std::vector<std::string> inactive_softs_;
+  std::set<std::string> covered_;
 };
 
+/**
+ *
+ */
 struct VariableGenerator {
   typedef boost::shared_ptr<VariableSolver> VarSolverPtr;
 
   VariableGenerator(VariableContainer& vcon) 
   : vcon_(vcon), solvers_() { }
 
-  void reset(std::vector<ConstraintPartition>& partitions) {
+  virtual void reset(std::vector<ConstraintPartition>& partitions) {
     solvers_.clear();
     BOOST_FOREACH(ConstraintPartition& partition, partitions) {
-      VarSolverPtr vs(new VariableSolver(vcon_, partition));
+      VarSolverPtr vs(new VariableDefaultSolver(vcon_, partition));
       solvers_.push_back(vs);
     }
   }
 
-  bool solve() {
+  virtual bool solve() {
     BOOST_FOREACH(VarSolverPtr vs, solvers_)
       if (!vs->solve()) return false;
     return true;
@@ -185,9 +238,30 @@ struct VariableGenerator {
     return str_vec;
   }
 
-private:
+protected:
   VariableContainer& vcon_;
   std::vector<VarSolverPtr> solvers_;
+};
+
+struct VariableCoverageGenerator : VariableGenerator {
+ 
+  VariableCoverageGenerator(VariableContainer& vcon) 
+  : VariableGenerator(vcon) { }
+
+  virtual void reset(std::vector<ConstraintPartition>& partitions) {
+    solvers_.clear();
+    BOOST_FOREACH(ConstraintPartition& partition, partitions) {
+      VarSolverPtr vs(new VariableCoverageSolver(vcon_, partition));
+      solvers_.push_back(vs);
+    }
+  }
+
+  virtual bool solve() {
+    bool res = false;
+    BOOST_FOREACH(VarSolverPtr vs, solvers_)
+      if (vs->solve()) res = true; // one solver has hitted an uncovered constraint -> everything ok, from covered solvers, the last solutions will be reused.  
+    return res;
+  }
 };
 
 

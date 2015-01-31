@@ -21,14 +21,20 @@ public:
   Generator()
   : constr_mng_(), vcon_(crave::variables), ctx_(vcon_)
   , var_gen_(vcon_)
-  , vec_gen_(var_gen_) {
+  , vec_gen_(var_gen_)
+  , var_cov_gen_(vcon_)
+  , vec_cov_gen_(var_cov_gen_)
+  , covered_(false) {
   }
 
   template<typename Expr>
   Generator(Expr expr)
   : constr_mng_(), vcon_(crave::variables), ctx_(vcon_) 
   , var_gen_(vcon_)
-  , vec_gen_(var_gen_) {
+  , vec_gen_(var_gen_)
+  , var_cov_gen_(vcon_)
+  , vec_cov_gen_(var_cov_gen_)
+  , covered_(false) {
     (*this)(expr);
   }
 
@@ -84,6 +90,7 @@ public:
   void reset() {
     constr_mng_.set_synced();
     cp.reset();
+    reset_coverage();
   }
 
   void rebuild(bool selfInclude = false) {
@@ -91,6 +98,8 @@ public:
     cp.partition();
     var_gen_.reset(cp.get_partitions());
     vec_gen_.reset(cp.get_vector_constraints());
+    var_cov_gen_.reset(cp.get_partitions());
+    vec_cov_gen_.reset(cp.get_vector_constraints());
   }
 
   bool next() {
@@ -99,6 +108,27 @@ public:
       rebuild(true);
     }
     return var_gen_.solve() && vec_gen_.solve();
+  }
+
+  bool next_cov() {
+    if (constr_mng_.is_changed()) {
+      reset();
+      rebuild(true);
+    }
+    if (!covered_) {
+      if (var_cov_gen_.solve() && vec_cov_gen_.solve())
+        return true;
+      else
+        covered_ = true;
+    }
+    return next();
+  }
+
+  bool is_covered() { return covered_; }
+  void reset_coverage() { 
+    covered_ = false; 
+    var_cov_gen_.reset(cp.get_partitions());
+    vec_cov_gen_.reset(cp.get_vector_constraints());
   }
 
   inline std::ostream& print_dot_graph(std::ostream& os, bool root = true) { 
@@ -141,6 +171,12 @@ private:
   // solvers
   VariableGenerator var_gen_;
   VectorGenerator vec_gen_;
+
+  VariableCoverageGenerator var_cov_gen_;
+  VectorGenerator vec_cov_gen_;
+
+  // coverage
+  bool covered_;
 };
 
 } // namespace crave

@@ -33,6 +33,17 @@ namespace crave {
       return constraint.next();
     }
 
+    virtual bool next_cov() { 
+      if (!gen_base_children()) return false;
+      if (rebuild) {
+        constraint.reset();
+        gather_constraints(constraint);
+        constraint.rebuild();
+        rebuild = false;
+      }
+      return constraint.next_cov();
+    }
+
     virtual void gather_values(std::vector<long>& ch) {
       for (std::vector<rand_base*>::const_iterator i = baseChildren.begin();
            i != baseChildren.end(); ++i)

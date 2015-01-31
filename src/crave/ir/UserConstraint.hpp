@@ -269,8 +269,8 @@ struct ConstraintManager {
         : new UserConstraint(c_id, n, name, ctx.support_vars(), soft, cover))
     );
 
-    assert(!c->is_soft() || !c->is_cover())); // soft cover constraint not defined/supported yet
-    assert(!c->is_vector_constraint() || !c->ccover())); // cover vector constraint not defined/supported yet
+    assert(!c->is_soft() || !c->is_cover()); // soft cover constraint not defined/supported yet
+    assert(!c->is_vector_constraint() || !c->is_cover()); // cover vector constraint not defined/supported yet
 
     changed_ = true;
     constraints_.push_back(c);

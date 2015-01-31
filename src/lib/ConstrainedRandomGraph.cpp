@@ -19,7 +19,7 @@ void Selector::accept(NodeVisitor& v) { v.visitSelector(*this); }
 void Sequence::accept(NodeVisitor& v) { v.visitSequence(*this); }
 
 struct Executor : NodeVisitor {
-  Executor(NodePtr r) : m_root(r), m_rules(global_rule_map), m_id(0), m_stack() { }
+  Executor(NodePtr r) : m_root(r), m_rules(global_rule_map), m_id(0), m_path_count(0) { }
   
   virtual void visitTerminal(Terminal& );  
   virtual void visitSelector(Selector& );  
@@ -46,7 +46,9 @@ private:
   std::stack<result_type> m_stack;
   std::map<int, std::vector<int> > m_adj;
   std::map<int, action_type> m_actions;
+  std::map<int, Rule*> m_main_to_rule_map;
   std::vector<int> path;
+  int m_path_count;
 };
 
 void Executor::check_root(Node& n) {
@@ -59,10 +61,30 @@ void Executor::dfs(int v) {
   path.push_back(v);
   if (m_adj.find(v) == m_adj.end()) {
     BOOST_ASSERT_MSG(v == 2, "Invalid end of unfolded sequence");
+    m_path_count++;
+    // reset coverage of all rand_objs on the new path 
     BOOST_FOREACH(int i, path) {
-      if (m_actions.find(i) != m_actions.end() && m_actions[i])
-        m_actions[i]();
+      if (m_main_to_rule_map.find(i) != m_main_to_rule_map.end())
+         m_main_to_rule_map[i]->reset_coverage(); 
     }
+    int iter_count = 0;
+    while (true) { // repeate until path is covered
+      iter_count++;
+      BOOST_FOREACH(int i, path) {
+        if (m_actions.find(i) != m_actions.end() && m_actions[i])
+          m_actions[i]();
+      }
+      bool path_covered = true;
+      BOOST_FOREACH(int i, path) {
+        if (m_main_to_rule_map.find(i) != m_main_to_rule_map.end() && !m_main_to_rule_map[i]->is_rand_obj_covered()) {
+          path_covered = false;
+          break;
+        }
+      }
+      if (path_covered)
+        break; 
+    }
+    LOG(INFO) << "Path " << m_path_count << " is covered after " << iter_count << " iteration(s)";
   }
   else {
     std::vector<int>& adj = m_adj[v];
@@ -78,6 +100,7 @@ void Executor::visitTerminal(Terminal& t) {
   m_actions.insert(std::make_pair(m_id, r->entry));
   m_actions.insert(std::make_pair(m_id + 1, r->main));
   m_actions.insert(std::make_pair(m_id + 2, r->exit));
+  m_main_to_rule_map.insert(std::make_pair(m_id + 1, r));
   make_edge(m_id, m_id + 1);
   make_edge(m_id + 1, m_id + 2);  
   m_stack.push(result_type(m_id, m_id + 2));
@@ -96,6 +119,7 @@ void Executor::visitSelector(Selector& nt) {
     m_actions.insert(std::make_pair(start, r->entry));
     m_actions.insert(std::make_pair(start + 1, r->main));
     m_actions.insert(std::make_pair(end, r->exit));
+    m_main_to_rule_map.insert(std::make_pair(start + 1, r));
   }
 
   make_edge(start, start + 1);
@@ -122,6 +146,7 @@ void Executor::visitSequence(Sequence& nt) {
     m_actions.insert(std::make_pair(start, r->entry));
     m_actions.insert(std::make_pair(start + 1, r->main));
     m_actions.insert(std::make_pair(end, r->exit));
+    m_main_to_rule_map.insert(std::make_pair(start + 1, r));
   }
 
   make_edge(start, start + 1);
