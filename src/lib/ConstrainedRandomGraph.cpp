@@ -68,7 +68,7 @@ void Executor::dfs(int v) {
          m_main_to_rule_map[i]->reset_coverage(); 
     }
     int iter_count = 0;
-    while (true) { // repeate until path is covered
+    while (true) { // repeat until path is covered
       iter_count++;
       BOOST_FOREACH(int i, path) {
         if (m_actions.find(i) != m_actions.end() && m_actions[i])

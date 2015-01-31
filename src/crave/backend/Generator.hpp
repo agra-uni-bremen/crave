@@ -96,9 +96,10 @@ public:
   void rebuild(bool selfInclude = false) {
     if (selfInclude) merge(*this);
     cp.partition();
+    // currently, every hard/soft/cover constraint is considered for partitioning, this is suboptimal.
     var_gen_.reset(cp.get_partitions());
     vec_gen_.reset(cp.get_vector_constraints());
-    var_cov_gen_.reset(cp.get_partitions());
+    var_cov_gen_.reset(cp.get_partitions()); 
     vec_cov_gen_.reset(cp.get_vector_constraints());
   }
 
