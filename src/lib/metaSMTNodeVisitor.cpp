@@ -15,6 +15,15 @@
   > BoolectorSolverType;
 #endif
 
+#ifdef metaSMT_USE_CVC4
+  #include <metaSMT/backend/CVC4.hpp>
+  typedef metaSMT::DirectSolver_Context <
+    metaSMT::UnpackFuture_Context <
+    metaSMT::solver::CVC4
+    >
+  > CVC4SolverType;
+#endif
+
 #ifdef metaSMT_USE_SWORD
   #include <metaSMT/backend/SWORD_Backend.hpp>
   typedef metaSMT::DirectSolver_Context <
@@ -52,6 +61,8 @@ namespace crave {
 
 #ifdef metaSMT_USE_Boolector
   std::string metaSMTVisitor::solver_type = "Boolector";
+#elif metaSMT_USE_CVC4
+  std::string metaSMTVisitor::solver_type = "CVC4";
 #elif metaSMT_USE_Z3
   std::string metaSMTVisitor::solver_type = "Z3";
 #elif metaSMT_USE_SWORD
@@ -68,9 +79,13 @@ metaSMTVisitor* FactoryMetaSMT::getNewInstance() {
   if (0 == metaSMTVisitor::solver_type.compare("SWORD"))
     return new metaSMTVisitorImpl<SWORDSolverType>();
 #endif
-#if defined metaSMT_USE_Boolector
+#ifdef metaSMT_USE_Boolector
   if (0 == metaSMTVisitor::solver_type.compare("Boolector"))
     return new metaSMTVisitorImpl<BoolectorSolverType>();
+#endif
+#ifdef metaSMT_USE_CVC4
+  if (0 == metaSMTVisitor::solver_type.compare("CVC4"))
+    return new metaSMTVisitorImpl<CVC4SolverType>();
 #endif
 #ifdef metaSMT_USE_Z3
   if (0 == metaSMTVisitor::solver_type.compare("Z3"))

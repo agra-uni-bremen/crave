@@ -30,6 +30,11 @@ if (metaSMT_USE_Boolector)
   add_all_tests(use_Boolector use_Boolector.cpp)
 endif (metaSMT_USE_Boolector)
 
+if (metaSMT_USE_CVC4)
+  add_executable(use_CVC4 use_CVC4.cpp)
+  add_all_tests(use_CVC4 use_CVC4.cpp)
+endif (metaSMT_USE_CVC4)
+
 if (metaSMT_USE_Z3)
   add_executable(use_Z3 use_Z3.cpp)
   add_all_tests(use_Z3 use_Z3.cpp)
