@@ -27,5 +27,11 @@ namespace crave {
     static solver_t solver_type;
   };
 
+  template<solver_t SolverType> 
+  struct FactorySolver {
+    static bool isDefined() { return false; }  
+    static crave::metaSMTVisitor* getNewInstance() { return NULL; }  
+  };
+
 } // namespace crave;
 

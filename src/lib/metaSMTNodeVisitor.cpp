@@ -8,13 +8,8 @@
 
 #include <glog/logging.h>
 
-template<crave::solver_t SolverType> 
-struct FactorySolver {
-  static bool isDefined() { return false; }  
-  static crave::metaSMTVisitor* getNewInstance() { return NULL; }  
-};
-
 #define DEFINE_SOLVER(inCrave, inMetaSMT) \
+namespace crave { \
   template<> \
   struct FactorySolver<inCrave> { \
     typedef metaSMT::DirectSolver_Context < \
@@ -23,8 +18,9 @@ struct FactorySolver {
       > \
     > SolverType; \
     static bool isDefined() { return true; } \
-    static crave::metaSMTVisitor* getNewInstance() { return new crave::metaSMTVisitorImpl<SolverType>(); } \
+    static metaSMTVisitor* getNewInstance() { return new metaSMTVisitorImpl<SolverType>(); } \
   }; \
+} \
 
 #ifdef metaSMT_USE_Boolector
 #include <metaSMT/backend/Boolector.hpp>
