@@ -50,11 +50,6 @@ endif (metaSMT_USE_SWORD)
 #  add_all_tests(use_Cudd use_Cudd.cpp)
 #endif (metaSMT_USE_CUDD)
 
-if (metaSMT_USE_Boolector AND metaSMT_USE_CUDD)
-  add_executable(use_Priority use_Priority.cpp)
-  add_all_tests(use_Priority use_Priority.cpp)
-endif (metaSMT_USE_Boolector AND metaSMT_USE_CUDD)
-
 if(SystemC_FOUND)
   find_package(Threads REQUIRED)
   include_directories(${SystemC_INCLUDE_DIR})
