@@ -6,101 +6,101 @@
 #include <metaSMT/DirectSolver_Context.hpp>
 #include <metaSMT/UnpackFuture_Context.hpp>
 
+#include <glog/logging.h>
+
+template<crave::solver_t SolverType> 
+struct FactorySolver {
+  static bool isDefined() { return false; }  
+  static crave::metaSMTVisitor* getNewInstance() { return NULL; }  
+};
+
+#define DEFINE_SOLVER(inCrave, inMetaSMT) \
+  template<> \
+  struct FactorySolver<inCrave> { \
+    typedef metaSMT::DirectSolver_Context < \
+      metaSMT::UnpackFuture_Context < \
+        inMetaSMT \
+      > \
+    > SolverType; \
+    static bool isDefined() { return true; } \
+    static crave::metaSMTVisitor* getNewInstance() { return new crave::metaSMTVisitorImpl<SolverType>(); } \
+  }; \
+
 #ifdef metaSMT_USE_Boolector
-  #include <metaSMT/backend/Boolector.hpp>
-  typedef metaSMT::DirectSolver_Context <
-    metaSMT::UnpackFuture_Context <
-    metaSMT::solver::Boolector
-    >
-  > BoolectorSolverType;
+#include <metaSMT/backend/Boolector.hpp>
+DEFINE_SOLVER(crave::BOOLECTOR, metaSMT::solver::Boolector);
 #endif
 
 #ifdef metaSMT_USE_CVC4
-  #include <metaSMT/backend/CVC4.hpp>
-  typedef metaSMT::DirectSolver_Context <
-    metaSMT::UnpackFuture_Context <
-    metaSMT::solver::CVC4
-    >
-  > CVC4SolverType;
+#include <metaSMT/backend/CVC4.hpp> 
+DEFINE_SOLVER(crave::CVC4, metaSMT::solver::CVC4);
 #endif
 
 #ifdef metaSMT_USE_SWORD
-  #include <metaSMT/backend/SWORD_Backend.hpp>
-  typedef metaSMT::DirectSolver_Context <
-    metaSMT::UnpackFuture_Context <
-    metaSMT::solver::SWORD_Backend
-    >
-  > SWORDSolverType;
+#include <metaSMT/backend/SWORD_Backend.hpp>
+DEFINE_SOLVER(crave::SWORD, metaSMT::solver::SWORD_Backend);
 #endif
 
 #ifdef metaSMT_USE_Z3
-  #include <metaSMT/backend/Z3_Backend.hpp>
-  typedef metaSMT::DirectSolver_Context <
-    metaSMT::UnpackFuture_Context <
-    metaSMT::solver::Z3_Backend
-    >
-  > Z3SolverType;
+#include <metaSMT/backend/Z3_Backend.hpp>
+DEFINE_SOLVER(crave::Z3, metaSMT::solver::Z3_Backend);
 #endif
 
 #ifdef metaSMT_USE_CUDD
-  #include <metaSMT/backend/CUDD_Distributed.hpp>
-  typedef metaSMT::DirectSolver_Context <
-    metaSMT::UnpackFuture_Context <
-    metaSMT::BitBlast <
-    metaSMT::solver::CUDD_Distributed
-    > >
-  > CUDDSolverType;
+#include <metaSMT/backend/CUDD_Distributed.hpp>
+DEFINE_SOLVER(crave::CUDD, metaSMT::BitBlast<metaSMT::solver::CUDD_Distributed>);
 #endif
 
-#if defined(metaSMT_USE_CUDD) && defined(metaSMT_USE_Boolector)
-  #include <metaSMT/Priority_Context.hpp>
-  typedef metaSMT::Priority_Context< BoolectorSolverType, CUDDSolverType > SolverType;
-#endif
+#undef DEFINE_SOLVER
 
 namespace crave {
 
-#ifdef metaSMT_USE_Boolector
-  std::string metaSMTVisitor::solver_type = "Boolector";
-#elif metaSMT_USE_CVC4
-  std::string metaSMTVisitor::solver_type = "CVC4";
-#elif metaSMT_USE_Z3
-  std::string metaSMTVisitor::solver_type = "Z3";
-#elif metaSMT_USE_SWORD
-  std::string metaSMTVisitor::solver_type = "SWORD";
-#elif metaSMT_USE_CUDD
-  std::string metaSMTVisitor::solver_type = "Cudd";
-#endif
+solver_t FactoryMetaSMT::solver_type = UNDEFINED_SOLVER; // default solver
 
 void FactoryMetaSMT::setSolverType(std::string const& type) {
-  metaSMTVisitor::solver_type = type;
+  if (type == "Boolector") solver_type = BOOLECTOR;
+  else if (type == "CVC4") solver_type = CVC4;
+  else if (type == "Z3") solver_type = Z3;
+  else if (type == "SWORD") solver_type = SWORD;
+  else if (type == "Cudd") solver_type = CUDD; 
 }
+
+#define TRY_GET_SOLVER(solver) \
+      if (!FactorySolver<solver>::isDefined()) { \
+        solver_type = UNDEFINED_SOLVER; \
+        LOG(INFO) << #solver << " has not been defined, another solver will be selected"; \
+        return getNewInstance(); \
+      } \
+      else \
+        return FactorySolver<solver>::getNewInstance(); \
+
+#define TRY_GET_SOLVER_WHEN_UNDEFINED(solver) \
+      if (FactorySolver<solver>::isDefined()) { \
+        solver_type = solver; \
+        LOG(INFO) << #solver << " has been automatically selected"; \
+        return getNewInstance(); \
+      }
+
 metaSMTVisitor* FactoryMetaSMT::getNewInstance() {
-#ifdef metaSMT_USE_SWORD
-  if (0 == metaSMTVisitor::solver_type.compare("SWORD"))
-    return new metaSMTVisitorImpl<SWORDSolverType>();
-#endif
-#ifdef metaSMT_USE_Boolector
-  if (0 == metaSMTVisitor::solver_type.compare("Boolector"))
-    return new metaSMTVisitorImpl<BoolectorSolverType>();
-#endif
-#ifdef metaSMT_USE_CVC4
-  if (0 == metaSMTVisitor::solver_type.compare("CVC4"))
-    return new metaSMTVisitorImpl<CVC4SolverType>();
-#endif
-#ifdef metaSMT_USE_Z3
-  if (0 == metaSMTVisitor::solver_type.compare("Z3"))
-    return new metaSMTVisitorImpl<Z3SolverType>();
-#endif
-#ifdef metaSMT_USE_CUDD
-  if (0 == metaSMTVisitor::solver_type.compare("Cudd"))
-    return new metaSMTVisitorImpl<CUDDSolverType>();
-#endif
-#if defined(metaSMT_USE_CUDD) && defined(metaSMT_USE_Boolector)
-  if (0 == metaSMTVisitor::solver_type.compare("Priority"))
-    return new metaSMTVisitorImpl<SolverType>();
-#endif
-  assert("Unsupported backend is choosen.");
-  return NULL;
+  switch (solver_type) {
+    case BOOLECTOR: 
+      TRY_GET_SOLVER(BOOLECTOR);
+    case CVC4:
+      TRY_GET_SOLVER(CVC4);    
+    case Z3: 
+      TRY_GET_SOLVER(Z3);    
+    case SWORD: 
+      TRY_GET_SOLVER(SWORD);    
+    case CUDD: 
+      TRY_GET_SOLVER(CUDD);
+    default: // UNDEFINED_SOLVER
+      TRY_GET_SOLVER_WHEN_UNDEFINED(BOOLECTOR);
+      TRY_GET_SOLVER_WHEN_UNDEFINED(CVC4);
+      TRY_GET_SOLVER_WHEN_UNDEFINED(Z3);
+      TRY_GET_SOLVER_WHEN_UNDEFINED(SWORD);
+      TRY_GET_SOLVER_WHEN_UNDEFINED(CUDD);
+      assert(false && "No solver has been defined.");
+  }
 }
 
 } // end crave namespace

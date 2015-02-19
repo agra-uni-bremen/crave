@@ -1,5 +1,4 @@
-#ifndef METASMTNODEVISITORIMPL_H
-#define METASMTNODEVISITORIMPL_H
+#pragma once
 
 #include "../crave/ir/visitor/metaSMTNodeVisitor.hpp"
 #include "../crave/frontend/AssignResult.hpp"
@@ -9,10 +8,8 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/foreach.hpp>
-#include <boost/function.hpp>
 #include <metaSMT/frontend/QF_BV.hpp>
 #include <metaSMT/DirectSolver_Context.hpp>
-#include <metaSMT/Priority_Context.hpp>
 #include <metaSMT/support/cardinality.hpp>
 #include <metaSMT/support/contradiction_analysis.hpp>
 
@@ -780,4 +777,3 @@ bool metaSMTVisitorImpl<SolverType>::readVector( std::vector<VariablePtr>& vec, 
 
 } // namespace crave
 
-#endif /* end of include guard: METASMTNODEVISITORIMPL_H */

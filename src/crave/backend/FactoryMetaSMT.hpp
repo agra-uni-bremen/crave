@@ -6,6 +6,15 @@
 
 namespace crave {
 
+  enum solver_t {
+    UNDEFINED_SOLVER,
+    BOOLECTOR, 
+    CVC4, 
+    Z3, 
+    SWORD, 
+    CUDD
+  };
+
   class FactoryMetaSMT {
   public:
     static void setSolverType(std::string const&);
@@ -14,6 +23,9 @@ namespace crave {
       * metaSMTNodeVisitor::solver_type. Caller is responsible for deleting the visitor.
       **/
     static metaSMTVisitor* getNewInstance();
+
+    static solver_t solver_type;
   };
 
 } // namespace crave;
+

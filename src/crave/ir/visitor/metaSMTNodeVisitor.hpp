@@ -1,5 +1,4 @@
-#ifndef METASMTNODEVISITOR_HPP_
-#define METASMTNODEVISITOR_HPP_
+#pragma once
 
 #include "../../frontend/RandomBase.hpp"
 #include "../../frontend/AssignResult.hpp"
@@ -31,12 +30,9 @@ public:
   virtual bool solve(bool ignoreSofts = true) = 0;
   virtual bool read(Node const&, AssignResult&) = 0;
   virtual bool readVector(std::vector<VariablePtr>& vec, __rand_vec_base& rand_vec) = 0;
-
-  static std::string solver_type;
 };
 
 typedef boost::shared_ptr<metaSMTVisitor> SolverPtr;
 
 } //end namespace crave
 
-#endif /* METASMTNODEVISITOR_HPP_ */
