@@ -72,7 +72,7 @@ void UpdateVisitor::visitSequence(Sequence& seq) { visitNonTerminal(seq); }
 
 #define TDV_INDENT(x) std::string(m_stack.size() + x, '\t')
   
-void ToDotVisitor::create_node(int ind, int id, const char* name, const char* shape, const char* color) {
+void ToDotVisitor::createNode(int ind, int id, const char* name, const char* shape, const char* color) {
   m_out << TDV_INDENT(ind) << id;
   m_out << " [";
   m_out << "label=\"" << name << "\" ";
@@ -84,14 +84,14 @@ void ToDotVisitor::create_node(int ind, int id, const char* name, const char* sh
   m_out << "]" << std::endl;
 }
 
-void ToDotVisitor::create_edge(int source, int dest, const char* color) {
+void ToDotVisitor::createEdge(int source, int dest, const char* color) {
   m_out << TDV_INDENT(1) << source << " -> " << dest;
   if (color)
     m_out << "[color=" << color << "]";
   m_out << std::endl;
 }
 
-void ToDotVisitor::begin_subgraph(const char* name, const char* color, const char* style) {
+void ToDotVisitor::beginSubgraph(const char* name, const char* color, const char* style) {
   static unsigned int sg_cnt = 0;   
   if (name) {
     m_out << TDV_INDENT(0) <<  "subgraph cluster_" << sg_cnt << " {" << std::endl;
@@ -109,13 +109,13 @@ void ToDotVisitor::begin_subgraph(const char* name, const char* color, const cha
   sg_cnt++;
 }
 
-void ToDotVisitor::end_subgraph() {
+void ToDotVisitor::endSubgraph() {
   m_out << TDV_INDENT(0) <<  "}" << std::endl;
 }
   
 void ToDotVisitor::visitTerminal(Terminal& t) {
   m_stack.push(result_type(m_node_count, m_node_count));
-  create_node(0, m_node_count, t.name(), 0, "steelblue1");
+  createNode(0, m_node_count, t.name(), 0, "steelblue1");
   m_node_count++;
 }
 
@@ -125,20 +125,20 @@ void ToDotVisitor::visitSelector(Selector& nt) {
   m_node_count += 2;
   m_stack.push(result_type(start, end)); 
     
-  begin_subgraph(nt.name(), "yellowgreen", "dashed");
+  beginSubgraph(nt.name(), "yellowgreen", "dashed");
     
-  create_node(1, start, "start", "point", 0);
-  create_node(1, end, "end", "point", 0);
+  createNode(1, start, "start", "point", 0);
+  createNode(1, end, "end", "point", 0);
 
   BOOST_FOREACH(NodePtr n, nt.children) {
     n->accept(*this);
     result_type& r = m_stack.top();
     m_stack.pop();
-    create_edge(start, r.first, "azure4");
-    create_edge(r.second, end, "azure4");
+    createEdge(start, r.first, "azure4");
+    createEdge(r.second, end, "azure4");
   }
 
-  end_subgraph();
+  endSubgraph();
 }
 
 void ToDotVisitor::visitSequence(Sequence& nt) { 
@@ -147,23 +147,23 @@ void ToDotVisitor::visitSequence(Sequence& nt) {
   m_node_count += 2;
   m_stack.push(result_type(start, end)); 
 
-  begin_subgraph(nt.name(), "yellowgreen", "dashed");
+  beginSubgraph(nt.name(), "yellowgreen", "dashed");
     
-  create_node(1, start, "start", "point", 0);
-  create_node(1, end, "end", "point", 0);
+  createNode(1, start, "start", "point", 0);
+  createNode(1, end, "end", "point", 0);
 
   int last = start;
   BOOST_FOREACH(NodePtr n, nt.children) {
     n->accept(*this);
     result_type& r = m_stack.top();
     m_stack.pop();
-    create_edge(last, r.first, "azure4");
+    createEdge(last, r.first, "azure4");
     last = r.second;
   }
 
-  create_edge(last, end, "azure4");
+  createEdge(last, end, "azure4");
 
-  end_subgraph();
+  endSubgraph();
 }
 
 #undef TDV_INDENT

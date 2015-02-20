@@ -62,10 +62,10 @@ private:
   int m_node_count;
 
 private:  
-  void create_node(int ind, int id, const char* name, const char* shape, const char* color);
-  void create_edge(int source, int dest, const char* color);
-  void begin_subgraph(const char* name, const char* color, const char* style);
-  void end_subgraph();
+  void createNode(int ind, int id, const char* name, const char* shape, const char* color);
+  void createEdge(int source, int dest, const char* color);
+  void beginSubgraph(const char* name, const char* color, const char* style);
+  void endSubgraph();
 };
 
 };
