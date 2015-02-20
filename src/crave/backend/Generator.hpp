@@ -88,7 +88,7 @@ public:
   void merge(Generator& other) { constr_pttn.mergeConstraints(other.constr_mng); }
 
   void reset() {
-    constr_mng.set_synced();
+    constr_mng.resetChanged();
     constr_pttn.reset();
     resetCoverage();
   }

@@ -235,7 +235,7 @@ struct ConstraintManager {
     return changed_;
   }
 
-  void set_synced() {
+  void resetChanged() {
     changed_ = false;
   }
 
@@ -247,17 +247,17 @@ struct ConstraintManager {
     if (constr_map_.find(name) != constr_map_.end()) 
       throw std::runtime_error("Constraint already exists.");
 
-    ctx.reset_support_vars();
+    ctx.resetSupportVars();
 
     FixWidthVisitor vis;
     NodePtr n(vis.fix_width(*boost::proto::eval(e, ctx)));
 
     ConstraintPtr c(
       boost::dynamic_pointer_cast<ForEach>(n) != 0
-      ? new UserVectorConstraint(c_id, n, name, ctx.support_vars(), false, soft, cover)
+      ? new UserVectorConstraint(c_id, n, name, ctx.getSupportVars(), false, soft, cover)
       : (boost::dynamic_pointer_cast<Unique>(n) != 0
-        ? new UserVectorConstraint(c_id, n, name, ctx.support_vars(), true, soft, cover)
-        : new UserConstraint(c_id, n, name, ctx.support_vars(), soft, cover))
+        ? new UserVectorConstraint(c_id, n, name, ctx.getSupportVars(), true, soft, cover)
+        : new UserConstraint(c_id, n, name, ctx.getSupportVars(), soft, cover))
     );
 
     assert(!c->isSoft() || !c->isCover()); // soft cover constraint not defined/supported yet
