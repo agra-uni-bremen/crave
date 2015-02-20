@@ -41,11 +41,11 @@ public:
   }
 
   template<typename Integer>
-  Integer get_result() const {
-    return static_cast<Integer>(visitor_.get_result().value());
+  Integer result() const {
+    return static_cast<Integer>(visitor_.result().value());
   }
-  unsigned long get_result() const {
-    return get_result<unsigned long>();
+  unsigned long result() const {
+    return result<unsigned long>();
   }
 
 private:

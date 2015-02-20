@@ -65,7 +65,7 @@ private:
   void evalTernExpr( TernaryExpression const&, stack_entry&, stack_entry&, stack_entry& );
 
 public:
-  result_type fix_width(Node const& expr) {
+  result_type fixWidth(Node const& expr) {
 
     expr.visit(*this);
     stack_entry entry;

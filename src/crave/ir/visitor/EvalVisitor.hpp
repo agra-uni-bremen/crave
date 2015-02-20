@@ -65,9 +65,7 @@ private:
   void evalTernExpr( TernaryExpression const&, stack_entry&, stack_entry&, stack_entry& );
 
 public:
-  Constant get_result() const {
-    return result_;
-  }
+  Constant result() const { return result_; }
 
   bool evaluate(Node const& expr) {
 

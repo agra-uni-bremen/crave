@@ -56,15 +56,10 @@ public:
   virtual void visitBitslice( Bitslice const & );
 
   void reset();
-  inline bool okay() {
-    return okay_;
-  }
-  inline NodePtr result() {
-    return result_;
-  }
-  inline void set_vec_idx(unsigned int const idx) {
-    vec_idx_ = idx;
-  }
+  bool okay() { return okay_; }
+  NodePtr result() { return result_; }
+  void setVecIdx(unsigned int const idx) { vec_idx_ = idx; }
+  
 private:
   void updateResult();
   void evalUnaryExpr(UnaryExpression const&, NodePtr&);
