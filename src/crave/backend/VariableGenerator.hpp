@@ -31,7 +31,7 @@ struct VariableSolver {
   template<typename T>
   bool read(Variable<T> const &var, T& value) {
     if (var_ctn.variables.find(var.id()) == var_ctn.variables.end()) return false;
-    if (!constr_pttn.contains_var(var.id())) return false;
+    if (!constr_pttn.containsVar(var.id())) return false;
     AssignResultImpl<T> result;
     solver->read(*var_ctn.variables[var.id()], result);
     value = result.value();
@@ -62,11 +62,11 @@ struct VariableDefaultSolver : VariableSolver {
     LOG(INFO) << "Create solver for partition " << constr_pttn;
 
     BOOST_FOREACH(ConstraintPtr c, constr_pttn) {
-      if (c->is_cover()) continue; // default solver ignores cover constraints
-      if (c->is_soft()) {
-        solver->makeSoftAssertion(*c->get_expression());
+      if (c->isCover()) continue; // default solver ignores cover constraints
+      if (c->isSoft()) {
+        solver->makeSoftAssertion(*c->expr());
       } else {
-        solver->makeAssertion(*c->get_expression());
+        solver->makeAssertion(*c->expr());
       }
     }
     analyseHards();
@@ -92,14 +92,14 @@ struct VariableDefaultSolver : VariableSolver {
     if (!contradictions_.empty()) 
       return false;
     BOOST_FOREACH(VariableContainer::ReadRefPair pair, var_ctn.read_references)
-      if (constr_pttn.contains_var(pair.first))
+      if (constr_pttn.containsVar(pair.first))
         solver->makeAssumption(*pair.second->expr());
     BOOST_FOREACH(VariableContainer::ReadRefPair pair, var_ctn.dist_references)
-      if (constr_pttn.contains_var(pair.first))
+      if (constr_pttn.containsVar(pair.first))
         solver->makeSuggestion(*pair.second->expr());
     if (solver->solve()) { 
       BOOST_FOREACH(VariableContainer::WriteRefPair pair, var_ctn.write_references)
-        if (constr_pttn.contains_var(pair.first))
+        if (constr_pttn.containsVar(pair.first))
           solver->read(*var_ctn.variables[pair.first], *pair.second);
       return true;
     }
@@ -115,9 +115,9 @@ private:
     std::vector<std::vector<unsigned int> > results;
 
     BOOST_FOREACH(ConstraintPtr c, constr_pttn)
-      if (!c->is_soft() && !c->is_cover()) {
-        s.insert(std::make_pair(s.size(), c->get_expression()));
-        out.push_back(c->get_name());
+      if (!c->isSoft() && !c->isCover()) {
+        s.insert(std::make_pair(s.size(), c->expr()));
+        out.push_back(c->name());
       }
 
     results = solver->analyseContradiction(s);
@@ -138,10 +138,10 @@ private:
     unsigned cnt = 0;
     BOOST_FOREACH(ConstraintPtr c, constr_pttn) {
       if (ite == result.end()) break;
-      if (c->is_soft()) {
+      if (c->isSoft()) {
         if (*ite == cnt) {
           ite++;
-          inactive_softs_.push_back(c->get_name());
+          inactive_softs_.push_back(c->name());
         }
         cnt++;
       }
@@ -161,26 +161,26 @@ struct VariableCoverageSolver : VariableSolver {
     LOG(INFO) << "Create coverage solver for partition " << constr_pttn;
 
     BOOST_FOREACH(ConstraintPtr c, constr_pttn) {
-      if (c->is_soft()) continue; // coverage solver ignores soft constraints for now
-      if (!c->is_cover())
-        solver->makeAssertion(*c->get_expression());
+      if (c->isSoft()) continue; // coverage solver ignores soft constraints for now
+      if (!c->isCover())
+        solver->makeAssertion(*c->expr());
     }
   }
 
   virtual bool solve() {
     BOOST_FOREACH(ConstraintPtr c, constr_pttn) {
-      if (!c->is_cover()) continue;
-      if (covered_set.find(c->get_name()) != covered_set.end()) continue; // alread covered
+      if (!c->isCover()) continue;
+      if (covered_set.find(c->name()) != covered_set.end()) continue; // alread covered
       // try solve
       BOOST_FOREACH(VariableContainer::ReadRefPair pair, var_ctn.read_references)
-        if (constr_pttn.contains_var(pair.first))
+        if (constr_pttn.containsVar(pair.first))
           solver->makeAssumption(*pair.second->expr());
-      solver->makeAssumption(*c->get_expression());
+      solver->makeAssumption(*c->expr());
       if (solver->solve()) { 
-        LOG(INFO) << "Solve partition " << constr_pttn << " hitting constraint " << c->get_name();
-        covered_set.insert(c->get_name());
+        LOG(INFO) << "Solve partition " << constr_pttn << " hitting constraint " << c->name();
+        covered_set.insert(c->name());
         BOOST_FOREACH(VariableContainer::WriteRefPair pair, var_ctn.write_references)
-          if (constr_pttn.contains_var(pair.first))
+          if (constr_pttn.containsVar(pair.first))
             solver->read(*var_ctn.variables[pair.first], *pair.second);        
         return true;
       }

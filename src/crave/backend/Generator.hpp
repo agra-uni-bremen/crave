@@ -74,10 +74,10 @@ public:
     return *this;
   }
 
-  bool enableConstraint(std::string const& name) { return constr_mng.enable_constraint(name); }
-  bool disableConstraint(std::string const& name) { return constr_mng.disable_constraint(name); }
-  bool isConstraintEnabled(std::string const& name) { return constr_mng.is_constraint_enabled(name); }
-  bool isChanged() { return constr_mng.is_changed(); }
+  bool enableConstraint(std::string const& name) { return constr_mng.enableConstraint(name); }
+  bool disableConstraint(std::string const& name) { return constr_mng.disableConstraint(name); }
+  bool isConstraintEnabled(std::string const& name) { return constr_mng.isConstraintEnabled(name); }
+  bool isChanged() { return constr_mng.isChanged(); }
 
   Generator & operator()() {
     if (!next())
@@ -97,14 +97,14 @@ public:
     if (selfInclude) merge(*this);
     constr_pttn.partition();
     // currently, every hard/soft/cover constraint is considered for partitioning, this is suboptimal.
-    var_gen.reset(constr_pttn.get_partitions());
-    vec_gen.reset(constr_pttn.get_vector_constraints());
-    var_cov_gen.reset(constr_pttn.get_partitions()); 
-    vec_cov_gen.reset(constr_pttn.get_vector_constraints());
+    var_gen.reset(constr_pttn.getPartitions());
+    vec_gen.reset(constr_pttn.getVectorConstraints());
+    var_cov_gen.reset(constr_pttn.getPartitions()); 
+    vec_cov_gen.reset(constr_pttn.getVectorConstraints());
   }
 
   bool next() {
-    if (constr_mng.is_changed()) {
+    if (constr_mng.isChanged()) {
       reset();
       rebuild(true);
     }
@@ -112,7 +112,7 @@ public:
   }
 
   bool nextCov() {
-    if (constr_mng.is_changed()) {
+    if (constr_mng.isChanged()) {
       reset();
       rebuild(true);
     }
@@ -129,14 +129,14 @@ public:
   
   void resetCoverage() { 
     covered_ = false; 
-    var_cov_gen.reset(constr_pttn.get_partitions());
-    vec_cov_gen.reset(constr_pttn.get_vector_constraints());
+    var_cov_gen.reset(constr_pttn.getPartitions());
+    vec_cov_gen.reset(constr_pttn.getVectorConstraints());
   }
 
   std::ostream& printDotGraph(std::ostream& os, bool root = true) { 
     if (root)
       os << "digraph AST {" << std::endl;
-    constr_mng.print_dot_graph_(os);
+    constr_mng.printDotGraph(os);
     if (root)
       os << "}" << std::endl;
     return os;

@@ -61,16 +61,16 @@ private:
 
     BOOST_FOREACH ( VectorConstraintPtr constraint, constraints ) {
 
-      if (!constraint->is_unique()) {
+      if (!constraint->isUnique()) {
 
         ReplaceVisitor replacer(vec_elements);
         for (unsigned int i = 0u; i < size; ++i) {
 
           replacer.set_vec_idx(i);
-          constraint->get_expression()->visit(replacer);
+          constraint->expr()->visit(replacer);
 
           if (replacer.okay()) {
-            if (constraint->is_soft())
+            if (constraint->isSoft())
               solver->makeSoftAssertion(*replacer.result());
             else
               solver->makeAssertion(*replacer.result());
@@ -83,7 +83,7 @@ private:
         for (uint i = 0; i < vec_elements.size(); i++)
           for (uint j = i + 1; j < vec_elements.size(); ++j) {
             NotEqualOpr neOp(vec_elements[i], vec_elements[j]);
-            if (constraint->is_soft())
+            if (constraint->isSoft())
               solver->makeSoftAssertion(neOp);
             else   
               solver->makeAssertion(neOp);
@@ -126,7 +126,7 @@ struct VectorGenerator {
 
 private:
   void addConstraint(VectorConstraintPtr vc) {
-    int v_id = vc->get_vector_id();
+    int v_id = vc->getVectorId();
     VectorSolverMap::iterator ite(vector_solvers.lower_bound(v_id));
     if (ite != vector_solvers.end() && !(vector_solvers.key_comp()(v_id, ite->first))) {
         ite->second.addConstraint(vc);
