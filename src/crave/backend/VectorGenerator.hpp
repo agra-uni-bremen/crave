@@ -14,25 +14,43 @@
 
 namespace crave {
 
+/*
+ *
+ */
 struct VectorSolver {
 
   typedef boost::intrusive_ptr<VariableExpr> VariablePtr;
   typedef std::vector<VariablePtr> VectorElements;
   
-  VectorSolver(int vector_id, VariableGenerator& var_gen) 
-  : constraints_(), vector_id_(vector_id), solver_(FactoryMetaSMT::getNewInstance())
-  , vec_elements(), var_gen_(var_gen) {  }
+  VectorSolver(int vector_id_, VariableGenerator& var_gen_) 
+  : constraints(), vector_id(vector_id_), solver(FactoryMetaSMT::getNewInstance())
+  , vec_elements(), var_gen(var_gen_) {  }
 
   void addConstraint(VectorConstraintPtr vc) {
-    constraints_.push_back(vc);
+    constraints.push_back(vc);
   }
 
-  void reset_solver_(unsigned int const size) {
-    solver_.reset(FactoryMetaSMT::getNewInstance());
-    build_solver_(size);
+  bool solve() {
+    __rand_vec_base* vector = vectorBaseMap[vector_id];
+
+    unsigned int size = default_rand_vec_size();
+    if (!var_gen.read(vector->size_var(), size))
+      LOG(INFO) << "Use default size for vector " << vector_id;
+    resetSolver(size);
+    bool result = solver->solve(false) || solver->solve(true);
+    if (result)
+      solver->readVector(vec_elements, *vector);
+
+    return result;
   }
 
-  void build_solver_(unsigned int const size) {
+private:
+  void resetSolver(unsigned int const size) {
+    solver.reset(FactoryMetaSMT::getNewInstance());
+    buildSolver(size);
+  }
+
+  void buildSolver(unsigned int const size) {
 
     if (vec_elements.size() != size) {
       unsigned int old_size = vec_elements.size();
@@ -41,7 +59,7 @@ struct VectorSolver {
         vec_elements[i] = new VariableExpr(new_var_id(), 1u, true);
     }
 
-    BOOST_FOREACH ( VectorConstraintPtr constraint, constraints_ ) {
+    BOOST_FOREACH ( VectorConstraintPtr constraint, constraints ) {
 
       if (!constraint->is_unique()) {
 
@@ -53,9 +71,9 @@ struct VectorSolver {
 
           if (replacer.okay()) {
             if (constraint->is_soft())
-              solver_->makeSoftAssertion(*replacer.result());
+              solver->makeSoftAssertion(*replacer.result());
             else
-              solver_->makeAssertion(*replacer.result());
+              solver->makeAssertion(*replacer.result());
           }
 
           replacer.reset();
@@ -66,53 +84,42 @@ struct VectorSolver {
           for (uint j = i + 1; j < vec_elements.size(); ++j) {
             NotEqualOpr neOp(vec_elements[i], vec_elements[j]);
             if (constraint->is_soft())
-              solver_->makeSoftAssertion(neOp);
+              solver->makeSoftAssertion(neOp);
             else   
-              solver_->makeAssertion(neOp);
+              solver->makeAssertion(neOp);
           }
       }
     }
   }
 
-  bool solve_() {
-    __rand_vec_base* vector = vectorBaseMap[vector_id_];
-
-    unsigned int size = default_rand_vec_size();
-    if (!var_gen_.read(vector->size_var(), size))
-      LOG(INFO) << "Use default size for vector " << vector_id_;
-    reset_solver_(size);
-    bool result = solver_->solve(false) || solver_->solve(true);
-    if (result)
-      solver_->readVector(vec_elements, *vector);
-
-    return result;
-  }
-
 private:
-  std::vector<VectorConstraintPtr> constraints_;
-  int vector_id_;
-  SolverPtr solver_;
+  std::vector<VectorConstraintPtr> constraints;
+  int vector_id;
+  SolverPtr solver;
   VectorElements vec_elements;
 
-  VariableGenerator& var_gen_;
+  VariableGenerator& var_gen;
 };
 
+/*
+ *
+ */
 struct VectorGenerator {
 
   typedef std::map<int, VectorSolver> VectorSolverMap;
 
-  VectorGenerator(VariableGenerator& var_gen) 
-  : vector_solvers_(), var_gen_(var_gen) {  }
+  VectorGenerator(VariableGenerator& var_gen_) 
+  : vector_solvers(), var_gen(var_gen_) {  }
 
   bool solve() {
-    BOOST_FOREACH ( VectorSolverMap::value_type& c_pair , vector_solvers_ ) {
-      if (!c_pair.second.solve_()) return false;    
+    BOOST_FOREACH ( VectorSolverMap::value_type& c_pair , vector_solvers ) {
+      if (!c_pair.second.solve()) return false;    
     }
     return true;
   }
 
   void reset(std::vector<VectorConstraintPtr>& v) { 
-    vector_solvers_.clear(); 
+    vector_solvers.clear(); 
     BOOST_FOREACH(VectorConstraintPtr vc, v) 
       addConstraint(vc);
   }
@@ -120,19 +127,19 @@ struct VectorGenerator {
 private:
   void addConstraint(VectorConstraintPtr vc) {
     int v_id = vc->get_vector_id();
-    VectorSolverMap::iterator ite(vector_solvers_.lower_bound(v_id));
-    if (ite != vector_solvers_.end() && !(vector_solvers_.key_comp()(v_id, ite->first))) {
+    VectorSolverMap::iterator ite(vector_solvers.lower_bound(v_id));
+    if (ite != vector_solvers.end() && !(vector_solvers.key_comp()(v_id, ite->first))) {
         ite->second.addConstraint(vc);
     } else {
-      VectorSolver vs(v_id, var_gen_);
+      VectorSolver vs(v_id, var_gen);
       vs.addConstraint(vc);
-      vector_solvers_.insert( std::make_pair(v_id, vs) );
+      vector_solvers.insert( std::make_pair(v_id, vs) );
     }
   }
 
 private:
-  VectorSolverMap vector_solvers_;
-  VariableGenerator& var_gen_;
+  VectorSolverMap vector_solvers;
+  VariableGenerator& var_gen;
 };
 
 } // namespace crave

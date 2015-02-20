@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE ( randv_dist_t4 )
   gen( "y", dist(v() ,
     distribution<int>::simple_range(5000, 6000)
   ));
-  gen.disable_constraint("x");
+  gen.disableConstraint("x");
   int total = 10000;
   for (int i = 0; i < total; i++) {
     BOOST_REQUIRE(gen.next());

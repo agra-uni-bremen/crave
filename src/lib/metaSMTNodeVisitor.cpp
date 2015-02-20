@@ -51,7 +51,7 @@ DEFINE_SOLVER(crave::CUDD, metaSMT::BitBlast<metaSMT::solver::CUDD_Distributed>)
 
 namespace crave {
 
-solver_t FactoryMetaSMT::solver_type = UNDEFINED_SOLVER; // default solver
+SolverTypes FactoryMetaSMT::solver_type = UNDEFINED_SOLVER; // default solver
 
 void FactoryMetaSMT::setSolverType(std::string const& type) {
   if (type == "Boolector") solver_type = BOOLECTOR;

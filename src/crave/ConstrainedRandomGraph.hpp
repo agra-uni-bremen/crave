@@ -45,8 +45,8 @@ struct Rule {
     main = boost::bind(&Rule::gen, this);
   }
 
-  bool is_rand_obj_covered() const { return m_rand_obj == 0 || m_rand_obj->constraint.is_covered(); }
-  void reset_coverage() { if (m_rand_obj) m_rand_obj->constraint.reset_coverage(); }
+  bool is_rand_obj_covered() const { return m_rand_obj == 0 || m_rand_obj->constraint.isCovered(); }
+  void reset_coverage() { if (m_rand_obj) m_rand_obj->constraint.resetCoverage(); }
 
 private:
   const char* m_name;

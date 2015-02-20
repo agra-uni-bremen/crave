@@ -234,7 +234,7 @@ BOOST_AUTO_TEST_CASE(no_conflict)
   ;
 
  BOOST_REQUIRE(gen.next());
- std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
+ std::vector<std::vector<std::string> > result = gen.analyseContradiction();
  BOOST_REQUIRE_EQUAL(result.size(), 0);
 }
 
@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE(one_conflict1)
   ;
 
  BOOST_REQUIRE(!gen.next());
- std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
+ std::vector<std::vector<std::string> > result = gen.analyseContradiction();
  sort_results(result);
  print_vec_vec(std::cout, result);
  std::cout << std::endl;
@@ -275,7 +275,7 @@ BOOST_AUTO_TEST_CASE(one_conflict2)
  ;
 
  BOOST_REQUIRE(!gen.next());
- std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
+ std::vector<std::vector<std::string> > result = gen.analyseContradiction();
  sort_results(result);
  print_vec_vec(std::cout, result);
  std::cout << std::endl;
@@ -301,7 +301,7 @@ BOOST_AUTO_TEST_CASE(two_conflicts1)
  ;
 
  BOOST_REQUIRE(!gen.next());
- std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
+ std::vector<std::vector<std::string> > result = gen.analyseContradiction();
  sort_results(result);
  print_vec_vec(std::cout, result);
  std::cout << std::endl;
@@ -336,7 +336,7 @@ BOOST_AUTO_TEST_CASE(two_conflicts2)
     ;
 
   BOOST_REQUIRE(!gen.next());
-  std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
+  std::vector<std::vector<std::string> > result = gen.analyseContradiction();
   sort_results(result);
   print_vec_vec(std::cout, result);
   std::cout << std::endl;
@@ -369,7 +369,7 @@ BOOST_AUTO_TEST_CASE(two_conflicts3)
  ;
 
  BOOST_REQUIRE(!gen.next());
- std::vector<std::vector<std::string> > result = gen.analyse_contradiction();
+ std::vector<std::vector<std::string> > result = gen.analyseContradiction();
  sort_results(result);
  print_vec_vec(std::cout, result);
  std::cout << std::endl;
@@ -402,7 +402,7 @@ BOOST_AUTO_TEST_CASE(conflict_with_softs_t1)
 
   BOOST_CHECK(gen.next());
 
-  std::vector<std::string> result = gen.get_inactive_softs();
+  std::vector<std::string> result = gen.getInactiveSofts();
   std::sort(result.begin(), result.end());
   print_vec(std::cout, result);
   std::cout << std::endl;
@@ -429,7 +429,7 @@ BOOST_AUTO_TEST_CASE(conflict_with_softs_t2)
 
   BOOST_REQUIRE(gen.next());
 
-  std::vector<std::string> result = gen.get_inactive_softs();
+  std::vector<std::string> result = gen.getInactiveSofts();
   std::sort(result.begin(), result.end());
   print_vec(std::cout, result);
   std::cout << std::endl;

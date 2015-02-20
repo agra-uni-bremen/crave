@@ -6,7 +6,7 @@
 
 namespace crave {
 
-  enum solver_t {
+  enum SolverTypes {
     UNDEFINED_SOLVER,
     BOOLECTOR, 
     CVC4, 
@@ -15,8 +15,7 @@ namespace crave {
     CUDD
   };
 
-  class FactoryMetaSMT {
-  public:
+  struct FactoryMetaSMT {
     static void setSolverType(std::string const&);
     /**
       * creates a new metaSMTVisitor with a backend specified by
@@ -24,13 +23,13 @@ namespace crave {
       **/
     static metaSMTVisitor* getNewInstance();
 
-    static solver_t solver_type;
+    static SolverTypes solver_type;
   };
 
-  template<solver_t SolverType> 
+  template<SolverTypes solver_type> 
   struct FactorySolver {
     static bool isDefined() { return false; }  
-    static crave::metaSMTVisitor* getNewInstance() { return NULL; }  
+    static metaSMTVisitor* getNewInstance() { return NULL; }  
   };
 
 } // namespace crave;

@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE ( unique_test_2 )
   gen("unique", unique(v()));
   BOOST_REQUIRE(!gen.next());
 
-  gen.disable_constraint("unique");
+  gen.disableConstraint("unique");
   BOOST_REQUIRE(gen.next());
   BOOST_REQUIRE(v.size() == 7);
   for (uint i = 0; i < v.size(); i++) {
@@ -184,7 +184,7 @@ struct Item5 : public rand_obj {
 BOOST_AUTO_TEST_CASE ( index_constraint_test )
 {
   Item5 it;
-  it.constraint.print_dot_graph(std::cout);
+  it.constraint.printDotGraph(std::cout);
   it.next();
   BOOST_REQUIRE(it.v.size() == 50);
   for (uint i = 0; i < it.v.size(); i++) {

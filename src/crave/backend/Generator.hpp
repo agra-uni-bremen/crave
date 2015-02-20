@@ -19,65 +19,65 @@ struct Generator {
 
 public:
   Generator()
-  : constr_mng_(), vcon_(crave::variables), ctx_(vcon_)
-  , var_gen_(vcon_)
-  , vec_gen_(var_gen_)
-  , var_cov_gen_(vcon_)
-  , vec_cov_gen_(var_cov_gen_)
+  : constr_mng(), var_ctn(crave::variables), ctx(var_ctn)
+  , var_gen(var_ctn)
+  , vec_gen(var_gen)
+  , var_cov_gen(var_ctn)
+  , vec_cov_gen(var_cov_gen)
   , covered_(false) {
   }
 
   template<typename Expr>
   Generator(Expr expr)
-  : constr_mng_(), vcon_(crave::variables), ctx_(vcon_) 
-  , var_gen_(vcon_)
-  , vec_gen_(var_gen_)
-  , var_cov_gen_(vcon_)
-  , vec_cov_gen_(var_cov_gen_)
+  : constr_mng(), var_ctn(crave::variables), ctx(var_ctn) 
+  , var_gen(var_ctn)
+  , vec_gen(var_gen)
+  , var_cov_gen(var_ctn)
+  , vec_cov_gen(var_cov_gen)
   , covered_(false) {
     (*this)(expr);
   }
 
   template<typename Expr>
   Generator & operator()(Expr expr) {
-    constr_mng_.makeConstraint(expr, ctx_);
+    constr_mng.makeConstraint(expr, ctx);
     return *this;
   }
 
   template<typename Expr>
   Generator & operator()(std::string constraint_name, Expr expr) {
-    constr_mng_.makeConstraint(constraint_name, expr, ctx_);
+    constr_mng.makeConstraint(constraint_name, expr, ctx);
     return *this;
   }
 
   template<typename Expr>
   Generator & soft(Expr e) {
-    constr_mng_.makeConstraint(e, ctx_, true);
+    constr_mng.makeConstraint(e, ctx, true);
     return *this;
   }
 
   template<typename Expr>
   Generator & soft(std::string name, Expr e) {
-    constr_mng_.makeConstraint(name, e, ctx_, true);
+    constr_mng.makeConstraint(name, e, ctx, true);
     return *this;
   }
 
   template<typename Expr>
   Generator & cover(Expr e) {
-    constr_mng_.makeConstraint(e, ctx_, false, true);
+    constr_mng.makeConstraint(e, ctx, false, true);
     return *this;
   }
 
   template<typename Expr>
   Generator & cover(std::string name, Expr e) {
-    constr_mng_.makeConstraint(name, e, ctx_, false, true);
+    constr_mng.makeConstraint(name, e, ctx, false, true);
     return *this;
   }
 
-  inline bool enable_constraint(std::string const& name) { return constr_mng_.enable_constraint(name); }
-  inline bool disable_constraint(std::string const& name) { return constr_mng_.disable_constraint(name); }
-  inline bool is_constraint_enabled(std::string const& name) { return constr_mng_.is_constraint_enabled(name); }
-  inline bool is_changed() { return constr_mng_.is_changed(); }
+  bool enableConstraint(std::string const& name) { return constr_mng.enable_constraint(name); }
+  bool disableConstraint(std::string const& name) { return constr_mng.disable_constraint(name); }
+  bool isConstraintEnabled(std::string const& name) { return constr_mng.is_constraint_enabled(name); }
+  bool isChanged() { return constr_mng.is_changed(); }
 
   Generator & operator()() {
     if (!next())
@@ -85,39 +85,39 @@ public:
     return *this;
   }
 
-  inline void merge(Generator& other) { cp.mergeConstraints(other.constr_mng_); }
+  void merge(Generator& other) { constr_pttn.mergeConstraints(other.constr_mng); }
 
   void reset() {
-    constr_mng_.set_synced();
-    cp.reset();
-    reset_coverage();
+    constr_mng.set_synced();
+    constr_pttn.reset();
+    resetCoverage();
   }
 
   void rebuild(bool selfInclude = false) {
     if (selfInclude) merge(*this);
-    cp.partition();
+    constr_pttn.partition();
     // currently, every hard/soft/cover constraint is considered for partitioning, this is suboptimal.
-    var_gen_.reset(cp.get_partitions());
-    vec_gen_.reset(cp.get_vector_constraints());
-    var_cov_gen_.reset(cp.get_partitions()); 
-    vec_cov_gen_.reset(cp.get_vector_constraints());
+    var_gen.reset(constr_pttn.get_partitions());
+    vec_gen.reset(constr_pttn.get_vector_constraints());
+    var_cov_gen.reset(constr_pttn.get_partitions()); 
+    vec_cov_gen.reset(constr_pttn.get_vector_constraints());
   }
 
   bool next() {
-    if (constr_mng_.is_changed()) {
+    if (constr_mng.is_changed()) {
       reset();
       rebuild(true);
     }
-    return var_gen_.solve() && vec_gen_.solve();
+    return var_gen.solve() && vec_gen.solve();
   }
 
-  bool next_cov() {
-    if (constr_mng_.is_changed()) {
+  bool nextCov() {
+    if (constr_mng.is_changed()) {
       reset();
       rebuild(true);
     }
     if (!covered_) {
-      if (var_cov_gen_.solve() && vec_cov_gen_.solve())
+      if (var_cov_gen.solve() && vec_cov_gen.solve())
         return true;
       else
         covered_ = true;
@@ -125,34 +125,35 @@ public:
     return next();
   }
 
-  bool is_covered() { return covered_; }
-  void reset_coverage() { 
+  bool isCovered() { return covered_; }
+  
+  void resetCoverage() { 
     covered_ = false; 
-    var_cov_gen_.reset(cp.get_partitions());
-    vec_cov_gen_.reset(cp.get_vector_constraints());
+    var_cov_gen.reset(constr_pttn.get_partitions());
+    vec_cov_gen.reset(constr_pttn.get_vector_constraints());
   }
 
-  inline std::ostream& print_dot_graph(std::ostream& os, bool root = true) { 
+  std::ostream& printDotGraph(std::ostream& os, bool root = true) { 
     if (root)
       os << "digraph AST {" << std::endl;
-    constr_mng_.print_dot_graph_(os);
+    constr_mng.print_dot_graph_(os);
     if (root)
       os << "}" << std::endl;
     return os;
   }
 
-  inline std::vector<std::vector<std::string> > analyse_contradiction() {
-    return var_gen_.analyse_contradiction();
+  std::vector<std::vector<std::string> > analyseContradiction() {
+    return var_gen.analyseContradiction();
   }
 
-  inline std::vector<std::string> get_inactive_softs() {
-    return var_gen_.get_inactive_softs();
+  std::vector<std::string> getInactiveSofts() {
+    return var_gen.getInactiveSofts();
   }
 
   template<typename T>
   T operator[](Variable<T> const &var) {
     T result;
-    if (!var_gen_.read(var, result)) {
+    if (!var_gen.read(var, result)) {
       throw std::runtime_error("Invalid variable read request.");
     }
     return result;
@@ -160,21 +161,21 @@ public:
 
 private:
   // constraints
-  ConstraintManager constr_mng_;
-  ConstraintPartitioner cp;
+  ConstraintManager constr_mng;
+  ConstraintPartitioner constr_pttn;
 
   // variables
-  VariableContainer& vcon_;
+  VariableContainer& var_ctn;
 
   // context
-  Context ctx_;
+  Context ctx;
 
   // solvers
-  VariableGenerator var_gen_;
-  VectorGenerator vec_gen_;
+  VariableGenerator var_gen;
+  VectorGenerator vec_gen;
 
-  VariableCoverageGenerator var_cov_gen_;
-  VectorGenerator vec_cov_gen_;
+  VariableCoverageGenerator var_cov_gen;
+  VectorGenerator vec_cov_gen;
 
   // coverage
   bool covered_;

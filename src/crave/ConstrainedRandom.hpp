@@ -41,7 +41,7 @@ namespace crave {
         constraint.rebuild();
         rebuild = false;
       }
-      return constraint.next_cov();
+      return constraint.nextCov();
     }
 
     virtual void gather_values(std::vector<long>& ch) {
@@ -60,18 +60,18 @@ namespace crave {
     void add_obj_child(rand_obj* ro) { objChildren.push_back(ro); request_rebuild(); }
 
     bool enable_constraint(std::string name) { 
-      bool res = constraint.enable_constraint(name); 
-      if (constraint.is_changed()) request_rebuild();
+      bool res = constraint.enableConstraint(name); 
+      if (constraint.isChanged()) request_rebuild();
       return res;
     }
     
     bool disable_constraint(std::string name) {
-      bool res = constraint.disable_constraint(name);
-      if (constraint.is_changed()) request_rebuild();
+      bool res = constraint.disableConstraint(name);
+      if (constraint.isChanged()) request_rebuild();
       return res;
     }
     
-    bool is_constraint_enabled(std::string name) { return constraint.is_constraint_enabled(name); }
+    bool is_constraint_enabled(std::string name) { return constraint.isConstraintEnabled(name); }
 
     std::ostream& print_dot_graph(std::ostream&, bool);
     void display_constraints();

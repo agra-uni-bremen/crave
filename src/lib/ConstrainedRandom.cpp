@@ -85,7 +85,7 @@ namespace crave {
       os << "digraph AST {" << std::endl;
     for (uint i = 0; i < objChildren.size(); i++)
       objChildren[i]->print_dot_graph(os, false);
-    constraint.print_dot_graph(os, false);  
+    constraint.printDotGraph(os, false);  
     if (root)
      os << "}" << std::endl;
     return os;
