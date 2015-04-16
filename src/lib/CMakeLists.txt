@@ -1,4 +1,4 @@
-add_library (crave
+add_library (crave STATIC
   ConstrainedRandom.cpp
   EvalVisitor.cpp
   FixWidthVisitor.cpp
