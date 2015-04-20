@@ -2,6 +2,7 @@ add_library (crave STATIC
   ConstrainedRandom.cpp
   EvalVisitor.cpp
   FixWidthVisitor.cpp
+  GetSupportSetVisitor.cpp
   metaSMTNodeVisitor.cpp
   ReplaceVisitor.cpp
   ToDotNodeVisitor.cpp

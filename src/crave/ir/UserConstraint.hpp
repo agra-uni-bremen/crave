@@ -3,6 +3,7 @@
 #include "Context.hpp"
 #include "Node.hpp"
 #include "visitor/FixWidthVisitor.hpp"
+#include "visitor/GetSupportSetVisitor.hpp"
 #include "visitor/ToDotNodeVisitor.hpp"
 
 #include <boost/intrusive_ptr.hpp>
@@ -247,17 +248,18 @@ struct ConstraintManager {
     if (constr_map_.find(name) != constr_map_.end()) 
       throw std::runtime_error("Constraint already exists.");
 
-    ctx.resetSupportVars();
+    FixWidthVisitor fwv;
+    NodePtr n(fwv.fixWidth(*boost::proto::eval(e, ctx)));
 
-    FixWidthVisitor vis;
-    NodePtr n(vis.fixWidth(*boost::proto::eval(e, ctx)));
+    GetSupportSetVisitor gssv;
+    n->visit(gssv);
 
     ConstraintPtr c(
       boost::dynamic_pointer_cast<ForEach>(n) != 0
-      ? new UserVectorConstraint(c_id, n, name, ctx.getSupportVars(), false, soft, cover)
+      ? new UserVectorConstraint(c_id, n, name, gssv.getSupportVars(), false, soft, cover)
       : (boost::dynamic_pointer_cast<Unique>(n) != 0
-        ? new UserVectorConstraint(c_id, n, name, ctx.getSupportVars(), true, soft, cover)
-        : new UserConstraint(c_id, n, name, ctx.getSupportVars(), soft, cover))
+        ? new UserVectorConstraint(c_id, n, name, gssv.getSupportVars(), true, soft, cover)
+        : new UserConstraint(c_id, n, name, gssv.getSupportVars(), soft, cover))
     );
 
     assert(!c->isSoft() || !c->isCover()); // soft cover constraint not defined/supported yet

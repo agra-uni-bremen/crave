@@ -345,9 +345,6 @@ public:
       return new Bitslice(boost::proto::eval(var_term, *this), rb, lb);
   }
 
-  void resetSupportVars() { }
-  std::set<int>& getSupportVars() { std::set<int> empty; return empty; }
-
 private:
   std::map<int, result_type>& variables_;
   std::map<int, result_type>& vector_variables_;
