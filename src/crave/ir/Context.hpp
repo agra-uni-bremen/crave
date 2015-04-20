@@ -53,17 +53,12 @@ public:
 
   template<typename value_type>
   result_type operator()(boost::proto::tag::terminal, var_tag<value_type> const & tag) { 
-    support_vars_.insert(tag.id);
-
     std::map<int, result_type>::iterator ite(variables_.find(tag.id));
-
     return ite != variables_.end() ? ite->second : new_var(tag);
   }
 
   template<typename value_type>
   result_type operator()(boost::proto::tag::terminal, vector_tag<value_type> const & tag) {
-    support_vars_.insert(tag.id);   
-
     std::map<int, result_type>::const_iterator ite = vector_variables_.find(tag.id);
 
     if ( ite != vector_variables_.end() ) {
@@ -82,8 +77,6 @@ public:
 
   template<typename value_type>
   result_type operator()(boost::proto::tag::terminal t, write_ref_tag<value_type> const & ref) {
-    support_vars_.insert(ref.id);   
-
     std::map<int, result_type>::const_iterator ite = variables_.find(ref.id);
 
     if ( ite != variables_.end() ) {
@@ -229,8 +222,6 @@ public:
 
   template<typename Integer>
   result_type operator()(boost::proto::tag::terminal t, read_ref_tag<Integer> const & ref) {
-    support_vars_.insert(ref.id);   
-
     std::map<int, result_type>::const_iterator ite = variables_.find(ref.id);
 
     if ( ite != variables_.end() ) {
@@ -276,7 +267,6 @@ public:
     }
 
     unsigned id = new_var_id();
-    support_vars_.insert(id);
     result_type tmp_var = new_var(id, width, sign);
     boost::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<Integer>(dist, tmp_var));
     dist_references_.push_back(std::make_pair(id, ref_expr));
@@ -299,7 +289,6 @@ public:
       bool sign = crave::is_signed<Integer>::value;
 
       unsigned id = new_var_id();
-      support_vars_.insert(id);
       result_type tmp_var = new_var(id, width, sign);
       boost::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<Integer>(dist, tmp_var));
       dist_references_.push_back(std::make_pair(id, ref_expr));
@@ -356,8 +345,8 @@ public:
       return new Bitslice(boost::proto::eval(var_term, *this), rb, lb);
   }
 
-  void resetSupportVars() {support_vars_.clear(); }
-  std::set<int>& getSupportVars() { return support_vars_; }
+  void resetSupportVars() { }
+  std::set<int>& getSupportVars() { std::set<int> empty; return empty; }
 
 private:
   std::map<int, result_type>& variables_;
@@ -365,8 +354,6 @@ private:
   std::vector<ReadRefPair>& read_references_;
   std::vector<WriteRefPair>& write_references_;
   std::vector<ReadRefPair>& dist_references_;
-
-  std::set<int> support_vars_;
 };
 // Context
 
