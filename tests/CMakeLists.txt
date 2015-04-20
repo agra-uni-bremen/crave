@@ -25,6 +25,9 @@ find_library(PTHREAD pthread)
 add_library (${PROJECT_NAME}_boost_test ${STATIC_OR_SHARED} boost_test.cpp)
 link_libraries (${PROJECT_NAME}_boost_test ${PROJECT_NAME} ${Boost_THREAD_LIBRARY} ${PTHREAD} ${GLOG_LIBRARY})
 
+add_executable(solver_independent_tests solver_independent_tests.cpp)
+add_all_tests(solver_independent_tests solver_independent_tests.cpp)
+
 if (metaSMT_USE_Boolector)
   add_executable(use_Boolector use_Boolector.cpp)
   add_all_tests(use_Boolector use_Boolector.cpp)
