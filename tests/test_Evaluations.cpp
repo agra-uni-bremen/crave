@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <crave/utils/Evaluator.hpp>
+#include <crave/ir/UserConstraint.hpp>
 
 #include <set>
 #include <iostream>
@@ -29,28 +30,26 @@ BOOST_AUTO_TEST_CASE (logical_not_t2) {
   randv<unsigned char> a(0);
   randv<unsigned int> b(0);
   Evaluator eval;
-  NodePtr expression(eval.get_expression(
-    if_then_else(!(a() % 2 == 0), b() > 0 && b() <= 50, b() > 50 && b() <= 100 )
-  ));
+  expression expr = make_expression(if_then_else(!(a() % 2 == 0), b() > 0 && b() <= 50, b() > 50 && b() <= 100));
 
   eval.assign(a(), 1u);
 
-  BOOST_CHECK( !eval.evaluate(*expression) );
+  BOOST_CHECK( !eval.evaluate(expr) );
 
   eval.assign(b(), 35u);
 
-  BOOST_REQUIRE( eval.evaluate(*expression) );
+  BOOST_REQUIRE( eval.evaluate(expr) );
   BOOST_CHECK( eval.result<bool>() );
 
   eval.assign(a(), 2u);
   eval.assign(b(), 75u);
 
-  BOOST_REQUIRE( eval.evaluate(*expression) );
+  BOOST_REQUIRE( eval.evaluate(expr) );
   BOOST_CHECK( eval.result<bool>() );
 
   eval.assign(a(), 1u);
 
-  BOOST_REQUIRE( eval.evaluate(*expression) );
+  BOOST_REQUIRE( eval.evaluate(expr) );
   BOOST_CHECK( !eval.result<bool>() );
 }
 
@@ -535,15 +534,13 @@ BOOST_AUTO_TEST_CASE (if_then_else_t1) {
   Variable<unsigned int> a;
   randv<unsigned int> b(0);
   Evaluator eval;
-  NodePtr expr(eval.get_expression(if_then_else(a < 5,
-                                                b() > 0 && b() <= 50,
-                                                b() > 50 && b() <= 100 )));
+  expression expr = make_expression(if_then_else(a < 5, b() > 0 && b() <= 50, b() > 50 && b() <= 100 ));
 
   for (int i = 0; i < 10; ++i) {
 
     eval.assign(a, i);
     eval.assign(b(), 25);
-    BOOST_REQUIRE( eval.evaluate(*expr) );
+    BOOST_REQUIRE( eval.evaluate(expr) );
 
     if (i < 5) {
       BOOST_REQUIRE(  eval.result<bool>() );
@@ -551,7 +548,7 @@ BOOST_AUTO_TEST_CASE (if_then_else_t1) {
       BOOST_REQUIRE( !eval.result<bool>() );
     }
     eval.assign(b(), 75);
-    BOOST_REQUIRE( eval.evaluate(*expr) );
+    BOOST_REQUIRE( eval.evaluate(expr) );
 
     if (i < 5) {
       BOOST_REQUIRE( !eval.result<bool>() );
@@ -565,17 +562,17 @@ BOOST_AUTO_TEST_CASE (if_then_t1) {
   Variable<unsigned int> a;
   randv<unsigned int> b(0);
   Evaluator eval;
-  NodePtr expr(eval.get_expression(if_then(a < 5, b() > 0 && b() <= 100 )));
+  expression expr = make_expression(if_then(a < 5, b() > 0 && b() <= 100 ));
 
   for (int i = 0; i < 10; ++i) {
 
     eval.assign(a, i);
     eval.assign(b(), 25u);
-    BOOST_REQUIRE( eval.evaluate(*expr) );
+    BOOST_REQUIRE( eval.evaluate(expr) );
     BOOST_REQUIRE( eval.result<bool>() );
 
     eval.assign(b(), 705u);
-    BOOST_REQUIRE( eval.evaluate(*expr) );
+    BOOST_REQUIRE( eval.evaluate(expr) );
 
     if (i < 5) {
       BOOST_REQUIRE( !eval.result<bool>() );

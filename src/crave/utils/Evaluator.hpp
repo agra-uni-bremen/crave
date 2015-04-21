@@ -13,8 +13,6 @@
 namespace crave {
 
 class Evaluator {
-
-  typedef NodePtr expression;
   typedef EvalVisitor::eval_map eval_map;
 
 public:
@@ -29,15 +27,10 @@ public:
 
   template<typename Expr>
   bool evaluate(Expr expr) {
-    return evaluate(*get_expression(expr));
+    return evaluate(make_expression(expr));
   }
-  bool evaluate(Node const& expr) {
-    return visitor_.evaluate(expr);
-  }
-
-  template<typename Expr>
-  expression get_expression(Expr expr) const {
-    return LWGenerator()(expr);
+  bool evaluate(expression const & expr) {
+    return visitor_.evaluate(*boost::proto::value(expr));
   }
 
   template<typename Integer>
@@ -51,19 +44,6 @@ public:
 private:
   eval_map assignments_;
   EvalVisitor visitor_;
-
-  struct LWGenerator {
-    LWGenerator()
-      : ctx_(crave::variables) { }
-
-    template<typename Expr>
-    expression operator()(Expr expr) {
-      return boost::proto::eval(expr, ctx_);
-    }
-
-  private:
-    Context ctx_;
-  };
 };
 
 } // end namespace crave
