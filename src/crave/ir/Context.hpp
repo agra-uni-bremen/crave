@@ -27,8 +27,7 @@ namespace crave {
 struct Context: boost::proto::callable_context<Context, boost::proto::null_context> {
 
 public:
-  typedef Node expression;
-  typedef boost::intrusive_ptr<expression> result_type;
+  typedef NodePtr result_type;
 
 private:
   typedef std::pair<int, boost::shared_ptr<crave::ReferenceExpression> > ReadRefPair;
@@ -43,6 +42,7 @@ public:
   , dist_references_(vars.dist_references) { }
 
   result_type new_var(unsigned id, unsigned width, bool sign) { return (variables_[id] = new VariableExpr(id, width, sign)); }
+
 
   template<typename value_type>
   result_type new_var(var_tag<value_type> const & tag) {
@@ -74,6 +74,8 @@ public:
   }
 
   result_type operator()(boost::proto::tag::terminal, placeholder_tag const & tag) { return new Placeholder(tag.id); }
+
+  result_type operator()(boost::proto::tag::terminal, result_type const & r) { return r; }
 
   template<typename value_type>
   result_type operator()(boost::proto::tag::terminal t, write_ref_tag<value_type> const & ref) {

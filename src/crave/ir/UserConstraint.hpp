@@ -22,6 +22,23 @@
 
 namespace crave {
 
+struct expr_tag : public Constraint< boost::proto::terminal<NodePtr>::type > {
+  typedef Constraint< boost::proto::terminal<NodePtr>::type > base_type;
+  expr_tag(NodePtr n) : base_type( boost::proto::make_expr<boost::proto::tag::terminal>(n)) { }
+};
+
+typedef typename boost::proto::result_of::make_expr<
+  boost::proto::tag::terminal
+  , Constraint_Domain
+  , NodePtr
+> ::type expression;
+
+template<typename Expr>
+expression make_expression(Expr e) {
+  static Context ctx(crave::variables);
+  return boost::proto::make_expr< boost::proto::tag::terminal, Constraint_Domain >( boost::proto::eval(e, ctx) );
+}
+
 int new_constraint_id();
 
 struct ConstraintManager;
