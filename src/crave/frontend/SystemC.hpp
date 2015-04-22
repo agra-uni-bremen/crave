@@ -32,8 +32,8 @@ namespace crave {
 // XXX last 2 lines are necessary workaround for old compilers such as gcc 4.1.x
 #define RANDV_SCDT_INTERFACE(Typename) \
 public: \
-  void gather_values(std::vector<long>& ch) { ch.insert(ch.end(), this->value.to_long()); } \
-  bool next() { static distribution<long> dist; this->value = dist.nextValue(); return true; } \
+  void gather_values(std::vector<long long>& ch) { ch.insert(ch.end(), this->value.to_int64()); } \
+  bool next() { static distribution<long long> dist; this->value = dist.nextValue(); return true; } \
   randv<Typename>& operator=(unsigned int i) { this->value = i; return *this; } \
   randv<Typename>& operator=(int i) { this->value = i; return *this; } \
 
@@ -44,7 +44,7 @@ public: \
     ReferenceExpressionImpl(randv< Typename <N> > const& value, ReferenceExpression::result_type expr ) : value_(value), expr_(expr) { } \
     virtual ~ReferenceExpressionImpl() { } \
     virtual ReferenceExpression::result_type expr() const { \
-      return new EqualOpr(expr_, new Constant(((Typename <N>) value_).to_ulong(), N, crave::is_signed< Typename <N> >::value)); \
+      return new EqualOpr(expr_, new Constant(((Typename <N>) value_).to_uint64(), N, crave::is_signed< Typename <N> >::value)); \
     } \
   private: \
     randv< Typename <N> > const & value_; \

@@ -17,7 +17,7 @@ namespace crave {
 
   public:
     virtual bool next() = 0;
-    virtual void gather_values(std::vector<long>&) = 0;
+    virtual void gather_values(std::vector<long long>&) = 0;
   };
 
   class rand_obj_base : public rand_base {
@@ -67,7 +67,7 @@ public: \
 
 #define RANDV_PRIM_INTERFACE(Typename) \
 public: \
-  void gather_values(std::vector<long>& ch) { ch.push_back(static_cast<long>(value)); } \
+  void gather_values(std::vector<long long>& ch) { ch.push_back(static_cast<long long>(value)); } \
   bool next() { static distribution<Typename> dist; value = dist.nextValue(); return true; } \
 
   template<>
@@ -165,7 +165,7 @@ class randv<typename> : public randv_base<typename> { \
       return true;
     }
 
-    virtual void gather_values(std::vector<long>& ch) { ch.push_back(this->size()); }
+    virtual void gather_values(std::vector<long long>& ch) { ch.push_back(this->size()); }
   };
 
 } // namespace crave

@@ -44,7 +44,7 @@ namespace crave {
       return constraint.nextCov();
     }
 
-    virtual void gather_values(std::vector<long>& ch) {
+    virtual void gather_values(std::vector<long long>& ch) {
       for (std::vector<rand_base*>::const_iterator i = baseChildren.begin();
            i != baseChildren.end(); ++i)
         (*i)->gather_values(ch);

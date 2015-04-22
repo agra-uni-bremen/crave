@@ -297,7 +297,7 @@ void EvalVisitor::visitDevideOpr(const DevideOpr& d)
     result = lhs.second && rhs.second;
 
     if (lhs.first.sign() || rhs.first.sign())
-      constant = Constant(static_cast<long>(lhs.first.value()) / static_cast<long>(rhs.first.value()),
+      constant = Constant(static_cast<long long>(lhs.first.value()) / static_cast<long long>(rhs.first.value()),
                           lhs.first.bitsize(), true);
     else
       constant = Constant(lhs.first.value() / rhs.first.value(),
@@ -321,7 +321,7 @@ void EvalVisitor::visitModuloOpr(const ModuloOpr& m)
     result = lhs.second && rhs.second;
 
     if (lhs.first.sign() || rhs.first.sign())
-      constant = Constant(static_cast<long>(lhs.first.value()) % static_cast<long>(rhs.first.value()),
+      constant = Constant(static_cast<long long>(lhs.first.value()) % static_cast<long long>(rhs.first.value()),
                           lhs.first.bitsize(), true);
     else
       constant = Constant(lhs.first.value() % rhs.first.value(),
@@ -375,7 +375,7 @@ void EvalVisitor::visitBitslice(const Bitslice& b)
   pop(entry);
 
   Constant const& child = entry.first;
-  unsigned long v = 0;
+  unsigned long long v = 0;
   for (int i = b.l(); i <= b.r(); i++) v |= (1 << i);
   Constant constant((v & child.value()) >> b.l(), b.r() - b.l() + 1, false);
   exprStack_.push(std::make_pair(constant, false));

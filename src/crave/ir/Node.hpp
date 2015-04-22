@@ -72,17 +72,17 @@ private:
 class Constant : public Terminal {
 public:
   Constant() : Terminal(1, true), value_(false) { }
-  Constant( unsigned long val, unsigned int bs, bool s ) : Terminal(bs, s), value_(val) { }
+  Constant( unsigned long long val, unsigned int bs, bool s ) : Terminal(bs, s), value_(val) { }
   Constant( bool b ) : Terminal(1, true), value_(b) { }
   Constant( Constant const& c ) : Terminal(c.bitsize(), c.sign()), value_(c.value()) { }
 
   void visit( NodeVisitor& v ) const { v.visitConstant(*this); }
 
-  operator unsigned long() const { return value_; }
+  operator unsigned long long() const { return value_; }
 
-  unsigned long value() const { return value_; }
+  unsigned long long value() const { return value_; }
 private:
-  unsigned long value_;
+  unsigned long long value_;
 };
 
 class VectorExpr : public Terminal {

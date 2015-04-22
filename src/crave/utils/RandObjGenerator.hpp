@@ -13,7 +13,7 @@ namespace crave {
 
 class rand_obj_gen {
 
-  typedef std::bitset<sizeof(long) << 3> Bitset;
+  typedef std::bitset<sizeof(long long) << 3> Bitset;
   typedef std::vector<Bitset> Solution;
   typedef std::vector<Solution> Solutions;
   typedef std::vector<std::clock_t> Times;
@@ -52,7 +52,7 @@ bool rand_obj_gen::generate() {
       throw std::runtime_error("Generation error.\n");
     elapsed_gen_times_[i] = std::clock() - start;
 
-    std::vector<long> values;
+    std::vector<long long> values;
     obj_->gather_values(values);
     solutions_[i].insert(solutions_[i].begin(), values.begin(), values.end());
 

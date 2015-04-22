@@ -32,8 +32,8 @@ public:
   Integer result() const {
     return static_cast<Integer>(visitor_.result().value());
   }
-  unsigned long result() const {
-    return result<unsigned long>();
+  unsigned long long result() const {
+    return result<unsigned long long>();
   }
 
 private:
