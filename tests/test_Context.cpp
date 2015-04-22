@@ -421,7 +421,4 @@ BOOST_AUTO_TEST_CASE (dist_of_boolean75)
 
 BOOST_AUTO_TEST_SUITE_END() // Context
 
-bitsize_traits<long> _instanciate1;
-bitsize_traits<short> _instanciate2;
-
 //  vim: ft=cpp:ts=2:sw=2:expandtab

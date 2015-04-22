@@ -65,7 +65,7 @@ namespace crave {
   template<typename value_type>
   struct vector_tag { vector_tag(int id_): id(id_) { }; int id; };
 
-  struct placeholder_tag { placeholder_tag(int id_): id(id_) { }; int id; };
+  struct placeholder_tag { explicit placeholder_tag(int id_): id(id_) { }; int id; };
 
   template<typename value_type>
   struct write_ref_tag : public var_tag<value_type> {

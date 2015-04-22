@@ -103,11 +103,35 @@ BOOST_AUTO_TEST_CASE( randv_sc_dt_t )
   gen(d() == a() + b());
 
   BOOST_REQUIRE(gen.next());
-  BOOST_CHECK_EQUAL( ++a, sc_uint<4>(16) );
-  b = ((sc_uint<4>)b) + 1;
-  BOOST_CHECK_EQUAL( b, sc_uint<4>(16) );
-  BOOST_CHECK_EQUAL( c, sc_uint<4>(14) );
-  BOOST_CHECK_EQUAL( d, sc_uint<8>(30) );
+  BOOST_CHECK_EQUAL( ++a, 16 );
+  BOOST_CHECK_EQUAL( b + 1, 16 );
+  BOOST_CHECK_EQUAL( c, 14 );
+  BOOST_CHECK_EQUAL( d, 30 );
+}
+
+BOOST_AUTO_TEST_CASE( randv_sc_dt_op_support_t ) 
+{
+  using namespace sc_dt;
+
+  randv< sc_uint<4> > a;
+  randv< sc_int<4> > b;
+  randv< sc_bv<4> > c;
+
+  1 + a; 1 - a; 1 * a; 1 / a; 1 % a;
+  1 == a; 1 != a; 1 < a; 1 <= a; 1 > a; 1 >= a;
+  1 & a; 1 | a; 1 ^ a; ~a;
+  a << 1; a >> 1; a << b; a >> b;
+
+  1 + b; 1 - b; 1 * b; 1 / b; 1 % b;
+  1 == b; 1 != b; 1 < b; 1 <= b; 1 > b; 1 >= b;
+  1 & b; 1 | b; 1 ^ b; ~b;
+  b << 1; b >> 1; b << a; b >> a;
+
+  b == a; b != a; b < a; b <= a; b > a; b >= a;  
+  a + b; a - b; a * b; a / b; a % b;
+    
+  1 == c; 1 != c; 1 < c; 1 <= c; 1 > c; 1 >= c;
+  c == 1; c != 1; c < 1; c <= 1; c > 1; c >= 1;  
 }
 
 BOOST_AUTO_TEST_SUITE_END() // SystemC_Data
