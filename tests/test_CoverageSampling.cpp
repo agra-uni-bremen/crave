@@ -14,14 +14,24 @@ BOOST_AUTO_TEST_CASE( basic_test )
 {
   randv<unsigned> a, b, c, d, e;
   
-  coverpoint cp1("coverpoint1");
-  cp1.bins() = boost::assign::list_of( coverbin(a() == 0, 10) )( coverbin(a() == 1, 10) )( coverbin(a() == 2, 5) );
+  coverpoint cp1("coverpoint1"); 
+  {
+    std::vector<coverbin> tmp = boost::assign::list_of( coverbin(a() == 0, 10) )( coverbin(a() == 1, 10) )( coverbin(a() == 2, 5) );
+    cp1.bins() = tmp;
+  }    
 
   coverpoint cp2("coverpoint2");
-  cp2.bins() = boost::assign::list_of( coverbin(0 <= b() && b() < 10, 15) )( coverbin(10 <= b() && b() < 20, 10) );
+  
+  {
+    std::vector<coverbin> tmp = boost::assign::list_of( coverbin(a() == 0, 10) )( coverbin(a() == 1, 10) )( coverbin(a() == 2, 5) );
+    cp2.bins() = tmp;
+  }    
 
   covergroup cg("covergroup1");
-  cg.points() = boost::assign::list_of( cp1 )( cp2 );
+  {
+    std::vector<coverpoint> tmp = boost::assign::list_of( cp1 )( cp2 );
+    cg.points() = tmp;
+  }
   
   for (int i = 0; i < 5; i++)
     for (int j = 0; j < 5; j++) {
