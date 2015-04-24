@@ -4,10 +4,10 @@
 
 namespace crave {
 
-  struct AssignResult {
-    AssignResult() { }
-    virtual ~AssignResult() { }
+struct AssignResult {
+  AssignResult() {}
+  virtual ~AssignResult() {}
 
-    virtual void set_value( std::string const& result ) = 0;
-  };
+  virtual void set_value(std::string const& result) = 0;
+};
 } /* namespace crave */

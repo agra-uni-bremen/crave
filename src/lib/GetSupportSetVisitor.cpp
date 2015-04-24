@@ -2,22 +2,22 @@
 
 namespace crave {
 
-void GetSupportSetVisitor::visitNode(const Node&) { }
+void GetSupportSetVisitor::visitNode(const Node&) {}
 
-void GetSupportSetVisitor::visitTerminal(const Terminal&) { }
+void GetSupportSetVisitor::visitTerminal(const Terminal&) {}
 
 void GetSupportSetVisitor::visitUnaryExpr(const UnaryExpression& u) {
   u.child()->visit(*this);
 }
 
-void GetSupportSetVisitor::visitUnaryOpr(const UnaryOperator&) { }
+void GetSupportSetVisitor::visitUnaryOpr(const UnaryOperator&) {}
 
 void GetSupportSetVisitor::visitBinaryExpr(const BinaryExpression& b) {
   b.lhs()->visit(*this);
   b.rhs()->visit(*this);
 }
 
-void GetSupportSetVisitor::visitBinaryOpr(const BinaryOperator&) { }
+void GetSupportSetVisitor::visitBinaryOpr(const BinaryOperator&) {}
 
 void GetSupportSetVisitor::visitTernaryExpr(const TernaryExpression& t) {
   t.a()->visit(*this);
@@ -25,45 +25,35 @@ void GetSupportSetVisitor::visitTernaryExpr(const TernaryExpression& t) {
   t.c()->visit(*this);
 }
 
-void GetSupportSetVisitor::visitPlaceholder(const Placeholder& pl) { }
+void GetSupportSetVisitor::visitPlaceholder(const Placeholder& pl) {}
 
 void GetSupportSetVisitor::visitVariableExpr(const VariableExpr& v) {
   support_vars.insert(v.id());
 }
 
-void GetSupportSetVisitor::visitConstant(const Constant& c) { }
+void GetSupportSetVisitor::visitConstant(const Constant& c) {}
 
 void GetSupportSetVisitor::visitVectorExpr(const VectorExpr& v) {
   support_vars.insert(v.id());
 }
 
-void GetSupportSetVisitor::visitNotOpr(const NotOpr& n) {
-  visitUnaryExpr(n);
-}
+void GetSupportSetVisitor::visitNotOpr(const NotOpr& n) { visitUnaryExpr(n); }
 
-void GetSupportSetVisitor::visitNegOpr(const NegOpr& n) {
-  visitUnaryExpr(n);
-}
+void GetSupportSetVisitor::visitNegOpr(const NegOpr& n) { visitUnaryExpr(n); }
 
 void GetSupportSetVisitor::visitComplementOpr(const ComplementOpr& c) {
   visitUnaryExpr(c);
 }
 
-void GetSupportSetVisitor::visitInside(const Inside& i) {
-  visitUnaryExpr(i);
-}
+void GetSupportSetVisitor::visitInside(const Inside& i) { visitUnaryExpr(i); }
 
 void GetSupportSetVisitor::visitExtendExpr(const ExtendExpression& e) {
   visitUnaryExpr(e);
 }
 
-void GetSupportSetVisitor::visitAndOpr(const AndOpr& a) {
-  visitBinaryExpr(a);
-}
+void GetSupportSetVisitor::visitAndOpr(const AndOpr& a) { visitBinaryExpr(a); }
 
-void GetSupportSetVisitor::visitOrOpr(const OrOpr& o) {
-  visitBinaryExpr(o);
-}
+void GetSupportSetVisitor::visitOrOpr(const OrOpr& o) { visitBinaryExpr(o); }
 
 void GetSupportSetVisitor::visitLogicalAndOpr(const LogicalAndOpr& la) {
   visitBinaryExpr(la);
@@ -71,11 +61,9 @@ void GetSupportSetVisitor::visitLogicalAndOpr(const LogicalAndOpr& la) {
 
 void GetSupportSetVisitor::visitLogicalOrOpr(const LogicalOrOpr& lo) {
   visitBinaryExpr(lo);
-}  
-
-void GetSupportSetVisitor::visitXorOpr(const XorOpr& x) {
-  visitBinaryExpr(x);
 }
+
+void GetSupportSetVisitor::visitXorOpr(const XorOpr& x) { visitBinaryExpr(x); }
 
 void GetSupportSetVisitor::visitEqualOpr(const EqualOpr& eq) {
   visitBinaryExpr(eq);
@@ -129,17 +117,15 @@ void GetSupportSetVisitor::visitShiftRightOpr(const ShiftRightOpr& shr) {
   visitBinaryExpr(shr);
 }
 
-void GetSupportSetVisitor::visitVectorAccess(const VectorAccess& va) { 
+void GetSupportSetVisitor::visitVectorAccess(const VectorAccess& va) {
   visitBinaryExpr(va);
 }
 
-void GetSupportSetVisitor::visitForEach(const ForEach& fe) { 
+void GetSupportSetVisitor::visitForEach(const ForEach& fe) {
   visitBinaryExpr(fe);
 }
 
-void GetSupportSetVisitor::visitUnique(const Unique& u) { 
-  visitUnaryExpr(u);
-}
+void GetSupportSetVisitor::visitUnique(const Unique& u) { visitUnaryExpr(u); }
 
 void GetSupportSetVisitor::visitIfThenElse(const IfThenElse& ite) {
   visitTernaryExpr(ite);
@@ -149,4 +135,4 @@ void GetSupportSetVisitor::visitBitslice(const Bitslice& b) {
   visitUnaryExpr(b);
 }
 
-} // end namespace crave
+}  // end namespace crave

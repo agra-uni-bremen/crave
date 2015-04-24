@@ -17,75 +17,86 @@ namespace crave {
 
 struct Generator {
 
-public:
+ public:
   Generator()
-  : constr_mng(), var_ctn(crave::variables), ctx(var_ctn)
-  , var_gen(var_ctn)
-  , vec_gen(var_gen)
-  , var_cov_gen(var_ctn)
-  , vec_cov_gen(var_cov_gen)
-  , covered_(false) {
-  }
+      : constr_mng(),
+        var_ctn(crave::variables),
+        ctx(var_ctn),
+        var_gen(var_ctn),
+        vec_gen(var_gen),
+        var_cov_gen(var_ctn),
+        vec_cov_gen(var_cov_gen),
+        covered_(false) {}
 
-  template<typename Expr>
+  template <typename Expr>
   Generator(Expr expr)
-  : constr_mng(), var_ctn(crave::variables), ctx(var_ctn) 
-  , var_gen(var_ctn)
-  , vec_gen(var_gen)
-  , var_cov_gen(var_ctn)
-  , vec_cov_gen(var_cov_gen)
-  , covered_(false) {
+      : constr_mng(),
+        var_ctn(crave::variables),
+        ctx(var_ctn),
+        var_gen(var_ctn),
+        vec_gen(var_gen),
+        var_cov_gen(var_ctn),
+        vec_cov_gen(var_cov_gen),
+        covered_(false) {
     (*this)(expr);
   }
 
-  template<typename Expr>
-  Generator & operator()(Expr expr) {
+  template <typename Expr>
+  Generator& operator()(Expr expr) {
     constr_mng.makeConstraint(expr, ctx);
     return *this;
   }
 
-  template<typename Expr>
-  Generator & operator()(std::string constraint_name, Expr expr) {
+  template <typename Expr>
+  Generator& operator()(std::string constraint_name, Expr expr) {
     constr_mng.makeConstraint(constraint_name, expr, ctx);
     return *this;
   }
 
-  template<typename Expr>
-  Generator & soft(Expr e) {
+  template <typename Expr>
+  Generator& soft(Expr e) {
     constr_mng.makeConstraint(e, ctx, true);
     return *this;
   }
 
-  template<typename Expr>
-  Generator & soft(std::string name, Expr e) {
+  template <typename Expr>
+  Generator& soft(std::string name, Expr e) {
     constr_mng.makeConstraint(name, e, ctx, true);
     return *this;
   }
 
-  template<typename Expr>
-  Generator & cover(Expr e) {
+  template <typename Expr>
+  Generator& cover(Expr e) {
     constr_mng.makeConstraint(e, ctx, false, true);
     return *this;
   }
 
-  template<typename Expr>
-  Generator & cover(std::string name, Expr e) {
+  template <typename Expr>
+  Generator& cover(std::string name, Expr e) {
     constr_mng.makeConstraint(name, e, ctx, false, true);
     return *this;
   }
 
-  bool enableConstraint(std::string const& name) { return constr_mng.enableConstraint(name); }
-  bool disableConstraint(std::string const& name) { return constr_mng.disableConstraint(name); }
-  bool isConstraintEnabled(std::string const& name) { return constr_mng.isConstraintEnabled(name); }
+  bool enableConstraint(std::string const& name) {
+    return constr_mng.enableConstraint(name);
+  }
+  bool disableConstraint(std::string const& name) {
+    return constr_mng.disableConstraint(name);
+  }
+  bool isConstraintEnabled(std::string const& name) {
+    return constr_mng.isConstraintEnabled(name);
+  }
   bool isChanged() { return constr_mng.isChanged(); }
 
-  Generator & operator()() {
+  Generator& operator()() {
     if (!next())
       throw std::runtime_error("Generator constraint unsatisfiable.");
     return *this;
   }
 
-  void merge(Generator& other) { constr_pttn.mergeConstraints(other.constr_mng); }
+  void merge(Generator& other) {
+    constr_pttn.mergeConstraints(other.constr_mng);
+  }
 
   void reset() {
     constr_mng.resetChanged();
@@ -96,10 +107,11 @@ public:
   void rebuild(bool selfInclude = false) {
     if (selfInclude) merge(*this);
     constr_pttn.partition();
-    // currently, every hard/soft/cover constraint is considered for partitioning, this is suboptimal.
+    // currently, every hard/soft/cover constraint is considered for
+    // partitioning, this is suboptimal.
     var_gen.reset(constr_pttn.getPartitions());
     vec_gen.reset(constr_pttn.getVectorConstraints());
-    var_cov_gen.reset(constr_pttn.getPartitions()); 
+    var_cov_gen.reset(constr_pttn.getPartitions());
     vec_cov_gen.reset(constr_pttn.getVectorConstraints());
   }
 
@@ -126,19 +138,17 @@ public:
   }
 
   bool isCovered() { return covered_; }
-  
-  void resetCoverage() { 
-    covered_ = false; 
+
+  void resetCoverage() {
+    covered_ = false;
     var_cov_gen.reset(constr_pttn.getPartitions());
     vec_cov_gen.reset(constr_pttn.getVectorConstraints());
   }
 
-  std::ostream& printDotGraph(std::ostream& os, bool root = true) { 
-    if (root)
-      os << "digraph AST {" << std::endl;
+  std::ostream& printDotGraph(std::ostream& os, bool root = true) {
+    if (root) os << "digraph AST {" << std::endl;
     constr_mng.printDotGraph(os);
-    if (root)
-      os << "}" << std::endl;
+    if (root) os << "}" << std::endl;
     return os;
   }
 
@@ -150,16 +160,16 @@ public:
     return var_gen.getInactiveSofts();
   }
 
-  template<typename T>
-  T operator[](Variable<T> const &var) {
+  template <typename T>
+  T operator[](Variable<T> const& var) {
     T result;
     if (!var_gen.read(var, result)) {
       throw std::runtime_error("Invalid variable read request.");
     }
     return result;
-  }  
+  }
 
-private:
+ private:
   // constraints
   ConstraintManager constr_mng;
   ConstraintPartitioner constr_pttn;
@@ -181,6 +191,5 @@ private:
   bool covered_;
 };
 
-} // namespace crave
+}  // namespace crave
 //  vim: ft=cpp:ts=2:sw=2:expandtab
-

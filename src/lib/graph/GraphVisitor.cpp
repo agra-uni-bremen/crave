@@ -9,7 +9,8 @@ namespace crave {
 namespace graph {
 
 void PrintVisitor::printNode(Node& n) {
-  std::cout << std::string(depth, ' ') << n.kind() << " " << (n.name() ? n.name() : "") << std::endl;
+  std::cout << std::string(depth, ' ') << n.kind() << " "
+            << (n.name() ? n.name() : "") << std::endl;
 }
 
 void PrintVisitor::visitTerminal(Terminal& t) {
@@ -19,24 +20,25 @@ void PrintVisitor::visitTerminal(Terminal& t) {
 void PrintVisitor::visitSelector(Selector& sel) {
   ++depth;
   printNode(sel);
-  BOOST_FOREACH(NodePtr n, sel.children) 
-    n->accept(*this);
+  BOOST_FOREACH(NodePtr n, sel.children)
+  n->accept(*this);
   --depth;
 }
 
 void PrintVisitor::visitSequence(Sequence& seq) {
   ++depth;
   printNode(seq);
-  BOOST_FOREACH(NodePtr n, seq.children) 
-    n->accept(*this);
+  BOOST_FOREACH(NodePtr n, seq.children)
+  n->accept(*this);
   --depth;
 }
-  
-void UpdateVisitor::visitTerminal(Terminal& t) { }
+
+void UpdateVisitor::visitTerminal(Terminal& t) {}
 
 void UpdateVisitor::visitNonTerminal(NonTerminal& nt) {
   if (nt.name()) {
-    BOOST_ASSERT_MSG(m_on_path.find(nt.name()) == m_on_path.end(), "Loop detected");
+    BOOST_ASSERT_MSG(m_on_path.find(nt.name()) == m_on_path.end(),
+                     "Loop detected");
     m_on_path.insert(nt.name());
   }
 
@@ -50,11 +52,11 @@ void UpdateVisitor::visitNonTerminal(NonTerminal& nt) {
     tmp->accept(*this);
     if (!tmp->name() && tmp->kind() == nt.kind()) {
       // unfold unnamed child of same kind
-      NonTerminal& nt_child = static_cast<NonTerminal&>(*tmp); 
-      updated_children.insert(updated_children.end(), nt_child.children.begin(), nt_child.children.end());
+      NonTerminal& nt_child = static_cast<NonTerminal&>(*tmp);
+      updated_children.insert(updated_children.end(), nt_child.children.begin(),
+                              nt_child.children.end());
       nt_child.children.clear();
-    } 
-    else {
+    } else {
       updated_children.push_back(tmp);
     }
   }
@@ -71,62 +73,57 @@ void UpdateVisitor::visitSelector(Selector& sel) { visitNonTerminal(sel); }
 void UpdateVisitor::visitSequence(Sequence& seq) { visitNonTerminal(seq); }
 
 #define TDV_INDENT(x) std::string(m_stack.size() + x, '\t')
-  
-void ToDotVisitor::createNode(int ind, int id, const char* name, const char* shape, const char* color) {
+
+void ToDotVisitor::createNode(int ind, int id, const char* name,
+                              const char* shape, const char* color) {
   m_out << TDV_INDENT(ind) << id;
   m_out << " [";
   m_out << "label=\"" << name << "\" ";
-  if (shape)
-    m_out << "shape=" << shape << " ";
-  if (color)
-    m_out << "color=" << color << " ";
+  if (shape) m_out << "shape=" << shape << " ";
+  if (color) m_out << "color=" << color << " ";
   m_out << "style=filled";
   m_out << "]" << std::endl;
 }
 
 void ToDotVisitor::createEdge(int source, int dest, const char* color) {
   m_out << TDV_INDENT(1) << source << " -> " << dest;
-  if (color)
-    m_out << "[color=" << color << "]";
+  if (color) m_out << "[color=" << color << "]";
   m_out << std::endl;
 }
 
-void ToDotVisitor::beginSubgraph(const char* name, const char* color, const char* style) {
-  static unsigned int sg_cnt = 0;   
+void ToDotVisitor::beginSubgraph(const char* name, const char* color,
+                                 const char* style) {
+  static unsigned int sg_cnt = 0;
   if (name) {
-    m_out << TDV_INDENT(0) <<  "subgraph cluster_" << sg_cnt << " {" << std::endl;
+    m_out << TDV_INDENT(0) << "subgraph cluster_" << sg_cnt << " {"
+          << std::endl;
     m_out << TDV_INDENT(1) << "label=\"" << name << "\";" << std::endl;
-    if (color)
-      m_out << TDV_INDENT(1) << "color=" << color << ";" << std::endl;
-    if (style)
-      m_out << TDV_INDENT(1) << "style=" << style << ";" << std::endl;
-  }
-  else {
-    m_out << TDV_INDENT(0) <<  "subgraph sg_" << sg_cnt << " {" << std::endl;
+    if (color) m_out << TDV_INDENT(1) << "color=" << color << ";" << std::endl;
+    if (style) m_out << TDV_INDENT(1) << "style=" << style << ";" << std::endl;
+  } else {
+    m_out << TDV_INDENT(0) << "subgraph sg_" << sg_cnt << " {" << std::endl;
   }
   m_out << TDV_INDENT(1) << "labeljust=l;" << std::endl;
   m_out << TDV_INDENT(1) << "fontsize=20.0;" << std::endl;
   sg_cnt++;
 }
 
-void ToDotVisitor::endSubgraph() {
-  m_out << TDV_INDENT(0) <<  "}" << std::endl;
-}
-  
+void ToDotVisitor::endSubgraph() { m_out << TDV_INDENT(0) << "}" << std::endl; }
+
 void ToDotVisitor::visitTerminal(Terminal& t) {
   m_stack.push(result_type(m_node_count, m_node_count));
   createNode(0, m_node_count, t.name(), 0, "steelblue1");
   m_node_count++;
 }
 
-void ToDotVisitor::visitSelector(Selector& nt) { 
+void ToDotVisitor::visitSelector(Selector& nt) {
   int start = m_node_count;
   int end = m_node_count + 1;
   m_node_count += 2;
-  m_stack.push(result_type(start, end)); 
-    
+  m_stack.push(result_type(start, end));
+
   beginSubgraph(nt.name(), "yellowgreen", "dashed");
-    
+
   createNode(1, start, "start", "point", 0);
   createNode(1, end, "end", "point", 0);
 
@@ -141,14 +138,14 @@ void ToDotVisitor::visitSelector(Selector& nt) {
   endSubgraph();
 }
 
-void ToDotVisitor::visitSequence(Sequence& nt) { 
+void ToDotVisitor::visitSequence(Sequence& nt) {
   int start = m_node_count;
   int end = m_node_count + 1;
   m_node_count += 2;
-  m_stack.push(result_type(start, end)); 
+  m_stack.push(result_type(start, end));
 
   beginSubgraph(nt.name(), "yellowgreen", "dashed");
-    
+
   createNode(1, start, "start", "point", 0);
   createNode(1, end, "end", "point", 0);
 
@@ -167,8 +164,5 @@ void ToDotVisitor::visitSequence(Sequence& nt) {
 }
 
 #undef TDV_INDENT
-
 };
-
 };
-

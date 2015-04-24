@@ -2,8 +2,7 @@
 #include <crave/ConstrainedRandom.hpp>
 
 struct Context_Fixture {
-  Context_Fixture () {
-  }
+  Context_Fixture() {}
 };
 
 #include "test_Syntax.cpp"

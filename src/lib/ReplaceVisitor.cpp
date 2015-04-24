@@ -4,14 +4,16 @@
 
 namespace crave {
 
-void ReplaceVisitor::evalUnaryExpr(UnaryExpression const& unary_expr, NodePtr& node) {
+void ReplaceVisitor::evalUnaryExpr(UnaryExpression const& unary_expr,
+                                   NodePtr& node) {
   visitUnaryExpr(unary_expr);
   assert(aux_stack_.size() >= 1);
   node = aux_stack_.top();
   aux_stack_.pop();
 }
 
-void ReplaceVisitor::evalBinExpr(BinaryExpression const& bin_expr, NodePtr &lhs, NodePtr&rhs) {
+void ReplaceVisitor::evalBinExpr(BinaryExpression const& bin_expr, NodePtr& lhs,
+                                 NodePtr& rhs) {
   visitBinaryExpr(bin_expr);
   assert(aux_stack_.size() >= 2);
   rhs = aux_stack_.top();
@@ -20,7 +22,8 @@ void ReplaceVisitor::evalBinExpr(BinaryExpression const& bin_expr, NodePtr &lhs,
   aux_stack_.pop();
 }
 
-void ReplaceVisitor::evalTernExpr(TernaryExpression const &tern_expr, NodePtr &a, NodePtr &b, NodePtr &c) {
+void ReplaceVisitor::evalTernExpr(TernaryExpression const& tern_expr,
+                                  NodePtr& a, NodePtr& b, NodePtr& c) {
   visitTernaryExpr(tern_expr);
   assert(aux_stack_.size() >= 3);
   c = aux_stack_.top();
@@ -49,23 +52,23 @@ void ReplaceVisitor::evalTernSubscript(int& a, int& b, int& c) {
   subscript_stack_.pop();
 }
 
-void ReplaceVisitor::visitNode( Node const& n ) { }
-void ReplaceVisitor::visitTerminal( Terminal const& t ) { }
-void ReplaceVisitor::visitUnaryExpr( UnaryExpression const& e ) {
+void ReplaceVisitor::visitNode(Node const& n) {}
+void ReplaceVisitor::visitTerminal(Terminal const& t) {}
+void ReplaceVisitor::visitUnaryExpr(UnaryExpression const& e) {
   e.child()->visit(*this);
 }
-void ReplaceVisitor::visitUnaryOpr( UnaryOperator const& ) { }
-void ReplaceVisitor::visitBinaryExpr( BinaryExpression const& e ) {
+void ReplaceVisitor::visitUnaryOpr(UnaryOperator const&) {}
+void ReplaceVisitor::visitBinaryExpr(BinaryExpression const& e) {
   e.lhs()->visit(*this);
   e.rhs()->visit(*this);
 }
-void ReplaceVisitor::visitBinaryOpr( BinaryOperator const& ) { }
-void ReplaceVisitor::visitTernaryExpr( TernaryExpression const& t ) {
+void ReplaceVisitor::visitBinaryOpr(BinaryOperator const&) {}
+void ReplaceVisitor::visitTernaryExpr(TernaryExpression const& t) {
   t.a()->visit(*this);
   t.b()->visit(*this);
   t.c()->visit(*this);
 }
-void ReplaceVisitor::visitPlaceholder( Placeholder const& p ) {
+void ReplaceVisitor::visitPlaceholder(Placeholder const& p) {
   // assert( lsh is vector expression )
   std::map<int, NodePtr>::iterator ite(terminals_.lower_bound(p.id()));
   if (ite != terminals_.end() && !(terminals_.key_comp()(p.id(), ite->first))) {
@@ -78,7 +81,7 @@ void ReplaceVisitor::visitPlaceholder( Placeholder const& p ) {
   updateResult();
   subscript_stack_.push(vec_idx_);
 }
-void ReplaceVisitor::visitVariableExpr( VariableExpr const& v ) {
+void ReplaceVisitor::visitVariableExpr(VariableExpr const& v) {
   std::map<int, NodePtr>::iterator ite(terminals_.lower_bound(v.id()));
   if (ite != terminals_.end() && !(terminals_.key_comp()(v.id(), ite->first))) {
     // v already exists
@@ -90,12 +93,12 @@ void ReplaceVisitor::visitVariableExpr( VariableExpr const& v ) {
   updateResult();
   subscript_stack_.push(0);
 }
-void ReplaceVisitor::visitConstant( Constant const& c ) {
+void ReplaceVisitor::visitConstant(Constant const& c) {
   aux_stack_.push(new Constant(c));
   updateResult();
   subscript_stack_.push(c.value());
 }
-void ReplaceVisitor::visitVectorExpr( VectorExpr const& v ) {
+void ReplaceVisitor::visitVectorExpr(VectorExpr const& v) {
   std::map<int, NodePtr>::iterator ite(terminals_.lower_bound(v.id()));
   if (ite != terminals_.end() && !(terminals_.key_comp()(v.id(), ite->first))) {
     // v already exists
@@ -107,7 +110,7 @@ void ReplaceVisitor::visitVectorExpr( VectorExpr const& v ) {
   updateResult();
   subscript_stack_.push(0);
 }
-void ReplaceVisitor::visitNotOpr( NotOpr const& n ) {
+void ReplaceVisitor::visitNotOpr(NotOpr const& n) {
   NodePtr child;
   evalUnaryExpr(n, child);
   aux_stack_.push(new NotOpr(child));
@@ -116,7 +119,7 @@ void ReplaceVisitor::visitNotOpr( NotOpr const& n ) {
   subscript_stack_.pop();
   subscript_stack_.push(!idx);
 }
-void ReplaceVisitor::visitNegOpr( NegOpr const& n ) {
+void ReplaceVisitor::visitNegOpr(NegOpr const& n) {
   NodePtr child;
   evalUnaryExpr(n, child);
   aux_stack_.push(new NegOpr(child));
@@ -125,7 +128,7 @@ void ReplaceVisitor::visitNegOpr( NegOpr const& n ) {
   subscript_stack_.pop();
   subscript_stack_.push(-idx);
 }
-void ReplaceVisitor::visitComplementOpr( ComplementOpr const& c ) {
+void ReplaceVisitor::visitComplementOpr(ComplementOpr const& c) {
   NodePtr child;
   evalUnaryExpr(c, child);
   aux_stack_.push(new ComplementOpr(child));
@@ -134,19 +137,19 @@ void ReplaceVisitor::visitComplementOpr( ComplementOpr const& c ) {
   subscript_stack_.pop();
   subscript_stack_.push(~idx);
 }
-void ReplaceVisitor::visitInside( Inside const& i ) {
+void ReplaceVisitor::visitInside(Inside const& i) {
   NodePtr child;
   evalUnaryExpr(i, child);
   aux_stack_.push(new Inside(child, i.collection()));
   updateResult();
 }
-void ReplaceVisitor::visitExtendExpr( ExtendExpression const& e ) {
+void ReplaceVisitor::visitExtendExpr(ExtendExpression const& e) {
   NodePtr child;
   evalUnaryExpr(e, child);
   aux_stack_.push(new ExtendExpression(child, e.value()));
   updateResult();
 }
-void ReplaceVisitor::visitAndOpr( AndOpr const& a ) {
+void ReplaceVisitor::visitAndOpr(AndOpr const& a) {
   NodePtr lhs, rhs;
   evalBinExpr(a, lhs, rhs);
   aux_stack_.push(new AndOpr(lhs, rhs));
@@ -155,7 +158,7 @@ void ReplaceVisitor::visitAndOpr( AndOpr const& a ) {
   evalBinSubscript(l_val, r_val);
   subscript_stack_.push(l_val & r_val);
 }
-void ReplaceVisitor::visitOrOpr( OrOpr const& o ) {
+void ReplaceVisitor::visitOrOpr(OrOpr const& o) {
   NodePtr lhs, rhs;
   evalBinExpr(o, lhs, rhs);
   aux_stack_.push(new OrOpr(lhs, rhs));
@@ -164,7 +167,7 @@ void ReplaceVisitor::visitOrOpr( OrOpr const& o ) {
   evalBinSubscript(l_val, r_val);
   subscript_stack_.push(l_val | r_val);
 }
-void ReplaceVisitor::visitLogicalAndOpr( LogicalAndOpr const& a ) {
+void ReplaceVisitor::visitLogicalAndOpr(LogicalAndOpr const& a) {
   NodePtr lhs, rhs;
   evalBinExpr(a, lhs, rhs);
   aux_stack_.push(new LogicalAndOpr(lhs, rhs));
@@ -173,7 +176,7 @@ void ReplaceVisitor::visitLogicalAndOpr( LogicalAndOpr const& a ) {
   evalBinSubscript(l_val, r_val);
   subscript_stack_.push(l_val && r_val);
 }
-void ReplaceVisitor::visitLogicalOrOpr( LogicalOrOpr const& o ) {
+void ReplaceVisitor::visitLogicalOrOpr(LogicalOrOpr const& o) {
   NodePtr lhs, rhs;
   evalBinExpr(o, lhs, rhs);
   aux_stack_.push(new LogicalOrOpr(lhs, rhs));
@@ -182,7 +185,7 @@ void ReplaceVisitor::visitLogicalOrOpr( LogicalOrOpr const& o ) {
   evalBinSubscript(l_val, r_val);
   subscript_stack_.push(l_val || r_val);
 }
-void ReplaceVisitor::visitXorOpr( XorOpr const& x ) {
+void ReplaceVisitor::visitXorOpr(XorOpr const& x) {
   NodePtr lhs, rhs;
   evalBinExpr(x, lhs, rhs);
   aux_stack_.push(new XorOpr(lhs, rhs));
@@ -191,7 +194,7 @@ void ReplaceVisitor::visitXorOpr( XorOpr const& x ) {
   evalBinSubscript(l_val, r_val);
   subscript_stack_.push(l_val ^ r_val);
 }
-void ReplaceVisitor::visitEqualOpr( EqualOpr const& e ) {
+void ReplaceVisitor::visitEqualOpr(EqualOpr const& e) {
   NodePtr lhs, rhs;
   evalBinExpr(e, lhs, rhs);
   aux_stack_.push(new EqualOpr(lhs, rhs));
@@ -200,7 +203,7 @@ void ReplaceVisitor::visitEqualOpr( EqualOpr const& e ) {
   evalBinSubscript(l_val, r_val);
   subscript_stack_.push(l_val == r_val);
 }
-void ReplaceVisitor::visitNotEqualOpr( NotEqualOpr const& n ) {
+void ReplaceVisitor::visitNotEqualOpr(NotEqualOpr const& n) {
   NodePtr lhs, rhs;
   evalBinExpr(n, lhs, rhs);
   aux_stack_.push(new NotEqualOpr(lhs, rhs));
@@ -209,7 +212,7 @@ void ReplaceVisitor::visitNotEqualOpr( NotEqualOpr const& n ) {
   evalBinSubscript(l_val, r_val);
   subscript_stack_.push(l_val != r_val);
 }
-void ReplaceVisitor::visitLessOpr( LessOpr const& l ) {
+void ReplaceVisitor::visitLessOpr(LessOpr const& l) {
   NodePtr lhs, rhs;
   evalBinExpr(l, lhs, rhs);
   aux_stack_.push(new LessOpr(lhs, rhs));
@@ -218,7 +221,7 @@ void ReplaceVisitor::visitLessOpr( LessOpr const& l ) {
   evalBinSubscript(l_val, r_val);
   subscript_stack_.push(l_val < r_val);
 }
-void ReplaceVisitor::visitLessEqualOpr( LessEqualOpr const& l ) {
+void ReplaceVisitor::visitLessEqualOpr(LessEqualOpr const& l) {
   NodePtr lhs, rhs;
   evalBinExpr(l, lhs, rhs);
   aux_stack_.push(new LessEqualOpr(lhs, rhs));
@@ -227,7 +230,7 @@ void ReplaceVisitor::visitLessEqualOpr( LessEqualOpr const& l ) {
   evalBinSubscript(l_val, r_val);
   subscript_stack_.push(l_val <= r_val);
 }
-void ReplaceVisitor::visitGreaterOpr( GreaterOpr const& g ) {
+void ReplaceVisitor::visitGreaterOpr(GreaterOpr const& g) {
   NodePtr lhs, rhs;
   evalBinExpr(g, lhs, rhs);
   aux_stack_.push(new GreaterOpr(lhs, rhs));
@@ -236,7 +239,7 @@ void ReplaceVisitor::visitGreaterOpr( GreaterOpr const& g ) {
   evalBinSubscript(l_val, r_val);
   subscript_stack_.push(l_val > r_val);
 }
-void ReplaceVisitor::visitGreaterEqualOpr( GreaterEqualOpr const& g ) {
+void ReplaceVisitor::visitGreaterEqualOpr(GreaterEqualOpr const& g) {
   NodePtr lhs, rhs;
   evalBinExpr(g, lhs, rhs);
   aux_stack_.push(new GreaterEqualOpr(lhs, rhs));
@@ -245,7 +248,7 @@ void ReplaceVisitor::visitGreaterEqualOpr( GreaterEqualOpr const& g ) {
   evalBinSubscript(l_val, r_val);
   subscript_stack_.push(l_val >= r_val);
 }
-void ReplaceVisitor::visitPlusOpr( PlusOpr const& p ) {
+void ReplaceVisitor::visitPlusOpr(PlusOpr const& p) {
   NodePtr lhs, rhs;
   evalBinExpr(p, lhs, rhs);
   aux_stack_.push(new PlusOpr(lhs, rhs));
@@ -254,7 +257,7 @@ void ReplaceVisitor::visitPlusOpr( PlusOpr const& p ) {
   evalBinSubscript(l_val, r_val);
   subscript_stack_.push(l_val + r_val);
 }
-void ReplaceVisitor::visitMinusOpr( MinusOpr const& m ) {
+void ReplaceVisitor::visitMinusOpr(MinusOpr const& m) {
   NodePtr lhs, rhs;
   evalBinExpr(m, lhs, rhs);
   aux_stack_.push(new MinusOpr(lhs, rhs));
@@ -263,7 +266,7 @@ void ReplaceVisitor::visitMinusOpr( MinusOpr const& m ) {
   evalBinSubscript(l_val, r_val);
   subscript_stack_.push(l_val - r_val);
 }
-void ReplaceVisitor::visitMultipliesOpr( MultipliesOpr const& m ) {
+void ReplaceVisitor::visitMultipliesOpr(MultipliesOpr const& m) {
   NodePtr lhs, rhs;
   evalBinExpr(m, lhs, rhs);
   aux_stack_.push(new MultipliesOpr(lhs, rhs));
@@ -272,7 +275,7 @@ void ReplaceVisitor::visitMultipliesOpr( MultipliesOpr const& m ) {
   evalBinSubscript(l_val, r_val);
   subscript_stack_.push(l_val * r_val);
 }
-void ReplaceVisitor::visitDevideOpr( DevideOpr const& d ) {
+void ReplaceVisitor::visitDevideOpr(DevideOpr const& d) {
   NodePtr lhs, rhs;
   evalBinExpr(d, lhs, rhs);
   aux_stack_.push(new DevideOpr(lhs, rhs));
@@ -281,7 +284,7 @@ void ReplaceVisitor::visitDevideOpr( DevideOpr const& d ) {
   evalBinSubscript(l_val, r_val);
   subscript_stack_.push(l_val / r_val);
 }
-void ReplaceVisitor::visitModuloOpr( ModuloOpr const& m ) {
+void ReplaceVisitor::visitModuloOpr(ModuloOpr const& m) {
   NodePtr lhs, rhs;
   evalBinExpr(m, lhs, rhs);
   aux_stack_.push(new ModuloOpr(lhs, rhs));
@@ -290,7 +293,7 @@ void ReplaceVisitor::visitModuloOpr( ModuloOpr const& m ) {
   evalBinSubscript(l_val, r_val);
   subscript_stack_.push(l_val % r_val);
 }
-void ReplaceVisitor::visitShiftLeftOpr( ShiftLeftOpr const& s ) {
+void ReplaceVisitor::visitShiftLeftOpr(ShiftLeftOpr const& s) {
   NodePtr lhs, rhs;
   evalBinExpr(s, lhs, rhs);
   aux_stack_.push(new ShiftLeftOpr(lhs, rhs));
@@ -299,7 +302,7 @@ void ReplaceVisitor::visitShiftLeftOpr( ShiftLeftOpr const& s ) {
   evalBinSubscript(l_val, r_val);
   subscript_stack_.push(l_val << r_val);
 }
-void ReplaceVisitor::visitShiftRightOpr( ShiftRightOpr const& s ) {
+void ReplaceVisitor::visitShiftRightOpr(ShiftRightOpr const& s) {
   NodePtr lhs, rhs;
   evalBinExpr(s, lhs, rhs);
   aux_stack_.push(new ShiftRightOpr(lhs, rhs));
@@ -308,13 +311,13 @@ void ReplaceVisitor::visitShiftRightOpr( ShiftRightOpr const& s ) {
   evalBinSubscript(l_val, r_val);
   subscript_stack_.push(l_val >> r_val);
 }
-void ReplaceVisitor::visitVectorAccess( VectorAccess const& v ) {
+void ReplaceVisitor::visitVectorAccess(VectorAccess const& v) {
   NodePtr lhs, rhs;
   evalBinExpr(v, lhs, rhs);
   int l_val, i;
   evalBinSubscript(l_val, i);
 
-  if (0 <= i && i < (int) variables_.size()) {
+  if (0 <= i && i < (int)variables_.size()) {
 
     VectorExpr& vec = *static_cast<VectorExpr*>(lhs.get());
     VariableExpr& var = *static_cast<VariableExpr*>(variables_[i].get());
@@ -328,7 +331,7 @@ void ReplaceVisitor::visitVectorAccess( VectorAccess const& v ) {
   updateResult();
   subscript_stack_.push(0);
 }
-void ReplaceVisitor::visitIfThenElse( IfThenElse const& i ) {
+void ReplaceVisitor::visitIfThenElse(IfThenElse const& i) {
   NodePtr a, b, c;
   evalTernExpr(i, a, b, c);
   aux_stack_.push(new IfThenElse(a, b, c));
@@ -338,13 +341,13 @@ void ReplaceVisitor::visitIfThenElse( IfThenElse const& i ) {
   subscript_stack_.push(a_val ? b_val : c_val);
 }
 
-void ReplaceVisitor::visitForEach( ForEach const& fe ) {
-  fe.rhs()->visit(*this);
+void ReplaceVisitor::visitForEach(ForEach const& fe) { fe.rhs()->visit(*this); }
+
+void ReplaceVisitor::visitUnique(Unique const& u) {
+  throw std::runtime_error("Unique is not allowed in ReplaceVisitor.");
 }
 
-void ReplaceVisitor::visitUnique( Unique const& u ) { throw std::runtime_error("Unique is not allowed in ReplaceVisitor."); }
-
-void ReplaceVisitor::visitBitslice( Bitslice const& b ) {
+void ReplaceVisitor::visitBitslice(Bitslice const& b) {
   NodePtr child;
   evalUnaryExpr(b, child);
   aux_stack_.push(new Bitslice(child, b.r(), b.l()));
@@ -354,18 +357,14 @@ void ReplaceVisitor::visitBitslice( Bitslice const& b ) {
   subscript_stack_.push(!idx);
 }
 
-void ReplaceVisitor::updateResult() {
-  result_ = aux_stack_.top();
-}
+void ReplaceVisitor::updateResult() { result_ = aux_stack_.top(); }
 
 void ReplaceVisitor::reset() {
   terminals_.clear();
-  while (!aux_stack_.empty())
-    aux_stack_.pop();
-  while (!subscript_stack_.empty())
-    subscript_stack_.pop();
+  while (!aux_stack_.empty()) aux_stack_.pop();
+  while (!subscript_stack_.empty()) subscript_stack_.pop();
   result_.reset();
   okay_ = true;
 }
 
-} // end namespace crave
+}  // end namespace crave

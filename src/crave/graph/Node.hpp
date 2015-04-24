@@ -20,7 +20,7 @@ typedef std::map<std::string, NodePtr> node_map;
 struct NodeVisitor;
 
 struct Node {
-  Node(const char* name = 0) : m_name(name) { }
+  Node(const char* name = 0) : m_name(name) {}
 
   const char* name() const { return m_name; }
   void rename(const char* name) { m_name = name; }
@@ -28,12 +28,12 @@ struct Node {
   virtual const char* kind() const = 0;
   virtual void accept(NodeVisitor&) = 0;
 
-protected:
+ protected:
   const char* m_name;
 };
 
 struct Terminal : Node {
-  Terminal(const char* name) : Node(name) { }
+  Terminal(const char* name) : Node(name) {}
 
   virtual const char* kind() const { return "Terminal"; }
   virtual void accept(NodeVisitor& v);
@@ -53,8 +53,5 @@ struct Sequence : NonTerminal {
   virtual const char* kind() const { return "Sequence"; }
   virtual void accept(NodeVisitor& v);
 };
-
 };
-
 };
-
