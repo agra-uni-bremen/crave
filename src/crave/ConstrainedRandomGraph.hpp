@@ -3,8 +3,8 @@
 #include <iostream>
 #include <string>
 #include <set>
+#include <functional>
 
-#include <boost/function.hpp>
 #include <boost/proto/proto.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/assert.hpp>
@@ -25,7 +25,7 @@ struct Rule;
 typedef boost::shared_ptr<Rule> RulePtr;
 typedef proto::terminal<Rule>::type rule_type;
 typedef std::map<std::string, Rule*> rule_map;
-typedef boost::function<void()> action_type;
+typedef std::function<void()> action_type;
 
 extern rule_map global_rule_map;
 
