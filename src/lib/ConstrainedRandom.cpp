@@ -40,9 +40,7 @@ void set_global_seed(unsigned int s) {
   rng.seed(s);
 };
 
-void set_solver_backend(std::string const& type) {
-  FactoryMetaSMT::setSolverType(type);
-}
+void set_solver_backend(std::string const& type) { FactoryMetaSMT::setSolverType(type); }
 
 std::string config_file_name = "crave.cfg";
 std::string const& get_config_file_name() { return config_file_name; }
@@ -85,8 +83,7 @@ void init(std::string const& cfg_file) {
 
 std::ostream& rand_obj::print_dot_graph(std::ostream& os, bool root = true) {
   if (root) os << "digraph AST {" << std::endl;
-  for (uint i = 0; i < objChildren.size(); i++)
-    objChildren[i]->print_dot_graph(os, false);
+  for (uint i = 0; i < objChildren.size(); i++) objChildren[i]->print_dot_graph(os, false);
   constraint.printDotGraph(os, false);
   if (root) os << "}" << std::endl;
   return os;

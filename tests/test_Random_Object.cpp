@@ -35,8 +35,7 @@ enum football_enum {
   RW,   // Right Winger
   CF    // Centre Striker
 };
-CRAVE_ENUM(football_enum, (GK)(SW)(LWB)(LB)(LCB)(RCB)(RB)(RWB)(DM)(LM)(CM)(RM)(
-                              AM)(LW)(SS)(RW)(CF));
+CRAVE_ENUM(football_enum, (GK)(SW)(LWB)(LB)(LCB)(RCB)(RB)(RWB)(DM)(LM)(CM)(RM)(AM)(LW)(SS)(RW)(CF));
 
 BOOST_FIXTURE_TEST_SUITE(Random_Object_t, Context_Fixture)
 
@@ -45,9 +44,7 @@ class my_rand_obj : public rand_obj {
   randv<color_enum> color;
   randv<int> x;
 
-  my_rand_obj(rand_obj* parent = 0) : rand_obj(parent), color(this), x(this) {
-    constraint(color() == x());
-  }
+  my_rand_obj(rand_obj* parent = 0) : rand_obj(parent), color(this), x(this) { constraint(color() == x()); }
 };
 
 BOOST_AUTO_TEST_CASE(t_rand_enum) {
@@ -60,9 +57,7 @@ BOOST_AUTO_TEST_CASE(t_rand_enum) {
   }
 }
 
-BOOST_AUTO_TEST_CASE(t_rand_enum_standalone) {
-  BOOST_CHECK_THROW(randv<color_enum> color(0), std::runtime_error);
-}
+BOOST_AUTO_TEST_CASE(t_rand_enum_standalone) { BOOST_CHECK_THROW(randv<color_enum> color(0), std::runtime_error); }
 
 class tall_rand_enum_obj : public rand_obj {
  public:
@@ -77,9 +72,7 @@ class tall_rand_enum_obj_gt : public rand_obj {
  public:
   randv<football_enum> player;
 
-  tall_rand_enum_obj_gt(rand_obj* parent = 0) : rand_obj(parent), player(this) {
-    constraint(player() > AM);
-  }
+  tall_rand_enum_obj_gt(rand_obj* parent = 0) : rand_obj(parent), player(this) { constraint(player() > AM); }
 };
 
 BOOST_AUTO_TEST_CASE(enum_no_overflow) {
@@ -95,16 +88,13 @@ BOOST_AUTO_TEST_CASE(enum_gt) {
   for (int i = 0; i < 100; ++i) {
     BOOST_REQUIRE(obj.next());
     BOOST_REQUIRE_GT(obj.player, AM);
-    BOOST_REQUIRE(obj.player == LW || obj.player == SS || obj.player == RW ||
-                  obj.player == CF);
+    BOOST_REQUIRE(obj.player == LW || obj.player == SS || obj.player == RW || obj.player == CF);
   }
 }
 
 class item : public rand_obj {
  public:
-  item(rand_obj* parent) : rand_obj(parent), a(this), b(this), c(this) {
-    constraint(a() + b() == c());
-  }
+  item(rand_obj* parent) : rand_obj(parent), a(this), b(this), c(this) { constraint(a() + b() == c()); }
 
  public:
   randv<int> a;
@@ -122,9 +112,7 @@ class item1 : public item {
 
 class item2 : public item1 {
  public:
-  item2(rand_obj* parent) : item1(parent), d(this) {
-    constraint(a() + b() + c() == 100);
-  }
+  item2(rand_obj* parent) : item1(parent), d(this) { constraint(a() + b() + c() == 100); }
   randv<int> d;
 };
 
@@ -155,15 +143,13 @@ BOOST_AUTO_TEST_CASE(t4) {
 
 class obj : public rand_obj {
  public:
-  obj(rand_obj* parent)
-      : rand_obj(parent), a(this), b(this), c(this), d(this), e(this), f(this) {
+  obj(rand_obj* parent) : rand_obj(parent), a(this), b(this), c(this), d(this), e(this), f(this) {
     constraint(dist(a(), distribution<int>::simple_range(-20, -10)));
     constraint(dist(b(), distribution<unsigned int>::simple_range(10, 20)));
     constraint(dist(c(), distribution<short>::simple_range(-20, -10)));
     constraint(dist(d(), distribution<unsigned short>::simple_range(10, 20)));
     constraint("e", dist(e(), distribution<char>::simple_range('a', 'z')));
-    constraint("f",
-               dist(f(), distribution<unsigned char>::simple_range('A', 'Z')));
+    constraint("f", dist(f(), distribution<unsigned char>::simple_range('A', 'Z')));
   }
   randv<int> a;
   randv<unsigned int> b;
@@ -173,8 +159,7 @@ class obj : public rand_obj {
   randv<unsigned char> f;
 
   friend ostream& operator<<(ostream& os, const obj& o) {
-    os << "(" << o.a << " " << o.b << " " << o.c << " " << o.d << " " << o.e
-       << " " << o.f << ")";
+    os << "(" << o.a << " " << o.b << " " << o.c << " " << o.d << " " << o.e << " " << o.f << ")";
     return os;
   }
 };
@@ -191,13 +176,11 @@ class obj1 : public obj {
 
 class obj2 : public rand_obj {
  public:
-  obj2(rand_obj* parent)
-      : rand_obj(parent), g(this), h(this), i(this), j(this), k(this), l(this) {
+  obj2(rand_obj* parent) : rand_obj(parent), g(this), h(this), i(this), j(this), k(this), l(this) {
     constraint(dist(g(), distribution<long>::simple_range(-20, -10)));
     constraint(dist(h(), distribution<unsigned long>::simple_range(10, 20)));
     constraint(dist(i(), distribution<long long>::simple_range(-20, -10)));
-    constraint(
-        dist(j(), distribution<unsigned long long>::simple_range(10, 20)));
+    constraint(dist(j(), distribution<unsigned long long>::simple_range(10, 20)));
   }
   randv<long> g;
   randv<unsigned long> h;
@@ -207,8 +190,7 @@ class obj2 : public rand_obj {
   obj1 l;
 
   friend ostream& operator<<(ostream& os, const obj2& o1) {
-    os << o1.l << " " << o1.g << " " << o1.h << " " << o1.i << " " << o1.j
-       << " " << o1.k;
+    os << o1.l << " " << o1.g << " " << o1.h << " " << o1.i << " " << o1.j << " " << o1.k;
     return os;
   }
 };
@@ -302,8 +284,8 @@ BOOST_AUTO_TEST_CASE(item_with_vector) {
   for (int i = 0; i < 20; i++) {
     BOOST_REQUIRE(it.next());
     BOOST_REQUIRE_EQUAL(it.data.size(), 4);
-    std::cout << "@" << it.address << ": " << it.data[0] << " " << it.data[1]
-              << " " << it.data[2] << " " << it.data[3] << std::endl;
+    std::cout << "@" << it.address << ": " << it.data[0] << " " << it.data[1] << " " << it.data[2] << " " << it.data[3]
+              << std::endl;
     BOOST_REQUIRE_EQUAL(it.address % 4, 0);
     BOOST_REQUIRE_LE(it.address, 1000);
     for (uint i = 0; i < it.data.size(); i++) {

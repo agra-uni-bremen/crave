@@ -99,8 +99,7 @@ BOOST_AUTO_TEST_CASE(randv_sc_dt_t) {
   BOOST_CHECK_EQUAL(++a, 0);  // wrap around
   BOOST_CHECK_EQUAL(b + 1, 16);
   BOOST_CHECK_EQUAL(c, 14);
-  BOOST_CHECK_EQUAL(
-      d, 14);  // deviation to sc_uint semantics (no overflow, thus d == 30)
+  BOOST_CHECK_EQUAL(d, 14);  // deviation to sc_uint semantics (no overflow, thus d == 30)
 }
 
 BOOST_AUTO_TEST_CASE(randv_sc_dt_op_support_t) {

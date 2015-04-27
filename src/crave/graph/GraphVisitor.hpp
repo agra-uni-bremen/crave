@@ -49,8 +49,7 @@ struct UpdateVisitor : NodeVisitor {
 struct ToDotVisitor : NodeVisitor {
   typedef std::pair<int, int> result_type;
 
-  ToDotVisitor(std::ostream& stream)
-      : m_out(stream), m_stack(), m_node_count(0) {}
+  ToDotVisitor(std::ostream& stream) : m_out(stream), m_stack(), m_node_count(0) {}
 
   virtual void visitTerminal(Terminal& t);
   virtual void visitSelector(Selector& nt);
@@ -62,8 +61,7 @@ struct ToDotVisitor : NodeVisitor {
   int m_node_count;
 
  private:
-  void createNode(int ind, int id, const char* name, const char* shape,
-                  const char* color);
+  void createNode(int ind, int id, const char* name, const char* shape, const char* color);
   void createEdge(int source, int dest, const char* color);
   void beginSubgraph(const char* name, const char* color, const char* style);
   void endSubgraph();

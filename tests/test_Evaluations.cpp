@@ -30,8 +30,7 @@ BOOST_AUTO_TEST_CASE(logical_not_t2) {
   randv<unsigned char> a(0);
   randv<unsigned int> b(0);
   Evaluator eval;
-  expression expr = make_expression(if_then_else(
-      !(a() % 2 == 0), b() > 0 && b() <= 50, b() > 50 && b() <= 100));
+  expression expr = make_expression(if_then_else(!(a() % 2 == 0), b() > 0 && b() <= 50, b() > 50 && b() <= 100));
 
   eval.assign(a(), 1u);
 
@@ -313,8 +312,7 @@ BOOST_AUTO_TEST_CASE(shiftleft) {
     eval.assign(b, count % (sizeof(unsigned) << 3u));
 
     BOOST_CHECK(eval.evaluate(a << b));
-    BOOST_CHECK_EQUAL(eval.result<unsigned>(),
-                      count << (count % (sizeof(unsigned) << 3u)));
+    BOOST_CHECK_EQUAL(eval.result<unsigned>(), count << (count % (sizeof(unsigned) << 3u)));
   }
 }
 
@@ -524,8 +522,7 @@ BOOST_AUTO_TEST_CASE(if_then_else_t1) {
   Variable<unsigned int> a;
   randv<unsigned int> b(0);
   Evaluator eval;
-  expression expr = make_expression(
-      if_then_else(a<5, b()> 0 && b() <= 50, b() > 50 && b() <= 100));
+  expression expr = make_expression(if_then_else(a<5, b()> 0 && b() <= 50, b() > 50 && b() <= 100));
 
   for (int i = 0; i < 10; ++i) {
 

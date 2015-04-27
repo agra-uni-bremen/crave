@@ -19,8 +19,7 @@ void print_vec(std::ostream& out, std::vector<std::string> const& v) {
   out << ')';
 }
 
-void print_vec_vec(std::ostream& out,
-                   std::vector<std::vector<std::string> > const& v) {
+void print_vec_vec(std::ostream& out, std::vector<std::vector<std::string> > const& v) {
   out << "( ";
   BOOST_FOREACH(std::vector<std::string> const & u, v) {
     print_vec(out, u);
@@ -29,8 +28,7 @@ void print_vec_vec(std::ostream& out,
   out << ')';
 }
 
-bool cmp_vec(std::vector<std::string> const& a,
-             std::vector<std::string> const& b) {
+bool cmp_vec(std::vector<std::string> const& a, std::vector<std::string> const& b) {
   if (a.size() == b.size()) {
     for (unsigned i = 0; i < a.size(); i++) {
       if (a[i].compare(b[i]) != 0) {
@@ -160,13 +158,7 @@ BOOST_AUTO_TEST_CASE(Pythagoras) {
 
 class ItemPacketBaseConstraint : public rand_obj {
  public:
-  ItemPacketBaseConstraint()
-      : rand_obj(),
-        i_(),
-        src_addr(this),
-        dest_addr(this),
-        msg_length(this),
-        msg(this) {
+  ItemPacketBaseConstraint() : rand_obj(), i_(), src_addr(this), dest_addr(this), msg_length(this), msg(this) {
     constraint(msg_length() < 80);
     constraint(msg_length() > 2);
     constraint(src_addr() != dest_addr());
@@ -183,13 +175,10 @@ class ItemPacketBaseConstraint : public rand_obj {
 
 class ItemPacketHierConstraint : public ItemPacketBaseConstraint {
  public:
-  ItemPacketHierConstraint()
-      : ItemPacketBaseConstraint(), dest_min(this), dest_max(this) {
+  ItemPacketHierConstraint() : ItemPacketBaseConstraint(), dest_min(this), dest_max(this) {
     constraint((dest_addr() > dest_min()) && (dest_addr() < dest_max()));
-    constraint(((src_addr() > (dest_addr() + 0x100000)) &&
-                (src_addr() < (dest_addr() + 0x200000))) ||
-               ((src_addr() < (dest_addr() - 0x10000)) &&
-                (src_addr() > (dest_addr() - 0xfffff))));
+    constraint(((src_addr() > (dest_addr() + 0x100000)) && (src_addr() < (dest_addr() + 0x200000))) ||
+               ((src_addr() < (dest_addr() - 0x10000)) && (src_addr() > (dest_addr() - 0xfffff))));
   }
   randv<uint> dest_min;
   randv<uint> dest_max;
@@ -240,8 +229,7 @@ BOOST_AUTO_TEST_CASE(one_conflict1) {
   BOOST_REQUIRE_EQUAL(result.size(), 1);
   std::vector<std::string> expected = list_of("a")("b")("c");
   std::sort(result[0].begin(), result[0].end());
-  BOOST_REQUIRE_EQUAL_COLLECTIONS(result[0].begin(), result[0].end(),
-                                  expected.begin(), expected.end());
+  BOOST_REQUIRE_EQUAL_COLLECTIONS(result[0].begin(), result[0].end(), expected.begin(), expected.end());
 }
 
 BOOST_AUTO_TEST_CASE(one_conflict2) {
@@ -260,8 +248,7 @@ BOOST_AUTO_TEST_CASE(one_conflict2) {
   BOOST_REQUIRE_EQUAL(result.size(), 1);
   std::vector<std::string> expected = list_of("a")("b");
   std::sort(result[0].begin(), result[0].end());
-  BOOST_REQUIRE_EQUAL_COLLECTIONS(result[0].begin(), result[0].end(),
-                                  expected.begin(), expected.end());
+  BOOST_REQUIRE_EQUAL_COLLECTIONS(result[0].begin(), result[0].end(), expected.begin(), expected.end());
 }
 
 BOOST_AUTO_TEST_CASE(two_conflicts1) {
@@ -280,14 +267,12 @@ BOOST_AUTO_TEST_CASE(two_conflicts1) {
 
   {
     std::vector<std::string> expected = list_of("a")("b");
-    BOOST_REQUIRE_EQUAL_COLLECTIONS(result[0].begin(), result[0].end(),
-                                    expected.begin(), expected.end());
+    BOOST_REQUIRE_EQUAL_COLLECTIONS(result[0].begin(), result[0].end(), expected.begin(), expected.end());
   }
 
   {
     std::vector<std::string> expected = list_of("c")("d");
-    BOOST_REQUIRE_EQUAL_COLLECTIONS(result[1].begin(), result[1].end(),
-                                    expected.begin(), expected.end());
+    BOOST_REQUIRE_EQUAL_COLLECTIONS(result[1].begin(), result[1].end(), expected.begin(), expected.end());
   }
 
   BOOST_REQUIRE_EQUAL(result.size(), 2);
@@ -304,8 +289,7 @@ BOOST_AUTO_TEST_CASE(two_conflicts2) {
 
   Generator gen;
   gen("a", a() != b())
-  ("b", b() != c())("c", a() != c())("d", d() == 0)("e",
-                                                    e() == d() && e() != 0);
+  ("b", b() != c())("c", a() != c())("d", d() == 0)("e", e() == d() && e() != 0);
 
   BOOST_REQUIRE(!gen.next());
   std::vector<std::vector<std::string> > result = gen.analyseContradiction();
@@ -315,14 +299,12 @@ BOOST_AUTO_TEST_CASE(two_conflicts2) {
 
   {
     std::vector<std::string> expected = list_of("d")("e");
-    BOOST_REQUIRE_EQUAL_COLLECTIONS(result[0].begin(), result[0].end(),
-                                    expected.begin(), expected.end());
+    BOOST_REQUIRE_EQUAL_COLLECTIONS(result[0].begin(), result[0].end(), expected.begin(), expected.end());
   }
 
   {
     std::vector<std::string> expected = list_of("a")("b")("c");
-    BOOST_REQUIRE_EQUAL_COLLECTIONS(result[1].begin(), result[1].end(),
-                                    expected.begin(), expected.end());
+    BOOST_REQUIRE_EQUAL_COLLECTIONS(result[1].begin(), result[1].end(), expected.begin(), expected.end());
   }
 
   BOOST_REQUIRE_EQUAL(result.size(), 2);
@@ -351,14 +333,12 @@ BOOST_AUTO_TEST_CASE(two_conflicts3) {
 
   {
     std::vector<std::string> expected = list_of("c1")("c2");
-    BOOST_REQUIRE_EQUAL_COLLECTIONS(result[0].begin(), result[0].end(),
-                                    expected.begin(), expected.end());
+    BOOST_REQUIRE_EQUAL_COLLECTIONS(result[0].begin(), result[0].end(), expected.begin(), expected.end());
   }
 
   {
     std::vector<std::string> expected = list_of("c1")("c3")("c4")("c5");
-    BOOST_REQUIRE_EQUAL_COLLECTIONS(result[1].begin(), result[1].end(),
-                                    expected.begin(), expected.end());
+    BOOST_REQUIRE_EQUAL_COLLECTIONS(result[1].begin(), result[1].end(), expected.begin(), expected.end());
   }
 }
 
@@ -382,8 +362,7 @@ BOOST_AUTO_TEST_CASE(conflict_with_softs_t1) {
   BOOST_REQUIRE_EQUAL(result.size(), 1);
 
   std::vector<std::string> expected = list_of("c4");
-  BOOST_REQUIRE_EQUAL_COLLECTIONS(result.begin(), result.end(),
-                                  expected.begin(), expected.end());
+  BOOST_REQUIRE_EQUAL_COLLECTIONS(result.begin(), result.end(), expected.begin(), expected.end());
 }
 
 BOOST_AUTO_TEST_CASE(conflict_with_softs_t2) {
@@ -405,17 +384,14 @@ BOOST_AUTO_TEST_CASE(conflict_with_softs_t2) {
   std::cout << std::endl;
 
   std::vector<std::string> expected = list_of("s1")("s4");
-  BOOST_CHECK_EQUAL_COLLECTIONS(result.begin(), result.end(), expected.begin(),
-                                expected.end());
+  BOOST_CHECK_EQUAL_COLLECTIONS(result.begin(), result.end(), expected.begin(), expected.end());
 }
 
 class Item2 : public rand_obj {
  public:
   Item2() : rand_obj(), a(this), b(this) {
-    constraint("d1",
-               dist(a(), distribution<uint>::create(range<uint>(10, 20))));
-    constraint("d2",
-               dist(a(), distribution<uint>::create(range<uint>(30, 50))));
+    constraint("d1", dist(a(), distribution<uint>::create(range<uint>(10, 20))));
+    constraint("d2", dist(a(), distribution<uint>::create(range<uint>(30, 50))));
     constraint(b() == a() * 5);
   }
   randv<uint> a;

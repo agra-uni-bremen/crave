@@ -22,8 +22,7 @@ BOOST_AUTO_TEST_CASE(logical_not_t2) {
   randv<unsigned int> b(0);
   Generator gen;
 
-  gen(if_then_else(!(a() % 2 == 0), b() > 0 && b() <= 50,
-                   b() > 50 && b() <= 100));
+  gen(if_then_else(!(a() % 2 == 0), b() > 0 && b() <= 50, b() > 50 && b() <= 100));
 
   BOOST_REQUIRE(gen.next());
   std::cout << "a =" << a << ", b = " << b << std::endl;
@@ -335,8 +334,8 @@ BOOST_AUTO_TEST_CASE(plus_minus) {
     BOOST_REQUIRE_EQUAL(gen[a] - gen[b], gen[r]);
 
     gen(a != gen[a] || b != gen[b]);
-    std::cout << "#" << cnt++ << ": result: a=" << gen[a] << ", b=" << gen[b]
-              << ", q=" << gen[q] << ", r=" << gen[r] << "\n" << std::endl;
+    std::cout << "#" << cnt++ << ": result: a=" << gen[a] << ", b=" << gen[b] << ", q=" << gen[q] << ", r=" << gen[r]
+              << "\n" << std::endl;
   }
 }
 
@@ -380,8 +379,8 @@ BOOST_AUTO_TEST_CASE(divide) {
     BOOST_REQUIRE_EQUAL(gen[a] % gen[b], gen[r]);
 
     gen(a != gen[a] || b != gen[b]);
-    std::cout << "result: a=" << gen[a] << ", b=" << gen[b] << ", q=" << gen[q]
-              << ", r=" << gen[r] << "\n" << std::endl;
+    std::cout << "result: a=" << gen[a] << ", b=" << gen[b] << ", q=" << gen[q] << ", r=" << gen[r] << "\n"
+              << std::endl;
   }
 }
 
@@ -562,8 +561,7 @@ BOOST_AUTO_TEST_CASE(if_then_else_t1) {
   randv<unsigned int> b(0);
   Generator gen;
 
-  gen(if_then_else(reference(a)<5, b()> 0 && b() <= 50,
-                   b() > 50 && b() <= 100));
+  gen(if_then_else(reference(a)<5, b()> 0 && b() <= 50, b() > 50 && b() <= 100));
 
   for (a = 0; a < 10; ++a) {
     BOOST_REQUIRE(gen.next());

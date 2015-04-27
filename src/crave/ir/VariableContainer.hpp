@@ -13,8 +13,7 @@ namespace crave {
 
 struct VariableContainer {
 
-  typedef std::pair<int, boost::shared_ptr<crave::ReferenceExpression> >
-      ReadRefPair;
+  typedef std::pair<int, boost::shared_ptr<crave::ReferenceExpression> > ReadRefPair;
   typedef std::pair<int, boost::shared_ptr<crave::AssignResult> > WriteRefPair;
 
   std::map<int, NodePtr> variables;

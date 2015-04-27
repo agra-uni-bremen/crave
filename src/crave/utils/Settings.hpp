@@ -38,9 +38,7 @@ class Setting {
     ptree tree;
 
     std::ifstream cfg_file(filename_.c_str());
-    if (cfg_file.is_open())
-      read_xml(cfg_file, tree,
-               boost::property_tree::xml_parser::trim_whitespace);
+    if (cfg_file.is_open()) read_xml(cfg_file, tree, boost::property_tree::xml_parser::trim_whitespace);
 
     cfg_file.close();
     return tree;
@@ -108,12 +106,7 @@ class LoggerSetting : public Setting {
 class CraveSetting : public Setting {
  public:
   CraveSetting(std::string const& filename)
-      : Setting(filename),
-        module_name_("crave"),
-        backend_(),
-        seed_(),
-        BACKEND("backend"),
-        SEED("seed") {}
+      : Setting(filename), module_name_("crave"), backend_(), seed_(), BACKEND("backend"), SEED("seed") {}
 
  private:
   virtual void load_(ptree& tree) {

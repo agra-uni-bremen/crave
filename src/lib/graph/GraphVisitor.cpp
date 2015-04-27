@@ -9,13 +9,10 @@ namespace crave {
 namespace graph {
 
 void PrintVisitor::printNode(Node& n) {
-  std::cout << std::string(depth, ' ') << n.kind() << " "
-            << (n.name() ? n.name() : "") << std::endl;
+  std::cout << std::string(depth, ' ') << n.kind() << " " << (n.name() ? n.name() : "") << std::endl;
 }
 
-void PrintVisitor::visitTerminal(Terminal& t) {
-  ++depth, printNode(t), --depth;
-}
+void PrintVisitor::visitTerminal(Terminal& t) { ++depth, printNode(t), --depth; }
 
 void PrintVisitor::visitSelector(Selector& sel) {
   ++depth;
@@ -37,8 +34,7 @@ void UpdateVisitor::visitTerminal(Terminal& t) {}
 
 void UpdateVisitor::visitNonTerminal(NonTerminal& nt) {
   if (nt.name()) {
-    BOOST_ASSERT_MSG(m_on_path.find(nt.name()) == m_on_path.end(),
-                     "Loop detected");
+    BOOST_ASSERT_MSG(m_on_path.find(nt.name()) == m_on_path.end(), "Loop detected");
     m_on_path.insert(nt.name());
   }
 
@@ -53,8 +49,7 @@ void UpdateVisitor::visitNonTerminal(NonTerminal& nt) {
     if (!tmp->name() && tmp->kind() == nt.kind()) {
       // unfold unnamed child of same kind
       NonTerminal& nt_child = static_cast<NonTerminal&>(*tmp);
-      updated_children.insert(updated_children.end(), nt_child.children.begin(),
-                              nt_child.children.end());
+      updated_children.insert(updated_children.end(), nt_child.children.begin(), nt_child.children.end());
       nt_child.children.clear();
     } else {
       updated_children.push_back(tmp);
@@ -74,8 +69,7 @@ void UpdateVisitor::visitSequence(Sequence& seq) { visitNonTerminal(seq); }
 
 #define TDV_INDENT(x) std::string(m_stack.size() + x, '\t')
 
-void ToDotVisitor::createNode(int ind, int id, const char* name,
-                              const char* shape, const char* color) {
+void ToDotVisitor::createNode(int ind, int id, const char* name, const char* shape, const char* color) {
   m_out << TDV_INDENT(ind) << id;
   m_out << " [";
   m_out << "label=\"" << name << "\" ";
@@ -91,12 +85,10 @@ void ToDotVisitor::createEdge(int source, int dest, const char* color) {
   m_out << std::endl;
 }
 
-void ToDotVisitor::beginSubgraph(const char* name, const char* color,
-                                 const char* style) {
+void ToDotVisitor::beginSubgraph(const char* name, const char* color, const char* style) {
   static unsigned int sg_cnt = 0;
   if (name) {
-    m_out << TDV_INDENT(0) << "subgraph cluster_" << sg_cnt << " {"
-          << std::endl;
+    m_out << TDV_INDENT(0) << "subgraph cluster_" << sg_cnt << " {" << std::endl;
     m_out << TDV_INDENT(1) << "label=\"" << name << "\";" << std::endl;
     if (color) m_out << TDV_INDENT(1) << "color=" << color << ";" << std::endl;
     if (style) m_out << TDV_INDENT(1) << "style=" << style << ";" << std::endl;

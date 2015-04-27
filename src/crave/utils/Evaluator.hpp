@@ -24,9 +24,7 @@ class Evaluator {
   bool evaluate(Expr expr) {
     return evaluate(make_expression(expr));
   }
-  bool evaluate(expression const& expr) {
-    return visitor_.evaluate(*boost::proto::value(expr));
-  }
+  bool evaluate(expression const& expr) { return visitor_.evaluate(*boost::proto::value(expr)); }
 
   template <typename Integer>
   Integer result() const {

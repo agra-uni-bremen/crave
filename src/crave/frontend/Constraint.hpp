@@ -19,24 +19,19 @@ struct Variable;
 int new_var_id();
 
 template <typename Expr>
-struct Constraint
-    : boost::proto::extends<Expr, Constraint<Expr>, Constraint_Domain> {
-  typedef boost::proto::extends<Expr, Constraint<Expr>, Constraint_Domain>
-      base_type;
+struct Constraint : boost::proto::extends<Expr, Constraint<Expr>, Constraint_Domain> {
+  typedef boost::proto::extends<Expr, Constraint<Expr>, Constraint_Domain> base_type;
 
   explicit Constraint(Expr const& expr = Expr()) : base_type(expr) {}
 
   template <typename T, typename E2>
-  typename boost::proto::result_of::make_expr<boost::proto::tag::assign,
-                                              Constraint_Domain, Expr, E2>::type
-  operator=(E2 e) {
+  typename boost::proto::result_of::make_expr<boost::proto::tag::assign, Constraint_Domain, Expr, E2>::type operator=(
+      E2 e) {
     return boost::proto::make_expr<boost::proto::tag::assign>(*this, e);
   }
 };
 
-struct Constraint_Domain
-    : boost::proto::domain<boost::proto::generator<Constraint>,
-                           Constraint_Grammar> {};
+struct Constraint_Domain : boost::proto::domain<boost::proto::generator<Constraint>, Constraint_Grammar> {};
 
 template <typename Expr>
 void check(Constraint<Expr> const&) {
@@ -57,15 +52,10 @@ struct var_tag {
 };
 
 template <typename value_type_>
-struct Variable
-    : public Constraint<
-          typename boost::proto::terminal<var_tag<value_type_> >::type> {
-  typedef Constraint<
-      typename boost::proto::terminal<var_tag<value_type_> >::type> base_type;
+struct Variable : public Constraint<typename boost::proto::terminal<var_tag<value_type_> >::type> {
+  typedef Constraint<typename boost::proto::terminal<var_tag<value_type_> >::type> base_type;
 
-  Variable()
-      : base_type(boost::proto::make_expr<boost::proto::tag::terminal>(
-            var_tag<value_type_>(new_var_id()))) {}
+  Variable() : base_type(boost::proto::make_expr<boost::proto::tag::terminal>(var_tag<value_type_>(new_var_id()))) {}
 
   template <typename T>
   explicit Variable(T linkto)
@@ -75,17 +65,12 @@ struct Variable
 
   typedef value_type_ value_type;
 
-  int id() const {
-    return boost::proto::value(*this).id;
-  }
+  int id() const { return boost::proto::value(*this).id; }
 
-  typename boost::proto::result_of::make_expr<
-      boost::proto::tag::assign, Constraint_Domain,
-      Variable<value_type_> const&, value_type_ const&>::type const
+  typename boost::proto::result_of::make_expr<boost::proto::tag::assign, Constraint_Domain,
+                                              Variable<value_type_> const&, value_type_ const&>::type const
   operator=(value_type_ const& e) const {
-    return boost::proto::make_expr<boost::proto::tag::assign,
-                                   Constraint_Domain>(boost::cref(*this),
-                                                      boost::cref(e));
+    return boost::proto::make_expr<boost::proto::tag::assign, Constraint_Domain>(boost::cref(*this), boost::cref(e));
   }
 };
 
@@ -93,35 +78,26 @@ struct Variable
 
 template <typename value_type>
 struct write_ref_tag : public var_tag<value_type> {
-  write_ref_tag(int id_, value_type& ref_)
-      : var_tag<value_type>(id_), ref(ref_) {}
+  write_ref_tag(int id_, value_type& ref_) : var_tag<value_type>(id_), ref(ref_) {}
   value_type& ref;
 };
 
 template <typename value_type_>
-struct WriteReference
-    : public Constraint<
-          typename boost::proto::terminal<write_ref_tag<value_type_> >::type> {
-  typedef Constraint<typename boost::proto::terminal<
-      write_ref_tag<value_type_> >::type> base_type;
+struct WriteReference : public Constraint<typename boost::proto::terminal<write_ref_tag<value_type_> >::type> {
+  typedef Constraint<typename boost::proto::terminal<write_ref_tag<value_type_> >::type> base_type;
 
   explicit WriteReference(value_type_& ref)
-      : base_type(boost::proto::make_expr<boost::proto::tag::terminal>(
-            write_ref_tag<value_type_>(new_var_id(), ref))) {}
+      : base_type(boost::proto::make_expr<boost::proto::tag::terminal>(write_ref_tag<value_type_>(new_var_id(), ref))) {
+  }
 
   typedef value_type_ value_type;
 
-  int id() const {
-    return boost::proto::value(*this).id;
-  }
+  int id() const { return boost::proto::value(*this).id; }
 
-  typename boost::proto::result_of::make_expr<
-      boost::proto::tag::assign, Constraint_Domain,
-      WriteReference<value_type_> const&, value_type_ const&>::type const
+  typename boost::proto::result_of::make_expr<boost::proto::tag::assign, Constraint_Domain,
+                                              WriteReference<value_type_> const&, value_type_ const&>::type const
   operator=(value_type_ const& e) const {
-    return boost::proto::make_expr<boost::proto::tag::assign,
-                                   Constraint_Domain>(boost::cref(*this),
-                                                      boost::cref(e));
+    return boost::proto::make_expr<boost::proto::tag::assign, Constraint_Domain>(boost::cref(*this), boost::cref(e));
   }
 };
 
@@ -129,36 +105,26 @@ struct WriteReference
 
 template <typename value_type>
 struct read_ref_tag : public var_tag<value_type> {
-  read_ref_tag(int id_, value_type const& ref_)
-      : var_tag<value_type>(id_), ref(ref_) {}
+  read_ref_tag(int id_, value_type const& ref_) : var_tag<value_type>(id_), ref(ref_) {}
   value_type const& ref;
 };
 
 template <typename value_type_>
-struct ReadReference
-    : public Constraint<
-          typename boost::proto::terminal<read_ref_tag<value_type_> >::type> {
-  typedef Constraint<typename boost::proto::terminal<
-      read_ref_tag<value_type_> >::type> base_type;
+struct ReadReference : public Constraint<typename boost::proto::terminal<read_ref_tag<value_type_> >::type> {
+  typedef Constraint<typename boost::proto::terminal<read_ref_tag<value_type_> >::type> base_type;
 
   explicit ReadReference(value_type_ const& ref)
-      : base_type(boost::proto::make_expr<boost::proto::tag::terminal>(
-            read_ref_tag<value_type_>(new_var_id(), ref))) {}
+      : base_type(boost::proto::make_expr<boost::proto::tag::terminal>(read_ref_tag<value_type_>(new_var_id(), ref))) {}
 
   typedef value_type_ value_type;
 
-  int id() const {
-    return boost::proto::value(*this).id;
-  }
+  int id() const { return boost::proto::value(*this).id; }
 };
 
 template <typename T>
-typename boost::proto::result_of::make_expr<
-    boost::proto::tag::terminal, Constraint_Domain, read_ref_tag<T> >::type
+typename boost::proto::result_of::make_expr<boost::proto::tag::terminal, Constraint_Domain, read_ref_tag<T> >::type
 reference(T const& ref) {
-  return boost::proto::make_expr<boost::proto::tag::terminal,
-                                 Constraint_Domain>(
-      read_ref_tag<T>(new_var_id(), ref));
+  return boost::proto::make_expr<boost::proto::tag::terminal, Constraint_Domain>(read_ref_tag<T>(new_var_id(), ref));
 }
 
 // Vector
@@ -170,21 +136,14 @@ struct vector_tag {
 };
 
 template <typename value_type_>
-struct Vector
-    : public Constraint<
-          typename boost::proto::terminal<vector_tag<value_type_> >::type> {
-  typedef Constraint<typename boost::proto::terminal<
-      vector_tag<value_type_> >::type> base_type;
+struct Vector : public Constraint<typename boost::proto::terminal<vector_tag<value_type_> >::type> {
+  typedef Constraint<typename boost::proto::terminal<vector_tag<value_type_> >::type> base_type;
 
-  Vector()
-      : base_type(boost::proto::make_expr<boost::proto::tag::terminal>(
-            vector_tag<value_type_>(new_var_id()))) {}
+  Vector() : base_type(boost::proto::make_expr<boost::proto::tag::terminal>(vector_tag<value_type_>(new_var_id()))) {}
 
   typedef value_type_ value_type;
 
-  int id() const {
-    return boost::proto::value(*this).id;
-  }
+  int id() const { return boost::proto::value(*this).id; }
 
   const Variable<unsigned int>& size() const { return _size; }
 
@@ -199,13 +158,10 @@ struct placeholder_tag {
   int id;
 };
 
-struct placeholder
-    : public Constraint<boost::proto::terminal<placeholder_tag>::type> {
+struct placeholder : public Constraint<boost::proto::terminal<placeholder_tag>::type> {
   typedef Constraint<boost::proto::terminal<placeholder_tag>::type> base_type;
 
-  placeholder()
-      : base_type(boost::proto::make_expr<boost::proto::tag::terminal>(
-            placeholder_tag(new_var_id()))) {}
+  placeholder() : base_type(boost::proto::make_expr<boost::proto::tag::terminal>(placeholder_tag(new_var_id()))) {}
 
   int id() const { return boost::proto::value(*this).id; }
 };

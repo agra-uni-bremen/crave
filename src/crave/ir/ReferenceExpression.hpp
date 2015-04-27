@@ -18,9 +18,7 @@ struct ReferenceExpression {
 template <typename Integer>
 struct ReferenceExpressionImpl : public ReferenceExpression {
  public:
-  ReferenceExpressionImpl(Integer const& value,
-                          ReferenceExpression::result_type expr)
-      : value_(value), expr_(expr) {}
+  ReferenceExpressionImpl(Integer const& value, ReferenceExpression::result_type expr) : value_(value), expr_(expr) {}
   virtual ~ReferenceExpressionImpl() {}
 
  public:
@@ -37,9 +35,7 @@ struct ReferenceExpressionImpl : public ReferenceExpression {
 
 template <typename Integer>
 struct DistReferenceExpr : ReferenceExpression {
-  DistReferenceExpr(distribution<Integer> dist,
-                    ReferenceExpression::result_type expr)
-      : dist_(dist), expr_(expr) {}
+  DistReferenceExpr(distribution<Integer> dist, ReferenceExpression::result_type expr) : dist_(dist), expr_(expr) {}
 
   virtual ReferenceExpression::result_type expr() const {
     unsigned width = bitsize_traits<Integer>::value;

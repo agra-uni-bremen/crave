@@ -36,8 +36,7 @@ BOOST_AUTO_TEST_CASE(fibo_test) {
   BOOST_REQUIRE_LE(it.v.size(), 50);
   BOOST_REQUIRE_EQUAL(it.v[0], 0);
   BOOST_REQUIRE_EQUAL(it.v[1], 1);
-  for (uint i = 2; i < it.v.size(); i++)
-    BOOST_REQUIRE_EQUAL(it.v[i], it.v[i - 1] + it.v[i - 2]);
+  for (uint i = 2; i < it.v.size(); i++) BOOST_REQUIRE_EQUAL(it.v[i], it.v[i - 1] + it.v[i - 2]);
 }
 
 struct Item1 : public rand_obj {
@@ -57,9 +56,7 @@ BOOST_AUTO_TEST_CASE(free_vector_test) {
 }
 
 struct Item2 : public rand_obj {
-  Item2() : idx(), v(this) {
-    constraint(foreach(v(), 100 <= v()[idx] && v()[idx] <= 200));
-  }
+  Item2() : idx(), v(this) { constraint(foreach(v(), 100 <= v()[idx] && v()[idx] <= 200)); }
 
   placeholder idx;
   rand_vec<unsigned int> v;

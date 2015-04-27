@@ -46,9 +46,7 @@ class coverpoint {
   static coverpoint cross(coverpoint cp1, coverpoint cp2) {
     coverpoint res(std::string("cross_") + cp1.name() + "_" + cp2.name());
     BOOST_FOREACH(coverbin & cb1, cp1.bins()) {
-      BOOST_FOREACH(coverbin & cb2, cp2.bins()) {
-        res.bins().push_back(coverbin(cb1.bin_expr() && cb2.bin_expr()));
-      }
+      BOOST_FOREACH(coverbin & cb2, cp2.bins()) { res.bins().push_back(coverbin(cb1.bin_expr() && cb2.bin_expr())); }
     }
     return res;
   }
@@ -85,8 +83,7 @@ class covergroup {
       std::cout << "Coverpoint " << cp.name() << std::endl;
       int c = 0;
       BOOST_FOREACH(coverbin & cb, cp.bins()) {
-        std::cout << "  Coverbin " << c++ << ": " << cb.hit_count() << " "
-                  << cb.hit_minimum() << std::endl;
+        std::cout << "  Coverbin " << c++ << ": " << cb.hit_count() << " " << cb.hit_minimum() << std::endl;
       }
     }
   }

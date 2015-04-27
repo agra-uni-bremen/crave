@@ -15,16 +15,16 @@ BOOST_AUTO_TEST_CASE(basic_test) {
 
   coverpoint cp1("coverpoint1");
   {
-    std::vector<coverbin> tmp = boost::assign::list_of(coverbin(a() == 0, 10))(
-        coverbin(a() == 1, 10))(coverbin(a() == 2, 5));
+    std::vector<coverbin> tmp =
+        boost::assign::list_of(coverbin(a() == 0, 10))(coverbin(a() == 1, 10))(coverbin(a() == 2, 5));
     cp1.bins() = tmp;
   }
 
   coverpoint cp2("coverpoint2");
 
   {
-    std::vector<coverbin> tmp = boost::assign::list_of(coverbin(a() == 0, 10))(
-        coverbin(a() == 1, 10))(coverbin(a() == 2, 5));
+    std::vector<coverbin> tmp =
+        boost::assign::list_of(coverbin(a() == 0, 10))(coverbin(a() == 1, 10))(coverbin(a() == 2, 5));
     cp2.bins() = tmp;
   }
 

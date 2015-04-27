@@ -24,13 +24,10 @@ struct AssignResultImpl : AssignResult {
   bool random_bit() const { return (*random_)(); }
 
  public:
-  virtual T value() const {
-    return value_;
-  }
+  virtual T value() const { return value_; }
   virtual void set_value(std::string const& str) {
     value_ = ((crave::is_signed<T>::value && str[0] == '1') ? -1 : 0);
-    for (std::string::const_iterator ite = str.begin(); ite != str.end();
-         ++ite) {
+    for (std::string::const_iterator ite = str.begin(); ite != str.end(); ++ite) {
       value_ <<= 1;
       switch (*ite) {
         case '0':
@@ -65,13 +62,10 @@ struct AssignResultToRef : AssignResult {
   bool random_bit() const { return (*random_)(); }
 
  public:
-  virtual T const& value() const {
-    return value_;
-  }
+  virtual T const& value() const { return value_; }
   virtual void set_value(std::string const& str) {
     value_ = ((crave::is_signed<T>::value && str[0] == '1') ? -1 : 0);
-    for (std::string::const_iterator ite = str.begin(); ite != str.end();
-         ++ite) {
+    for (std::string::const_iterator ite = str.begin(); ite != str.end(); ++ite) {
       value_ <<= 1;
       switch (*ite) {
         case '0':

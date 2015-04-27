@@ -8,17 +8,14 @@
 
 #include <glog/logging.h>
 
-#define DEFINE_SOLVER(inCrave, inMetaSMT)                      \
-  namespace crave {                                            \
-  template <>                                                  \
-  struct FactorySolver<inCrave> {                              \
-    typedef metaSMT::DirectSolver_Context<                     \
-        metaSMT::UnpackFuture_Context<inMetaSMT> > SolverType; \
-    static bool isDefined() { return true; }                   \
-    static metaSMTVisitor* getNewInstance() {                  \
-      return new metaSMTVisitorImpl<SolverType>();             \
-    }                                                          \
-  };                                                           \
+#define DEFINE_SOLVER(inCrave, inMetaSMT)                                                        \
+  namespace crave {                                                                              \
+  template <>                                                                                    \
+  struct FactorySolver<inCrave> {                                                                \
+    typedef metaSMT::DirectSolver_Context<metaSMT::UnpackFuture_Context<inMetaSMT> > SolverType; \
+    static bool isDefined() { return true; }                                                     \
+    static metaSMTVisitor* getNewInstance() { return new metaSMTVisitorImpl<SolverType>(); }     \
+  };                                                                                             \
   }
 
 #ifdef metaSMT_USE_Boolector
@@ -43,8 +40,7 @@ DEFINE_SOLVER(crave::Z3, metaSMT::solver::Z3_Backend);
 
 #ifdef metaSMT_USE_CUDD
 #include <metaSMT/backend/CUDD_Distributed.hpp>
-DEFINE_SOLVER(crave::CUDD,
-              metaSMT::BitBlast<metaSMT::solver::CUDD_Distributed>);
+DEFINE_SOLVER(crave::CUDD, metaSMT::BitBlast<metaSMT::solver::CUDD_Distributed>);
 #endif
 
 #undef DEFINE_SOLVER
@@ -66,13 +62,12 @@ void FactoryMetaSMT::setSolverType(std::string const& type) {
     solver_type = CUDD;
 }
 
-#define TRY_GET_SOLVER(solver)                                             \
-  if (!FactorySolver<solver>::isDefined()) {                               \
-    solver_type = UNDEFINED_SOLVER;                                        \
-    LOG(INFO) << #solver                                                   \
-              << " has not been defined, another solver will be selected"; \
-    return getNewInstance();                                               \
-  } else                                                                   \
+#define TRY_GET_SOLVER(solver)                                                        \
+  if (!FactorySolver<solver>::isDefined()) {                                          \
+    solver_type = UNDEFINED_SOLVER;                                                   \
+    LOG(INFO) << #solver << " has not been defined, another solver will be selected"; \
+    return getNewInstance();                                                          \
+  } else                                                                              \
     return FactorySolver<solver>::getNewInstance();
 
 #define TRY_GET_SOLVER_WHEN_UNDEFINED(solver)                   \
