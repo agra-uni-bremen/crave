@@ -1,8 +1,12 @@
+// Copyright 2014 The CRAVE developers. All rights reserved.
+
 #pragma once
 
 #include <sysc/datatypes/int/sc_int.h>
 #include <sysc/datatypes/int/sc_uint.h>
 #include <sysc/datatypes/bit/sc_bv.h>
+
+#include <vector>
 
 #include "../ir/ReferenceExpression.hpp"
 #include "bitsize_traits.hpp"
@@ -89,62 +93,63 @@ struct bitsize_traits<
     return i BinOp((Typename<N>)r);                                       \
   }
 
-#define RANDV_SCDT_VALUE_OPERATORS(Typename)                     \
-  RANDV_SCDT_BINARY_OPERATOR(Typename, +)                        \
-      RANDV_SCDT_BINARY_OPERATOR(Typename, -)                    \
-      RANDV_SCDT_BINARY_OPERATOR(Typename, *)                    \
-      RANDV_SCDT_BINARY_OPERATOR(Typename, / )                   \
-      RANDV_SCDT_BINARY_OPERATOR(Typename, % )                   \
-      RANDV_SCDT_BINARY_OPERATOR(Typename, &)                    \
-      RANDV_SCDT_BINARY_OPERATOR(Typename, | )                   \
-      RANDV_SCDT_BINARY_OPERATOR(Typename, ^)                    \
-      RANDV_SCDT_BINARY_OPERATOR(Typename, << )                  \
-      RANDV_SCDT_BINARY_OPERATOR(Typename, >> ) template <int N> \
-  sc_dt::int64 operator~(randv<Typename<N> > const& r) {         \
-    return ~((Typename<N>)r);                                    \
+#define RANDV_SCDT_VALUE_OPERATORS(Typename)             \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, +);               \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, -);               \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, *);               \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, / );              \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, % );              \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, &);               \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, | );              \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, ^);               \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, << );             \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, >> );             \
+  template <int N>                                       \
+  sc_dt::int64 operator~(randv<Typename<N> > const& r) { \
+    return ~((Typename<N>)r);                            \
   }
 
 #define RANDV_SCDT_COMPARISON_OPERATORS(Typename) \
-  RANDV_SCDT_BINARY_OPERATOR(Typename, == )       \
-      RANDV_SCDT_BINARY_OPERATOR(Typename, != )   \
-      RANDV_SCDT_BINARY_OPERATOR(Typename, > )    \
-      RANDV_SCDT_BINARY_OPERATOR(Typename, >= )   \
-      RANDV_SCDT_BINARY_OPERATOR(Typename, < )    \
-      RANDV_SCDT_BINARY_OPERATOR(Typename, <= )
+  RANDV_SCDT_BINARY_OPERATOR(Typename, == );      \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, != );      \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, > );       \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, >= );      \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, < );       \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, <= );
 
 template <int N>
 class randv<sc_dt::sc_bv<N> > : public randv_base<sc_dt::sc_bv<N> > {
   typedef sc_dt::sc_bv<N> sc_bv;
-  RANDV_COMMON_INTERFACE(sc_bv)
-  RANDV_SCDT_PRIM_INTERFACE(sc_bv)
+  RANDV_COMMON_INTERFACE(sc_bv);
+  RANDV_SCDT_PRIM_INTERFACE(sc_bv);
 };
-RANDV_SCDT_BINARY_OPERATOR(sc_dt::sc_bv, == )
-RANDV_SCDT_BINARY_OPERATOR(sc_dt::sc_bv, != )
-RANDV_SCDT_REF_EXPR(sc_dt::sc_bv)
+RANDV_SCDT_BINARY_OPERATOR(sc_dt::sc_bv, == );
+RANDV_SCDT_BINARY_OPERATOR(sc_dt::sc_bv, != );
+RANDV_SCDT_REF_EXPR(sc_dt::sc_bv);
 
 template <int N>
 class randv<sc_dt::sc_int<N> > : public randv_base<sc_dt::sc_int<N> > {
   typedef sc_dt::sc_int<N> sc_int;
-  RANDV_COMMON_INTERFACE(sc_int)
-  RANDV_ARITHMETIC_INTERFACE(sc_int)
-  RANDV_BITWISE_INTERFACE(sc_int)
-  RANDV_SCDT_PRIM_INTERFACE(sc_int)
+  RANDV_COMMON_INTERFACE(sc_int);
+  RANDV_ARITHMETIC_INTERFACE(sc_int);
+  RANDV_BITWISE_INTERFACE(sc_int);
+  RANDV_SCDT_PRIM_INTERFACE(sc_int);
 };
-RANDV_SCDT_VALUE_OPERATORS(sc_dt::sc_int)
-RANDV_SCDT_COMPARISON_OPERATORS(sc_dt::sc_int)
-RANDV_SCDT_REF_EXPR(sc_dt::sc_int)
+RANDV_SCDT_VALUE_OPERATORS(sc_dt::sc_int);
+RANDV_SCDT_COMPARISON_OPERATORS(sc_dt::sc_int);
+RANDV_SCDT_REF_EXPR(sc_dt::sc_int);
 
 template <int N>
 class randv<sc_dt::sc_uint<N> > : public randv_base<sc_dt::sc_uint<N> > {
   typedef sc_dt::sc_uint<N> sc_uint;
-  RANDV_COMMON_INTERFACE(sc_uint)
-  RANDV_ARITHMETIC_INTERFACE(sc_uint)
-  RANDV_BITWISE_INTERFACE(sc_uint)
-  RANDV_SCDT_PRIM_INTERFACE(sc_uint)
+  RANDV_COMMON_INTERFACE(sc_uint);
+  RANDV_ARITHMETIC_INTERFACE(sc_uint);
+  RANDV_BITWISE_INTERFACE(sc_uint);
+  RANDV_SCDT_PRIM_INTERFACE(sc_uint);
 };
-RANDV_SCDT_VALUE_OPERATORS(sc_dt::sc_uint)
-RANDV_SCDT_COMPARISON_OPERATORS(sc_dt::sc_uint)
-RANDV_SCDT_REF_EXPR(sc_dt::sc_uint)
+RANDV_SCDT_VALUE_OPERATORS(sc_dt::sc_uint);
+RANDV_SCDT_COMPARISON_OPERATORS(sc_dt::sc_uint);
+RANDV_SCDT_REF_EXPR(sc_dt::sc_uint);
 
 }  // namespace crave
 

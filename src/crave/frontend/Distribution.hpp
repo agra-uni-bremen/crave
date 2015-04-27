@@ -1,11 +1,13 @@
-#pragma once
+// Copyright 2014 The CRAVE developers. All rights reserved.
 
-#include "../ir/Node.hpp"
+#pragma once
 
 #include <boost/random.hpp>
 
 #include <limits>
 #include <vector>
+
+#include "../ir/Node.hpp"
 
 namespace crave {
 
@@ -103,7 +105,7 @@ struct distribution : Node {
 
 template <>
 struct distribution<bool> : Node {
-  distribution(const double prob = 0.5) : prob_(prob) {}
+  explicit distribution(const double prob = 0.5) : prob_(prob) {}
 
   static distribution create(const double prob) {
     distribution dist(prob);

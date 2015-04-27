@@ -2,6 +2,8 @@
 
 #include <string>
 
+// Copyright 2014 The CRAVE developers. All rights reserved.
+
 namespace crave {
 
 struct AssignResult {

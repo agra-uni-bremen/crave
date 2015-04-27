@@ -1,12 +1,14 @@
-#pragma once
+// Copyright 2014 The CRAVE developers. All rights reserved.
 
-#include "AssignResult.hpp"
-#include "bitsize_traits.hpp"
+#pragma once
 
 #include <boost/function.hpp>
 #include <boost/optional.hpp>
 
 #include <string>
+
+#include "AssignResult.hpp"
+#include "bitsize_traits.hpp"
 
 namespace crave {
 
@@ -14,7 +16,7 @@ template <typename T>
 struct AssignResultImpl : AssignResult {
  public:
   AssignResultImpl() {}
-  AssignResultImpl(T& value) : value_(value) {}
+  explicit AssignResultImpl(T& value) : value_(value) {}
 
  private:
   typedef boost::optional<boost::function0<bool> > Random;
@@ -24,7 +26,7 @@ struct AssignResultImpl : AssignResult {
  public:
   virtual T value() const {
     return value_;
-  };
+  }
   virtual void set_value(std::string const& str) {
     value_ = ((crave::is_signed<T>::value && str[0] == '1') ? -1 : 0);
     for (std::string::const_iterator ite = str.begin(); ite != str.end();
@@ -55,7 +57,7 @@ struct AssignResultImpl : AssignResult {
 template <typename T>
 struct AssignResultToRef : AssignResult {
  public:
-  AssignResultToRef(T& ref) : value_(ref) {}
+  explicit AssignResultToRef(T& ref) : value_(ref) {}
 
  private:
   typedef boost::optional<boost::function0<bool> > Random;
@@ -65,7 +67,7 @@ struct AssignResultToRef : AssignResult {
  public:
   virtual T const& value() const {
     return value_;
-  };
+  }
   virtual void set_value(std::string const& str) {
     value_ = ((crave::is_signed<T>::value && str[0] == '1') ? -1 : 0);
     for (std::string::const_iterator ite = str.begin(); ite != str.end();

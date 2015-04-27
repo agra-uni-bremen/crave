@@ -1,12 +1,15 @@
+// Copyright 2014 The CRAVE developers. All rights reserved.
+
 #pragma once
+
+#include <vector>
+#include <map>
+#include <string>
 
 #include "Constraint.hpp"
 #include "Distribution.hpp"
 
 #include "AssignResultImpl.hpp"
-
-#include <vector>
-#include <map>
 
 namespace crave {
 
@@ -22,7 +25,7 @@ class rand_base {
 
 class rand_obj_base : public rand_base {
  public:
-  virtual void add_base_child(rand_base*) = 0;
+  virtual void add_base_child(rand_base* rb) = 0;
 };
 
 template <typename T>
@@ -36,7 +39,7 @@ class randv_base : public rand_base {
   WriteReference<T> const& operator()() const { return var; }
 
  protected:
-  randv_base(rand_obj_base* parent) : var(value) {
+  explicit randv_base(rand_obj_base* parent) : var(value) {
     if (parent != 0) parent->add_base_child(this);
   }
   randv_base(const randv_base& other) : var(value), value(other.value) {}
@@ -212,7 +215,7 @@ class __rand_vec<bool> : public __rand_vec_base1<bool, char> {};
 template <typename T>
 class rand_vec : public __rand_vec<T>, public rand_base {
  public:
-  rand_vec(rand_obj_base* parent = 0) : __rand_vec<T>() {
+  explicit rand_vec(rand_obj_base* parent = 0) : __rand_vec<T>() {
     if (parent != 0) parent->add_base_child(this);
   }
 

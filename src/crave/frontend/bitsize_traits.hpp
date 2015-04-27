@@ -1,4 +1,7 @@
+// Copyright 2014 The CRAVE developers. All rights reserved.
+
 #pragma once
+
 #include <boost/mpl/times.hpp>
 #include <boost/mpl/int.hpp>
 #include <boost/mpl/sizeof.hpp>
