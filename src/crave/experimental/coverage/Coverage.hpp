@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../ir/UserConstraint.hpp"
-#include "../utils/Evaluator.hpp"
+#include "../../ir/UserConstraint.hpp"
+#include "../../utils/Evaluator.hpp"
 
 #include <boost/foreach.hpp>
 

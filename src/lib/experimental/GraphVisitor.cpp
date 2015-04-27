@@ -1,5 +1,5 @@
-#include "../../crave/graph/Node.hpp"
-#include "../../crave/graph/GraphVisitor.hpp"
+#include "../../crave/experimental/graph/Node.hpp"
+#include "../../crave/experimental/graph/GraphVisitor.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/assert.hpp>

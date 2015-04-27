@@ -11,7 +11,7 @@
 
 #include "graph/Node.hpp"
 
-#include "ConstrainedRandom.hpp"
+#include "../ConstrainedRandom.hpp"
 
 #define NAMED_RULE(name) crave::graph::rule_type name = {crave::graph::Rule(#name)};
 

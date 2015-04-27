@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/assign.hpp>
 
-#include <crave/coverage/Coverage.hpp>
+#include <crave/experimental/coverage/Coverage.hpp>
 
 #include <vector>
 

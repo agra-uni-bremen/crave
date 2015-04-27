@@ -28,6 +28,11 @@ link_libraries (${PROJECT_NAME}_boost_test ${PROJECT_NAME} ${Boost_THREAD_LIBRAR
 add_executable(solver_independent_tests solver_independent_tests.cpp)
 add_all_tests(solver_independent_tests solver_independent_tests.cpp)
 
+if (CRAVE_ENABLE_EXPERIMENTAL)
+  add_executable(experimental_tests experimental_tests.cpp)
+  add_all_tests(experimental_tests experimental_tests.cpp)
+endif (CRAVE_ENABLE_EXPERIMENTAL)
+
 if (metaSMT_USE_Boolector)
   add_executable(use_Boolector use_Boolector.cpp)
   add_all_tests(use_Boolector use_Boolector.cpp)

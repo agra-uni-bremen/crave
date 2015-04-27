@@ -3,8 +3,8 @@
 #include <boost/foreach.hpp>
 #include <boost/assert.hpp>
 
-#include "../crave/ConstrainedRandomGraph.hpp"
-#include "../crave/graph/GraphVisitor.hpp"
+#include "../../crave/experimental/ConstrainedRandomGraph.hpp"
+#include "../../crave/experimental/graph/GraphVisitor.hpp"
 
 namespace crave {
 
