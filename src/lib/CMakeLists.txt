@@ -11,6 +11,7 @@ SET(CRAVE_LIB_SRC
 
 if (CRAVE_ENABLE_EXPERIMENTAL)
   LIST(APPEND CRAVE_LIB_SRC
+    experimental/Object.cpp	
     experimental/GraphVisitor.cpp	
     experimental/ConstrainedRandomGraph.cpp  
   )
