@@ -47,10 +47,23 @@ BOOST_AUTO_TEST_CASE(basic_test) {
   random_object1 o1("o1");
   random_object2 o2("o2");
   random_object3 o3("o3");
-  BOOST_CHECK_EQUAL(crv_object::count(), 17);
+  crv_object::root()->print_object_hierarchy();
+  BOOST_CHECK_EQUAL(crv_object::count(), 16);
+
   BOOST_CHECK(crv_object::find("root") == nullptr);
-  BOOST_CHECK(crv_object::find("o3.obj") == nullptr);
-  BOOST_CHECK_EQUAL(crv_object::find("root.o3.obj"), &o3.obj);
+
+  BOOST_CHECK_EQUAL(crv_object::find("o1"), &o1);
+  BOOST_CHECK_EQUAL(crv_object::find("o1.v1"), &o1.v1);
+  BOOST_CHECK_EQUAL(crv_object::find("o1.v2"), &o1.v2);
+
+  BOOST_CHECK_EQUAL(crv_object::find("o2"), &o2);
+  BOOST_CHECK_EQUAL(crv_object::find("o2.obj"), &o2.obj);
+  BOOST_CHECK_EQUAL(crv_object::find("o2.v3"), &o2.v3);
+
+  BOOST_CHECK_EQUAL(crv_object::find("o3"), &o3);
+  BOOST_CHECK_EQUAL(crv_object::find("o3.obj"), &o3.obj);
+  BOOST_CHECK_EQUAL(crv_object::find("o3.v3"), &o3.v3);
+  BOOST_CHECK_EQUAL(crv_object::find("o3.obj1_ptr"), o3.obj1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()  // ObjectHierarchy
