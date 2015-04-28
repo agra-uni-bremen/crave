@@ -1,5 +1,4 @@
 #include <boost/test/unit_test.hpp>
-#include <boost/assign.hpp>
 
 #include <crave/experimental/coverage/Coverage.hpp>
 
@@ -14,25 +13,13 @@ BOOST_AUTO_TEST_CASE(basic_test) {
   randv<unsigned> a, b, c, d, e;
 
   coverpoint cp1("coverpoint1");
-  {
-    std::vector<coverbin> tmp =
-        boost::assign::list_of(coverbin(a() == 0, 10))(coverbin(a() == 1, 10))(coverbin(a() == 2, 5));
-    cp1.bins() = tmp;
-  }
+  cp1.bins() = { coverbin(a() == 0, 10), coverbin(a() == 1, 10), coverbin(a() == 2, 5) };
 
   coverpoint cp2("coverpoint2");
-
-  {
-    std::vector<coverbin> tmp =
-        boost::assign::list_of(coverbin(a() == 0, 10))(coverbin(a() == 1, 10))(coverbin(a() == 2, 5));
-    cp2.bins() = tmp;
-  }
+  cp2.bins() = { coverbin(a() == 0, 10), coverbin(a() == 1, 10), coverbin(a() == 2, 5) };
 
   covergroup cg("covergroup1");
-  {
-    std::vector<coverpoint> tmp = boost::assign::list_of(cp1)(cp2);
-    cg.points() = tmp;
-  }
+  cg.points() = { cp1, cp2 };
 
   for (int i = 0; i < 5; i++)
     for (int j = 0; j < 5; j++) {
