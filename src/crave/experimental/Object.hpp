@@ -3,8 +3,9 @@
 #pragma once
 
 #include <iostream>
-#include <stack>
 #include <list>
+#include <string>
+#include <unordered_map>
 
 namespace crave {
 
@@ -14,9 +15,9 @@ class crv_object;
 struct crv_object_name {
   crv_object_name(const char*);
   ~crv_object_name();
-  operator const char*() const;
+  operator std::string() const { return name_; }
 
-  const char* name_;
+  std::string name_;
   crv_object* object_;
 };
 
@@ -25,23 +26,29 @@ class crv_object {
   crv_object();
   ~crv_object();
 
-  virtual const char* kind() { return "crv_object"; }
-  const char* name() { return name_; }
-  const char* fullname() { return fullname_; } 
+  virtual std::string kind() { return "crv_object"; }
+  virtual bool randomize() { return false; }
+
+  std::string name() { return name_; }
+  std::string fullname() { return fullname_; }
   void print_object_hierarchy(int level = 0);
 
   static crv_object* root();
-  static crv_object* find(const char*);
+  static crv_object* find(std::string);
   static unsigned count();
 
  protected:
-  const char* name_;
+  crv_object(const crv_object& other)
+      : name_(other.name_), parent_(other.parent_), children_(other.children_), fullname_(other.fullname_) {}
+
+  std::string name_;
   crv_object* parent_;
   std::list<crv_object*> children_;
-  const char* fullname_;
-  
+  std::string fullname_;
+  std::unordered_map<std::string, unsigned> local_name_map_;
+
  private:
-  crv_object(const char* name);
+  crv_object(std::string name);
 };
 
 };  // namespace crave
