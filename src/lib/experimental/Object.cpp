@@ -18,6 +18,8 @@ crv_object_name::crv_object_name(const char* c) : name_(c), object_(0) {
 }
 
 crv_object_name::~crv_object_name() {
+  if (object_ == nullptr) return;
+  assert(!crv_obj_stack.empty());
   assert(crv_obj_stack.back() == object_);
   crv_obj_stack.pop_back();
   object_ = nullptr;
@@ -25,11 +27,11 @@ crv_object_name::~crv_object_name() {
 
 crv_object::crv_object() {
   assert(!crv_name_stack.empty());
-  crv_name_stack.back()->object_ = this;  
+  crv_object_name* top = crv_name_stack.back();
+  top->object_ = this;  
   parent_ = !crv_obj_stack.empty() ? crv_obj_stack.back() : root();
   parent_->children_.push_back(this);
-
-  name_ = *crv_name_stack.back();
+  name_ = top->name_;
   // check name conflict
   auto& name_map = parent_->local_name_map_;
   if (name_map.find(name_) != name_map.end()) {
@@ -41,17 +43,14 @@ crv_object::crv_object() {
   // calculate fullname
   for (auto obj : crv_obj_stack) fullname_ += obj->name_ + ".";
   fullname_ += name_;
-
   crv_obj_map[fullname_] = this;
   crv_obj_stack.push_back(this);
   crv_name_stack.pop_back();
 }
 
-crv_object::crv_object(std::string name) : name_(name), parent_(0), children_(), fullname_(name) { }
-
 crv_object::~crv_object() {
   if (parent_) {
-    parent_->children_.remove(this);
+    parent_->remove_child(this);
     parent_ = nullptr;  
   }
   crv_obj_map.erase(fullname_);
@@ -64,8 +63,14 @@ void crv_object::print_object_hierarchy(int lvl) {
     obj->print_object_hierarchy(lvl + 1);
 }
 
+void crv_object::remove_child(crv_object* child) {
+  children_.remove(child);
+  if (--local_name_map_[child->name_] == 0)
+    local_name_map_.erase(child->name_);
+}
+
 crv_object* crv_object::root() {
-  static crv_object root("root");
+  static crv_object root(0);
   return &root;    
 }
 

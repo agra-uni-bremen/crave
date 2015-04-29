@@ -66,6 +66,31 @@ BOOST_AUTO_TEST_CASE(basic_test) {
   BOOST_CHECK_EQUAL(crv_object::find("o3.obj1_ptr"), o3.obj1);
 }
 
+struct random_object4 : public random_object2 {
+  random_object1 other_obj;
+
+  random_object4(crv_object_name name) : random_object2(name), other_obj("other_obj") { }
+};
+
+struct random_object5 : public random_object4 { 
+  random_object5(crv_object_name name) : random_object4(name) { }
+};
+
+BOOST_AUTO_TEST_CASE(inheritance_test) {
+  random_object5 o5("o5");
+  random_object3 o3("o3");
+
+  BOOST_CHECK_EQUAL(crv_object::find("o5"), &o5);
+  BOOST_CHECK_EQUAL(crv_object::find("o5.obj"), &o5.obj);
+  BOOST_CHECK_EQUAL(crv_object::find("o5.v3"), &o5.v3);
+  BOOST_CHECK_EQUAL(crv_object::find("o5.other_obj"), &o5.other_obj);
+
+  BOOST_CHECK_EQUAL(crv_object::find("o3"), &o3);
+  BOOST_CHECK_EQUAL(crv_object::find("o3.obj"), &o3.obj);
+  BOOST_CHECK_EQUAL(crv_object::find("o3.v3"), &o3.v3);
+  BOOST_CHECK_EQUAL(crv_object::find("o3.obj1_ptr"), o3.obj1);
+}
+
 BOOST_AUTO_TEST_SUITE_END()  // ObjectHierarchy
 
 //  vim: ft=cpp:ts=2:sw=2:expandtab
