@@ -235,7 +235,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
   }
 
   template <typename Integer>
-  result_type operator()(boost::proto::tag::terminal, Integer const& i) {
+  static result_type new_value(Integer const& i) {
     unsigned width = bitsize_traits<Integer>::value;
     bool sign = crave::is_signed<Integer>::value;
     if (i >= 0) {
@@ -243,6 +243,11 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
         if ((i >> j) == 0) return new Constant(i, j, false);
     }
     return new Constant(i, width, sign);
+  }
+
+  template <typename Integer>
+  result_type operator()(boost::proto::tag::terminal, Integer const& i) {
+    return new_value<Integer>(i);
   }
 
   template <typename Integer, typename CollectionTerm>

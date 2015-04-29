@@ -36,6 +36,11 @@ expression make_expression(Expr e) {
   return boost::proto::make_expr<boost::proto::tag::terminal, Constraint_Domain>(boost::proto::eval(e, ctx));
 }
 
+template <typename Integer>
+expression value_to_expression(Integer const& i) {
+  return boost::proto::make_expr<boost::proto::tag::terminal, Constraint_Domain>(Context::new_value(i));
+}
+
 int new_constraint_id();
 
 struct ConstraintManager;
