@@ -2,6 +2,7 @@
 
 #include "backend/Generator.hpp"
 #include "frontend/RandomBase.hpp"
+#include "ir/UserExpression.hpp"
 
 #include <boost/bind.hpp>
 

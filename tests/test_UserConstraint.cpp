@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <crave/ir/UserConstraint.hpp>
+#include <crave/ir/UserExpression.hpp>
 #include <crave/utils/Evaluator.hpp>
 
 // using namespace std;

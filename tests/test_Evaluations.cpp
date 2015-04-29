@@ -2,6 +2,7 @@
 
 #include <crave/utils/Evaluator.hpp>
 #include <crave/ir/UserConstraint.hpp>
+#include <crave/ir/UserExpression.hpp>
 
 #include <set>
 #include <iostream>

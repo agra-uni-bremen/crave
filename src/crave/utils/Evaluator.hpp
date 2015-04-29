@@ -2,6 +2,7 @@
 
 #include "../frontend/bitsize_traits.hpp"
 #include "../ir/visitor/EvalVisitor.hpp"
+#include "../ir/UserExpression.hpp"
 
 #include <boost/proto/eval.hpp>
 
