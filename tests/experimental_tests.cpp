@@ -1,6 +1,6 @@
 #define BOOST_TEST_MODULE experimental
 
-#include <crave/experimental/ConstrainedRandomGraph.hpp>
+#include <crave/experimental/Experimental.hpp>
 
 struct Context_Fixture {
   Context_Fixture() {}

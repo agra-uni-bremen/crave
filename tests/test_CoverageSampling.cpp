@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 
-#include <crave/experimental/coverage/Coverage.hpp>
+#include <crave/experimental/Coverage.hpp>
+#include <crave/experimental/Variable.hpp>
 
 #include <vector>
 
@@ -10,7 +11,7 @@ using namespace crave;
 BOOST_FIXTURE_TEST_SUITE(CoverageSampling, Context_Fixture)
 
 BOOST_AUTO_TEST_CASE(basic_test) {
-  randv<unsigned> a, b, c, d, e;
+  crv_variable<unsigned> a, b, c, d, e;
 
   coverpoint cp1("coverpoint1");
   cp1.bins() = { coverbin(a() == 0, 10), coverbin(a() == 1, 10), coverbin(a() == 2, 5) };
