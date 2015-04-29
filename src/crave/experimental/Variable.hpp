@@ -24,7 +24,7 @@ class crv_variable_base : public crv_object {
   }
   WriteReference<T> const& operator()() const { return var; }
 
-  virtual std::string kind() { return "crv_variable"; }
+  std::string kind() override { return "crv_variable"; }
 
  protected:
   crv_variable_base() : var(value) {}
@@ -35,7 +35,7 @@ class crv_variable_base : public crv_object {
 
 #define CRV_VARIABLE_COMMON_INTERFACE(Typename)                                   \
  public:                                                                          \
-  crv_variable(crv_object_name name = "var") {}                                                \
+  crv_variable(crv_object_name name = "var") {}                                   \
   crv_variable(const crv_variable& other) : crv_variable_base<Typename>(other) {} \
   crv_variable<Typename>& operator=(const crv_variable<Typename>& i) {            \
     this->value = i.value;                                                        \
@@ -111,8 +111,7 @@ class crv_variable_base : public crv_object {
 
 #define CRV_VARIABLE_PRIM_INTERFACE(Typename)                                                     \
  public:                                                                                          \
-  void gather_values(std::vector<long long>& ch) { ch.push_back(static_cast<long long>(value)); } \
-  bool randomize() {                                                                              \
+  bool randomize() override {                                                                     \
     static distribution<Typename> dist;                                                           \
     value = dist.nextValue();                                                                     \
     return true;                                                                                  \
