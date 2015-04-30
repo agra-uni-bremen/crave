@@ -13,40 +13,36 @@ struct base_object : crv_object {
 };
 
 struct random_object1 : crv_object {
-  base_object v1;
-  base_object v2;
-  
-  random_object1(crv_object_name);
+  base_object v1{"v1"};
+  base_object v2{"v2"};
+  random_object1(crv_object_name) { }
 };
-
-random_object1::random_object1(crv_object_name n) : v1("v1"), v2("v2") {}
 
 struct random_object2 : crv_object {
-  random_object1 obj;
-  base_object v3;
+  random_object1 obj{"obj"};
+  base_object v3{"v3"};
   
-  random_object2(crv_object_name);
+  random_object2(crv_object_name) { }
 };
 
-random_object2::random_object2(crv_object_name n) : obj("obj"), v3("v3") {}
-
 struct random_object3 : crv_object {
-  random_object1 obj;
-  base_object v3;
+  random_object1 obj{"obj"};
+  base_object v3{"v3"};
+
   random_object1* obj1;
   
   random_object3(crv_object_name);
 };
 
-random_object3::random_object3(crv_object_name n) : obj("obj"), v3("v3") {
-  obj1 = new random_object1("obj1_ptr");  
-  random_object2 tmp("tmp");
+random_object3::random_object3(crv_object_name) {
+  obj1 = new random_object1{"obj1_ptr"};  
+  random_object2 tmp{"tmp"};
 }
 
 BOOST_AUTO_TEST_CASE(basic_test) {
-  random_object1 o1("o1");
-  random_object2 o2("o2");
-  random_object3 o3("o3");
+  random_object1 o1{"o1"};
+  random_object2 o2{"o2"};
+  random_object3 o3{"o3"};
   crv_object::root()->print_object_hierarchy();
   BOOST_CHECK_EQUAL(crv_object::count(), 16);
 
@@ -67,9 +63,9 @@ BOOST_AUTO_TEST_CASE(basic_test) {
 }
 
 struct random_object4 : public random_object2 {
-  random_object1 other_obj;
+  random_object1 other_obj{"other_obj"};
 
-  random_object4(crv_object_name name) : random_object2(name), other_obj("other_obj") { }
+  random_object4(crv_object_name name) : random_object2(name) { }
 };
 
 struct random_object5 : public random_object4 { 
@@ -77,8 +73,8 @@ struct random_object5 : public random_object4 {
 };
 
 BOOST_AUTO_TEST_CASE(inheritance_test) {
-  random_object5 o5("o5");
-  random_object3 o3("o3");
+  random_object5 o5{"o5"};
+  random_object3 o3{"o3"};
 
   BOOST_CHECK_EQUAL(crv_object::find("o5"), &o5);
   BOOST_CHECK_EQUAL(crv_object::find("o5.obj"), &o5.obj);
