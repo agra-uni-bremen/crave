@@ -21,6 +21,8 @@ class Evaluator {
     assignments_[var.id()] = Constant(value, width, sign);
   }
 
+  void assign(unsigned id, Constant c) { assignments_[id] = c; }
+
   template <typename Expr>
   bool evaluate(Expr expr) {
     return evaluate(make_expression(expr));
