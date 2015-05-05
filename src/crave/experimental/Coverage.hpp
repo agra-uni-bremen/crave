@@ -1,26 +1,27 @@
+// Copyright 2014 The CRAVE developers. All rights reserved.
+
 #pragma once
 
-#include "../ir/UserConstraint.hpp"
+#include "Object.hpp"
+#include "Variable.hpp"
+#include "../ir/UserExpression.hpp"
 #include "../utils/Evaluator.hpp"
-
-#include <boost/foreach.hpp>
 
 #include <glog/logging.h>
 
-#include <ostream>
 #include <string>
 #include <vector>
 
 namespace crave {
 
-class covergroup;
-class coverpoint;
-class coverbin;
+class crv_covergroup;
+class crv_coverpoint;
+class crv_bin;
 
-class coverbin {
+class crv_bin {
  public:
   template <typename Expr>
-  coverbin(Expr expr, unsigned min = 1)
+  crv_bin(Expr expr, unsigned min = 1)
       : bin_expr_(make_expression(expr)), hit_minimum_(min), hit_count_(0) {}
 
   expression bin_expr() { return bin_expr_; }
@@ -36,67 +37,85 @@ class coverbin {
   unsigned hit_count_;
 };
 
-class coverpoint {
+class crv_coverpoint : public crv_object {
  public:
-  coverpoint(std::string name) : name_(name), bins_() {}
+  crv_coverpoint(crv_object_name) : bins_() {}
 
-  std::string name() { return name_; }
-  std::vector<coverbin>& bins() { return bins_; }
+  std::string kind() override { return "crv_coverpoint"; }
 
-  static coverpoint cross(coverpoint cp1, coverpoint cp2) {
-    coverpoint res(std::string("cross_") + cp1.name() + "_" + cp2.name());
-    BOOST_FOREACH(coverbin & cb1, cp1.bins()) {
-      BOOST_FOREACH(coverbin & cb2, cp2.bins()) { res.bins().push_back(coverbin(cb1.bin_expr() && cb2.bin_expr())); }
-    }
-    return res;
+  std::vector<crv_bin>& bins() { return bins_; }
+  
+  void bins(expression_list elist) {
+    for (auto e : elist) bins_.push_back(crv_bin(e));
+  }
+
+  static std::vector<crv_bin> cross(crv_coverpoint & cp1, crv_coverpoint & cp2) {
+    std::vector<crv_bin> result;
+    for (crv_bin & cb1 : cp1.bins()) 
+      for (crv_bin & cb2 : cp2.bins()) 
+        result.push_back(crv_bin(cb1.bin_expr() && cb2.bin_expr()));
+    return result;
   }
 
   bool covered() {
-    BOOST_FOREACH(coverbin & cb, bins_)
-    if (!cb.covered()) return false;
+    for (crv_bin & cb : bins_)
+      if (!cb.covered()) return false;
     return true;
   }
 
  private:
-  std::vector<coverbin> bins_;
-  std::string name_;
+  std::vector<crv_bin> bins_;
 };
 
-class covergroup {
+class crv_covergroup : public crv_object {
  public:
-  covergroup(std::string name) : name_(name), points_() {}
+  crv_covergroup() : points_(), vars_(), built_(false), eval_() {
+  }
 
-  std::string name() { return name_; }
-  std::vector<coverpoint>& points() { return points_; }
-  Evaluator& eval() { return eval_; }
+  std::string kind() override { return "crv_covergroup"; }
 
   void sample() {
-    BOOST_FOREACH(coverpoint & cp, points_) {
-      BOOST_FOREACH(coverbin & cb, cp.bins()) {
+    if (!built_) build();
+    for (auto v : vars_) eval_.assign(v->id(), v->constant_expr());
+    for (crv_coverpoint* cp : points_) 
+      for (crv_bin & cb : cp->bins()) 
         if (eval_.evaluate(cb.bin_expr()) && eval_.result<bool>()) cb.hit();
-      }
-    }
   }
 
   void report() {
-    BOOST_FOREACH(coverpoint & cp, points_) {
-      std::cout << "Coverpoint " << cp.name() << std::endl;
+    for (crv_coverpoint* cp : points_) {
+      std::cout << cp->kind() << " " << cp->name() << std::endl;
       int c = 0;
-      BOOST_FOREACH(coverbin & cb, cp.bins()) {
-        std::cout << "  Coverbin " << c++ << ": " << cb.hit_count() << " " << cb.hit_minimum() << std::endl;
+      for (crv_bin & cb : cp->bins()) {
+        std::cout << "  crv_bin " << c++ << ": " << cb.hit_count() << " " << cb.hit_minimum() << " " << (cb.covered() ? "covered" : "uncovered") << std::endl;
       }
     }
   }
 
   bool covered() {
-    BOOST_FOREACH(coverpoint & cp, points_)
-    if (!cp.covered()) return false;
+    for (crv_coverpoint* cp : points_)
+      if (!cp->covered()) return false;
     return true;
   }
 
  private:
-  std::vector<coverpoint> points_;
-  std::string name_;
+  void build() {
+    built_ = true;
+    for (crv_object* obj : children_) {
+      if (obj->kind() == "crv_variable") {
+        crv_variable_base_* v = (crv_variable_base_*) obj;
+        vars_.push_back(v);
+      }
+      if (obj->kind() == "crv_coverpoint") {
+        crv_coverpoint* cp = (crv_coverpoint*) obj;
+        points_.push_back(cp);
+      }
+    }  
+  }
+
+  std::vector<crv_coverpoint*> points_;
+  std::vector<crv_variable_base_*> vars_;
+  bool built_;
   Evaluator eval_;
 };
 
