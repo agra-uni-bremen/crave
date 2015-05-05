@@ -8,14 +8,21 @@
 
 #include "../frontend/Constraint.hpp"
 #include "../frontend/Distribution.hpp"
+#include "../ir/UserExpression.hpp"
 
 namespace crave {
 
 template <typename T>
 class crv_variable;
 
+struct crv_variable_base_ : public crv_object {
+  virtual Constant constant_expr() = 0;
+  virtual unsigned id() = 0;
+  std::string kind() override { return "crv_variable"; }  
+};
+
 template <typename T>
-class crv_variable_base : public crv_object {
+class crv_variable_base : public crv_variable_base_ {
  public:
   operator T() const { return value; }
   friend ostream& operator<<(ostream& os, const crv_variable_base<T>& e) {
@@ -23,12 +30,16 @@ class crv_variable_base : public crv_object {
     return os;
   }
   WriteReference<T> const& operator()() const { return var; }
-
-  std::string kind() override { return "crv_variable"; }
+  unsigned id() override { return var.id(); }
+  Constant constant_expr() override { 
+    unsigned width = bitsize_traits<T>::value;
+    bool sign = crave::is_signed<T>::value;
+    return Constant(value, width, sign);
+  }
 
  protected:
   crv_variable_base() : var(value) {}
-  crv_variable_base(const crv_variable_base& other) : var(value), value(other.value), crv_object(other) {}
+  crv_variable_base(const crv_variable_base& other) : var(value), value(other.value), crv_variable_base_(other) {}
   WriteReference<T> var;
   T value;
 };
