@@ -10,6 +10,7 @@
 namespace crave {
 
 class expression_list {
+  typedef std::vector<expression> container_type;
  public:
   template <typename... Exprs>
   expression_list(Exprs... exprs) : exprs_() {
@@ -26,7 +27,12 @@ class expression_list {
     for (auto e : exprs_) result = make_expression(result && e);
     return result;
   }
-    
+
+  container_type::iterator begin() { return exprs_.begin(); }
+  container_type::iterator end() { return exprs_.end(); }
+  container_type::const_iterator begin() const { return exprs_.begin(); }
+  container_type::const_iterator end() const { return exprs_.end(); }
+  
  private:
   void add_exprs() { }
 
@@ -36,7 +42,7 @@ class expression_list {
     add_exprs(exprs...);
   }
 
-  std::vector<expression> exprs_;
+  container_type exprs_;
 };
 
 template <typename IntegerType>
