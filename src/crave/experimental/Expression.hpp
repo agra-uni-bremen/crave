@@ -5,15 +5,39 @@
 #include "../frontend/bitsize_traits.hpp"
 #include "../ir/UserExpression.hpp"
 
+#include <vector>
+
 namespace crave {
 
-template <typename CollectionType>
-expression sum(CollectionType const& collection) {
-  expression result = value_to_expression(0);
-  for (auto& v : collection)
-    result = crave::make_expression(result + v());
-  return result;
-}
+class expression_list {
+ public:
+  template <typename... Exprs>
+  expression_list(Exprs... exprs) : exprs_() {
+    add_exprs(exprs...); 
+  }
+
+  void operator=(expression_list const & list) { exprs_ = list.exprs_; }
+
+  template <typename Expr>
+  void add_expr(Expr expr) { exprs_.push_back(make_expression(expr)); }
+
+  expression single_expr() {
+    expression result = value_to_expression(true);
+    for (auto e : exprs_) result = make_expression(result && e);
+    return result;
+  }
+    
+ private:
+  void add_exprs() { }
+
+  template <typename Expr, typename... Exprs>
+  void add_exprs(Expr expr, Exprs... exprs) { 
+    add_expr(expr);
+    add_exprs(exprs...);
+  }
+
+  std::vector<expression> exprs_;
+};
 
 template <typename IntegerType>
 expression onehot(IntegerType const& x) {
