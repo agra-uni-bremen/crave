@@ -4,6 +4,7 @@
 
 #include "Object.hpp"
 #include "Variable.hpp"
+#include "Array.hpp"
 #include "Expression.hpp"
 #include "Constraint.hpp"
 #include "Coverage.hpp"
