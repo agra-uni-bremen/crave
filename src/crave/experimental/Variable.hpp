@@ -17,6 +17,7 @@ class crv_variable;
 
 struct crv_variable_base_ : public crv_object {
   virtual Constant constant_expr() = 0;
+  virtual expression bound_expr() = 0;
   virtual unsigned id() = 0;
   std::string kind() override { return "crv_variable"; }  
 };
@@ -24,9 +25,9 @@ struct crv_variable_base_ : public crv_object {
 template <typename T>
 class crv_variable_base : public crv_variable_base_ {
  public:
-  operator T() const { return value; }
+  operator T() const { return actual_value(); }
   friend ostream& operator<<(ostream& os, const crv_variable_base<T>& e) {
-    os << e.value;
+    os << e.actual_value();
     return os;
   }
   WriteReference<T> const& operator()() const { return var; }
@@ -34,14 +35,21 @@ class crv_variable_base : public crv_variable_base_ {
   Constant constant_expr() override { 
     unsigned width = bitsize_traits<T>::value;
     bool sign = crave::is_signed<T>::value;
-    return Constant(value, width, sign);
+    return Constant(actual_value(), width, sign);
   }
+  void bind(crv_variable_base& other) { bound_var = &other; }
+  void unbind() { bound_var = nullptr; }
+  expression bound_expr() { return bound_var ? make_expression(var == bound_var->var) : value_to_expression(true); }
 
  protected:
-  crv_variable_base() : var(value) {}
-  crv_variable_base(const crv_variable_base& other) : var(value), value(other.value), crv_variable_base_(other) {}
+  crv_variable_base() : var(value), value(), bound_var() {}
+  crv_variable_base(const crv_variable_base& other) : var(value), value(other.value), bound_var(other.bound_var), crv_variable_base_(other) {}
+
+  T actual_value() const { return bound_var ? bound_var->value : value; }
+
   WriteReference<T> var;
   T value;
+  crv_variable_base<T>* bound_var;
 };
 
 #define CRV_VARIABLE_COMMON_INTERFACE(Typename)                                   \

@@ -19,6 +19,8 @@
 
 #define CRV_CONSTRAINT(name, ...) crave::crv_constraint name { #name, __VA_ARGS__  }
 
+#define CRV_COVERPOINT(name, ...) crave::crv_coverpoint name { #name }
+
 namespace crave {
 
 class crv_sequence_item : public crv_object {
@@ -37,7 +39,12 @@ class crv_sequence_item : public crv_object {
       }  
       built_ = true;
     }
-    return gen_.next(); 
+    return gen_.nextCov(); 
+  }
+
+  void goal(crv_covergroup & group) {
+    for (auto e : group.bound_var_expr_list()) gen_(e);
+    for (auto e : group.uncovered_as_list()) gen_.cover(e);
   }
 
  protected:

@@ -48,6 +48,11 @@ class crv_coverpoint : public crv_object {
   void bins(expression_list elist) {
     for (auto e : elist) bins_.push_back(crv_bin(e));
   }
+  
+  void operator=(expression_list list) { 
+    bins_.clear();
+    bins(list);
+  }
 
   static std::vector<crv_bin> cross(crv_coverpoint & cp1, crv_coverpoint & cp2) {
     std::vector<crv_bin> result;
@@ -69,8 +74,7 @@ class crv_coverpoint : public crv_object {
 
 class crv_covergroup : public crv_object {
  public:
-  crv_covergroup() : points_(), vars_(), built_(false), eval_() {
-  }
+  crv_covergroup() : points_(), vars_(), built_(false), eval_() { }
 
   std::string kind() override { return "crv_covergroup"; }
 
@@ -83,6 +87,7 @@ class crv_covergroup : public crv_object {
   }
 
   void report() {
+    if (!built_) build();
     for (crv_coverpoint* cp : points_) {
       std::cout << cp->kind() << " " << cp->name() << std::endl;
       int c = 0;
@@ -92,7 +97,26 @@ class crv_covergroup : public crv_object {
     }
   }
 
+  expression_list uncovered_as_list() {
+    if (!built_) build();
+    expression_list result;
+    for (crv_coverpoint* cp : points_)
+      for (crv_bin & cb : cp->bins()) 
+        if (!cb.covered())
+          result.add_expr(cb.bin_expr());
+    return result;
+  }
+
+  expression_list bound_var_expr_list() {
+    if (!built_) build();
+    expression_list result;
+    for (auto v : vars_)
+      result.add_expr(v->bound_expr());
+    return result;    
+  }
+
   bool covered() {
+    if (!built_) build();
     for (crv_coverpoint* cp : points_)
       if (!cp->covered()) return false;
     return true;
