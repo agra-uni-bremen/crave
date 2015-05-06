@@ -4,6 +4,7 @@
 
 #include "Object.hpp"
 #include "Variable.hpp"
+#include "Expression.hpp"
 #include "../ir/UserExpression.hpp"
 #include "../utils/Evaluator.hpp"
 
