@@ -1,16 +1,9 @@
+// Copyright 2014 The CRAVE developers. All rights reserved.//
+
 #pragma once
 
-#include "../frontend/RandomBase.hpp"
-#include "../ir/Node.hpp"
-#include "../ir/visitor/ReplaceVisitor.hpp"
-#include "FactoryMetaSMT.hpp"
 #include "VariableGenerator.hpp"
-
-#include <boost/foreach.hpp>
-#include <boost/intrusive_ptr.hpp>
-
-#include <map>
-#include <vector>
+#include "../ir/visitor/ReplaceVisitor.hpp"
 
 namespace crave {
 

@@ -1,17 +1,10 @@
+// Copyright 2014 The CRAVE developers. All rights reserved.//
+
 #pragma once
 
-#include "../ir/Context.hpp"
 #include "../ir/UserConstraint.hpp"
-#include "../ir/VariableContainer.hpp"
+#include "VariableGenerator.hpp"
 #include "../backend/VectorGenerator.hpp"
-
-#include <boost/foreach.hpp>
-#include <boost/function.hpp>
-
-#include <ostream>
-#include <stdexcept>
-#include <string>
-#include <vector>
 
 namespace crave {
 
