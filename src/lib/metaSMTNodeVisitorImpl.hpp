@@ -655,8 +655,9 @@ bool metaSMTVisitorImpl<SolverType>::solve(bool ignoreSofts) {
     for (int i = 0; i < k; i++) metaSMT::assumption(solver_, suggestions_[i]);
 
     if (!ignoreSofts) {
-      BOOST_FOREACH(typename std::vector<result_type>::value_type const & item, softs_)
-      metaSMT::assumption(solver_, preds::equal(item, preds::True));
+      BOOST_FOREACH(typename std::vector<result_type>::value_type const & item, softs_) {
+        metaSMT::assumption(solver_, preds::equal(item, preds::True));
+      }
     }
 
     if (metaSMT::solve(solver_)) {

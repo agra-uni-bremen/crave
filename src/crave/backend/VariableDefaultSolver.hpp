@@ -25,29 +25,30 @@ struct VariableDefaultSolver : VariableSolver {
     if (contradictions_.empty()) {
       analyseSofts();
       LOG(INFO) << "Partition is solvable with " << inactive_softs_.size() << " soft constraint(s) deactivated:";
-      BOOST_FOREACH(std::string & s, inactive_softs_)
-      LOG(INFO) << " " << s;
+      BOOST_FOREACH(std::string & s, inactive_softs_) { LOG(INFO) << " " << s; }
     } else {
       LOG(INFO) << "Partition has unsatisfiable hard constraints:";
       uint cnt = 0;
 
       BOOST_FOREACH(std::vector<std::string> & vs, contradictions_) {
         LOG(INFO) << "  set #" << ++cnt;
-        BOOST_FOREACH(std::string & s, vs)
-        LOG(INFO) << "   " << s;
+        BOOST_FOREACH(std::string & s, vs) { LOG(INFO) << "   " << s; }
       }
     }
   }
 
   virtual bool solve() {
     if (!contradictions_.empty()) return false;
-    BOOST_FOREACH(VariableContainer::ReadRefPair pair, var_ctn.read_references)
-    if (constr_pttn.containsVar(pair.first)) solver->makeAssumption(*pair.second->expr());
-    BOOST_FOREACH(VariableContainer::ReadRefPair pair, var_ctn.dist_references)
-    if (constr_pttn.containsVar(pair.first)) solver->makeSuggestion(*pair.second->expr());
+    BOOST_FOREACH(VariableContainer::ReadRefPair pair, var_ctn.read_references) {
+      if (constr_pttn.containsVar(pair.first)) solver->makeAssumption(*pair.second->expr());
+    }
+    BOOST_FOREACH(VariableContainer::ReadRefPair pair, var_ctn.dist_references) {
+      if (constr_pttn.containsVar(pair.first)) solver->makeSuggestion(*pair.second->expr());
+    }
     if (solver->solve()) {
-      BOOST_FOREACH(VariableContainer::WriteRefPair pair, var_ctn.write_references)
-      if (constr_pttn.containsVar(pair.first)) solver->read(*var_ctn.variables[pair.first], *pair.second);
+      BOOST_FOREACH(VariableContainer::WriteRefPair pair, var_ctn.write_references) {
+        if (constr_pttn.containsVar(pair.first)) solver->read(*var_ctn.variables[pair.first], *pair.second);
+      }
       return true;
     }
     return false;
@@ -61,12 +62,12 @@ struct VariableDefaultSolver : VariableSolver {
     std::vector<std::string> out;
     std::vector<std::vector<unsigned int> > results;
 
-    BOOST_FOREACH(ConstraintPtr c, constr_pttn)
-    if (!c->isSoft() && !c->isCover()) {
-      s.insert(std::make_pair(s.size(), c->expr()));
-      out.push_back(c->name());
+    BOOST_FOREACH(ConstraintPtr c, constr_pttn) {
+      if (!c->isSoft() && !c->isCover()) {
+        s.insert(std::make_pair(s.size(), c->expr()));
+        out.push_back(c->name());
+      }
     }
-
     results = solver->analyseContradiction(s);
 
     BOOST_FOREACH(std::vector<unsigned int> result, results) {

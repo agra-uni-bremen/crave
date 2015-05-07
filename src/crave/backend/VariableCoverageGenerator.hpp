@@ -21,10 +21,11 @@ struct VariableCoverageGenerator : VariableGenerator {
 
   virtual bool solve() {
     bool res = false;
-    BOOST_FOREACH(VarSolverPtr vs, solvers)
-    if (vs->solve()) res = true;  // one solver has hitted an uncovered constraint ->
-    // everything ok, from covered solvers, the last solutions
-    // will be reused.
+    BOOST_FOREACH(VarSolverPtr vs, solvers) {
+      if (vs->solve())
+        res = true;  // one solver has hitted an uncovered constraint -> everything ok, from covered solvers, the last
+                     // solutions will be reused.
+    }
     return res;
   }
 };

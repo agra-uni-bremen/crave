@@ -120,7 +120,7 @@ void ToDotVisitor::visitInside(Inside const &o) {
   if (putNode(&o)) {
     visitNode(o);
     out_ << " [label=\"inside\n{ ";
-    BOOST_FOREACH(unsigned long u, o.collection()) out_ << u << " ";
+    BOOST_FOREACH(unsigned long u, o.collection()) { out_ << u << " "; }
     out_ << "}\"]" << std::endl;
   }
   visitUnaryExpr(o);

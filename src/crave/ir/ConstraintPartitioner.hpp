@@ -21,8 +21,7 @@ struct ConstraintPartitioner {
 
   void mergeConstraints(ConstraintManager& mng) {
     LOG(INFO) << "Merge set " << mng.id_ << " with set(s)";
-    BOOST_FOREACH(unsigned id, constr_mngs_)
-    LOG(INFO) << " " << id;
+    BOOST_FOREACH(unsigned id, constr_mngs_) { LOG(INFO) << " " << id; }
     constr_mngs_.insert(mng.id_);
 
     BOOST_FOREACH(ConstraintPtr c, mng.constraints_) {
@@ -42,8 +41,7 @@ struct ConstraintPartitioner {
       partitions_.push_back(cp);
     }
     LOG(INFO) << "Partition results of set(s)";
-    BOOST_FOREACH(unsigned id, constr_mngs_)
-    LOG(INFO) << " " << id;
+    BOOST_FOREACH(unsigned id, constr_mngs_) { LOG(INFO) << " " << id; }
     LOG(INFO) << ": ";
 
     LOG(INFO) << "  " << vec_constraints_.size() << " vector constraint(s):";

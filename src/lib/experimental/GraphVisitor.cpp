@@ -19,16 +19,14 @@ void PrintVisitor::visitTerminal(Terminal& t) { ++depth, printNode(t), --depth; 
 void PrintVisitor::visitSelector(Selector& sel) {
   ++depth;
   printNode(sel);
-  BOOST_FOREACH(NodePtr n, sel.children)
-  n->accept(*this);
+  BOOST_FOREACH(NodePtr n, sel.children) { n->accept(*this); }
   --depth;
 }
 
 void PrintVisitor::visitSequence(Sequence& seq) {
   ++depth;
   printNode(seq);
-  BOOST_FOREACH(NodePtr n, seq.children)
-  n->accept(*this);
+  BOOST_FOREACH(NodePtr n, seq.children) { n->accept(*this); }
   --depth;
 }
 

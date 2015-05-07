@@ -85,8 +85,7 @@ void Executor::dfs(int v) {
     LOG(INFO) << "Path " << m_path_count << " is covered after " << iter_count << " iteration(s)";
   } else {
     std::vector<int>& adj = m_adj[v];
-    BOOST_FOREACH(int i, adj)
-    dfs(i);
+    BOOST_FOREACH(int i, adj) { dfs(i); }
   }
   path.pop_back();
 }
