@@ -1,3 +1,5 @@
+// Copyright 2014 The CRAVE developers. All rights reserved.//
+
 #include <boost/foreach.hpp>
 
 #include "../crave/ir/visitor/ToDotNodeVisitor.hpp"

@@ -1,3 +1,5 @@
+// Copyright 2014 The CRAVE developers. All rights reserved.//
+
 #include "../crave/ir/visitor/EvalVisitor.hpp"
 
 #include <stdexcept>

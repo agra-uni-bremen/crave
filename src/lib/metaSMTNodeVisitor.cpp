@@ -1,3 +1,5 @@
+// Copyright 2014 The CRAVE developers. All rights reserved.//
+
 #include "../crave/ir/visitor/metaSMTNodeVisitor.hpp"
 #include "../crave/backend/FactoryMetaSMT.hpp"
 #include "metaSMTNodeVisitorImpl.hpp"
