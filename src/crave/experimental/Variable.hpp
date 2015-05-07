@@ -26,7 +26,7 @@ template <typename T>
 class crv_variable_base : public crv_variable_base_ {
  public:
   operator T() const { return actual_value(); }
-  friend ostream& operator<<(ostream& os, const crv_variable_base<T>& e) {
+  friend std::ostream& operator<<(std::ostream& os, const crv_variable_base<T>& e) {
     os << e.actual_value();
     return os;
   }
