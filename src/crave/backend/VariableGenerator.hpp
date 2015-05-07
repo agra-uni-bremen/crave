@@ -8,4 +8,3 @@
 #include "VariableGeneratorType.hpp"
 #include "VariableCoverageGenerator.hpp"
 #include "FactoryMetaSMT.hpp"
-

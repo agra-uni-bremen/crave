@@ -5,8 +5,4 @@
 #include "SettingsType.hpp"
 #include "CraveSettings.hpp"
 
-namespace crave {
-
-
-
-}  // end namespace crave
+namespace crave {}  // end namespace crave

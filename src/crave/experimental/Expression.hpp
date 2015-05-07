@@ -11,16 +11,20 @@ namespace crave {
 
 class expression_list {
   typedef std::vector<expression> container_type;
+
  public:
   template <typename... Exprs>
-  expression_list(Exprs... exprs) : exprs_() {
-    add_exprs(exprs...); 
+  expression_list(Exprs... exprs)
+      : exprs_() {
+    add_exprs(exprs...);
   }
 
-  void operator=(expression_list const & list) { exprs_ = list.exprs_; }
+  void operator=(expression_list const& list) { exprs_ = list.exprs_; }
 
   template <typename Expr>
-  void add_expr(Expr expr) { exprs_.push_back(make_expression(expr)); }
+  void add_expr(Expr expr) {
+    exprs_.push_back(make_expression(expr));
+  }
 
   expression single_expr() {
     expression result = value_to_expression(true);
@@ -32,12 +36,12 @@ class expression_list {
   container_type::iterator end() { return exprs_.end(); }
   container_type::const_iterator begin() const { return exprs_.begin(); }
   container_type::const_iterator end() const { return exprs_.end(); }
-  
+
  private:
-  void add_exprs() { }
+  void add_exprs() {}
 
   template <typename Expr, typename... Exprs>
-  void add_exprs(Expr expr, Exprs... exprs) { 
+  void add_exprs(Expr expr, Exprs... exprs) {
     add_expr(expr);
     add_exprs(exprs...);
   }

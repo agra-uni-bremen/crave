@@ -6,8 +6,7 @@
 #include "../ir/VariableContainer.hpp"
 #include "FactoryMetaSMT.hpp"
 
-namespace crave
-{
+namespace crave {
 struct VariableSolver {
   friend struct VariableGenerator;
 
@@ -38,6 +37,4 @@ struct VariableSolver {
   std::vector<std::vector<std::string> > contradictions_;
   std::vector<std::string> inactive_softs_;
 };
-
 }
-

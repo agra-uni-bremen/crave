@@ -16,12 +16,14 @@ namespace crave {
 
 class crv_constraint : public crv_object {
  public:
-  crv_constraint(crv_object_name) { }
+  crv_constraint(crv_object_name) {}
 
-  crv_constraint(crv_object_name, expression_list list) : list_(list) { }
+  crv_constraint(crv_object_name, expression_list list) : list_(list) {}
 
   template <typename Expr>
-  void operator()(Expr expr) { list_.add_expr(expr); }
+  void operator()(Expr expr) {
+    list_.add_expr(expr);
+  }
 
   expression single_expr() { return list_.single_expr(); }
 

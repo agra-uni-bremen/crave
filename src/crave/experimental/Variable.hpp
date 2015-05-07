@@ -19,7 +19,7 @@ struct crv_variable_base_ : public crv_object {
   virtual Constant constant_expr() = 0;
   virtual expression bound_expr() = 0;
   virtual unsigned id() = 0;
-  std::string kind() override { return "crv_variable"; }  
+  std::string kind() override { return "crv_variable"; }
 };
 
 template <typename T>
@@ -32,7 +32,7 @@ class crv_variable_base : public crv_variable_base_ {
   }
   WriteReference<T> const& operator()() const { return var; }
   unsigned id() override { return var.id(); }
-  Constant constant_expr() override { 
+  Constant constant_expr() override {
     unsigned width = bitsize_traits<T>::value;
     bool sign = crave::is_signed<T>::value;
     return Constant(actual_value(), width, sign);
@@ -43,7 +43,8 @@ class crv_variable_base : public crv_variable_base_ {
 
  protected:
   crv_variable_base() : var(value), value(), bound_var() {}
-  crv_variable_base(const crv_variable_base& other) : var(value), value(other.value), bound_var(other.bound_var), crv_variable_base_(other) {}
+  crv_variable_base(const crv_variable_base& other)
+      : var(value), value(other.value), bound_var(other.bound_var), crv_variable_base_(other) {}
 
   T actual_value() const { return bound_var ? bound_var->value : value; }
 
@@ -128,12 +129,12 @@ class crv_variable_base : public crv_variable_base_ {
     return *this;                                   \
   }
 
-#define CRV_VARIABLE_PRIM_INTERFACE(Typename)                                                     \
- public:                                                                                          \
-  bool randomize() override {                                                                     \
-    static distribution<Typename> dist;                                                           \
-    value = dist.nextValue();                                                                     \
-    return true;                                                                                  \
+#define CRV_VARIABLE_PRIM_INTERFACE(Typename) \
+ public:                                      \
+  bool randomize() override {                 \
+    static distribution<Typename> dist;       \
+    value = dist.nextValue();                 \
+    return true;                              \
   }
 
 template <>

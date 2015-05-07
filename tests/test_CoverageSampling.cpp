@@ -15,10 +15,10 @@ struct my_covergroup : public crv_covergroup {
 
   crv_coverpoint cp1{"coverpoint1"};
   crv_coverpoint cp2{"coverpoint2"};
-  
+
   my_covergroup(crv_object_name) {
-    cp1.bins() = { crv_bin(a() == 0, 10), crv_bin(a() == 1, 10), crv_bin(a() == 2, 5) };
-    cp2.bins() = { crv_bin(a() == 0, 10), crv_bin(a() == 1, 10), crv_bin(a() == 2, 5) };
+    cp1.bins() = {crv_bin(a() == 0, 10), crv_bin(a() == 1, 10), crv_bin(a() == 2, 5)};
+    cp2.bins() = {crv_bin(a() == 0, 10), crv_bin(a() == 1, 10), crv_bin(a() == 2, 5)};
   }
 };
 
@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(basic_test) {
     }
 
   BOOST_CHECK(cg.covered());
-  
+
   crv_object::root()->print_object_hierarchy();
 }
 

@@ -33,8 +33,10 @@ struct bitsize_traits : boost::mpl::int_<0> {
 };
 
 template <typename Integer>
-struct bitsize_traits<Integer, typename boost::enable_if<boost::is_integral<Integer> >::type>
-    : boost::mpl::times<boost::mpl::sizeof_<Integer>, boost::mpl::int_<8> >::type {};
+struct bitsize_traits<
+    Integer,
+    typename boost::enable_if<boost::is_integral<Integer> >::type> : boost::mpl::times<boost::mpl::sizeof_<Integer>,
+                                                                                       boost::mpl::int_<8> >::type {};
 
 template <>
 struct bitsize_traits<bool> : boost::mpl::int_<1> {};

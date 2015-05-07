@@ -14,7 +14,7 @@ class crv_object;
 
 struct crv_object_name {
   crv_object_name(const char*);
-  crv_object_name(const crv_object_name &) = default;
+  crv_object_name(const crv_object_name&) = default;
   ~crv_object_name();
 
   std::string name_;
@@ -50,7 +50,7 @@ class crv_object {
   std::unordered_map<std::string, unsigned> local_name_map_;
 
  private:
-  crv_object(int) : name_("root"), parent_(0), children_(), fullname_("root") { }
+  crv_object(int) : name_("root"), parent_(0), children_(), fullname_("root") {}
 };
 
 };  // namespace crave

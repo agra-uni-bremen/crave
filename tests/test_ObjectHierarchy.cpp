@@ -9,20 +9,20 @@ using namespace crave;
 BOOST_FIXTURE_TEST_SUITE(ObjectHierarchy, Context_Fixture)
 
 struct base_object : crv_object {
-  base_object(crv_object_name ) { }
+  base_object(crv_object_name) {}
 };
 
 struct random_object1 : crv_object {
   base_object v1{"v1"};
   base_object v2{"v2"};
-  random_object1(crv_object_name) { }
+  random_object1(crv_object_name) {}
 };
 
 struct random_object2 : crv_object {
   random_object1 obj{"obj"};
   base_object v3{"v3"};
-  
-  random_object2(crv_object_name) { }
+
+  random_object2(crv_object_name) {}
 };
 
 struct random_object3 : crv_object {
@@ -30,12 +30,12 @@ struct random_object3 : crv_object {
   base_object v3{"v3"};
 
   random_object1* obj1;
-  
+
   random_object3(crv_object_name);
 };
 
 random_object3::random_object3(crv_object_name) {
-  obj1 = new random_object1{"obj1_ptr"};  
+  obj1 = new random_object1{"obj1_ptr"};
   random_object2 tmp{"tmp"};
 }
 
@@ -65,11 +65,11 @@ BOOST_AUTO_TEST_CASE(basic_test) {
 struct random_object4 : public random_object2 {
   random_object1 other_obj{"other_obj"};
 
-  random_object4(crv_object_name name) : random_object2(name) { }
+  random_object4(crv_object_name name) : random_object2(name) {}
 };
 
-struct random_object5 : public random_object4 { 
-  random_object5(crv_object_name name) : random_object4(name) { }
+struct random_object5 : public random_object4 {
+  random_object5(crv_object_name name) : random_object4(name) {}
 };
 
 BOOST_AUTO_TEST_CASE(inheritance_test) {

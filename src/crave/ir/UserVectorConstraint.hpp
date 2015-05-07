@@ -5,8 +5,8 @@
 #include "UserConstraintType.hpp"
 
 namespace crave {
-    
-    struct UserVectorConstraint : UserConstraint {
+
+struct UserVectorConstraint : UserConstraint {
   friend struct ConstraintManager;
   friend struct ConstraintPartitioner;
 
@@ -23,5 +23,4 @@ namespace crave {
  protected:
   bool unique_;
 };
-
 }

@@ -5,12 +5,11 @@
 #include "Node.hpp"
 
 namespace crave {
-    
-    struct ReferenceExpression {
+
+struct ReferenceExpression {
  public:
   typedef NodePtr result_type;
   virtual ~ReferenceExpression() {}
   virtual result_type expr() const = 0;
 };
-
 }

@@ -5,10 +5,9 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-
 namespace crave {
-    
-    class Setting {
+
+class Setting {
  protected:
   typedef boost::property_tree::ptree ptree;
 
@@ -101,5 +100,4 @@ class LoggerSetting : public Setting {
   std::string const FILE_SIZE;
   std::string const MODULES;
 };
-
 }

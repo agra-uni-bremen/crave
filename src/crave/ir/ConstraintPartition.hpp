@@ -9,63 +9,49 @@
 
 namespace crave {
 
-    typedef boost::shared_ptr<UserConstraint> ConstraintPtr;
-    typedef std::list<ConstraintPtr> ConstraintList;
-    
-    
-    struct ConstraintPartition {
-        friend struct ConstraintPartitioner;
+typedef boost::shared_ptr<UserConstraint> ConstraintPtr;
+typedef std::list<ConstraintPtr> ConstraintList;
 
-        ConstraintPartition() {
-        }
+struct ConstraintPartition {
+  friend struct ConstraintPartitioner;
 
-        typedef ConstraintList::iterator iterator;
-        typedef ConstraintList::const_iterator const_iterator;
-        typedef ConstraintList::reference reference;
-        typedef ConstraintList::const_reference const_reference;
-        typedef ConstraintList::size_type size_type;
-        typedef ConstraintList::value_type value_type;
+  ConstraintPartition() {}
 
-        iterator begin() {
-            return constraints_.begin();
-        }
+  typedef ConstraintList::iterator iterator;
+  typedef ConstraintList::const_iterator const_iterator;
+  typedef ConstraintList::reference reference;
+  typedef ConstraintList::const_reference const_reference;
+  typedef ConstraintList::size_type size_type;
+  typedef ConstraintList::value_type value_type;
 
-        const_iterator begin() const {
-            return constraints_.begin();
-        }
+  iterator begin() { return constraints_.begin(); }
 
-        iterator end() {
-            return constraints_.end();
-        }
+  const_iterator begin() const { return constraints_.begin(); }
 
-        const_iterator end() const {
-            return constraints_.end();
-        }
+  iterator end() { return constraints_.end(); }
 
-        void add(ConstraintPtr c) {
-            iterator ite = constraints_.begin();
-            while (ite != constraints_.end() && ((*ite)->id() > c->id())) ite++;
-            constraints_.insert(ite, c);
-        }
+  const_iterator end() const { return constraints_.end(); }
 
-        bool containsVar(int id) {
-            return support_vars_.find(id) != support_vars_.end();
-        }
+  void add(ConstraintPtr c) {
+    iterator ite = constraints_.begin();
+    while (ite != constraints_.end() && ((*ite)->id() > c->id())) ite++;
+    constraints_.insert(ite, c);
+  }
 
-        template <typename ostream>
-        friend ostream& operator<<(ostream& os, const ConstraintPartition& cp) {
-            os << "[ ";
+  bool containsVar(int id) { return support_vars_.find(id) != support_vars_.end(); }
 
-            BOOST_FOREACH(ConstraintPtr c, cp) {
-                os << c->name() << " ";
-            }
-            os << "]";
-            os << std::flush;
-            return os;
-        }
+  template <typename ostream>
+  friend ostream& operator<<(ostream& os, const ConstraintPartition& cp) {
+    os << "[ ";
 
-    private:
-        ConstraintList constraints_;
-        std::set<int> support_vars_;
-    };
+    BOOST_FOREACH(ConstraintPtr c, cp) { os << c->name() << " "; }
+    os << "]";
+    os << std::flush;
+    return os;
+  }
+
+ private:
+  ConstraintList constraints_;
+  std::set<int> support_vars_;
+};
 }

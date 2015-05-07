@@ -45,26 +45,25 @@ class crv_coverpoint : public crv_object {
   std::string kind() override { return "crv_coverpoint"; }
 
   std::vector<crv_bin>& bins() { return bins_; }
-  
+
   void bins(expression_list elist) {
     for (auto e : elist) bins_.push_back(crv_bin(e));
   }
-  
-  void operator=(expression_list list) { 
+
+  void operator=(expression_list list) {
     bins_.clear();
     bins(list);
   }
 
-  static std::vector<crv_bin> cross(crv_coverpoint & cp1, crv_coverpoint & cp2) {
+  static std::vector<crv_bin> cross(crv_coverpoint& cp1, crv_coverpoint& cp2) {
     std::vector<crv_bin> result;
-    for (crv_bin & cb1 : cp1.bins()) 
-      for (crv_bin & cb2 : cp2.bins()) 
-        result.push_back(crv_bin(cb1.bin_expr() && cb2.bin_expr()));
+    for (crv_bin& cb1 : cp1.bins())
+      for (crv_bin& cb2 : cp2.bins()) result.push_back(crv_bin(cb1.bin_expr() && cb2.bin_expr()));
     return result;
   }
 
   bool covered() {
-    for (crv_bin & cb : bins_)
+    for (crv_bin& cb : bins_)
       if (!cb.covered()) return false;
     return true;
   }
@@ -75,15 +74,15 @@ class crv_coverpoint : public crv_object {
 
 class crv_covergroup : public crv_object {
  public:
-  crv_covergroup() : points_(), vars_(), built_(false), eval_() { }
+  crv_covergroup() : points_(), vars_(), built_(false), eval_() {}
 
   std::string kind() override { return "crv_covergroup"; }
 
   void sample() {
     if (!built_) build();
     for (auto v : vars_) eval_.assign(v->id(), v->constant_expr());
-    for (crv_coverpoint* cp : points_) 
-      for (crv_bin & cb : cp->bins()) 
+    for (crv_coverpoint* cp : points_)
+      for (crv_bin& cb : cp->bins())
         if (eval_.evaluate(cb.bin_expr()) && eval_.result<bool>()) cb.hit();
   }
 
@@ -92,8 +91,9 @@ class crv_covergroup : public crv_object {
     for (crv_coverpoint* cp : points_) {
       std::cout << cp->kind() << " " << cp->name() << std::endl;
       int c = 0;
-      for (crv_bin & cb : cp->bins()) {
-        std::cout << "  crv_bin " << c++ << ": " << cb.hit_count() << " " << cb.hit_minimum() << " " << (cb.covered() ? "covered" : "uncovered") << std::endl;
+      for (crv_bin& cb : cp->bins()) {
+        std::cout << "  crv_bin " << c++ << ": " << cb.hit_count() << " " << cb.hit_minimum() << " "
+                  << (cb.covered() ? "covered" : "uncovered") << std::endl;
       }
     }
   }
@@ -102,18 +102,16 @@ class crv_covergroup : public crv_object {
     if (!built_) build();
     expression_list result;
     for (crv_coverpoint* cp : points_)
-      for (crv_bin & cb : cp->bins()) 
-        if (!cb.covered())
-          result.add_expr(cb.bin_expr());
+      for (crv_bin& cb : cp->bins())
+        if (!cb.covered()) result.add_expr(cb.bin_expr());
     return result;
   }
 
   expression_list bound_var_expr_list() {
     if (!built_) build();
     expression_list result;
-    for (auto v : vars_)
-      result.add_expr(v->bound_expr());
-    return result;    
+    for (auto v : vars_) result.add_expr(v->bound_expr());
+    return result;
   }
 
   bool covered() {
@@ -128,14 +126,14 @@ class crv_covergroup : public crv_object {
     built_ = true;
     for (crv_object* obj : children_) {
       if (obj->kind() == "crv_variable") {
-        crv_variable_base_* v = (crv_variable_base_*) obj;
+        crv_variable_base_* v = (crv_variable_base_*)obj;
         vars_.push_back(v);
       }
       if (obj->kind() == "crv_coverpoint") {
-        crv_coverpoint* cp = (crv_coverpoint*) obj;
+        crv_coverpoint* cp = (crv_coverpoint*)obj;
         points_.push_back(cp);
       }
-    }  
+    }
   }
 
   std::vector<crv_coverpoint*> points_;

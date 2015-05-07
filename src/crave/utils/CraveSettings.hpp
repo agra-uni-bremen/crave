@@ -6,8 +6,7 @@
 #include <set>
 #include <string>
 
-namespace crave 
-{
+namespace crave {
 class CraveSetting : public Setting {
  public:
   CraveSetting(std::string const& filename)
