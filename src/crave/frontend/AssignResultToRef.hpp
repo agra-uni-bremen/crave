@@ -1,4 +1,4 @@
-// Copyright 2014 The CRAVE developers. All rights reserved.// Copyright 2014 The CRAVE developers. All rights reserved.
+// Copyright 2014 The CRAVE developers. All rights reserved.
 #pragma once
 
 #include "AssignResult.hpp"
