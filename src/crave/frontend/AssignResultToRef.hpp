@@ -1,22 +1,14 @@
-// Copyright 2014 The CRAVE developers. All rights reserved.
-
+// Copyright 2014 The CRAVE developers. All rights reserved.// Copyright 2014 The CRAVE developers. All rights reserved.
 #pragma once
 
-#include <boost/function.hpp>
-#include <boost/optional.hpp>
-#include <string>
 #include "AssignResult.hpp"
-#include "bitsize_traits.hpp"
-#include "AssignResultToRef.hpp"
 
 namespace crave {
 
 template <typename T>
-struct AssignResultImpl : AssignResult {
+struct AssignResultToRef : AssignResult {
  public:
-  AssignResultImpl() {}
-
-  explicit AssignResultImpl(T& value) : value_(value) {}
+  explicit AssignResultToRef(T& ref) : value_(ref) {}
 
  private:
   typedef boost::optional<boost::function0<bool> > Random;
@@ -24,7 +16,7 @@ struct AssignResultImpl : AssignResult {
   bool random_bit() const { return (*random_)(); }
 
  public:
-  virtual T value() const { return value_; }
+  virtual T const& value() const { return value_; }
 
   virtual void set_value(std::string const& str) {
     value_ = ((crave::is_signed<T>::value && str[0] == '1') ? -1 : 0);
@@ -48,7 +40,7 @@ struct AssignResultImpl : AssignResult {
   }
 
  protected:
-  T value_;
+  T& value_;
   Random random_;
 };
-} /* namespace crave */
+}

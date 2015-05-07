@@ -5,35 +5,41 @@
 #include <sysc/datatypes/int/sc_int.h>
 #include <sysc/datatypes/int/sc_uint.h>
 #include <sysc/datatypes/bit/sc_bv.h>
-
 #include <vector>
-
 #include "../ir/ReferenceExpression.hpp"
 #include "bitsize_traits.hpp"
 #include "Distribution.hpp"
 #include "RandomBase.hpp"
 
 namespace boost {
+
 template <int N>
 struct is_signed<sc_dt::sc_bv<N> > : boost::mpl::false_ {};
+
 template <int N>
 struct is_signed<sc_dt::sc_int<N> > : boost::mpl::true_ {};
+
 template <int N>
 struct is_signed<sc_dt::sc_uint<N> > : boost::mpl::false_ {};
 }
 
 namespace crave {
+
 template <typename T, int N = 0>
 struct is_sysc_dt : boost::mpl::false_ {};
+
 template <int N>
 struct is_sysc_dt<sc_dt::sc_bv<N> > : boost::mpl::true_ {};
+
 template <int N>
 struct is_sysc_dt<sc_dt::sc_int<N> > : boost::mpl::true_ {};
+
 template <int N>
 struct is_sysc_dt<sc_dt::sc_uint<N> > : boost::mpl::true_ {};
 
 template <class SCDT>
 struct sc_dt_width {};
+
 template <template <int> class SCDT, int N>
 struct sc_dt_width<SCDT<N> > : boost::mpl::int_<N> {};
 
