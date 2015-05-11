@@ -243,6 +243,31 @@ struct ConstraintManager {
 
     return constr_map_[name] = c;
   }
+  
+  ConstraintPtr makeConstraint(std::string const& name, int c_id, NodePtr n, Context& ctx, bool const soft = false,
+                               bool const cover = false) {
+    LOG(INFO) << "New " << (soft ? "soft " : "") << (cover ? "cover " : "") << "constraint " << name << " in set "
+              << id_;
+
+    if (constr_map_.find(name) != constr_map_.end()) throw std::runtime_error("Constraint already exists.");
+
+    GetSupportSetVisitor gssv;
+    n->visit(gssv);
+
+    ConstraintPtr c(boost::dynamic_pointer_cast<ForEach>(n) != 0
+                        ? new UserVectorConstraint(c_id, n, name, gssv.getSupportVars(), false, soft, cover)
+                        : (boost::dynamic_pointer_cast<Unique>(n) != 0
+                               ? new UserVectorConstraint(c_id, n, name, gssv.getSupportVars(), true, soft, cover)
+                               : new UserConstraint(c_id, n, name, gssv.getSupportVars(), soft, cover)));
+
+    assert(!c->isSoft() || !c->isCover());              // soft cover constraint not defined/supported yet
+    assert(!c->isVectorConstraint() || !c->isCover());  // cover vector constraint not defined/supported yet
+
+    changed_ = true;
+    constraints_.push_back(c);
+
+    return constr_map_[name] = c;
+  }
 
   template <typename Expr>
   ConstraintPtr makeConstraint(std::string const& name, Expr e, Context& ctx, bool const soft = false,
