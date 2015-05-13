@@ -25,6 +25,10 @@ struct VariableContainer {
   std::vector<ReadRefPair> dist_references;
 };
 
-static VariableContainer variables;
+extern VariableContainer variables;
+
+//static VariableContainer& variable_container();
+static VariableContainer& variable_container() { return variables; }
+
 
 }  // end namespace crave
