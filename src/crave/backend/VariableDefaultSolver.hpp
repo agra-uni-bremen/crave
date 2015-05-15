@@ -3,14 +3,16 @@
 #pragma once
 
 #include "VariableSolver.hpp"
+#include <vector>
+#include <map>
+#include <string>
 #include <boost/scoped_ptr.hpp>
 
 namespace crave {
 
 struct VariableDefaultSolver : VariableSolver {
-
-  VariableDefaultSolver(VariableContainer& vcon, ConstraintPartition& cp) : VariableSolver(vcon, cp) {
-
+  VariableDefaultSolver(VariableContainer& vcon,
+  ConstraintPartition& cp) : VariableSolver(vcon, cp) {
     LOG(INFO) << "Create solver for partition " << constr_pttn;
 
     BOOST_FOREACH(ConstraintPtr c, constr_pttn) {
@@ -24,7 +26,8 @@ struct VariableDefaultSolver : VariableSolver {
     analyseHards();
     if (contradictions_.empty()) {
       analyseSofts();
-      LOG(INFO) << "Partition is solvable with " << inactive_softs_.size() << " soft constraint(s) deactivated:";
+      LOG(INFO) << "Partition is solvable with " << inactive_softs_.size()
+                << " soft constraint(s) deactivated:";
       BOOST_FOREACH(std::string & s, inactive_softs_) { LOG(INFO) << " " << s; }
     } else {
       LOG(INFO) << "Partition has unsatisfiable hard constraints:";
@@ -39,15 +42,24 @@ struct VariableDefaultSolver : VariableSolver {
 
   virtual bool solve() {
     if (!contradictions_.empty()) return false;
-    BOOST_FOREACH(VariableContainer::ReadRefPair pair, var_ctn.read_references) {
-      if (constr_pttn.containsVar(pair.first)) solver->makeAssumption(*pair.second->expr());
+    BOOST_FOREACH(VariableContainer::ReadRefPair pair,
+                  var_ctn.read_references) {
+      if (constr_pttn.containsVar(pair.first)) {
+          solver->makeAssumption(*pair.second->expr());
+      }
     }
-    BOOST_FOREACH(VariableContainer::ReadRefPair pair, var_ctn.dist_references) {
-      if (constr_pttn.containsVar(pair.first)) solver->makeSuggestion(*pair.second->expr());
+    BOOST_FOREACH(VariableContainer::ReadRefPair pair,
+                  var_ctn.dist_references) {
+      if (constr_pttn.containsVar(pair.first)) {
+          solver->makeSuggestion(*pair.second->expr());
+      }
     }
     if (solver->solve()) {
-      BOOST_FOREACH(VariableContainer::WriteRefPair pair, var_ctn.write_references) {
-        if (constr_pttn.containsVar(pair.first)) solver->read(*var_ctn.variables[pair.first], *pair.second);
+      BOOST_FOREACH(VariableContainer::WriteRefPair pair,
+                    var_ctn.write_references) {
+        if (constr_pttn.containsVar(pair.first)) {
+            solver->read(*var_ctn.variables[pair.first], *pair.second);
+        }
       }
       return true;
     }
@@ -95,4 +107,4 @@ struct VariableDefaultSolver : VariableSolver {
     }
   }
 };
-}
+}  // namespace crave
