@@ -3,12 +3,12 @@
 #pragma once
 
 #include "VariableGeneratorType.hpp"
+#include <vector>
 
 namespace crave {
 
 struct VariableCoverageGenerator : VariableGenerator {
-
-  VariableCoverageGenerator(VariableContainer& vcon) : VariableGenerator(vcon) {}
+VariableCoverageGenerator(VariableContainer& vcon) : VariableGenerator(vcon) {}
 
   virtual void reset(std::vector<ConstraintPartition>& partitions) {
     solvers.clear();
@@ -23,10 +23,12 @@ struct VariableCoverageGenerator : VariableGenerator {
     bool res = false;
     BOOST_FOREACH(VarSolverPtr vs, solvers) {
       if (vs->solve())
-        res = true;  // one solver has hitted an uncovered constraint -> everything ok, from covered solvers, the last
+        res = true;  // one solver has hitted an uncovered constraint
+                     // -> everything ok,
+                     // from covered solvers, the last
                      // solutions will be reused.
     }
     return res;
   }
 };
-}
+}  // namespace crave
