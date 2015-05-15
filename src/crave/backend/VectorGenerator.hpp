@@ -3,6 +3,8 @@
 #pragma once
 
 #include "VariableGenerator.hpp"
+#include <vector>
+#include <map>
 #include "../ir/visitor/ReplaceVisitor.hpp"
 
 namespace crave {
@@ -11,7 +13,6 @@ namespace crave {
  *
  */
 struct VectorSolver {
-
   typedef boost::intrusive_ptr<VariableExpr> VariablePtr;
   typedef std::vector<VariablePtr> VectorElements;
 
@@ -28,7 +29,9 @@ struct VectorSolver {
     __rand_vec_base* vector = vectorBaseMap[vector_id];
 
     unsigned int size = default_rand_vec_size();
-    if (!var_gen.read(vector->size_var(), size)) LOG(INFO) << "Use default size for vector " << vector_id;
+    if (!var_gen.read(vector->size_var(), size)) {
+        LOG(INFO) << "Use default size for vector " << vector_id;
+    }
     resetSolver(size);
     bool result = solver->solve(false) || solver->solve(true);
     if (result) solver->readVector(vec_elements, *vector);
@@ -43,20 +46,18 @@ struct VectorSolver {
   }
 
   void buildSolver(unsigned int const size) {
-
     if (vec_elements.size() != size) {
       unsigned int old_size = vec_elements.size();
       vec_elements.resize(size);
-      for (unsigned int i = old_size; i < size; ++i) vec_elements[i] = new VariableExpr(new_var_id(), 1u, true);
+      for (unsigned int i = old_size; i < size; ++i) {
+          vec_elements[i] = new VariableExpr(new_var_id(), 1u, true);
+      }
     }
 
     BOOST_FOREACH(VectorConstraintPtr constraint, constraints) {
-
       if (!constraint->isUnique()) {
-
         ReplaceVisitor replacer(vec_elements);
         for (unsigned int i = 0u; i < size; ++i) {
-
           replacer.setVecIdx(i);
           constraint->expr()->visit(replacer);
 
@@ -95,10 +96,10 @@ struct VectorSolver {
  *
  */
 struct VectorGenerator {
-
   typedef std::map<int, VectorSolver> VectorSolverMap;
 
-  VectorGenerator(VariableGenerator& var_gen_) : vector_solvers(), var_gen(var_gen_) {}
+  explicit VectorGenerator(VariableGenerator& var_gen_) : vector_solvers(),
+                                                 var_gen(var_gen_) {}
 
   bool solve() {
     BOOST_FOREACH(VectorSolverMap::value_type & c_pair, vector_solvers) {
@@ -116,7 +117,8 @@ struct VectorGenerator {
   void addConstraint(VectorConstraintPtr vc) {
     int v_id = vc->getVectorId();
     VectorSolverMap::iterator ite(vector_solvers.lower_bound(v_id));
-    if (ite != vector_solvers.end() && !(vector_solvers.key_comp()(v_id, ite->first))) {
+    if (ite != vector_solvers.end() &&
+        !(vector_solvers.key_comp()(v_id, ite->first))) {
       ite->second.addConstraint(vc);
     } else {
       VectorSolver vs(v_id, var_gen);
