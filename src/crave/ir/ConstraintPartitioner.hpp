@@ -4,6 +4,9 @@
 
 #include <glog/logging.h>
 #include <boost/foreach.hpp>
+#include <vector>
+#include <set>
+
 #include "Context.hpp"
 
 namespace crave {
@@ -11,7 +14,6 @@ namespace crave {
 typedef boost::shared_ptr<UserVectorConstraint> VectorConstraintPtr;
 
 struct ConstraintPartitioner {
-
   void reset() {
     constr_mngs_.clear();
     constraints_.clear();
@@ -26,10 +28,12 @@ struct ConstraintPartitioner {
 
     BOOST_FOREACH(ConstraintPtr c, mng.constraints_) {
       if (c->isEnabled()) {
-        if (c->isVectorConstraint())
-          vec_constraints_.push_back(boost::static_pointer_cast<UserVectorConstraint>(c));
-        else
+        if (c->isVectorConstraint()) {
+          vec_constraints_.push_back(
+          boost::static_pointer_cast<UserVectorConstraint>(c));
+        } else {
           constraints_.push_back(c);
+        }
       }
     }
   }
@@ -46,17 +50,23 @@ struct ConstraintPartitioner {
 
     LOG(INFO) << "  " << vec_constraints_.size() << " vector constraint(s):";
 
-    BOOST_FOREACH(VectorConstraintPtr c, vec_constraints_) { LOG(INFO) << "   " << c->name(); }
+    BOOST_FOREACH(VectorConstraintPtr c, vec_constraints_) {
+        LOG(INFO) << "   " << c->name();
+    }
 
     LOG(INFO) << "  " << partitions_.size() << " constraint partition(s):";
     uint cnt = 0;
 
-    BOOST_FOREACH(ConstraintPartition & cp, partitions_) { LOG(INFO) << "    #" << ++cnt << ": " << cp; }
+    BOOST_FOREACH(ConstraintPartition & cp, partitions_) {
+    LOG(INFO) << "    #" << ++cnt << ": " << cp;
+    }
   }
 
   std::vector<ConstraintPartition>& getPartitions() { return partitions_; }
 
-  std::vector<VectorConstraintPtr>& getVectorConstraints() { return vec_constraints_; }
+  std::vector<VectorConstraintPtr>& getVectorConstraints() {
+      return vec_constraints_;
+  }
 
  private:
   void maximizePartition(ConstraintPartition& cp, ConstraintList& lc) {
@@ -71,12 +81,17 @@ struct ConstraintPartitioner {
       while (ite != lc.end()) {
         c = *ite;
         std::vector<int> v_intersection;
-        std::set_intersection(cp.support_vars_.begin(), cp.support_vars_.end(), c->support_vars_.begin(),
-                              c->support_vars_.end(), std::back_inserter(v_intersection));
+        std::set_intersection(cp.support_vars_.begin(),
+                              cp.support_vars_.end(),
+                              c->support_vars_.begin(),
+                              c->support_vars_.end(),
+                              std::back_inserter(v_intersection));
         if (!v_intersection.empty()) {
           changed = true;
           cp.add(c);
-          cp.support_vars_.insert(c->support_vars_.begin(), c->support_vars_.end());
+          cp.support_vars_.insert(
+          c->support_vars_.begin(),
+          c->support_vars_.end());
           ite = lc.erase(ite);
         } else {
           ++ite;
@@ -94,4 +109,4 @@ struct ConstraintPartitioner {
   std::vector<ConstraintPartition> partitions_;
   std::vector<VectorConstraintPtr> vec_constraints_;
 };
-}
+}  // namespace crave
