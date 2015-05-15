@@ -2,9 +2,8 @@
 
 #pragma once
 
-#include "../ir/visitor/metaSMTNodeVisitor.hpp"
-
 #include <string>
+#include "../ir/visitor/metaSMTNodeVisitor.hpp"
 
 namespace crave {
 
@@ -35,4 +34,4 @@ struct FactorySolver {
   static metaSMTVisitor* getNewInstance() { return NULL; }
 };
 
-}  // namespace crave;
+}  // namespace crave
