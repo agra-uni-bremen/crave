@@ -4,6 +4,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <list>
+#include <set>
 
 #include "UserConstraintType.hpp"
 
@@ -38,7 +39,9 @@ struct ConstraintPartition {
     constraints_.insert(ite, c);
   }
 
-  bool containsVar(int id) { return support_vars_.find(id) != support_vars_.end(); }
+  bool containsVar(int id) {
+      return support_vars_.find(id) != support_vars_.end();
+  }
 
   template <typename ostream>
   friend ostream& operator<<(ostream& os, const ConstraintPartition& cp) {
@@ -54,4 +57,4 @@ struct ConstraintPartition {
   ConstraintList constraints_;
   std::set<int> support_vars_;
 };
-}
+}  // namespace crave
