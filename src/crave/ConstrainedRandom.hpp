@@ -2,13 +2,14 @@
 
 #pragma once
 
+#include <vector>
+#include <string>
+#include <set>
+#include <boost/bind.hpp>
+
 #include "backend/Generator.hpp"
 #include "frontend/RandomBase.hpp"
 #include "ir/UserExpression.hpp"
-
-#include <boost/bind.hpp>
-
-#include <vector>
 
 namespace crave {
 
@@ -23,7 +24,7 @@ void init(std::string const&);
 
 class rand_obj : public rand_obj_base {
  public:
-  rand_obj(rand_obj* parent_ = 0) : parent(parent_), rebuild(false) {
+  explicit rand_obj(rand_obj* parent_ = 0) : parent(parent_), rebuild(false) {
     if (parent != 0) parent->add_obj_child(this);
   }
 
@@ -50,10 +51,13 @@ class rand_obj : public rand_obj_base {
   }
 
   virtual void gather_values(std::vector<long long>& ch) {
-    for (std::vector<rand_base*>::const_iterator i = baseChildren.begin(); i != baseChildren.end(); ++i)
+    for (std::vector<rand_base*>::const_iterator i = baseChildren.begin();
+         i != baseChildren.end(); ++i)
       (*i)->gather_values(ch);
-    for (std::vector<rand_obj*>::const_iterator i = objChildren.begin(); i != objChildren.end(); ++i)
+    for (std::vector<rand_obj*>::const_iterator i = objChildren.begin();
+         i != objChildren.end(); ++i) {
       (*i)->gather_values(ch);
+    }
   }
 
   virtual void add_base_child(rand_base* rb) { baseChildren.push_back(rb); }
@@ -80,7 +84,9 @@ class rand_obj : public rand_obj_base {
     return res;
   }
 
-  bool is_constraint_enabled(std::string name) { return constraint.isConstraintEnabled(name); }
+  bool is_constraint_enabled(std::string name) {
+      return constraint.isConstraintEnabled(name);
+  }
 
   std::ostream& print_dot_graph(std::ostream&, bool);
   void display_constraints();
@@ -95,7 +101,9 @@ class rand_obj : public rand_obj_base {
   }
 
   void gather_constraints(Generator& gen) {
-    for (uint i = 0; i < objChildren.size(); i++) objChildren[i]->gather_constraints(gen);
+    for (uint i = 0; i < objChildren.size(); i++) {
+        objChildren[i]->gather_constraints(gen);
+    }
     gen.merge(constraint);
   }
 
@@ -113,16 +121,17 @@ class rand_obj : public rand_obj_base {
 
 #define INSERT(s, DATA, ELEM) DATA.insert(ELEM);
 
-#define CRAVE_ENUM(name, ...)                                                                             \
-  namespace crave {                                                                                       \
-  template <>                                                                                             \
-  struct randv<name> : randv<int> {                                                                       \
-    randv(rand_obj* parent) : randv<int>(parent) {                                                        \
-      if (parent == 0) throw std::runtime_error("randv<enum> must be owned by an instance of rand_obj."); \
-                                                                                                          \
-      std::set<int> s;                                                                                    \
-      BOOST_PP_SEQ_FOR_EACH(INSERT, s, __VA_ARGS__);                                                      \
-      parent->constraint(inside(var, s));                                                                 \
-    }                                                                                                     \
-  };                                                                                                      \
-  }
+#define CRAVE_ENUM(name, ...)\
+  namespace crave {\
+  template <>\
+  struct randv<name> : randv<int> {\
+    explicit randv(rand_obj* parent) : randv<int>(parent) {\
+      if (parent == 0) {\
+      throw std::runtime_error("randv<enum> must be owned by an instance of rand_obj.");\
+      }\
+      std::set<int> s;\
+      BOOST_PP_SEQ_FOR_EACH(INSERT, s, __VA_ARGS__);\
+      parent->constraint(inside(var, s));\
+    }\
+  };\
+  }  // namespace crave
