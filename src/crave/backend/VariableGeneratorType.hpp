@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include <boost/foreach.hpp>
 #include "VariableDefaultSolver.hpp"
+#include <string>
 #include <vector>
+#include <boost/foreach.hpp>
 
 namespace crave {
 
@@ -14,7 +15,8 @@ namespace crave {
 struct VariableGenerator {
   typedef boost::shared_ptr<VariableSolver> VarSolverPtr;
 
-  VariableGenerator(VariableContainer& vcon) : var_ctn(vcon), solvers() {}
+  explicit VariableGenerator(VariableContainer& vcon) : var_ctn(vcon),
+                                                        solvers() {}
 
   virtual void reset(std::vector<ConstraintPartition>& partitions) {
     solvers.clear();
@@ -64,4 +66,4 @@ struct VariableGenerator {
   VariableContainer& var_ctn;
   std::vector<VarSolverPtr> solvers;
 };
-}
+}  // namespace crave
