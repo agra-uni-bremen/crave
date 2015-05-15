@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="95">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df root="/media/Daten/Programmieren/c++/crave-bundle-new/crave" name="0">
+      <df name="src">
+        <df name="lib">
+          <df name="experimental">
+            <in>ConstrainedRandomGraph.cpp</in>
+            <in>GraphVisitor.cpp</in>
+            <in>Object.cpp</in>
+          </df>
+          <in>ConstrainedRandom.cpp</in>
+          <in>EvalVisitor.cpp</in>
+          <in>FixWidthVisitor.cpp</in>
+          <in>GetSupportSetVisitor.cpp</in>
+          <in>ReplaceVisitor.cpp</in>
+          <in>ToDotNodeVisitor.cpp</in>
+          <in>metaSMTNodeVisitor.cpp</in>
+        </df>
+      </df>
+      <df name="tests">
+        <in>boost_test.cpp</in>
+        <in>experimental_tests.cpp</in>
+        <in>solver_independent_tests.cpp</in>
+        <in>test_Constraint_Management.cpp</in>
+        <in>test_Context.cpp</in>
+        <in>test_CoverageSampling.cpp</in>
+        <in>test_Distribution.cpp</in>
+        <in>test_Evaluations.cpp</in>
+        <in>test_ObjectHierarchy.cpp</in>
+        <in>test_Operators.cpp</in>
+        <in>test_Random_Object.cpp</in>
+        <in>test_Syntax.cpp</in>
+        <in>test_SystemC_Data.cpp</in>
+        <in>test_UserConstraint.cpp</in>
+        <in>test_Vector_Constraint.cpp</in>
+        <in>use_Boolector.cpp</in>
+        <in>use_CVC4.cpp</in>
+        <in>use_Cudd.cpp</in>
+        <in>use_SWORD.cpp</in>
+        <in>use_Z3.cpp</in>
+      </df>
+    </df>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>/home/niklas/Daten/Programmieren/c++/crave-bundle-new/crave/CMakeLists.txt</itemPath>
+      <itemPath>/home/niklas/Daten/Programmieren/c++/crave-bundle-new/crave/Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>
+  <sourceRootList>
+    <Elem>/home/niklas/Daten/Programmieren/c++/crave-bundle-new/crave</Elem>
+  </sourceRootList>
+  <projectmakefile>/home/niklas/Daten/Programmieren/c++/crave-bundle-new/crave/Makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>false</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <codeAssistance>
+      </codeAssistance>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>/home/niklas/Daten/Programmieren/c++/crave-bundle-new/crave</buildCommandWorkingDir>
+          <buildCommand>${MAKE} -f Makefile</buildCommand>
+          <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
+          <executablePath></executablePath>
+        </makeTool>
+      </makefileType>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/src/lib/ConstrainedRandom.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/src/lib/EvalVisitor.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/src/lib/FixWidthVisitor.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/src/lib/GetSupportSetVisitor.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/src/lib/ReplaceVisitor.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/src/lib/ToDotNodeVisitor.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/src/lib/experimental/ConstrainedRandomGraph.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/src/lib/experimental/GraphVisitor.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/src/lib/experimental/Object.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/src/lib/metaSMTNodeVisitor.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/tests/boost_test.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/tests/experimental_tests.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/tests/solver_independent_tests.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/tests/test_Constraint_Management.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/tests/test_Context.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/tests/test_CoverageSampling.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/tests/test_Distribution.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/tests/test_Evaluations.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/tests/test_ObjectHierarchy.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/tests/test_Operators.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/tests/test_Random_Object.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/tests/test_Syntax.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/tests/test_SystemC_Data.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/tests/test_UserConstraint.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/tests/test_Vector_Constraint.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/tests/use_Boolector.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/tests/use_CVC4.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/tests/use_Cudd.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/tests/use_SWORD.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+      <item path="/media/Daten/Programmieren/c++/crave-bundle-new/crave/tests/use_Z3.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>

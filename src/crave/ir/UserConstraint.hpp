@@ -249,7 +249,10 @@ struct ConstraintManager {
     LOG(INFO) << "New " << (soft ? "soft " : "") << (cover ? "cover " : "") << "constraint " << name << " in set "
               << id_;
 
-    if (constr_map_.find(name) != constr_map_.end()) throw std::runtime_error("Constraint already exists.");
+    if (constr_map_.find(name) != constr_map_.end()) 
+    {
+        throw std::runtime_error(name+"Constraint already exists.");
+    }
 
     GetSupportSetVisitor gssv;
     n->visit(gssv);
