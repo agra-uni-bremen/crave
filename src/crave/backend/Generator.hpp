@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
 #include "../ir/UserConstraint.hpp"
 #include "VariableGenerator.hpp"
 #include "../backend/VectorGenerator.hpp"
@@ -9,7 +11,6 @@
 namespace crave {
 
 struct Generator {
-
  public:
   Generator()
       : constr_mng(),
@@ -22,7 +23,7 @@ struct Generator {
         covered_(false) {}
 
   template <typename Expr>
-  Generator(Expr expr)
+  explicit Generator(Expr expr)
       : constr_mng(),
         var_ctn(crave::variables),
         ctx(var_ctn),
@@ -70,17 +71,32 @@ struct Generator {
     return *this;
   }
 
-  bool enableConstraint(std::string const& name) { return constr_mng.enableConstraint(name); }
-  bool disableConstraint(std::string const& name) { return constr_mng.disableConstraint(name); }
-  bool isConstraintEnabled(std::string const& name) { return constr_mng.isConstraintEnabled(name); }
-  bool isChanged() { return constr_mng.isChanged(); }
+  bool enableConstraint(std::string const& name) {
+      return constr_mng.enableConstraint(name);
+  }
+
+  bool disableConstraint(std::string const& name) {
+      return constr_mng.disableConstraint(name);
+  }
+
+  bool isConstraintEnabled(std::string const& name) {
+      return constr_mng.isConstraintEnabled(name);
+  }
+
+  bool isChanged() {
+      return constr_mng.isChanged();
+  }
 
   Generator& operator()() {
-    if (!next()) throw std::runtime_error("Generator constraint unsatisfiable.");
+    if (!next()) {
+        throw std::runtime_error("Generator constraint unsatisfiable.");
+    }
     return *this;
   }
 
-  void merge(Generator& other) { constr_pttn.mergeConstraints(other.constr_mng); }
+  void merge(Generator& other) {
+      constr_pttn.mergeConstraints(other.constr_mng);
+  }
 
   void reset() {
     constr_mng.resetChanged();
@@ -136,9 +152,13 @@ struct Generator {
     return os;
   }
 
-  std::vector<std::vector<std::string> > analyseContradiction() { return var_gen.analyseContradiction(); }
+  std::vector<std::vector<std::string> > analyseContradiction() {
+      return var_gen.analyseContradiction();
+  }
 
-  std::vector<std::string> getInactiveSofts() { return var_gen.getInactiveSofts(); }
+  std::vector<std::string> getInactiveSofts() {
+      return var_gen.getInactiveSofts();
+  }
 
   template <typename T>
   T operator[](Variable<T> const& var) {
