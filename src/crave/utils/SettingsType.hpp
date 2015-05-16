@@ -4,6 +4,8 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
+#include <string>
+#include <set>
 
 namespace crave {
 
@@ -12,7 +14,7 @@ class Setting {
   typedef boost::property_tree::ptree ptree;
 
  protected:
-  Setting(std::string const& filename) : filename_(filename) {}
+  explicit Setting(std::string const& filename) : filename_(filename) {}
 
  public:
   void load() {
@@ -20,7 +22,6 @@ class Setting {
     load_(tree);
   }
   void save() const {
-
     ptree tree = read_setting_file_();
     save_(tree);
 
@@ -36,7 +37,9 @@ class Setting {
     ptree tree;
 
     std::ifstream cfg_file(filename_.c_str());
-    if (cfg_file.is_open()) read_xml(cfg_file, tree, boost::property_tree::xml_parser::trim_whitespace);
+    if (cfg_file.is_open()) read_xml(cfg_file,
+                            tree,
+                            boost::property_tree::xml_parser::trim_whitespace);
 
     cfg_file.close();
     return tree;
@@ -44,13 +47,14 @@ class Setting {
 
  protected:
   std::string module_name_;  // stores module name for config file
+
  private:
   std::string filename_;  // stores file name of config file
 };
 
 class LoggerSetting : public Setting {
  public:
-  LoggerSetting(std::string const& filename)
+  explicit LoggerSetting(std::string const& filename)
       : Setting(filename),
         module_name_("logger"),
         file_(),
@@ -93,6 +97,7 @@ class LoggerSetting : public Setting {
   int s_level_;                    // severity level
   int file_size_;                  // maximum size of logfile
   std::set<std::string> modules_;  // modules where logging is enabled
+
  private:
   std::string const FILE;
   std::string const DIR;
@@ -100,4 +105,4 @@ class LoggerSetting : public Setting {
   std::string const FILE_SIZE;
   std::string const MODULES;
 };
-}
+}  // namespace crave
