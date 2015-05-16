@@ -2,19 +2,22 @@
 
 #pragma once
 
-#include "../Node.hpp"
-#include "NodeVisitor.hpp"
-
 #include <map>
 #include <stack>
 #include <vector>
+
+#include "../Node.hpp"
+#include "NodeVisitor.hpp"
+
+
 
 namespace crave {
 
 class ReplaceVisitor : public NodeVisitor {
  public:
-  ReplaceVisitor(std::vector<boost::intrusive_ptr<VariableExpr> >& vars)
-      : vec_idx_(), okay_(true), result_(), aux_stack_(), subscript_stack_(), variables_(vars), terminals_() {}
+explicit ReplaceVisitor(std::vector<boost::intrusive_ptr<VariableExpr> >& vars)
+      : vec_idx_(), okay_(true), result_(),
+        aux_stack_(), subscript_stack_(), variables_(vars), terminals_() {}
 
   virtual void visitNode(Node const&);
   virtual void visitTerminal(Terminal const&);
