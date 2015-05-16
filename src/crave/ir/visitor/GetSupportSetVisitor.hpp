@@ -2,15 +2,15 @@
 
 #pragma once
 
+#include <set>
+
 #include "../Node.hpp"
 #include "NodeVisitor.hpp"
 
-#include <set>
 
 namespace crave {
 
 class GetSupportSetVisitor : public NodeVisitor {
-
  public:
   GetSupportSetVisitor() : NodeVisitor(), support_vars() {}
 
