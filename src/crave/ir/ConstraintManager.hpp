@@ -4,6 +4,8 @@
 
 #include "Context.hpp"
 
+#include <glog/logging.h>
+
 #include <string>
 #include <map>
 
@@ -11,7 +13,7 @@
 #include "visitor/GetSupportSetVisitor.hpp"
 #include "visitor/ToDotNodeVisitor.hpp"
 
-#include <glog/logging.h>
+
 
 namespace crave {
 
@@ -137,8 +139,8 @@ struct ConstraintManager {
     ToDotVisitor visitor(os);
 
     BOOST_FOREACH(ConstraintPtr c, constraints_) {
-      long a = reinterpret_cast<long>(&*c);
-      long b = reinterpret_cast<long>(&(*c->expr()));
+      int64 a = reinterpret_cast<int64>(&*c);
+      int64 b = reinterpret_cast<int64>(&(*c->expr()));
       os << "\t" << a << " [label=\"" << c->name()
          << (c->isSoft() ? " soft" : "")
          << (c->isCover() ? " cover" : "")
