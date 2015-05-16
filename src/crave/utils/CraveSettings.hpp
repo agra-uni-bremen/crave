@@ -2,6 +2,7 @@
 
 #pragma once
 #include "Settings.hpp"
+
 #include <fstream>
 #include <set>
 #include <string>
@@ -9,8 +10,13 @@
 namespace crave {
 class CraveSetting : public Setting {
  public:
-  CraveSetting(std::string const& filename)
-      : Setting(filename), module_name_("crave"), backend_(), seed_(), BACKEND("backend"), SEED("seed") {}
+  explicit CraveSetting(std::string const& filename)
+      : Setting(filename),
+        module_name_("crave"),
+        backend_(),
+        seed_(),
+        BACKEND("backend"),
+        SEED("seed") {}
 
  private:
   virtual void load_(ptree& tree) {
@@ -37,4 +43,4 @@ class CraveSetting : public Setting {
   std::string const BACKEND;
   std::string const SEED;
 };
-}
+}  // namespace crave
