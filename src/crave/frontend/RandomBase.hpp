@@ -48,7 +48,9 @@ class __rand_vec_base1 : public __rand_vec_base {
     std::cout << std::endl;
   }
 
-  virtual Variable<unsigned int> const& size_var() const { return sym_vec.size(); }
+  virtual Variable<unsigned int> const& size_var() const {
+      return sym_vec.size();
+  }
 
   virtual void set_values(std::vector<std::string>& values) {
     AssignResultImpl<T2> result;
@@ -87,7 +89,9 @@ class rand_vec : public __rand_vec<T>, public rand_base {
     return true;
   }
 
-  virtual void gather_values(std::vector<long long>& ch) { ch.push_back(this->size()); }
+  virtual void gather_values(std::vector<long long>& ch) {
+      ch.push_back(this->size());
+  }
 };
 
 }  // namespace crave
