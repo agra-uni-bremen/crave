@@ -30,8 +30,8 @@ class Setting {
   }
 
  private:
-  virtual void load_(const ptree&) = 0;
-  virtual void save_(ptree*) const = 0;
+  virtual void load_(const ptree &tree) = 0;
+  virtual void save_(ptree *tree) const = 0;
 
   ptree read_setting_file_() const {
     ptree tree;
