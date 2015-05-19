@@ -11,7 +11,8 @@
 namespace crave {
 
 struct VariableCoverageSolver : VariableSolver {
-  VariableCoverageSolver(const VariableContainer &vcon, const ConstraintPartition& cp)
+  VariableCoverageSolver(const VariableContainer &vcon,
+                         const ConstraintPartition& cp)
   : VariableSolver(vcon, cp) {
     LOG(INFO) << "Create coverage solver for partition " << constr_pttn;
 
