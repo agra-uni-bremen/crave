@@ -10,7 +10,9 @@ namespace crave {
 template <typename Integer>
 struct ReferenceExpressionImpl : public ReferenceExpression {
  public:
-  ReferenceExpressionImpl(Integer const& value, ReferenceExpression::result_type expr) : value_(value), expr_(expr) {}
+  ReferenceExpressionImpl(Integer const& value,
+                          ReferenceExpression::result_type expr)
+                          : value_(value), expr_(expr) {}
 
   virtual ~ReferenceExpressionImpl() {}
 
@@ -25,4 +27,4 @@ struct ReferenceExpressionImpl : public ReferenceExpression {
   Integer const& value_;
   ReferenceExpression::result_type expr_;
 };
-}
+}  // namespace crave
