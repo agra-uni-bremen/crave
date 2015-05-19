@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <vector>
 #include "Constraint.hpp"
 
 namespace crave {
@@ -14,7 +15,7 @@ class rand_base {
 
  public:
   virtual bool next() = 0;
-  virtual void gather_values(std::vector<long long>&) = 0;
+  virtual void gather_values(std::vector<int64 int64>&) = 0;
 };
 
 class rand_obj_base : public rand_base {
@@ -43,4 +44,4 @@ class randv_base : public rand_base {
   WriteReference<T> var;
   T value;
 };
-}
+}  // namespace crave
