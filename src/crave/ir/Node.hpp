@@ -86,7 +86,7 @@ class VariableExpr : public Terminal {
 class Constant : public Terminal {
  public:
   Constant() : Terminal(1, true), value_(false) {}
-  Constant(unsigned long long val, unsigned int bs, bool s) :
+  Constant(u_int64_t val, unsigned int bs, bool s) :
            Terminal(bs, s), value_(val) {}
   explicit Constant(bool b) : Terminal(1, true), value_(b) {}
   Constant(Constant const& c) :
@@ -94,12 +94,12 @@ class Constant : public Terminal {
 
   void visit(NodeVisitor& v) const { v.visitConstant(*this); }
 
-  operator unsigned long long() const { return value_; }
+  operator u_int64_t() const { return value_; }
 
-  unsigned long long value() const { return value_; }
+  u_int64_t value() const { return value_; }
 
  private:
-  unsigned long long value_;
+  u_int64_t value_;
 };
 
 class VectorExpr : public Terminal {
