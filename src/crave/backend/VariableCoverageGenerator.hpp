@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "VariableGeneratorType.hpp"
 #include <vector>
+
+#include "VariableGeneratorType.hpp"
 
 namespace crave {
 
