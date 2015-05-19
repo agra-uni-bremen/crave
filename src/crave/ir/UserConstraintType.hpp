@@ -4,6 +4,8 @@
 
 #include <boost/foreach.hpp>
 #include <set>
+#include <string>
+
 #include "Node.hpp"
 
 namespace crave {
@@ -15,16 +17,29 @@ struct UserConstraint {
   typedef NodePtr expression;
 
  protected:
-  UserConstraint(unsigned const id, expression const expr, std::string const& name, std::set<int>& support_vars,
-                 bool const soft = false, bool const cover = false, bool const enabled = true)
-      : id_(id), expr_(expr), name_(name), support_vars_(support_vars), soft_(soft), cover_(cover), enabled_(enabled) {}
+  UserConstraint(unsigned const id,
+                 expression const expr,
+                 std::string const& name,
+                 std::set<int>& support_vars,
+                 bool const soft = false,
+                 bool const cover = false,
+                 bool const enabled = true)
+      : id_(id),
+        expr_(expr),
+        name_(name),
+        support_vars_(support_vars),
+        soft_(soft),
+        cover_(cover),
+        enabled_(enabled) {}
 
  public:
   virtual ~UserConstraint() {}
 
   template <typename ostream>
   friend ostream& operator<<(ostream& os, const UserConstraint& constr) {
-    os << constr.name_ << " is a " << (constr.soft_ ? "soft" : "hard") << " constraint and "
+    os << constr.name_ << " is a "
+       << (constr.soft_ ? "soft" : "hard")
+       << " constraint and "
        << (constr.enabled_ ? "enabled" : "disabled");
     os << ", support vars =";
     BOOST_FOREACH(int item, constr.support_vars_) { os << " " << item; }
@@ -58,4 +73,4 @@ struct UserConstraint {
   bool cover_;
   bool enabled_;
 };
-}
+}  // namespace crave
