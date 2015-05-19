@@ -316,7 +316,7 @@ struct ConstraintPartitioner {
     vec_constraints_.clear();
   }
 
-  void mergeConstraints(ConstraintManager& mng) {
+  void mergeConstraints(const ConstraintManager& mng) {
     LOG(INFO) << "Merge set " << mng.id_ << " with set(s)";
     BOOST_FOREACH(unsigned id, constr_mngs_) { LOG(INFO) << " " << id; }
     constr_mngs_.insert(mng.id_);

@@ -94,7 +94,7 @@ struct Generator {
     return *this;
   }
 
-  void merge(Generator& other) {
+  void merge(const Generator& other) {
       constr_pttn.mergeConstraints(other.constr_mng);
   }
 
