@@ -2,13 +2,14 @@
 
 #pragma once
 
-#include "Context.hpp"
+
 
 #include <glog/logging.h>
 
 #include <string>
 #include <map>
 
+#include "Context.hpp"
 #include "visitor/FixWidthVisitor.hpp"
 #include "visitor/GetSupportSetVisitor.hpp"
 #include "visitor/ToDotNodeVisitor.hpp"
