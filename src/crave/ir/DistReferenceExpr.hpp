@@ -8,8 +8,9 @@ namespace crave {
 
 template <typename Integer>
 struct DistReferenceExpr : ReferenceExpression {
-
-  DistReferenceExpr(distribution<Integer> dist, ReferenceExpression::result_type expr) : dist_(dist), expr_(expr) {}
+  DistReferenceExpr(distribution<Integer> dist,
+                    ReferenceExpression::result_type expr)
+                    : dist_(dist), expr_(expr) {}
 
   virtual ReferenceExpression::result_type expr() const {
     unsigned width = bitsize_traits<Integer>::value;
@@ -21,4 +22,4 @@ struct DistReferenceExpr : ReferenceExpression {
   distribution<Integer> dist_;
   ReferenceExpression::result_type expr_;
 };
-}
+}  // namespace crave
