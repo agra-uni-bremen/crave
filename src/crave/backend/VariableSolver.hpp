@@ -35,7 +35,9 @@ struct VariableSolver {
       return contradictions_;
   }
 
-  std::vector<std::string> getInactiveSofts() { return inactive_softs_; }
+  std::vector<std::string> getInactiveSofts() const { 
+      return inactive_softs_;
+  }
 
  protected:
   VariableContainer *var_ctn;
