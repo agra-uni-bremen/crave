@@ -38,11 +38,14 @@ struct distribution : Node {
   std::vector<weighted_range<T> >& ranges() { return ranges_; }
 
   T nextValue() const {
-    if (ranges_.empty())
-      return boost::uniform_int<T>(std::numeric_limits<T>::min(), std::numeric_limits<T>::max())(rng);
+    if (ranges_.empty()) {
+      return boost::uniform_int<T>(
+              std::numeric_limits<T>::min(),
+              std::numeric_limits<T>::max())(rng);
+    }
     weighted_range<T> selected = ranges_.back();
     if (ranges_.size() > 1) {
-      unsigned r = boost::uniform_int<unsigned>(0, selected.accumWeight - 1)(rng);
+      unsigned r = boost::uniform_int<unsigned>(0, selected.accumWeight-1)(rng);
       for (uint i = 0; i < ranges_.size(); i++)
         if (r < ranges_[i].accumWeight) {
           selected = ranges_[i];
@@ -55,8 +58,14 @@ struct distribution : Node {
  private:
   void addRange(weighted_range<T> wr) {
     for (uint i = 0; i < ranges_.size(); i++)
-      if (ranges_[i].overlap(wr)) throw std::runtime_error("Overlapping range exists.");
-    wr.accumWeight = (ranges_.empty() ? 0 : ranges_.back().accumWeight) + wr.weight;
+      if (ranges_[i].overlap(wr)) {
+          throw std::runtime_error("Overlapping range exists.");
+      }
+    if (ranges_.empty()) {
+        wr.accumWeight = wr.weight;
+    } else {
+        wr.accumWeight = ranges_.back().accumWeight + wr.weight;
+    }
     ranges_.push_back(wr);
   }
 
