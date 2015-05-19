@@ -95,4 +95,4 @@ template <typename OUT>
 OUT& operator<<(OUT& out, operator_bitslice const& tag) {
   return out << "bitslice";
 }
-}
+}  // namespace crave
