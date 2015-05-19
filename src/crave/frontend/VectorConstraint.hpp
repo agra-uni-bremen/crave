@@ -29,4 +29,4 @@ struct Vector : public Constraint<typename boost::proto::terminal<vector_tag<val
  private:
   Variable<unsigned int> _size;
 };
-}
+}  // namespace crave
