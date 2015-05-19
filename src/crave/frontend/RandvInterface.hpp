@@ -83,12 +83,12 @@ namespace crave {
 #define RANDV_PRIM_INTERFACE(Typename)             \
  public:                                           \
   void gather_values(std::vector<long long>& ch) { \
-    ch.push_back(static_cast<long long>(value)); \
-  } \
-  bool next() {                                \
-    static distribution<Typename> dist;        \
-    value = dist.nextValue();                  \
-    return true;                               \
+    ch.push_back(static_cast<long long>(value));   \
+  }                                                \
+  bool next() {                                    \
+    static distribution<Typename> dist;            \
+    value = dist.nextValue();                      \
+    return true;                                   \
   }
 
 template <>
@@ -99,11 +99,13 @@ class randv<bool> : public randv_base<bool> {
 };
 
 // for all C/C++ built-in integer types
-#define RANDV_INTEGER_TYPE(typename)                                                                     \
-  template <>                                                                                            \
-  class randv<typename> : public randv_base<typename> {                                                  \
-    RANDV_COMMON_INTERFACE(typename) RANDV_PRIM_INTERFACE(typename) RANDV_ARITHMETIC_INTERFACE(typename) \
-        RANDV_BITWISE_INTERFACE(typename)                                                                \
+#define RANDV_INTEGER_TYPE(typename)                       \
+  template <>                                              \
+  class randv<typename> : public randv_base<typename> {    \
+  RANDV_COMMON_INTERFACE(typename)                         \
+  RANDV_PRIM_INTERFACE(typename)                           \
+  RANDV_ARITHMETIC_INTERFACE(typename)                     \
+  RANDV_BITWISE_INTERFACE(typename)                        \
   };
 
 RANDV_INTEGER_TYPE(int)
