@@ -329,8 +329,8 @@ struct ConstraintManager {
   std::ostream& printDotGraph(std::ostream& os) {
     ToDotVisitor visitor(os);
     BOOST_FOREACH (ConstraintPtr c, constraints_) {
-      int32_t a = reinterpret_cast<long>(&*c);
-      int32_t b = reinterpret_cast<long>(&(*c->expr()));
+      int32_t a = reinterpret_cast<int32_t>(&*c);
+      int32_t b = reinterpret_cast<int32_t>(&(*c->expr()));
       os << "\t" << a << " [label=\"" << c->name()
          << (c->isSoft() ? " soft" : "") << (c->isCover() ? " cover" : "")
          << (!c->isEnabled() ? " disabled" : "") << "\"]" << std::endl;
