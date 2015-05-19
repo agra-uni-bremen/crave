@@ -15,7 +15,7 @@ typedef typename boost::proto::result_of::make_expr<boost::proto::tag::terminal,
 
 template <typename Expr>
 expression make_expression(Expr e) {
-  static Context ctx(crave::variables);
+  static Context ctx(&crave::variables);
   return boost::proto::make_expr<boost::proto::tag::terminal, Constraint_Domain>(boost::proto::eval(e, ctx));
 }
 

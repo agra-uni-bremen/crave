@@ -14,18 +14,20 @@ struct Generator {
  public:
   Generator()
       : constr_mng(),
-        var_ctn(crave::variables),
+        var_ctn(&crave::variables),
         ctx(var_ctn),
         var_gen(var_ctn),
         vec_gen(var_gen),
         var_cov_gen(var_ctn),
         vec_cov_gen(var_cov_gen),
-        covered_(false) {}
+        covered_(false) 
+      {
+      }
 
   template <typename Expr>
   explicit Generator(Expr expr)
       : constr_mng(),
-        var_ctn(crave::variables),
+        var_ctn(&crave::variables),
         ctx(var_ctn),
         var_gen(var_ctn),
         vec_gen(var_gen),
@@ -175,7 +177,7 @@ struct Generator {
   ConstraintPartitioner constr_pttn;
 
   // variables
-  VariableContainer& var_ctn;
+  VariableContainer *var_ctn;
 
   // context
   Context ctx;

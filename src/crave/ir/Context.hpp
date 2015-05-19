@@ -38,12 +38,12 @@ struct Context : boost::proto::callable_context<Context,
   typedef std::pair<int, boost::shared_ptr<crave::AssignResult> > WriteRefPair;
 
  public:
-  explicit Context(VariableContainer& vars)
-      : variables_(vars.variables),
-        vector_variables_(vars.vector_variables),
-        read_references_(vars.read_references),
-        write_references_(vars.write_references),
-        dist_references_(vars.dist_references) {}
+  explicit Context(VariableContainer *vars)
+      : variables_(vars->variables),
+        vector_variables_(vars->vector_variables),
+        read_references_(vars->read_references),
+        write_references_(vars->write_references),
+        dist_references_(vars->dist_references) {}
 
   result_type new_var(unsigned id, unsigned width, bool sign) {
     return (variables_[id] = new VariableExpr(id, width, sign));

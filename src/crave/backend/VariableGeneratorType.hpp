@@ -15,8 +15,9 @@ namespace crave {
 struct VariableGenerator {
   typedef boost::shared_ptr<VariableSolver> VarSolverPtr;
 
-  explicit VariableGenerator(VariableContainer& vcon) : var_ctn(vcon),
-                                                        solvers() {}
+  explicit VariableGenerator(VariableContainer* vcon) : solvers() {
+      var_ctn = vcon;
+  }
 
   virtual void reset(std::vector<ConstraintPartition>& partitions) {
     solvers.clear();
@@ -63,7 +64,7 @@ struct VariableGenerator {
   }
 
  protected:
-  VariableContainer& var_ctn;
+  VariableContainer *var_ctn;
   std::vector<VarSolverPtr> solvers;
 };
 }  // namespace crave

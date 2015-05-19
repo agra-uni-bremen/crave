@@ -13,7 +13,7 @@ BOOST_AUTO_TEST_CASE(constraint_partitioning) {
   randv<unsigned> a, b, c, d, e;
   ConstraintPartitioner cp;
   ConstraintManager cm1, cm2;
-  Context ctx(crave::variables);
+  Context ctx(&crave::variables);
   cm1.makeConstraint(a() > b(), ctx);
   cm1.makeConstraint(c() > d(), ctx);
   cm1.makeConstraint(e() > 1, ctx);

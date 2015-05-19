@@ -9,7 +9,7 @@
 namespace crave {
 
 struct VariableCoverageGenerator : VariableGenerator {
-VariableCoverageGenerator(VariableContainer& vcon) : VariableGenerator(vcon) {}
+VariableCoverageGenerator(VariableContainer *vcon) : VariableGenerator(vcon) {}
 
   virtual void reset(std::vector<ConstraintPartition>& partitions) {
     solvers.clear();
