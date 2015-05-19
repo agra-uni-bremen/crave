@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "VariableSolver.hpp"
 #include <vector>
 #include <map>
 #include <string>
 #include <boost/scoped_ptr.hpp>
+#include "VariableSolver.hpp"
 
 namespace crave {
 
