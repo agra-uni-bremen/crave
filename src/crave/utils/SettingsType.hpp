@@ -23,7 +23,7 @@ class Setting {
   }
   void save() const {
     ptree tree = read_setting_file_();
-    save_(tree);
+    save_(&tree);
 
     boost::property_tree::xml_writer_settings<char> settings('\t', 1);
     write_xml(filename_, tree, std::locale(), settings);
@@ -31,7 +31,7 @@ class Setting {
 
  private:
   virtual void load_(const ptree&) = 0;
-  virtual void save_(ptree&) const = 0;
+  virtual void save_(ptree*) const = 0;
 
   ptree read_setting_file_() const {
     ptree tree;
@@ -75,11 +75,11 @@ class LoggerSetting : public Setting {
     s_level_ = tree.get(module_name_ + "." + S_LEVEL, 2);
     file_size_ = tree.get(module_name_ + "." + FILE_SIZE, 100);
   }
-  virtual void save_(ptree& tree) const {
-    tree.put(module_name_ + "." + FILE, file_);
-    tree.put(module_name_ + "." + DIR, dir_);
-    tree.put(module_name_ + "." + S_LEVEL, s_level_);
-    tree.put(module_name_ + "." + FILE_SIZE, file_size_);
+  virtual void save_(ptree *tree) const {
+    tree->put(module_name_ + "." + FILE, file_);
+    tree->put(module_name_ + "." + DIR, dir_);
+    tree->put(module_name_ + "." + S_LEVEL, s_level_);
+    tree->put(module_name_ + "." + FILE_SIZE, file_size_);
   }
 
  public:

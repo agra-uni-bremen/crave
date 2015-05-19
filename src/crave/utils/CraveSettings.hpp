@@ -23,9 +23,9 @@ class CraveSetting : public Setting {
     backend_ = tree.get(module_name_ + "." + BACKEND, "Boolector");
     seed_ = tree.get(module_name_ + "." + SEED, 42);
   }
-  virtual void save_(ptree& tree) const {
-    tree.put(module_name_ + "." + BACKEND, backend_);
-    tree.put(module_name_ + "." + SEED, seed_);
+  virtual void save_(ptree *tree) const {
+    tree->put(module_name_ + "." + BACKEND, backend_);
+    tree->put(module_name_ + "." + SEED, seed_);
   }
 
  public:
