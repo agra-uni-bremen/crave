@@ -12,7 +12,7 @@ namespace crave {
 
 struct VariableDefaultSolver : VariableSolver {
   VariableDefaultSolver(VariableContainer *vcon,
-  ConstraintPartition& cp) : VariableSolver(vcon, cp) {
+  const ConstraintPartition& cp) : VariableSolver(vcon, cp) {
     LOG(INFO) << "Create solver for partition " << constr_pttn;
 
     BOOST_FOREACH(ConstraintPtr c, constr_pttn) {

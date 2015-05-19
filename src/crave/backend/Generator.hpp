@@ -20,8 +20,7 @@ struct Generator {
         vec_gen(var_gen),
         var_cov_gen(var_ctn),
         vec_cov_gen(var_cov_gen),
-        covered_(false) 
-      {
+        covered_(false) {
       }
 
   template <typename Expr>
