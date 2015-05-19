@@ -2,16 +2,17 @@
 
 #pragma once
 
+#include <boost/scoped_ptr.hpp>
 #include <vector>
 #include <map>
 #include <string>
-#include <boost/scoped_ptr.hpp>
+
 #include "VariableSolver.hpp"
 
 namespace crave {
 
 struct VariableDefaultSolver : VariableSolver {
-  VariableDefaultSolver(VariableContainer *vcon,
+  VariableDefaultSolver(const VariableContainer &vcon,
   const ConstraintPartition& cp) : VariableSolver(vcon, cp) {
     LOG(INFO) << "Create solver for partition " << constr_pttn;
 
