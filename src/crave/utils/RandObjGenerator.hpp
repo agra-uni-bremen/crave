@@ -13,7 +13,7 @@
 namespace crave {
 
 class rand_obj_gen {
-  typedef std::bitset<sizeof(long long) << 3> Bitset;
+  typedef std::bitset<sizeof(int64_t) << 3> Bitset;
   typedef std::vector<Bitset> Solution;
   typedef std::vector<Solution> Solutions;
   typedef std::vector<std::clock_t> Times;
