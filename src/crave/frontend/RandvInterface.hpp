@@ -80,13 +80,15 @@ namespace crave {
     return *this;                            \
   }
 
-#define RANDV_PRIM_INTERFACE(Typename)                                                            \
- public:                                                                                          \
-  void gather_values(std::vector<long long>& ch) { ch.push_back(static_cast<long long>(value)); } \
-  bool next() {                                                                                   \
-    static distribution<Typename> dist;                                                           \
-    value = dist.nextValue();                                                                     \
-    return true;                                                                                  \
+#define RANDV_PRIM_INTERFACE(Typename)             \
+ public:                                           \
+  void gather_values(std::vector<long long>& ch) { \
+    ch.push_back(static_cast<long long>(value)); \
+  } \
+  bool next() {                                \
+    static distribution<Typename> dist;        \
+    value = dist.nextValue();                  \
+    return true;                               \
   }
 
 template <>
