@@ -19,7 +19,7 @@ class CraveSetting : public Setting {
         SEED("seed") {}
 
  private:
-  virtual void load_(ptree& tree) {
+  virtual void load_(const ptree& tree) {
     backend_ = tree.get(module_name_ + "." + BACKEND, "Boolector");
     seed_ = tree.get(module_name_ + "." + SEED, 42);
   }

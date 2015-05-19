@@ -30,7 +30,7 @@ class Setting {
   }
 
  private:
-  virtual void load_(ptree&) = 0;
+  virtual void load_(const ptree&) = 0;
   virtual void save_(ptree&) const = 0;
 
   ptree read_setting_file_() const {
@@ -69,7 +69,7 @@ class LoggerSetting : public Setting {
         MODULES("modules") {}
 
  private:
-  virtual void load_(ptree& tree) {
+  virtual void load_(const ptree& tree) {
     file_ = tree.get(module_name_ + "." + FILE, "crave");
     dir_ = tree.get(module_name_ + "." + DIR, "./logs");
     s_level_ = tree.get(module_name_ + "." + S_LEVEL, 2);
