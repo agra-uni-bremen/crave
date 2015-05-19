@@ -28,7 +28,7 @@ struct VariableContainer {
 
 extern VariableContainer variables;
 
-//static VariableContainer& variable_container();
+// static VariableContainer& variable_container();
 static VariableContainer& variable_container() { return variables; }
 
 
