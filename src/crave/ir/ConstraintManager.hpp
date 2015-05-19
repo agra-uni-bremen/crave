@@ -140,8 +140,8 @@ struct ConstraintManager {
     ToDotVisitor visitor(os);
 
     BOOST_FOREACH(ConstraintPtr c, constraints_) {
-      int64 a = reinterpret_cast<int64>(&*c);
-      int64 b = reinterpret_cast<int64>(&(*c->expr()));
+      int32 a = reinterpret_cast<int32>(&*c);
+      int32 b = reinterpret_cast<int32>(&(*c->expr()));
       os << "\t" << a << " [label=\"" << c->name()
          << (c->isSoft() ? " soft" : "")
          << (c->isCover() ? " cover" : "")
