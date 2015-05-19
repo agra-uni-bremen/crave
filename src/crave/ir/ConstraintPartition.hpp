@@ -40,14 +40,14 @@ struct ConstraintPartition {
   }
 
   bool containsVar(int id) {
-      return support_vars_.find(id) != support_vars_.end();
+    return support_vars_.find(id) != support_vars_.end();
   }
 
   template <typename ostream>
   friend ostream& operator<<(ostream& os, const ConstraintPartition& cp) {
     os << "[ ";
 
-    BOOST_FOREACH(ConstraintPtr c, cp) { os << c->name() << " "; }
+    BOOST_FOREACH (ConstraintPtr c, cp) { os << c->name() << " "; }
     os << "]";
     os << std::flush;
     return os;

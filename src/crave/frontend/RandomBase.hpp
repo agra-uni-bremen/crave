@@ -49,7 +49,7 @@ class __rand_vec_base1 : public __rand_vec_base {
   }
 
   virtual Variable<unsigned int> const& size_var() const {
-      return sym_vec.size();
+    return sym_vec.size();
   }
 
   virtual void set_values(const std::vector<std::string>& values) {
@@ -89,8 +89,8 @@ class rand_vec : public __rand_vec<T>, public rand_base {
     return true;
   }
 
-  virtual void gather_values(std::vector<long long>& ch) {
-      ch.push_back(this->size());
+  virtual void gather_values(std::vector<int64_t>& ch) {
+    ch.push_back(this->size());
   }
 };
 

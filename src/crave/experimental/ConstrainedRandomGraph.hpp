@@ -13,7 +13,8 @@
 
 #include "../ConstrainedRandom.hpp"
 
-#define NAMED_RULE(name) crave::graph::rule_type name = {crave::graph::Rule(#name)};
+#define NAMED_RULE(name) \
+  crave::graph::rule_type name = {crave::graph::Rule(#name)};
 
 namespace crave {
 
@@ -34,7 +35,10 @@ struct Rule {
   action_type main;
   action_type exit;
 
-  Rule(const char* name) : entry(), main(), exit(), m_name(name), m_rand_obj(0) { global_rule_map[name] = this; }
+  Rule(const char* name)
+      : entry(), main(), exit(), m_name(name), m_rand_obj(0) {
+    global_rule_map[name] = this;
+  }
 
   const char* name() const { return m_name; }
 
@@ -43,7 +47,9 @@ struct Rule {
     main = boost::bind(&Rule::gen, this);
   }
 
-  bool is_rand_obj_covered() const { return m_rand_obj == 0 || m_rand_obj->constraint.isCovered(); }
+  bool is_rand_obj_covered() const {
+    return m_rand_obj == 0 || m_rand_obj->constraint.isCovered();
+  }
   void reset_coverage() {
     if (m_rand_obj) m_rand_obj->constraint.resetCoverage();
   }
@@ -55,7 +61,9 @@ struct Rule {
   void gen() {
     if (m_rand_obj) {
       if (is_rand_obj_covered())
-        LOG(INFO) << "Rule " << m_name << " has its rand_obj covered, now generate a random solution";
+        LOG(INFO)
+            << "Rule " << m_name
+            << " has its rand_obj covered, now generate a random solution";
       assert(m_rand_obj->next_cov());
     }
   }
@@ -73,7 +81,8 @@ struct RuleContext : proto::callable_context<RuleContext, proto::null_context> {
   Rule& operator[](rule_type& r) { return proto::value(r); }
 
   result_type operator()(proto::tag::terminal, Rule& r) {
-    if (m_named_nodes.find(r.name()) != m_named_nodes.end()) return m_named_nodes[r.name()];
+    if (m_named_nodes.find(r.name()) != m_named_nodes.end())
+      return m_named_nodes[r.name()];
     return m_named_nodes[r.name()] = NodePtr(new Terminal(r.name()));
   }
 

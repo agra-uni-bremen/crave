@@ -20,8 +20,7 @@ struct Generator {
         vec_gen(var_gen),
         var_cov_gen(var_ctn),
         vec_cov_gen(var_cov_gen),
-        covered_(false) {
-      }
+        covered_(false) {}
 
   template <typename Expr>
   explicit Generator(Expr expr)
@@ -73,30 +72,28 @@ struct Generator {
   }
 
   bool enableConstraint(std::string const& name) {
-      return constr_mng.enableConstraint(name);
+    return constr_mng.enableConstraint(name);
   }
 
   bool disableConstraint(std::string const& name) {
-      return constr_mng.disableConstraint(name);
+    return constr_mng.disableConstraint(name);
   }
 
   bool isConstraintEnabled(std::string const& name) {
-      return constr_mng.isConstraintEnabled(name);
+    return constr_mng.isConstraintEnabled(name);
   }
 
-  bool isChanged() {
-      return constr_mng.isChanged();
-  }
+  bool isChanged() { return constr_mng.isChanged(); }
 
   Generator& operator()() {
     if (!next()) {
-        throw std::runtime_error("Generator constraint unsatisfiable.");
+      throw std::runtime_error("Generator constraint unsatisfiable.");
     }
     return *this;
   }
 
   void merge(const Generator& other) {
-      constr_pttn.mergeConstraints(other.constr_mng);
+    constr_pttn.mergeConstraints(other.constr_mng);
   }
 
   void reset() {
@@ -154,11 +151,11 @@ struct Generator {
   }
 
   std::vector<std::vector<std::string> > analyseContradiction() {
-      return var_gen.analyseContradiction();
+    return var_gen.analyseContradiction();
   }
 
   std::vector<std::string> getInactiveSofts() {
-      return var_gen.getInactiveSofts();
+    return var_gen.getInactiveSofts();
   }
 
   template <typename T>
@@ -176,7 +173,7 @@ struct Generator {
   ConstraintPartitioner constr_pttn;
 
   // variables
-  VariableContainer *var_ctn;
+  VariableContainer* var_ctn;
 
   // context
   Context ctx;

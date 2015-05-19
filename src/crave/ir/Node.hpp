@@ -8,8 +8,6 @@
 
 #include "visitor/NodeVisitor.hpp"
 
-
-
 namespace crave {
 
 class Node;
@@ -51,10 +49,9 @@ class Placeholder : public Node {
 
 class Terminal : public Node {
  protected:
-  Terminal(unsigned int bs, bool s) :
-           Node(), bitsize_(bs), sign_(s) {}
-  Terminal(Terminal const& t) :
-           Node(t), bitsize_(t.bitsize()), sign_(t.sign()) {}
+  Terminal(unsigned int bs, bool s) : Node(), bitsize_(bs), sign_(s) {}
+  Terminal(Terminal const& t)
+      : Node(t), bitsize_(t.bitsize()), sign_(t.sign()) {}
 
  public:
   virtual void visit(NodeVisitor& v) const { v.visitTerminal(*this); }
@@ -70,10 +67,10 @@ class Terminal : public Node {
 
 class VariableExpr : public Terminal {
  public:
-  VariableExpr(unsigned int id,
-               unsigned int bs, bool s) : Terminal(bs, s), id_(id) {}
-  VariableExpr(VariableExpr const& v) : Terminal(v.bitsize(), v.sign()),
-                                        id_(v.id()) {}
+  VariableExpr(unsigned int id, unsigned int bs, bool s)
+      : Terminal(bs, s), id_(id) {}
+  VariableExpr(VariableExpr const& v)
+      : Terminal(v.bitsize(), v.sign()), id_(v.id()) {}
 
   void visit(NodeVisitor& v) const { v.visitVariableExpr(*this); }
 
@@ -86,11 +83,11 @@ class VariableExpr : public Terminal {
 class Constant : public Terminal {
  public:
   Constant() : Terminal(1, true), value_(false) {}
-  Constant(u_int64_t val, unsigned int bs, bool s) :
-           Terminal(bs, s), value_(val) {}
+  Constant(u_int64_t val, unsigned int bs, bool s)
+      : Terminal(bs, s), value_(val) {}
   explicit Constant(bool b) : Terminal(1, true), value_(b) {}
-  Constant(Constant const& c) :
-           Terminal(c.bitsize(), c.sign()), value_(c.value()) {}
+  Constant(Constant const& c)
+      : Terminal(c.bitsize(), c.sign()), value_(c.value()) {}
 
   void visit(NodeVisitor& v) const { v.visitConstant(*this); }
 
@@ -104,14 +101,12 @@ class Constant : public Terminal {
 
 class VectorExpr : public Terminal {
  public:
-  VectorExpr(unsigned int id, unsigned int bs, bool s) :
-             Terminal(bs, s), id_(id) {}
-  VectorExpr(VectorExpr const& v) :
-             Terminal(v.bitsize(), v.sign()), id_(v.id()) {}
+  VectorExpr(unsigned int id, unsigned int bs, bool s)
+      : Terminal(bs, s), id_(id) {}
+  VectorExpr(VectorExpr const& v)
+      : Terminal(v.bitsize(), v.sign()), id_(v.id()) {}
 
-  void visit(NodeVisitor& v) const {
-      v.visitVectorExpr(*this);
-  }
+  void visit(NodeVisitor& v) const { v.visitVectorExpr(*this); }
 
   unsigned int id() const { return id_; }
 
@@ -122,9 +117,8 @@ class VectorExpr : public Terminal {
 class UnaryExpression : public Node {
  protected:
   explicit UnaryExpression(NodePtr c) : Node(), child_(c) {}
-  UnaryExpression(UnaryExpression const& u) :
-                  Node(), child_() {
-      child_.operator=(u.child().get());
+  UnaryExpression(UnaryExpression const& u) : Node(), child_() {
+    child_.operator=(u.child().get());
   }
 
  public:
@@ -171,16 +165,13 @@ class ComplementOpr : public UnaryOperator {
 
 class Inside : public UnaryExpression {
  public:
-  Inside(NodePtr v, std::set<Constant> const& c) :
-         UnaryExpression(v), collection_(c) {}
-  Inside(Inside const& i) :
-         UnaryExpression(i), collection_(i.collection()) {}
+  Inside(NodePtr v, std::set<Constant> const& c)
+      : UnaryExpression(v), collection_(c) {}
+  Inside(Inside const& i) : UnaryExpression(i), collection_(i.collection()) {}
 
   void visit(NodeVisitor& v) const { v.visitInside(*this); }
 
-  std::set<Constant> const& collection() const {
-    return collection_;
-  }
+  std::set<Constant> const& collection() const { return collection_; }
 
  private:
   std::set<Constant> collection_;
@@ -188,16 +179,13 @@ class Inside : public UnaryExpression {
 
 class ExtendExpression : public UnaryExpression {
  public:
-  ExtendExpression(NodePtr v, unsigned int i) :
-                   UnaryExpression(v), value_(i) {}
-  ExtendExpression(ExtendExpression const& e) :
-                   UnaryExpression(e), value_(e.value()) {}
+  ExtendExpression(NodePtr v, unsigned int i) : UnaryExpression(v), value_(i) {}
+  ExtendExpression(ExtendExpression const& e)
+      : UnaryExpression(e), value_(e.value()) {}
 
   void visit(NodeVisitor& v) const { v.visitExtendExpr(*this); }
 
-  unsigned int const& value() const {
-    return value_;
-  }
+  unsigned int const& value() const { return value_; }
 
  private:
   unsigned int value_;
@@ -224,10 +212,8 @@ class BinaryExpression : public Node {
 
 class BinaryOperator : public BinaryExpression {
  protected:
-  BinaryOperator(NodePtr lhs, NodePtr rhs) :
-                 BinaryExpression(lhs, rhs) {}
-  BinaryOperator(BinaryOperator const& b) :
-                 BinaryExpression(b) {}
+  BinaryOperator(NodePtr lhs, NodePtr rhs) : BinaryExpression(lhs, rhs) {}
+  BinaryOperator(BinaryOperator const& b) : BinaryExpression(b) {}
 
  public:
   virtual void visit(NodeVisitor& v) const { v.visitBinaryOpr(*this); }
@@ -387,8 +373,8 @@ class VectorAccess : public BinaryExpression {
 
 class TernaryExpression : public Node {
  protected:
-     explicit TernaryExpression(NodePtr a, NodePtr b, NodePtr c) :
-                                Node(), a_(a), b_(b), c_(c) {}
+  explicit TernaryExpression(NodePtr a, NodePtr b, NodePtr c)
+      : Node(), a_(a), b_(b), c_(c) {}
   TernaryExpression(TernaryExpression const& t) : Node(t), a_(), b_(), c_() {
     a_.operator=(t.a().get());
     b_.operator=(t.b().get());

@@ -58,7 +58,8 @@ class crv_coverpoint : public crv_object {
   static std::vector<crv_bin> cross(crv_coverpoint& cp1, crv_coverpoint& cp2) {
     std::vector<crv_bin> result;
     for (crv_bin& cb1 : cp1.bins())
-      for (crv_bin& cb2 : cp2.bins()) result.push_back(crv_bin(cb1.bin_expr() && cb2.bin_expr()));
+      for (crv_bin& cb2 : cp2.bins())
+        result.push_back(crv_bin(cb1.bin_expr() && cb2.bin_expr()));
     return result;
   }
 
@@ -92,7 +93,8 @@ class crv_covergroup : public crv_object {
       std::cout << cp->kind() << " " << cp->name() << std::endl;
       int c = 0;
       for (crv_bin& cb : cp->bins()) {
-        std::cout << "  crv_bin " << c++ << ": " << cb.hit_count() << " " << cb.hit_minimum() << " "
+        std::cout << "  crv_bin " << c++ << ": " << cb.hit_count() << " "
+                  << cb.hit_minimum() << " "
                   << (cb.covered() ? "covered" : "uncovered") << std::endl;
       }
     }

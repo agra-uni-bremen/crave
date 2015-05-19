@@ -2,8 +2,6 @@
 
 #pragma once
 
-
-
 #include <boost/shared_ptr.hpp>
 
 #include <map>
@@ -30,6 +28,5 @@ extern VariableContainer variables;
 
 // static VariableContainer& variable_container();
 static VariableContainer& variable_container() { return variables; }
-
 
 }  // end namespace crave

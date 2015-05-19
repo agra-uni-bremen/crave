@@ -17,12 +17,9 @@ struct UserConstraint {
   typedef NodePtr expression;
 
  protected:
-  UserConstraint(unsigned const id,
-                 expression const expr,
-                 std::string const& name,
-                 std::set<int>& support_vars,
-                 bool const soft = false,
-                 bool const cover = false,
+  UserConstraint(unsigned const id, expression const expr,
+                 std::string const& name, std::set<int>& support_vars,
+                 bool const soft = false, bool const cover = false,
                  bool const enabled = true)
       : id_(id),
         expr_(expr),
@@ -37,12 +34,10 @@ struct UserConstraint {
 
   template <typename ostream>
   friend ostream& operator<<(ostream& os, const UserConstraint& constr) {
-    os << constr.name_ << " is a "
-       << (constr.soft_ ? "soft" : "hard")
-       << " constraint and "
-       << (constr.enabled_ ? "enabled" : "disabled");
+    os << constr.name_ << " is a " << (constr.soft_ ? "soft" : "hard")
+       << " constraint and " << (constr.enabled_ ? "enabled" : "disabled");
     os << ", support vars =";
-    BOOST_FOREACH(int item, constr.support_vars_) { os << " " << item; }
+    BOOST_FOREACH (int item, constr.support_vars_) { os << " " << item; }
     return os;
   }
 

@@ -2,8 +2,6 @@
 
 #pragma once
 
-
-
 #include <glog/logging.h>
 
 #include <string>
@@ -13,8 +11,6 @@
 #include "visitor/FixWidthVisitor.hpp"
 #include "visitor/GetSupportSetVisitor.hpp"
 #include "visitor/ToDotNodeVisitor.hpp"
-
-
 
 namespace crave {
 
@@ -32,12 +28,12 @@ struct ConstraintManager {
 
   template <typename ostream>
   friend ostream& operator<<(ostream& os, const ConstraintManager& set) {
-    os << "Set " << set.id_
-       << " has " << set.constraints_.size() << " constraint(s) and has "
-       << (set.changed_ ? "" : "not ") << "changed" << std::endl;
+    os << "Set " << set.id_ << " has " << set.constraints_.size()
+       << " constraint(s) and has " << (set.changed_ ? "" : "not ") << "changed"
+       << std::endl;
 
-    BOOST_FOREACH(ConstraintPtr item, set.constraints_) {
-    os << item << std::endl;
+    BOOST_FOREACH (ConstraintPtr item, set.constraints_) {
+      os << item << std::endl;
     }
     os << std::flush;
     return os;
@@ -87,17 +83,14 @@ struct ConstraintManager {
   void resetChanged() { changed_ = false; }
 
   template <typename Expr>
-  ConstraintPtr makeConstraint(std::string const& name,
-                               int c_id, Expr e, Context& ctx,
-                               bool const soft = false,
+  ConstraintPtr makeConstraint(std::string const& name, int c_id, Expr e,
+                               Context& ctx, bool const soft = false,
                                bool const cover = false) {
-    LOG(INFO) << "New " << (soft ? "soft " : "")
-              << (cover ? "cover " : "")
-              << "constraint " << name << " in set "
-              << id_;
+    LOG(INFO) << "New " << (soft ? "soft " : "") << (cover ? "cover " : "")
+              << "constraint " << name << " in set " << id_;
 
     if (constr_map_.find(name) != constr_map_.end()) {
-        throw std::runtime_error("Constraint already exists.");
+      throw std::runtime_error("Constraint already exists.");
     }
     FixWidthVisitor fwv;
     NodePtr n(fwv.fixWidth(*boost::proto::eval(e, ctx)));
@@ -105,15 +98,20 @@ struct ConstraintManager {
     GetSupportSetVisitor gssv;
     n->visit(gssv);
 
-    ConstraintPtr c(boost::dynamic_pointer_cast<ForEach>(n) != 0
-    ? new UserVectorConstraint(c_id, n, name, gssv.getSupportVars(),
-                               false, soft, cover)
-    : (boost::dynamic_pointer_cast<Unique>(n) != 0
-    ? new UserVectorConstraint(c_id, n, name, gssv.getSupportVars(),
-                               true, soft, cover)
-    : new UserConstraint(c_id, n, name, gssv.getSupportVars(), soft, cover)));
-    assert(!c->isSoft() || !c->isCover());              // soft cover constraint not defined/supported yet
-    assert(!c->isVectorConstraint() || !c->isCover());  // cover vector constraint not defined/supported yet
+    ConstraintPtr c(
+        boost::dynamic_pointer_cast<ForEach>(n) != 0
+            ? new UserVectorConstraint(c_id, n, name, gssv.getSupportVars(),
+                                       false, soft, cover)
+            : (boost::dynamic_pointer_cast<Unique>(n) != 0
+                   ? new UserVectorConstraint(c_id, n, name,
+                                              gssv.getSupportVars(), true, soft,
+                                              cover)
+                   : new UserConstraint(c_id, n, name, gssv.getSupportVars(),
+                                        soft, cover)));
+    assert(!c->isSoft() ||
+           !c->isCover());  // soft cover constraint not defined/supported yet
+    assert(!c->isVectorConstraint() ||
+           !c->isCover());  // cover vector constraint not defined/supported yet
 
     changed_ = true;
     constraints_.push_back(c);
@@ -122,8 +120,8 @@ struct ConstraintManager {
   }
 
   template <typename Expr>
-  ConstraintPtr makeConstraint(std::string const& name,
-                               Expr e, Context& ctx, bool const soft = false,
+  ConstraintPtr makeConstraint(std::string const& name, Expr e, Context& ctx,
+                               bool const soft = false,
                                bool const cover = false) {
     return makeConstraint(name, new_constraint_id(), e, ctx, soft, cover);
   }
@@ -139,12 +137,11 @@ struct ConstraintManager {
   std::ostream& printDotGraph(std::ostream& os) {
     ToDotVisitor visitor(os);
 
-    BOOST_FOREACH(ConstraintPtr c, constraints_) {
+    BOOST_FOREACH (ConstraintPtr c, constraints_) {
       int32 a = reinterpret_cast<int32>(&*c);
       int32 b = reinterpret_cast<int32>(&(*c->expr()));
       os << "\t" << a << " [label=\"" << c->name()
-         << (c->isSoft() ? " soft" : "")
-         << (c->isCover() ? " cover" : "")
+         << (c->isSoft() ? " soft" : "") << (c->isCover() ? " cover" : "")
          << (!c->isEnabled() ? " disabled" : "") << "\"]" << std::endl;
       os << "\t" << a << " -> " << b << std::endl;
       c->expr()->visit(visitor);

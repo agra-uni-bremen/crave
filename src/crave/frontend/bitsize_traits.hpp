@@ -34,9 +34,9 @@ struct bitsize_traits : boost::mpl::int_<0> {
 
 template <typename Integer>
 struct bitsize_traits<
-    Integer,
-    typename boost::enable_if<boost::is_integral<Integer> >::type> : boost::mpl::times<boost::mpl::sizeof_<Integer>,
-                                                                                       boost::mpl::int_<8> >::type {};
+    Integer, typename boost::enable_if<boost::is_integral<Integer> >::type>
+    : boost::mpl::times<boost::mpl::sizeof_<Integer>,
+                        boost::mpl::int_<8> >::type {};
 
 template <>
 struct bitsize_traits<bool> : boost::mpl::int_<1> {};
@@ -66,10 +66,13 @@ template <typename T>
 struct bitsize_traits<vector_tag<T> > : public bitsize_traits<T> {};
 
 template <typename Integral, Integral I>
-struct bitsize_traits<boost::mpl::integral_c<Integral, I> > : public bitsize_traits<Integral> {};
+struct bitsize_traits<boost::mpl::integral_c<Integral, I> >
+    : public bitsize_traits<Integral> {};
 
 template <typename Enum>
-struct bitsize_traits<Enum, typename boost::enable_if<boost::is_enum<Enum> >::type> : bitsize_traits<int>::type {};
+struct bitsize_traits<Enum,
+                      typename boost::enable_if<boost::is_enum<Enum> >::type>
+    : bitsize_traits<int>::type {};
 
 template <typename T>
 struct is_crave_variable : boost::mpl::false_ {};

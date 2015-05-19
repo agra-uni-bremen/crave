@@ -30,16 +30,16 @@ class Setting {
   }
 
  private:
-  virtual void load_(const ptree &tree) = 0;
-  virtual void save_(ptree *tree) const = 0;
+  virtual void load_(const ptree& tree) = 0;
+  virtual void save_(ptree* tree) const = 0;
 
   ptree read_setting_file_() const {
     ptree tree;
 
     std::ifstream cfg_file(filename_.c_str());
-    if (cfg_file.is_open()) read_xml(cfg_file,
-                            tree,
-                            boost::property_tree::xml_parser::trim_whitespace);
+    if (cfg_file.is_open())
+      read_xml(cfg_file, tree,
+               boost::property_tree::xml_parser::trim_whitespace);
 
     cfg_file.close();
     return tree;
@@ -75,7 +75,7 @@ class LoggerSetting : public Setting {
     s_level_ = tree.get(module_name_ + "." + S_LEVEL, 2);
     file_size_ = tree.get(module_name_ + "." + FILE_SIZE, 100);
   }
-  virtual void save_(ptree *tree) const {
+  virtual void save_(ptree* tree) const {
     tree->put(module_name_ + "." + FILE, file_);
     tree->put(module_name_ + "." + DIR, dir_);
     tree->put(module_name_ + "." + S_LEVEL, s_level_);

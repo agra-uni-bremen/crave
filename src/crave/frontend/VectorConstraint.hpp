@@ -15,10 +15,15 @@ struct vector_tag {
 };
 
 template <typename value_type_>
-struct Vector : public Constraint<typename boost::proto::terminal<vector_tag<value_type_> >::type> {
-  typedef Constraint<typename boost::proto::terminal<vector_tag<value_type_> >::type> base_type;
+struct Vector
+    : public Constraint<
+          typename boost::proto::terminal<vector_tag<value_type_> >::type> {
+  typedef Constraint<typename boost::proto::terminal<
+      vector_tag<value_type_> >::type> base_type;
 
-  Vector() : base_type(boost::proto::make_expr<boost::proto::tag::terminal>(vector_tag<value_type_>(new_var_id()))) {}
+  Vector()
+      : base_type(boost::proto::make_expr<boost::proto::tag::terminal>(
+            vector_tag<value_type_>(new_var_id()))) {}
 
   typedef value_type_ value_type;
 

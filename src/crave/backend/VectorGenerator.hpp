@@ -2,13 +2,11 @@
 
 #pragma once
 
-
 #include <vector>
 #include <map>
 
 #include "VariableGenerator.hpp"
 #include "../ir/visitor/ReplaceVisitor.hpp"
-
 
 namespace crave {
 
@@ -33,7 +31,7 @@ struct VectorSolver {
 
     unsigned int size = default_rand_vec_size();
     if (!var_gen.read(vector->size_var(), size)) {
-        LOG(INFO) << "Use default size for vector " << vector_id;
+      LOG(INFO) << "Use default size for vector " << vector_id;
     }
     resetSolver(size);
     bool result = solver->solve(false) || solver->solve(true);
@@ -53,11 +51,11 @@ struct VectorSolver {
       unsigned int old_size = vec_elements.size();
       vec_elements.resize(size);
       for (unsigned int i = old_size; i < size; ++i) {
-          vec_elements[i] = new VariableExpr(new_var_id(), 1u, true);
+        vec_elements[i] = new VariableExpr(new_var_id(), 1u, true);
       }
     }
 
-    BOOST_FOREACH(VectorConstraintPtr constraint, constraints) {
+    BOOST_FOREACH (VectorConstraintPtr constraint, constraints) {
       if (!constraint->isUnique()) {
         ReplaceVisitor replacer(vec_elements);
         for (unsigned int i = 0u; i < size; ++i) {
@@ -101,11 +99,11 @@ struct VectorSolver {
 struct VectorGenerator {
   typedef std::map<int, VectorSolver> VectorSolverMap;
 
-  explicit VectorGenerator(VariableGenerator& var_gen_) : vector_solvers(),
-                                                 var_gen(var_gen_) {}
+  explicit VectorGenerator(VariableGenerator& var_gen_)
+      : vector_solvers(), var_gen(var_gen_) {}
 
   bool solve() {
-    BOOST_FOREACH(VectorSolverMap::value_type & c_pair, vector_solvers) {
+    BOOST_FOREACH (VectorSolverMap::value_type& c_pair, vector_solvers) {
       if (!c_pair.second.solve()) return false;
     }
     return true;
@@ -113,7 +111,7 @@ struct VectorGenerator {
 
   void reset(std::vector<VectorConstraintPtr>& v) {
     vector_solvers.clear();
-    BOOST_FOREACH(VectorConstraintPtr vc, v) { addConstraint(vc); }
+    BOOST_FOREACH (VectorConstraintPtr vc, v) { addConstraint(vc); }
   }
 
  private:

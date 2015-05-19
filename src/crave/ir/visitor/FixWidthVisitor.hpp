@@ -10,8 +10,6 @@
 #include "../Node.hpp"
 #include "NodeVisitor.hpp"
 
-
-
 namespace crave {
 
 class FixWidthVisitor : NodeVisitor {
@@ -65,8 +63,7 @@ class FixWidthVisitor : NodeVisitor {
   void pop2(stack_entry&, stack_entry&);
   void pop3(stack_entry&, stack_entry&, stack_entry&);
   void evalBinExpr(BinaryExpression const&, stack_entry&, stack_entry&, bool);
-  void evalTernExpr(TernaryExpression const&,
-                    stack_entry&, stack_entry&,
+  void evalTernExpr(TernaryExpression const&, stack_entry&, stack_entry&,
                     stack_entry&);
 
  public:
@@ -94,8 +91,7 @@ inline void FixWidthVisitor::pop2(stack_entry& fst, stack_entry& snd) {
   snd = exprStack_.top();
   exprStack_.pop();
 }
-inline void FixWidthVisitor::pop3(stack_entry& fst,
-                                  stack_entry& snd,
+inline void FixWidthVisitor::pop3(stack_entry& fst, stack_entry& snd,
                                   stack_entry& trd) {
   assert(exprStack_.size() >= 3);
   fst = exprStack_.top();

@@ -39,7 +39,10 @@ class crv_object {
 
  protected:
   crv_object(const crv_object& other)
-      : name_(other.name_), parent_(other.parent_), children_(other.children_), fullname_(other.fullname_) {}
+      : name_(other.name_),
+        parent_(other.parent_),
+        children_(other.children_),
+        fullname_(other.fullname_) {}
 
   void remove_child(crv_object*);
 

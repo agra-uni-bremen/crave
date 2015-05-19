@@ -50,7 +50,7 @@ class rand_obj : public rand_obj_base {
     return constraint.nextCov();
   }
 
-  virtual void gather_values(std::vector<long long>& ch) {
+  virtual void gather_values(std::vector<int64_t>& ch) {
     for (std::vector<rand_base*>::const_iterator i = baseChildren.begin();
          i != baseChildren.end(); ++i)
       (*i)->gather_values(ch);
@@ -85,7 +85,7 @@ class rand_obj : public rand_obj_base {
   }
 
   bool is_constraint_enabled(std::string name) {
-      return constraint.isConstraintEnabled(name);
+    return constraint.isConstraintEnabled(name);
   }
 
   std::ostream& print_dot_graph(std::ostream&, bool);
@@ -102,7 +102,7 @@ class rand_obj : public rand_obj_base {
 
   void gather_constraints(Generator& gen) {
     for (uint i = 0; i < objChildren.size(); i++) {
-        objChildren[i]->gather_constraints(gen);
+      objChildren[i]->gather_constraints(gen);
     }
     gen.merge(constraint);
   }
@@ -121,17 +121,18 @@ class rand_obj : public rand_obj_base {
 
 #define INSERT(s, DATA, ELEM) DATA.insert(ELEM);
 
-#define CRAVE_ENUM(name, ...)\
-  namespace crave {\
-  template <>\
-  struct randv<name> : randv<int> {\
-    explicit randv(rand_obj* parent) : randv<int>(parent) {\
-      if (parent == 0) {\
-      throw std::runtime_error("randv<enum> must be owned by an instance of rand_obj.");\
-      }\
-      std::set<int> s;\
-      BOOST_PP_SEQ_FOR_EACH(INSERT, s, __VA_ARGS__);\
-      parent->constraint(inside(var, s));\
-    }\
-  };\
+#define CRAVE_ENUM(name, ...)                                         \
+  namespace crave {                                                   \
+  template <>                                                         \
+  struct randv<name> : randv<int> {                                   \
+    explicit randv(rand_obj* parent) : randv<int>(parent) {           \
+      if (parent == 0) {                                              \
+        throw std::runtime_error(                                     \
+            "randv<enum> must be owned by an instance of rand_obj."); \
+      }                                                               \
+      std::set<int> s;                                                \
+      BOOST_PP_SEQ_FOR_EACH(INSERT, s, __VA_ARGS__);                  \
+      parent->constraint(inside(var, s));                             \
+    }                                                                 \
+  };                                                                  \
   }  // namespace crave

@@ -7,14 +7,7 @@
 
 namespace crave {
 
-enum SolverTypes {
-  UNDEFINED_SOLVER,
-  BOOLECTOR,
-  CVC4,
-  Z3,
-  SWORD,
-  CUDD
-};
+enum SolverTypes { UNDEFINED_SOLVER, BOOLECTOR, CVC4, Z3, SWORD, CUDD };
 
 struct FactoryMetaSMT {
   static void setSolverType(std::string const&);

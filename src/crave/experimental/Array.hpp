@@ -24,7 +24,8 @@ class crv_array : public crv_object {
 
   expression sum() {
     expression result = value_to_expression(0);
-    for (crv_variable<T>* v : arr_) result = crave::make_expression(result + (*v)());
+    for (crv_variable<T>* v : arr_)
+      result = crave::make_expression(result + (*v)());
     return result;
   }
 

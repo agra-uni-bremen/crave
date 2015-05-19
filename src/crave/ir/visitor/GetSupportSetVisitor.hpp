@@ -7,7 +7,6 @@
 #include "../Node.hpp"
 #include "NodeVisitor.hpp"
 
-
 namespace crave {
 
 class GetSupportSetVisitor : public NodeVisitor {
