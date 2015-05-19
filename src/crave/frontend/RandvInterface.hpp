@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include "RandBase.hpp"
 namespace crave {
 #define RANDV_COMMON_INTERFACE(Typename)                             \
@@ -119,4 +121,4 @@ RANDV_INTEGER_TYPE(long)
 RANDV_INTEGER_TYPE(unsigned long)
 RANDV_INTEGER_TYPE(long long)
 RANDV_INTEGER_TYPE(unsigned long long)
-}
+}  // namespace crave
