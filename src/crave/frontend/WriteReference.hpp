@@ -9,12 +9,14 @@ namespace crave {
 
 template <typename value_type>
 struct write_ref_tag : public var_tag<value_type> {
-  write_ref_tag(int id_, value_type& ref_) : var_tag<value_type>(id_), ref(ref_) {}
+  write_ref_tag(int id_, value_type& ref_) :
+  var_tag<value_type>(id_), ref(ref_) {}
   value_type& ref;
 };
 
 template <typename value_type_>
-struct WriteReference : public Constraint<typename boost::proto::terminal<write_ref_tag<value_type_> >::type> {
+struct WriteReference :
+public Constraint<typename boost::proto::terminal<write_ref_tag<value_type_> >::type> {
   typedef Constraint<typename boost::proto::terminal<write_ref_tag<value_type_> >::type> base_type;
 
   explicit WriteReference(value_type_& ref)
@@ -31,4 +33,4 @@ struct WriteReference : public Constraint<typename boost::proto::terminal<write_
     return boost::proto::make_expr<boost::proto::tag::assign, Constraint_Domain>(boost::cref(*this), boost::cref(e));
   }
 };
-}
+}  // namespace crave
