@@ -2,11 +2,13 @@
 
 #pragma once
 
+#include <boost/proto/eval.hpp>
+
 #include "../frontend/bitsize_traits.hpp"
 #include "../ir/visitor/EvalVisitor.hpp"
 #include "../ir/UserExpression.hpp"
 
-#include <boost/proto/eval.hpp>
+
 
 namespace crave {
 
@@ -37,7 +39,7 @@ class Evaluator {
   Integer result() const {
     return static_cast<Integer>(visitor_.result().value());
   }
-  unsigned long long result() const { return result<unsigned long long>(); }
+  uint64_t result() const { return result<uint64_t>(); }
 
  private:
   eval_map assignments_;
