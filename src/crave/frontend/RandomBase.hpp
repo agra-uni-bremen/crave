@@ -21,7 +21,7 @@ unsigned int default_rand_vec_size();
 class __rand_vec_base {
  public:
   virtual ~__rand_vec_base() {}
-  virtual void set_values(std::vector<std::string>&) = 0;
+  virtual void set_values(const std::vector<std::string>&) = 0;
   virtual Variable<unsigned int> const& size_var() const = 0;
 };
 
@@ -52,7 +52,7 @@ class __rand_vec_base1 : public __rand_vec_base {
       return sym_vec.size();
   }
 
-  virtual void set_values(std::vector<std::string>& values) {
+  virtual void set_values(const std::vector<std::string>& values) {
     AssignResultImpl<T2> result;
     real_vec.clear();
     for (uint i = 0; i < values.size(); i++) {
