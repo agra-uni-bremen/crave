@@ -53,7 +53,7 @@ bool rand_obj_gen::generate() {
     if (!obj_->next()) throw std::runtime_error("Generation error.\n");
     elapsed_gen_times_[i] = std::clock() - start;
 
-    std::vector<long long> values;
+    std::vector<int64_t> values;
     obj_->gather_values(values);
     solutions_[i].insert(solutions_[i].begin(), values.begin(), values.end());
   }
