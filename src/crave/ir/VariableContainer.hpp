@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include "../frontend/AssignResult.hpp"
-#include "ReferenceExpression.hpp"
+
 
 #include <boost/shared_ptr.hpp>
 
@@ -11,12 +10,14 @@
 #include <utility>
 #include <vector>
 
+#include "ReferenceExpression.hpp"
+#include "../frontend/AssignResult.hpp"
+
 namespace crave {
 
 struct VariableContainer {
-
-  typedef std::pair<int, boost::shared_ptr<crave::ReferenceExpression> > ReadRefPair;
-  typedef std::pair<int, boost::shared_ptr<crave::AssignResult> > WriteRefPair;
+  typedef std::pair<int, boost::shared_ptr<ReferenceExpression> > ReadRefPair;
+  typedef std::pair<int, boost::shared_ptr<AssignResult> > WriteRefPair;
 
   std::map<int, NodePtr> variables;
   std::map<int, NodePtr> vector_variables;
