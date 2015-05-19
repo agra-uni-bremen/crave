@@ -1,11 +1,12 @@
 // Copyright 2014 The CRAVE developers. All rights reserved.//
 
 #pragma once
-#include "Settings.hpp"
 
 #include <fstream>
 #include <set>
 #include <string>
+
+#include "Settings.hpp"
 
 namespace crave {
 class CraveSetting : public Setting {
