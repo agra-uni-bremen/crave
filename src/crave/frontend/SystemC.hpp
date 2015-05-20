@@ -103,25 +103,25 @@ struct bitsize_traits<T, typename boost::enable_if<is_sysc_dt<T> >::type>
   RANDV_SCDT_BINARY_OPERATOR(Typename, +);               \
   RANDV_SCDT_BINARY_OPERATOR(Typename, -);               \
   RANDV_SCDT_BINARY_OPERATOR(Typename, *);               \
-  RANDV_SCDT_BINARY_OPERATOR(Typename, / );              \
-  RANDV_SCDT_BINARY_OPERATOR(Typename, % );              \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, /);              \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, %);              \
   RANDV_SCDT_BINARY_OPERATOR(Typename, &);               \
-  RANDV_SCDT_BINARY_OPERATOR(Typename, | );              \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, |);              \
   RANDV_SCDT_BINARY_OPERATOR(Typename, ^);               \
-  RANDV_SCDT_BINARY_OPERATOR(Typename, << );             \
-  RANDV_SCDT_BINARY_OPERATOR(Typename, >> );             \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, <<);             \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, >>);             \
   template <int N>                                       \
   sc_dt::int64 operator~(randv<Typename<N> > const& r) { \
     return ~((Typename<N>)r);                            \
   }
 
 #define RANDV_SCDT_COMPARISON_OPERATORS(Typename) \
-  RANDV_SCDT_BINARY_OPERATOR(Typename, == );      \
-  RANDV_SCDT_BINARY_OPERATOR(Typename, != );      \
-  RANDV_SCDT_BINARY_OPERATOR(Typename, > );       \
-  RANDV_SCDT_BINARY_OPERATOR(Typename, >= );      \
-  RANDV_SCDT_BINARY_OPERATOR(Typename, < );       \
-  RANDV_SCDT_BINARY_OPERATOR(Typename, <= );
+  RANDV_SCDT_BINARY_OPERATOR(Typename, ==);      \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, !=);      \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, >);       \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, >=);      \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, <);       \
+  RANDV_SCDT_BINARY_OPERATOR(Typename, <=);
 
 template <int N>
 class randv<sc_dt::sc_bv<N> > : public randv_base<sc_dt::sc_bv<N> > {
@@ -129,8 +129,8 @@ class randv<sc_dt::sc_bv<N> > : public randv_base<sc_dt::sc_bv<N> > {
   RANDV_COMMON_INTERFACE(sc_bv);
   RANDV_SCDT_PRIM_INTERFACE(sc_bv);
 };
-RANDV_SCDT_BINARY_OPERATOR(sc_dt::sc_bv, == );
-RANDV_SCDT_BINARY_OPERATOR(sc_dt::sc_bv, != );
+RANDV_SCDT_BINARY_OPERATOR(sc_dt::sc_bv, ==);
+RANDV_SCDT_BINARY_OPERATOR(sc_dt::sc_bv, !=);
 RANDV_SCDT_REF_EXPR(sc_dt::sc_bv);
 
 template <int N>

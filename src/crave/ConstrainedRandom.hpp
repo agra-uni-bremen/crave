@@ -2,10 +2,11 @@
 
 #pragma once
 
+#include <boost/bind.hpp>
+
 #include <vector>
 #include <string>
 #include <set>
-#include <boost/bind.hpp>
 
 #include "backend/Generator.hpp"
 #include "frontend/RandomBase.hpp"
@@ -135,4 +136,4 @@ class rand_obj : public rand_obj_base {
       parent->constraint(inside(var, s));                             \
     }                                                                 \
   };                                                                  \
-  }  // namespace crave
+}  // namespace crave

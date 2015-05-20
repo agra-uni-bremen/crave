@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "ConstraintType.hpp"
 #include <boost/proto/core.hpp>
+#include "ConstraintType.hpp"
+
 
 // Variable
 namespace crave {
@@ -49,4 +50,4 @@ struct Variable
                                                       boost::cref(e));
   }
 };
-}
+}  // namespace crave

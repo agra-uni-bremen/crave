@@ -32,7 +32,7 @@ struct ConstraintManager {
        << " constraint(s) and has " << (set.changed_ ? "" : "not ") << "changed"
        << std::endl;
 
-    BOOST_FOREACH (ConstraintPtr item, set.constraints_) {
+    BOOST_FOREACH(ConstraintPtr item, set.constraints_) {
       os << item << std::endl;
     }
     os << std::flush;
@@ -137,7 +137,7 @@ struct ConstraintManager {
   std::ostream& printDotGraph(std::ostream& os) {
     ToDotVisitor visitor(os);
 
-    BOOST_FOREACH (ConstraintPtr c, constraints_) {
+    BOOST_FOREACH(ConstraintPtr c, constraints_) {
       int32 a = reinterpret_cast<int32>(&*c);
       int32 b = reinterpret_cast<int32>(&(*c->expr()));
       os << "\t" << a << " [label=\"" << c->name()

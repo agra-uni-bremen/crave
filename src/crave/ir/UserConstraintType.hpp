@@ -37,7 +37,7 @@ struct UserConstraint {
     os << constr.name_ << " is a " << (constr.soft_ ? "soft" : "hard")
        << " constraint and " << (constr.enabled_ ? "enabled" : "disabled");
     os << ", support vars =";
-    BOOST_FOREACH (int item, constr.support_vars_) { os << " " << item; }
+    BOOST_FOREACH(int item, constr.support_vars_) { os << " " << item; }
     return os;
   }
 

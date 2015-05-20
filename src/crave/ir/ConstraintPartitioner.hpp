@@ -23,10 +23,10 @@ struct ConstraintPartitioner {
 
   void mergeConstraints(ConstraintManager& mng) {
     LOG(INFO) << "Merge set " << mng.id_ << " with set(s)";
-    BOOST_FOREACH (unsigned id, constr_mngs_) { LOG(INFO) << " " << id; }
+    BOOST_FOREACH(unsigned id, constr_mngs_) { LOG(INFO) << " " << id; }
     constr_mngs_.insert(mng.id_);
 
-    BOOST_FOREACH (ConstraintPtr c, mng.constraints_) {
+    BOOST_FOREACH(ConstraintPtr c, mng.constraints_) {
       if (c->isEnabled()) {
         if (c->isVectorConstraint()) {
           vec_constraints_.push_back(
@@ -45,19 +45,19 @@ struct ConstraintPartitioner {
       partitions_.push_back(cp);
     }
     LOG(INFO) << "Partition results of set(s)";
-    BOOST_FOREACH (unsigned id, constr_mngs_) { LOG(INFO) << " " << id; }
+    BOOST_FOREACH(unsigned id, constr_mngs_) { LOG(INFO) << " " << id; }
     LOG(INFO) << ": ";
 
     LOG(INFO) << "  " << vec_constraints_.size() << " vector constraint(s):";
 
-    BOOST_FOREACH (VectorConstraintPtr c, vec_constraints_) {
+    BOOST_FOREACH(VectorConstraintPtr c, vec_constraints_) {
       LOG(INFO) << "   " << c->name();
     }
 
     LOG(INFO) << "  " << partitions_.size() << " constraint partition(s):";
     uint cnt = 0;
 
-    BOOST_FOREACH (ConstraintPartition& cp, partitions_) {
+    BOOST_FOREACH(ConstraintPartition& cp, partitions_) {
       LOG(INFO) << "    #" << ++cnt << ": " << cp;
     }
   }

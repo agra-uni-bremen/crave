@@ -22,4 +22,4 @@ struct placeholder
 
   int id() const { return boost::proto::value(*this).id; }
 };
-}
+}  // namespace crave

@@ -66,7 +66,7 @@ struct UserConstraint {
     os << constr.name_ << " is a " << (constr.soft_ ? "soft" : "hard")
        << " constraint and " << (constr.enabled_ ? "enabled" : "disabled");
     os << ", support vars =";
-    BOOST_FOREACH (int item, constr.support_vars_) { os << " " << item; }
+    BOOST_FOREACH(int item, constr.support_vars_) { os << " " << item; }
     return os;
   }
 
@@ -158,7 +158,7 @@ struct ConstraintPartition {
   template <typename ostream>
   friend ostream& operator<<(ostream& os, const ConstraintPartition& cp) {
     os << "[ ";
-    BOOST_FOREACH (ConstraintPtr c, cp) { os << c->name() << " "; }
+    BOOST_FOREACH(ConstraintPtr c, cp) { os << c->name() << " "; }
     os << "]";
     os << std::flush;
     return os;
@@ -187,7 +187,7 @@ struct ConstraintManager {
     os << "Set " << set.id_ << " has " << set.constraints_.size()
        << " constraint(s) and has " << (set.changed_ ? "" : "not ") << "changed"
        << std::endl;
-    BOOST_FOREACH (ConstraintPtr item, set.constraints_) {
+    BOOST_FOREACH(ConstraintPtr item, set.constraints_) {
       os << item << std::endl;
     }
     os << std::flush;
@@ -328,7 +328,7 @@ struct ConstraintManager {
 
   std::ostream& printDotGraph(std::ostream& os) {
     ToDotVisitor visitor(os);
-    BOOST_FOREACH (ConstraintPtr c, constraints_) {
+    BOOST_FOREACH(ConstraintPtr c, constraints_) {
       int32_t a = reinterpret_cast<int32_t>(&*c);
       int32_t b = reinterpret_cast<int32_t>(&(*c->expr()));
       os << "\t" << a << " [label=\"" << c->name()
@@ -360,9 +360,9 @@ struct ConstraintPartitioner {
 
   void mergeConstraints(const ConstraintManager& mng) {
     LOG(INFO) << "Merge set " << mng.id_ << " with set(s)";
-    BOOST_FOREACH (unsigned id, constr_mngs_) { LOG(INFO) << " " << id; }
+    BOOST_FOREACH(unsigned id, constr_mngs_) { LOG(INFO) << " " << id; }
     constr_mngs_.insert(mng.id_);
-    BOOST_FOREACH (ConstraintPtr c, mng.constraints_) {
+    BOOST_FOREACH(ConstraintPtr c, mng.constraints_) {
       if (c->isEnabled()) {
         if (c->isVectorConstraint())
           vec_constraints_.push_back(
@@ -381,17 +381,17 @@ struct ConstraintPartitioner {
       partitions_.push_back(cp);
     }
     LOG(INFO) << "Partition results of set(s)";
-    BOOST_FOREACH (unsigned id, constr_mngs_) { LOG(INFO) << " " << id; }
+    BOOST_FOREACH(unsigned id, constr_mngs_) { LOG(INFO) << " " << id; }
     LOG(INFO) << ": ";
 
     LOG(INFO) << "  " << vec_constraints_.size() << " vector constraint(s):";
-    BOOST_FOREACH (VectorConstraintPtr c, vec_constraints_) {
+    BOOST_FOREACH(VectorConstraintPtr c, vec_constraints_) {
       LOG(INFO) << "   " << c->name();
     }
 
     LOG(INFO) << "  " << partitions_.size() << " constraint partition(s):";
     uint cnt = 0;
-    BOOST_FOREACH (ConstraintPartition& cp, partitions_) {
+    BOOST_FOREACH(ConstraintPartition& cp, partitions_) {
       LOG(INFO) << "    #" << ++cnt << ": " << cp;
     }
   }

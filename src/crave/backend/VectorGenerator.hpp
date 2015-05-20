@@ -55,7 +55,7 @@ struct VectorSolver {
       }
     }
 
-    BOOST_FOREACH (VectorConstraintPtr constraint, constraints) {
+    BOOST_FOREACH(VectorConstraintPtr constraint, constraints) {
       if (!constraint->isUnique()) {
         ReplaceVisitor replacer(vec_elements);
         for (unsigned int i = 0u; i < size; ++i) {
@@ -103,7 +103,7 @@ struct VectorGenerator {
       : vector_solvers(), var_gen(var_gen_) {}
 
   bool solve() {
-    BOOST_FOREACH (VectorSolverMap::value_type& c_pair, vector_solvers) {
+    BOOST_FOREACH(VectorSolverMap::value_type& c_pair, vector_solvers) {
       if (!c_pair.second.solve()) return false;
     }
     return true;
@@ -111,7 +111,7 @@ struct VectorGenerator {
 
   void reset(std::vector<VectorConstraintPtr>& v) {
     vector_solvers.clear();
-    BOOST_FOREACH (VectorConstraintPtr vc, v) { addConstraint(vc); }
+    BOOST_FOREACH(VectorConstraintPtr vc, v) { addConstraint(vc); }
   }
 
  private:

@@ -26,5 +26,4 @@ struct FactorySolver {
   static bool isDefined() { return false; }
   static metaSMTVisitor* getNewInstance() { return NULL; }
 };
-
 }  // namespace crave

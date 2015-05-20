@@ -321,7 +321,7 @@ struct Context
 
     std::set<Constant> constants;
     distribution<Integer> dist;
-    BOOST_FOREACH (CollectionEntry const& i, boost::proto::value(c)) {
+    BOOST_FOREACH(CollectionEntry const& i, boost::proto::value(c)) {
       constants.insert(Constant(i, width, sign));
       dist(weighted_value<Integer>(i, 1));
     }
@@ -358,7 +358,7 @@ struct Context
       dist_references_.push_back(std::make_pair(id, ref_expr));
 
       result_type in_ranges;
-      BOOST_FOREACH (weighted_range<Integer> const& r, dist.ranges()) {
+      BOOST_FOREACH(weighted_range<Integer> const& r, dist.ranges()) {
         result_type left(new Constant(r.left, width, sign));
         result_type right(new Constant(r.right, width, sign));
         result_type left_cond(new LessEqualOpr(left, tmp_var));
