@@ -18,7 +18,7 @@ struct UserConstraint {
 
  protected:
   UserConstraint(unsigned const id, expression const expr,
-                 std::string const& name, std::set<int>& support_vars,
+                 std::string const& name, std::set<int> support_vars,
                  bool const soft = false, bool const cover = false,
                  bool const enabled = true)
       : id_(id),

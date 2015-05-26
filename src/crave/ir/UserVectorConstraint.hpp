@@ -15,7 +15,7 @@ struct UserVectorConstraint : UserConstraint {
 
  protected:
   UserVectorConstraint(unsigned const id, expression const expr,
-                       std::string const& name, std::set<int>& support_vars,
+                       std::string const& name, std::set<int> support_vars,
                        bool const unique, bool const soft = false,
                        bool const cover = false, bool const enabled = true)
       : UserConstraint(id, expr, name, support_vars, soft, cover, enabled),
