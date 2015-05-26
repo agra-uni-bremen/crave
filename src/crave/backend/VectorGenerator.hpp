@@ -99,7 +99,7 @@ struct VectorSolver {
 struct VectorGenerator {
   typedef std::map<int, VectorSolver> VectorSolverMap;
 
-  explicit VectorGenerator(VariableGenerator& var_gen_)
+  explicit VectorGenerator(const VariableGenerator& var_gen_)
       : vector_solvers(), var_gen(var_gen_) {}
 
   bool solve() {
