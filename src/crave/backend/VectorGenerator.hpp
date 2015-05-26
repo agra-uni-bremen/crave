@@ -35,7 +35,7 @@ struct VectorSolver {
     }
     resetSolver(size);
     bool result = solver->solve(false) || solver->solve(true);
-    if (result) solver->readVector(vec_elements, *vector);
+    if (result) solver->readVector(vec_elements, vector);
 
     return result;
   }
