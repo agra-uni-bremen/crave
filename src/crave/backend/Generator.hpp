@@ -161,7 +161,7 @@ struct Generator {
   template <typename T>
   T operator[](Variable<T> const& var) {
     T result;
-    if (!var_gen.read(var, result)) {
+    if (!var_gen.read(var, &result)) {
       throw std::runtime_error("Invalid variable read request.");
     }
     return result;

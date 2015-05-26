@@ -10,7 +10,7 @@
 namespace crave {
 
 struct VariableCoverageSolver : VariableSolver {
-  VariableCoverageSolver(const VariableContainer& vcon,
+  VariableCoverageSolver(VariableContainer *vcon,
                          const ConstraintPartition& cp)
       : VariableSolver(vcon, cp) {
     LOG(INFO) << "Create coverage solver for partition " << constr_pttn;
@@ -31,7 +31,7 @@ struct VariableCoverageSolver : VariableSolver {
       }
       // try solve
       BOOST_FOREACH(VariableContainer::ReadRefPair pair,
-                     var_ctn.read_references) {
+                     var_ctn->read_references) {
         if (constr_pttn.containsVar(pair.first)) {
           solver->makeAssumption(*pair.second->expr());
         }
@@ -42,9 +42,9 @@ struct VariableCoverageSolver : VariableSolver {
                   << c->name();
         covered_set.insert(c->name());
         BOOST_FOREACH(VariableContainer::WriteRefPair pair,
-                       var_ctn.write_references) {
+                       var_ctn->write_references) {
           if (constr_pttn.containsVar(pair.first)) {
-            solver->read(*var_ctn.variables[pair.first], *pair.second);
+            solver->read(*var_ctn->variables[pair.first], *pair.second);
           }
         }
         return true;

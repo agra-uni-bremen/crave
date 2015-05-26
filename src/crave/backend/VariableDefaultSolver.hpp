@@ -12,7 +12,7 @@
 namespace crave {
 
 struct VariableDefaultSolver : VariableSolver {
-  VariableDefaultSolver(const VariableContainer& vcon,
+  VariableDefaultSolver(VariableContainer *vcon,
                         const ConstraintPartition& cp)
       : VariableSolver(vcon, cp) {
     LOG(INFO) << "Create solver for partition " << constr_pttn;
@@ -45,22 +45,22 @@ struct VariableDefaultSolver : VariableSolver {
   virtual bool solve() {
     if (!contradictions_.empty()) return false;
     BOOST_FOREACH(VariableContainer::ReadRefPair pair,
-                   var_ctn.read_references) {
+                   var_ctn->read_references) {
       if (constr_pttn.containsVar(pair.first)) {
         solver->makeAssumption(*pair.second->expr());
       }
     }
     BOOST_FOREACH(VariableContainer::ReadRefPair pair,
-                   var_ctn.dist_references) {
+                   var_ctn->dist_references) {
       if (constr_pttn.containsVar(pair.first)) {
         solver->makeSuggestion(*pair.second->expr());
       }
     }
     if (solver->solve()) {
       BOOST_FOREACH(VariableContainer::WriteRefPair pair,
-                     var_ctn.write_references) {
+                     var_ctn->write_references) {
         if (constr_pttn.containsVar(pair.first)) {
-          solver->read(*var_ctn.variables[pair.first], *pair.second);
+          solver->read(*var_ctn->variables[pair.first], *pair.second);
         }
       }
       return true;

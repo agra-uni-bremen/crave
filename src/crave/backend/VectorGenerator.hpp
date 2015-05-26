@@ -30,7 +30,7 @@ struct VectorSolver {
     __rand_vec_base* vector = vectorBaseMap[vector_id];
 
     unsigned int size = default_rand_vec_size();
-    if (!var_gen.read(vector->size_var(), size)) {
+    if (!var_gen.read(vector->size_var(), &size)) {
       LOG(INFO) << "Use default size for vector " << vector_id;
     }
     resetSolver(size);
