@@ -40,7 +40,6 @@ struct VariableSolver {
 
  protected:
   VariableContainer *var_ctn;
-  
   const ConstraintPartition& constr_pttn;
   SolverPtr solver;
 
