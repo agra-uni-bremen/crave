@@ -12,7 +12,7 @@ namespace crave {
 
 class ToDotVisitor : public NodeVisitor {
  public:
-  ToDotVisitor(std::ostream& os) : NodeVisitor(), out_(os), nodes_() {}
+  explicit ToDotVisitor(std::ostream& os) : NodeVisitor(), out_(os), nodes_() {}
 
   void visitNode(Node const&);
   void visitTerminal(Terminal const&);

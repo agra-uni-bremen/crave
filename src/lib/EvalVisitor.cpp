@@ -30,8 +30,8 @@ void EvalVisitor::visitTernaryExpr(const TernaryExpression& t) {
 void EvalVisitor::visitPlaceholder(const Placeholder&) {}
 
 void EvalVisitor::visitVariableExpr(const VariableExpr& v) {
-  eval_map::const_iterator ite(evalMap_.find(v.id()));
-  if (ite != evalMap_.end())
+  eval_map::const_iterator ite(evalMap_->find(v.id()));
+  if (ite != evalMap_->end())
     visitConstant(ite->second);
   else
     exprStack_.push(std::make_pair(Constant(), false));
@@ -40,8 +40,8 @@ void EvalVisitor::visitVariableExpr(const VariableExpr& v) {
 void EvalVisitor::visitConstant(const Constant& c) { exprStack_.push(std::make_pair(c, true)); }
 
 void EvalVisitor::visitVectorExpr(const VectorExpr& v) {
-  eval_map::const_iterator ite(evalMap_.find(v.id()));
-  if (ite != evalMap_.end())
+  eval_map::const_iterator ite(evalMap_->find(v.id()));
+  if (ite != evalMap_->end())
     visitConstant(ite->second);
   else
     exprStack_.push(std::make_pair(Constant(), false));
@@ -147,11 +147,11 @@ void EvalVisitor::visitEqualOpr(const EqualOpr& eq) {
 
   if (v1->id() != 0 && v2->id() != 0) {
 
-    eval_map::iterator ite = evalMap_.lower_bound(v1->id());
-    if (ite != evalMap_.end() && v1->id() >= ite->first) {
-      evalMap_.insert(std::make_pair(v2->id(), ite->second));
+    eval_map::iterator ite = evalMap_->lower_bound(v1->id());
+    if (ite != evalMap_->end() && v1->id() >= ite->first) {
+      evalMap_->insert(std::make_pair(v2->id(), ite->second));
     } else {
-      evalMap_.insert(ite, std::make_pair(v1->id(), evalMap_.at(v2->id())));
+      evalMap_->insert(ite, std::make_pair(v1->id(), evalMap_->at(v2->id())));
     }
   }
 

@@ -14,7 +14,7 @@ class Evaluator {
   typedef EvalVisitor::eval_map eval_map;
 
  public:
-  Evaluator() : assignments_(), visitor_(assignments_) {}
+  Evaluator() : assignments_(), visitor_(&assignments_) {}
 
   template <typename var_type, typename value_type>
   void assign(var_type const& var, value_type const& value) {

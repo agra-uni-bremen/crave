@@ -17,7 +17,7 @@ class EvalVisitor : NodeVisitor {
  public:
   typedef std::map<int, Constant> eval_map;
 
-  explicit EvalVisitor(eval_map& m)
+  explicit EvalVisitor(eval_map *m)
       : NodeVisitor(), exprStack_(), evalMap_(m), result_() {}
 
  private:
@@ -81,7 +81,7 @@ class EvalVisitor : NodeVisitor {
 
  private:
   std::stack<stack_entry> exprStack_;
-  eval_map& evalMap_;
+  eval_map *evalMap_;
 
   Constant result_;
 };

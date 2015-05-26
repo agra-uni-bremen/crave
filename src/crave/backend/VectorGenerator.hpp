@@ -57,7 +57,7 @@ struct VectorSolver {
 
     BOOST_FOREACH(VectorConstraintPtr constraint, constraints) {
       if (!constraint->isUnique()) {
-        ReplaceVisitor replacer(vec_elements);
+        ReplaceVisitor replacer(&vec_elements);
         for (unsigned int i = 0u; i < size; ++i) {
           replacer.setVecIdx(i);
           constraint->expr()->visit(&replacer);

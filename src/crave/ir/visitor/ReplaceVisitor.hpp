@@ -13,8 +13,7 @@ namespace crave {
 
 class ReplaceVisitor : public NodeVisitor {
  public:
-  explicit ReplaceVisitor(
-      std::vector<boost::intrusive_ptr<VariableExpr> >& vars)
+  explicit ReplaceVisitor(std::vector<boost::intrusive_ptr<VariableExpr>> *vars)
       : vec_idx_(),
         okay_(true),
         result_(),
@@ -82,7 +81,7 @@ class ReplaceVisitor : public NodeVisitor {
   NodePtr result_;
   std::stack<NodePtr> aux_stack_;
   std::stack<int> subscript_stack_;
-  std::vector<boost::intrusive_ptr<VariableExpr> >& variables_;
+  std::vector<boost::intrusive_ptr<VariableExpr>> *variables_;
   std::map<int, NodePtr> terminals_;
 };
 
