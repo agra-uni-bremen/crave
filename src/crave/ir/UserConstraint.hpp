@@ -415,7 +415,8 @@ struct ConstraintPartitioner {
       while (ite != lc->end()) {
         c = *ite;
         std::vector<int> v_intersection;
-        std::set_intersection(cp->support_vars_.begin(), cp->support_vars_.end(),
+        std::set_intersection(cp->support_vars_.begin(),
+                              cp->support_vars_.end(),
                               c->support_vars_.begin(), c->support_vars_.end(),
                               std::back_inserter(v_intersection));
         if (!v_intersection.empty()) {
