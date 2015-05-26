@@ -21,7 +21,7 @@ struct ConstraintPartitioner {
     vec_constraints_.clear();
   }
 
-  void mergeConstraints(ConstraintManager& mng) {
+  void mergeConstraints(const ConstraintManager& mng) {
     LOG(INFO) << "Merge set " << mng.id_ << " with set(s)";
     BOOST_FOREACH(unsigned id, constr_mngs_) { LOG(INFO) << " " << id; }
     constr_mngs_.insert(mng.id_);
@@ -69,27 +69,28 @@ struct ConstraintPartitioner {
   }
 
  private:
-  void maximizePartition(ConstraintPartition& cp, ConstraintList& lc) {
-    ConstraintPtr c = lc.front();
-    lc.pop_front();
-    cp.support_vars_ = c->support_vars_;
-    cp.add(c);
+  void maximizePartition(ConstraintPartition *cp, ConstraintList *lc) {
+    ConstraintPtr c = lc->front();
+    lc->pop_front();
+    cp->support_vars_ = c->support_vars_;
+    cp->add(c);
     while (true) {
       bool changed = false;
-      ConstraintList::iterator ite = lc.begin();
+      ConstraintList::iterator ite = lc->begin();
 
-      while (ite != lc.end()) {
+      while (ite != lc->end()) {
         c = *ite;
         std::vector<int> v_intersection;
-        std::set_intersection(cp.support_vars_.begin(), cp.support_vars_.end(),
+        std::set_intersection(cp->support_vars_.begin(),
+                              cp->support_vars_.end(),
                               c->support_vars_.begin(), c->support_vars_.end(),
                               std::back_inserter(v_intersection));
         if (!v_intersection.empty()) {
           changed = true;
-          cp.add(c);
-          cp.support_vars_.insert(c->support_vars_.begin(),
+          cp->add(c);
+          cp->support_vars_.insert(c->support_vars_.begin(),
                                   c->support_vars_.end());
-          ite = lc.erase(ite);
+          ite = lc->erase(ite);
         } else {
           ++ite;
         }
