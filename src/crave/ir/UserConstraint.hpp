@@ -47,7 +47,7 @@ struct UserConstraint {
 
  protected:
   UserConstraint(unsigned const id, expression const expr,
-                 std::string const& name, std::set<int>& support_vars,
+                 std::string const& name, std::set<int> support_vars,
                  bool const soft = false, bool const cover = false,
                  bool const enabled = true)
       : id_(id),
@@ -107,7 +107,7 @@ struct UserVectorConstraint : UserConstraint {
 
  protected:
   UserVectorConstraint(unsigned const id, expression const expr,
-                       std::string const& name, std::set<int>& support_vars,
+                       std::string const& name, std::set<int> support_vars,
                        bool const unique, bool const soft = false,
                        bool const cover = false, bool const enabled = true)
       : UserConstraint(id, expr, name, support_vars, soft, cover, enabled),
@@ -377,7 +377,7 @@ struct ConstraintPartitioner {
   void partition() {
     while (!constraints_.empty()) {
       ConstraintPartition cp;
-      maximizePartition(cp, constraints_);
+      maximizePartition(&cp, &constraints_);
       partitions_.push_back(cp);
     }
     LOG(INFO) << "Partition results of set(s)";
@@ -403,27 +403,27 @@ struct ConstraintPartitioner {
   }
 
  private:
-  void maximizePartition(ConstraintPartition& cp, ConstraintList& lc) {
-    ConstraintPtr c = lc.front();
-    lc.pop_front();
-    cp.support_vars_ = c->support_vars_;
-    cp.add(c);
+  void maximizePartition(ConstraintPartition *cp, ConstraintList *lc) {
+    ConstraintPtr c = lc->front();
+    lc->pop_front();
+    cp->support_vars_ = c->support_vars_;
+    cp->add(c);
     while (true) {
       bool changed = false;
-      ConstraintList::iterator ite = lc.begin();
+      ConstraintList::iterator ite = lc->begin();
 
-      while (ite != lc.end()) {
+      while (ite != lc->end()) {
         c = *ite;
         std::vector<int> v_intersection;
-        std::set_intersection(cp.support_vars_.begin(), cp.support_vars_.end(),
+        std::set_intersection(cp->support_vars_.begin(), cp->support_vars_.end(),
                               c->support_vars_.begin(), c->support_vars_.end(),
                               std::back_inserter(v_intersection));
         if (!v_intersection.empty()) {
           changed = true;
-          cp.add(c);
-          cp.support_vars_.insert(c->support_vars_.begin(),
+          cp->add(c);
+          cp->support_vars_.insert(c->support_vars_.begin(),
                                   c->support_vars_.end());
-          ite = lc.erase(ite);
+          ite = lc->erase(ite);
         } else {
           ++ite;
         }
