@@ -53,17 +53,17 @@ void ReplaceVisitor::evalTernSubscript(int& a, int& b, int& c) {
 
 void ReplaceVisitor::visitNode(Node const& n) {}
 void ReplaceVisitor::visitTerminal(Terminal const& t) {}
-void ReplaceVisitor::visitUnaryExpr(UnaryExpression const& e) { e.child()->visit(*this); }
+void ReplaceVisitor::visitUnaryExpr(UnaryExpression const& e) { e.child()->visit(this); }
 void ReplaceVisitor::visitUnaryOpr(UnaryOperator const&) {}
 void ReplaceVisitor::visitBinaryExpr(BinaryExpression const& e) {
-  e.lhs()->visit(*this);
-  e.rhs()->visit(*this);
+  e.lhs()->visit(this);
+  e.rhs()->visit(this);
 }
 void ReplaceVisitor::visitBinaryOpr(BinaryOperator const&) {}
 void ReplaceVisitor::visitTernaryExpr(TernaryExpression const& t) {
-  t.a()->visit(*this);
-  t.b()->visit(*this);
-  t.c()->visit(*this);
+  t.a()->visit(this);
+  t.b()->visit(this);
+  t.c()->visit(this);
 }
 void ReplaceVisitor::visitPlaceholder(Placeholder const& p) {
   // assert( lsh is vector expression )
@@ -338,7 +338,7 @@ void ReplaceVisitor::visitIfThenElse(IfThenElse const& i) {
   subscript_stack_.push(a_val ? b_val : c_val);
 }
 
-void ReplaceVisitor::visitForEach(ForEach const& fe) { fe.rhs()->visit(*this); }
+void ReplaceVisitor::visitForEach(ForEach const& fe) { fe.rhs()->visit(this); }
 
 void ReplaceVisitor::visitUnique(Unique const& u) {
   throw std::runtime_error("Unique is not allowed in ReplaceVisitor.");

@@ -252,7 +252,7 @@ struct ConstraintManager {
     NodePtr n(fwv.fixWidth(*boost::proto::eval(e, ctx)));
 
     GetSupportSetVisitor gssv;
-    n->visit(gssv);
+    n->visit(&gssv);
 
     ConstraintPtr c(
         boost::dynamic_pointer_cast<ForEach>(n) != 0
@@ -287,7 +287,7 @@ struct ConstraintManager {
     }
 
     GetSupportSetVisitor gssv;
-    n->visit(gssv);
+    n->visit(&gssv);
 
     ConstraintPtr c(
         boost::dynamic_pointer_cast<ForEach>(n) != 0
@@ -335,7 +335,7 @@ struct ConstraintManager {
          << (c->isSoft() ? " soft" : "") << (c->isCover() ? " cover" : "")
          << (!c->isEnabled() ? " disabled" : "") << "\"]" << std::endl;
       os << "\t" << a << " -> " << b << std::endl;
-      c->expr()->visit(visitor);
+      c->expr()->visit(&visitor);
     }
     return os;
   }

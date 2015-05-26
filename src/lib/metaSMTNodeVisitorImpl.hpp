@@ -155,7 +155,7 @@ void metaSMTVisitorImpl<SolverType>::visitTerminal(Terminal const &t) {}
 
 template <typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitUnaryExpr(UnaryExpression const &ue) {
-  ue.child()->visit(*this);
+  ue.child()->visit(this);
 }
 
 template <typename SolverType>
@@ -163,8 +163,8 @@ void metaSMTVisitorImpl<SolverType>::visitUnaryOpr(UnaryOperator const &) {}
 
 template <typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitBinaryExpr(BinaryExpression const &be) {
-  be.lhs()->visit(*this);
-  be.rhs()->visit(*this);
+  be.lhs()->visit(this);
+  be.rhs()->visit(this);
 }
 
 template <typename SolverType>
@@ -172,9 +172,9 @@ void metaSMTVisitorImpl<SolverType>::visitBinaryOpr(BinaryOperator const &) {}
 
 template <typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitTernaryExpr(TernaryExpression const &te) {
-  te.a()->visit(*this);
-  te.b()->visit(*this);
-  te.c()->visit(*this);
+  te.a()->visit(this);
+  te.b()->visit(this);
+  te.c()->visit(this);
 }
 
 template <typename SolverType>
@@ -250,7 +250,7 @@ void metaSMTVisitorImpl<SolverType>::visitInside(Inside const &in) {
   result_type result = evaluate(solver_, preds::False);
   BOOST_FOREACH(Constant c, in.collection()) {
     stack_entry constExpr;
-    c.visit(*this);
+    c.visit(this);
     pop(constExpr);
     result = evaluate(solver_, preds::Or(result, preds::equal(entry.first, constExpr.first)));
   }
@@ -555,7 +555,7 @@ void metaSMTVisitorImpl<SolverType>::visitUnique(Unique const &u) {
 
 template <typename SolverType>
 void metaSMTVisitorImpl<SolverType>::makeAssertion(Node const &expr) {
-  expr.visit(*this);
+  expr.visit(this);
 
   stack_entry entry;
   pop(entry);
@@ -565,7 +565,7 @@ void metaSMTVisitorImpl<SolverType>::makeAssertion(Node const &expr) {
 
 template <typename SolverType>
 void metaSMTVisitorImpl<SolverType>::makeSoftAssertion(Node const &expr) {
-  expr.visit(*this);
+  expr.visit(this);
 
   stack_entry entry;
   pop(entry);
@@ -575,7 +575,7 @@ void metaSMTVisitorImpl<SolverType>::makeSoftAssertion(Node const &expr) {
 
 template <typename SolverType>
 void metaSMTVisitorImpl<SolverType>::makeSuggestion(Node const &expr) {
-  expr.visit(*this);
+  expr.visit(this);
 
   stack_entry entry;
   pop(entry);
@@ -585,7 +585,7 @@ void metaSMTVisitorImpl<SolverType>::makeSuggestion(Node const &expr) {
 
 template <typename SolverType>
 void metaSMTVisitorImpl<SolverType>::makeAssumption(Node const &expr) {
-  expr.visit(*this);
+  expr.visit(this);
 
   stack_entry entry;
   pop(entry);
@@ -620,7 +620,7 @@ std::vector<std::vector<unsigned int> > metaSMTVisitorImpl<SolverType>::analyseC
   typedef std::pair<unsigned int, NodePtr> NodePair;
 
   BOOST_FOREACH(NodePair entry, s) {
-    entry.second->visit(*this);
+    entry.second->visit(this);
     stack_entry st_entry;
     pop(st_entry);
 

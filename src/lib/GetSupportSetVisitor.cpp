@@ -8,21 +8,21 @@ void GetSupportSetVisitor::visitNode(const Node&) {}
 
 void GetSupportSetVisitor::visitTerminal(const Terminal&) {}
 
-void GetSupportSetVisitor::visitUnaryExpr(const UnaryExpression& u) { u.child()->visit(*this); }
+void GetSupportSetVisitor::visitUnaryExpr(const UnaryExpression& u) { u.child()->visit(this); }
 
 void GetSupportSetVisitor::visitUnaryOpr(const UnaryOperator&) {}
 
 void GetSupportSetVisitor::visitBinaryExpr(const BinaryExpression& b) {
-  b.lhs()->visit(*this);
-  b.rhs()->visit(*this);
+  b.lhs()->visit(this);
+  b.rhs()->visit(this);
 }
 
 void GetSupportSetVisitor::visitBinaryOpr(const BinaryOperator&) {}
 
 void GetSupportSetVisitor::visitTernaryExpr(const TernaryExpression& t) {
-  t.a()->visit(*this);
-  t.b()->visit(*this);
-  t.c()->visit(*this);
+  t.a()->visit(this);
+  t.b()->visit(this);
+  t.c()->visit(this);
 }
 
 void GetSupportSetVisitor::visitPlaceholder(const Placeholder& pl) {}

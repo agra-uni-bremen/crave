@@ -71,7 +71,7 @@ class EvalVisitor : NodeVisitor {
   Constant result() const { return result_; }
 
   bool evaluate(Node const& expr) {
-    expr.visit(*this);
+    expr.visit(this);
     stack_entry entry;
     pop(entry);
 

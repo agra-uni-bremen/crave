@@ -68,7 +68,7 @@ class FixWidthVisitor : NodeVisitor {
 
  public:
   result_type fixWidth(Node const& expr) {
-    expr.visit(*this);
+    expr.visit(this);
     stack_entry entry;
     pop(entry);
 

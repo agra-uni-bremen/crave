@@ -60,7 +60,7 @@ struct VectorSolver {
         ReplaceVisitor replacer(vec_elements);
         for (unsigned int i = 0u; i < size; ++i) {
           replacer.setVecIdx(i);
-          constraint->expr()->visit(replacer);
+          constraint->expr()->visit(&replacer);
 
           if (replacer.okay()) {
             if (constraint->isSoft())

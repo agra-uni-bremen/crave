@@ -21,7 +21,7 @@ class Node {
   Node(Node const& n) : count_(0) {}
 
  public:
-  virtual void visit(NodeVisitor& v) const { v.visitNode(*this); }
+  virtual void visit(NodeVisitor *v) const { v->visitNode(*this); }
   std::ostream& printDot(std::ostream& out) const;
 
   // reference counting
@@ -39,7 +39,7 @@ class Placeholder : public Node {
   explicit Placeholder(unsigned int id) : Node(), id_(id) {}
   Placeholder(Placeholder const& p) : Node(p), id_(p.id()) {}
 
-  void visit(NodeVisitor& v) const { v.visitPlaceholder(*this); }
+  void visit(NodeVisitor *v) const { v->visitPlaceholder(*this); }
 
   unsigned int id() const { return id_; }
 
@@ -54,7 +54,7 @@ class Terminal : public Node {
       : Node(t), bitsize_(t.bitsize()), sign_(t.sign()) {}
 
  public:
-  virtual void visit(NodeVisitor& v) const { v.visitTerminal(*this); }
+  virtual void visit(NodeVisitor *v) const { v->visitTerminal(*this); }
 
   unsigned int bitsize() const { return bitsize_; }
   bool sign() const { return sign_; }
@@ -72,7 +72,7 @@ class VariableExpr : public Terminal {
   VariableExpr(VariableExpr const& v)
       : Terminal(v.bitsize(), v.sign()), id_(v.id()) {}
 
-  void visit(NodeVisitor& v) const { v.visitVariableExpr(*this); }
+  void visit(NodeVisitor *v) const { v->visitVariableExpr(*this); }
 
   unsigned int id() const { return id_; }
 
@@ -89,7 +89,7 @@ class Constant : public Terminal {
   Constant(Constant const& c)
       : Terminal(c.bitsize(), c.sign()), value_(c.value()) {}
 
-  void visit(NodeVisitor& v) const { v.visitConstant(*this); }
+  void visit(NodeVisitor *v) const { v->visitConstant(*this); }
 
   operator u_int64_t() const { return value_; }
 
@@ -106,7 +106,7 @@ class VectorExpr : public Terminal {
   VectorExpr(VectorExpr const& v)
       : Terminal(v.bitsize(), v.sign()), id_(v.id()) {}
 
-  void visit(NodeVisitor& v) const { v.visitVectorExpr(*this); }
+  void visit(NodeVisitor *v) const { v->visitVectorExpr(*this); }
 
   unsigned int id() const { return id_; }
 
@@ -122,7 +122,7 @@ class UnaryExpression : public Node {
   }
 
  public:
-  virtual void visit(NodeVisitor& v) const { v.visitUnaryExpr(*this); }
+  virtual void visit(NodeVisitor *v) const { v->visitUnaryExpr(*this); }
 
   NodePtr child() const { return child_; }
 
@@ -136,7 +136,7 @@ class UnaryOperator : public UnaryExpression {
   UnaryOperator(UnaryOperator const& u) : UnaryExpression(u) {}
 
  public:
-  virtual void visit(NodeVisitor& v) const { v.visitUnaryOpr(*this); }
+  virtual void visit(NodeVisitor *v) const { v->visitUnaryOpr(*this); }
 };
 
 class NotOpr : public UnaryOperator {
@@ -144,7 +144,7 @@ class NotOpr : public UnaryOperator {
   explicit NotOpr(NodePtr c) : UnaryOperator(c) {}
   NotOpr(NotOpr const& n) : UnaryOperator(n) {}
 
-  void visit(NodeVisitor& v) const { v.visitNotOpr(*this); }
+  void visit(NodeVisitor *v) const { v->visitNotOpr(*this); }
 };
 
 class NegOpr : public UnaryOperator {
@@ -152,7 +152,7 @@ class NegOpr : public UnaryOperator {
   explicit NegOpr(NodePtr c) : UnaryOperator(c) {}
   NegOpr(NegOpr const& n) : UnaryOperator(n) {}
 
-  void visit(NodeVisitor& v) const { v.visitNegOpr(*this); }
+  void visit(NodeVisitor *v) const { v->visitNegOpr(*this); }
 };
 
 class ComplementOpr : public UnaryOperator {
@@ -160,7 +160,7 @@ class ComplementOpr : public UnaryOperator {
   explicit ComplementOpr(NodePtr c) : UnaryOperator(c) {}
   ComplementOpr(ComplementOpr const& n) : UnaryOperator(n) {}
 
-  void visit(NodeVisitor& v) const { v.visitComplementOpr(*this); }
+  void visit(NodeVisitor *v) const { v->visitComplementOpr(*this); }
 };
 
 class Inside : public UnaryExpression {
@@ -169,7 +169,7 @@ class Inside : public UnaryExpression {
       : UnaryExpression(v), collection_(c) {}
   Inside(Inside const& i) : UnaryExpression(i), collection_(i.collection()) {}
 
-  void visit(NodeVisitor& v) const { v.visitInside(*this); }
+  void visit(NodeVisitor *v) const { v->visitInside(*this); }
 
   std::set<Constant> const& collection() const { return collection_; }
 
@@ -183,7 +183,7 @@ class ExtendExpression : public UnaryExpression {
   ExtendExpression(ExtendExpression const& e)
       : UnaryExpression(e), value_(e.value()) {}
 
-  void visit(NodeVisitor& v) const { v.visitExtendExpr(*this); }
+  void visit(NodeVisitor *v) const { v->visitExtendExpr(*this); }
 
   unsigned int const& value() const { return value_; }
 
@@ -200,7 +200,7 @@ class BinaryExpression : public Node {
   }
 
  public:
-  virtual void visit(NodeVisitor& v) const { v.visitBinaryExpr(*this); }
+  virtual void visit(NodeVisitor *v) const { v->visitBinaryExpr(*this); }
 
   NodePtr lhs() const { return lhs_; }
   NodePtr rhs() const { return rhs_; }
@@ -216,7 +216,7 @@ class BinaryOperator : public BinaryExpression {
   BinaryOperator(BinaryOperator const& b) : BinaryExpression(b) {}
 
  public:
-  virtual void visit(NodeVisitor& v) const { v.visitBinaryOpr(*this); }
+  virtual void visit(NodeVisitor *v) const { v->visitBinaryOpr(*this); }
 };
 
 class AndOpr : public BinaryOperator {
@@ -224,7 +224,7 @@ class AndOpr : public BinaryOperator {
   AndOpr(NodePtr lhs, NodePtr rhs) : BinaryOperator(lhs, rhs) {}
   AndOpr(AndOpr const& a) : BinaryOperator(a) {}
 
-  void visit(NodeVisitor& v) const { v.visitAndOpr(*this); }
+  void visit(NodeVisitor *v) const { v->visitAndOpr(*this); }
 };
 
 class OrOpr : public BinaryOperator {
@@ -232,7 +232,7 @@ class OrOpr : public BinaryOperator {
   OrOpr(NodePtr lhs, NodePtr rhs) : BinaryOperator(lhs, rhs) {}
   OrOpr(OrOpr const& o) : BinaryOperator(o) {}
 
-  void visit(NodeVisitor& v) const { v.visitOrOpr(*this); }
+  void visit(NodeVisitor *v) const { v->visitOrOpr(*this); }
 };
 
 class LogicalAndOpr : public BinaryOperator {
@@ -240,7 +240,7 @@ class LogicalAndOpr : public BinaryOperator {
   LogicalAndOpr(NodePtr lhs, NodePtr rhs) : BinaryOperator(lhs, rhs) {}
   LogicalAndOpr(LogicalAndOpr const& a) : BinaryOperator(a) {}
 
-  void visit(NodeVisitor& v) const { v.visitLogicalAndOpr(*this); }
+  void visit(NodeVisitor* v) const { v->visitLogicalAndOpr(*this); }
 };
 
 class LogicalOrOpr : public BinaryOperator {
@@ -248,7 +248,7 @@ class LogicalOrOpr : public BinaryOperator {
   LogicalOrOpr(NodePtr lhs, NodePtr rhs) : BinaryOperator(lhs, rhs) {}
   LogicalOrOpr(LogicalOrOpr const& o) : BinaryOperator(o) {}
 
-  void visit(NodeVisitor& v) const { v.visitLogicalOrOpr(*this); }
+  void visit(NodeVisitor *v) const { v->visitLogicalOrOpr(*this); }
 };
 
 class XorOpr : public BinaryOperator {
@@ -256,7 +256,7 @@ class XorOpr : public BinaryOperator {
   XorOpr(NodePtr lhs, NodePtr rhs) : BinaryOperator(lhs, rhs) {}
   XorOpr(XorOpr const& x) : BinaryOperator(x) {}
 
-  void visit(NodeVisitor& v) const { v.visitXorOpr(*this); }
+  void visit(NodeVisitor *v) const { v->visitXorOpr(*this); }
 };
 
 class EqualOpr : public BinaryOperator {
@@ -264,7 +264,7 @@ class EqualOpr : public BinaryOperator {
   EqualOpr(NodePtr lhs, NodePtr rhs) : BinaryOperator(lhs, rhs) {}
   EqualOpr(EqualOpr const& e) : BinaryOperator(e) {}
 
-  void visit(NodeVisitor& v) const { v.visitEqualOpr(*this); }
+  void visit(NodeVisitor *v) const { v->visitEqualOpr(*this); }
 };
 
 class NotEqualOpr : public BinaryOperator {
@@ -272,7 +272,7 @@ class NotEqualOpr : public BinaryOperator {
   NotEqualOpr(NodePtr lhs, NodePtr rhs) : BinaryOperator(lhs, rhs) {}
   NotEqualOpr(NotEqualOpr const& n) : BinaryOperator(n) {}
 
-  void visit(NodeVisitor& v) const { v.visitNotEqualOpr(*this); }
+  void visit(NodeVisitor *v) const { v->visitNotEqualOpr(*this); }
 };
 
 class LessOpr : public BinaryOperator {
@@ -280,7 +280,7 @@ class LessOpr : public BinaryOperator {
   LessOpr(NodePtr lhs, NodePtr rhs) : BinaryOperator(lhs, rhs) {}
   LessOpr(LessOpr const& l) : BinaryOperator(l) {}
 
-  void visit(NodeVisitor& v) const { v.visitLessOpr(*this); }
+  void visit(NodeVisitor *v) const { v->visitLessOpr(*this); }
 };
 
 class LessEqualOpr : public BinaryOperator {
@@ -288,7 +288,7 @@ class LessEqualOpr : public BinaryOperator {
   LessEqualOpr(NodePtr lhs, NodePtr rhs) : BinaryOperator(lhs, rhs) {}
   LessEqualOpr(LessEqualOpr const& l) : BinaryOperator(l) {}
 
-  void visit(NodeVisitor& v) const { v.visitLessEqualOpr(*this); }
+  void visit(NodeVisitor *v) const { v->visitLessEqualOpr(*this); }
 };
 
 class GreaterOpr : public BinaryOperator {
@@ -296,7 +296,7 @@ class GreaterOpr : public BinaryOperator {
   GreaterOpr(NodePtr lhs, NodePtr rhs) : BinaryOperator(lhs, rhs) {}
   GreaterOpr(GreaterOpr const& g) : BinaryOperator(g) {}
 
-  void visit(NodeVisitor& v) const { v.visitGreaterOpr(*this); }
+  void visit(NodeVisitor *v) const { v->visitGreaterOpr(*this); }
 };
 
 class GreaterEqualOpr : public BinaryOperator {
@@ -304,7 +304,7 @@ class GreaterEqualOpr : public BinaryOperator {
   GreaterEqualOpr(NodePtr lhs, NodePtr rhs) : BinaryOperator(lhs, rhs) {}
   GreaterEqualOpr(GreaterEqualOpr const& g) : BinaryOperator(g) {}
 
-  void visit(NodeVisitor& v) const { v.visitGreaterEqualOpr(*this); }
+  void visit(NodeVisitor *v) const { v->visitGreaterEqualOpr(*this); }
 };
 
 class PlusOpr : public BinaryOperator {
@@ -312,7 +312,7 @@ class PlusOpr : public BinaryOperator {
   PlusOpr(NodePtr lhs, NodePtr rhs) : BinaryOperator(lhs, rhs) {}
   PlusOpr(PlusOpr const& p) : BinaryOperator(p) {}
 
-  void visit(NodeVisitor& v) const { v.visitPlusOpr(*this); }
+  void visit(NodeVisitor *v) const { v->visitPlusOpr(*this); }
 };
 
 class MinusOpr : public BinaryOperator {
@@ -320,7 +320,7 @@ class MinusOpr : public BinaryOperator {
   MinusOpr(NodePtr lhs, NodePtr rhs) : BinaryOperator(lhs, rhs) {}
   MinusOpr(MinusOpr const& m) : BinaryOperator(m) {}
 
-  void visit(NodeVisitor& v) const { v.visitMinusOpr(*this); }
+  void visit(NodeVisitor *v) const { v->visitMinusOpr(*this); }
 };
 
 class MultipliesOpr : public BinaryOperator {
@@ -328,7 +328,7 @@ class MultipliesOpr : public BinaryOperator {
   MultipliesOpr(NodePtr lhs, NodePtr rhs) : BinaryOperator(lhs, rhs) {}
   MultipliesOpr(MultipliesOpr const& m) : BinaryOperator(m) {}
 
-  void visit(NodeVisitor& v) const { v.visitMultipliesOpr(*this); }
+  void visit(NodeVisitor *v) const { v->visitMultipliesOpr(*this); }
 };
 
 class DevideOpr : public BinaryOperator {
@@ -336,7 +336,7 @@ class DevideOpr : public BinaryOperator {
   DevideOpr(NodePtr lhs, NodePtr rhs) : BinaryOperator(lhs, rhs) {}
   DevideOpr(DevideOpr const& d) : BinaryOperator(d) {}
 
-  void visit(NodeVisitor& v) const { v.visitDevideOpr(*this); }
+  void visit(NodeVisitor *v) const { v->visitDevideOpr(*this); }
 };
 
 class ModuloOpr : public BinaryOperator {
@@ -344,7 +344,7 @@ class ModuloOpr : public BinaryOperator {
   ModuloOpr(NodePtr lhs, NodePtr rhs) : BinaryOperator(lhs, rhs) {}
   ModuloOpr(ModuloOpr const& m) : BinaryOperator(m) {}
 
-  void visit(NodeVisitor& v) const { v.visitModuloOpr(*this); }
+  void visit(NodeVisitor *v) const { v->visitModuloOpr(*this); }
 };
 
 class ShiftLeftOpr : public BinaryOperator {
@@ -352,7 +352,7 @@ class ShiftLeftOpr : public BinaryOperator {
   ShiftLeftOpr(NodePtr lhs, NodePtr rhs) : BinaryOperator(lhs, rhs) {}
   ShiftLeftOpr(ShiftLeftOpr const& s) : BinaryOperator(s) {}
 
-  void visit(NodeVisitor& v) const { v.visitShiftLeftOpr(*this); }
+  void visit(NodeVisitor *v) const { v->visitShiftLeftOpr(*this); }
 };
 
 class ShiftRightOpr : public BinaryOperator {
@@ -360,7 +360,7 @@ class ShiftRightOpr : public BinaryOperator {
   ShiftRightOpr(NodePtr lhs, NodePtr rhs) : BinaryOperator(lhs, rhs) {}
   ShiftRightOpr(ShiftRightOpr const& s) : BinaryOperator(s) {}
 
-  void visit(NodeVisitor& v) const { v.visitShiftRightOpr(*this); }
+  void visit(NodeVisitor *v) const { v->visitShiftRightOpr(*this); }
 };
 
 class VectorAccess : public BinaryExpression {
@@ -368,7 +368,7 @@ class VectorAccess : public BinaryExpression {
   VectorAccess(NodePtr lhs, NodePtr rhs) : BinaryExpression(lhs, rhs) {}
   VectorAccess(VectorAccess const& v) : BinaryExpression(v) {}
 
-  void visit(NodeVisitor& v) const { v.visitVectorAccess(*this); }
+  void visit(NodeVisitor *v) const { v->visitVectorAccess(*this); }
 };
 
 class TernaryExpression : public Node {
@@ -382,7 +382,7 @@ class TernaryExpression : public Node {
   }
 
  public:
-  virtual void visit(NodeVisitor& v) const { v.visitTernaryExpr(*this); }
+  virtual void visit(NodeVisitor *v) const { v->visitTernaryExpr(*this); }
 
   NodePtr a() const { return a_; }
   NodePtr b() const { return b_; }
@@ -399,7 +399,7 @@ class IfThenElse : public TernaryExpression {
   IfThenElse(NodePtr a, NodePtr b, NodePtr c) : TernaryExpression(a, b, c) {}
   IfThenElse(IfThenElse const& t) : TernaryExpression(t) {}
 
-  void visit(NodeVisitor& v) const { v.visitIfThenElse(*this); }
+  void visit(NodeVisitor *v) const { v->visitIfThenElse(*this); }
 };
 
 class ForEach : public BinaryOperator {
@@ -407,7 +407,7 @@ class ForEach : public BinaryOperator {
   ForEach(NodePtr a, NodePtr b) : BinaryOperator(a, b) {}
   ForEach(ForEach const& fe) : BinaryOperator(fe) {}
 
-  void visit(NodeVisitor& v) const { v.visitForEach(*this); }
+  void visit(NodeVisitor *v) const { v->visitForEach(*this); }
 };
 
 class Unique : public UnaryOperator {
@@ -415,7 +415,7 @@ class Unique : public UnaryOperator {
   explicit Unique(NodePtr a) : UnaryOperator(a) {}
   Unique(Unique const& u) : UnaryOperator(u) {}
 
-  void visit(NodeVisitor& v) const { v.visitUnique(*this); }
+  void visit(NodeVisitor *v) const { v->visitUnique(*this); }
 };
 
 class Bitslice : public UnaryExpression {
@@ -424,7 +424,7 @@ class Bitslice : public UnaryExpression {
 
   Bitslice(Bitslice const& b) : UnaryExpression(b), r_(b.r_), l_(b.l_) {}
 
-  void visit(NodeVisitor& v) const { v.visitBitslice(*this); }
+  void visit(NodeVisitor *v) const { v->visitBitslice(*this); }
 
   int r() const { return r_; }
   int l() const { return l_; }

@@ -10,21 +10,21 @@ void EvalVisitor::visitNode(const Node&) {}
 
 void EvalVisitor::visitTerminal(const Terminal& t) {}
 
-void EvalVisitor::visitUnaryExpr(const UnaryExpression& u) { u.child()->visit(*this); }
+void EvalVisitor::visitUnaryExpr(const UnaryExpression& u) { u.child()->visit(this); }
 
 void EvalVisitor::visitUnaryOpr(const UnaryOperator&) {}
 
 void EvalVisitor::visitBinaryExpr(const BinaryExpression& b) {
-  b.lhs()->visit(*this);
-  b.rhs()->visit(*this);
+  b.lhs()->visit(this);
+  b.rhs()->visit(this);
 }
 
 void EvalVisitor::visitBinaryOpr(const BinaryOperator&) {}
 
 void EvalVisitor::visitTernaryExpr(const TernaryExpression& t) {
-  t.a()->visit(*this);
-  t.b()->visit(*this);
-  t.c()->visit(*this);
+  t.a()->visit(this);
+  t.b()->visit(this);
+  t.c()->visit(this);
 }
 
 void EvalVisitor::visitPlaceholder(const Placeholder&) {}

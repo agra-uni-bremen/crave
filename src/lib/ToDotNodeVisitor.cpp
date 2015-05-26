@@ -8,7 +8,7 @@ namespace crave {
 
 std::ostream &Node::printDot(std::ostream &out) const {
   ToDotVisitor v(out);
-  this->visit(v);
+  this->visit(&v);
   return out;
 }
 
@@ -24,27 +24,27 @@ void ToDotVisitor::visitNode(Node const &n) { out_ << "\t" << reinterpret_cast<l
 void ToDotVisitor::visitTerminal(Terminal const &t) { out_ << " is " << (t.sign() ? "s" : "u") << t.bitsize(); }
 
 void ToDotVisitor::visitUnaryExpr(UnaryExpression const &ue) {
-  ue.child()->visit(*this);
+  ue.child()->visit(this);
   out_ << "\t" << reinterpret_cast<long>(&ue) << " -> " << reinterpret_cast<long>(ue.child().get()) << std::endl;
 }
 
 void ToDotVisitor::visitUnaryOpr(UnaryOperator const &uo) { out_ << "UnOp"; }
 
 void ToDotVisitor::visitBinaryExpr(BinaryExpression const &be) {
-  be.lhs()->visit(*this);
+  be.lhs()->visit(this);
   out_ << "\t" << reinterpret_cast<long>(&be) << " -> " << reinterpret_cast<long>(be.lhs().get()) << std::endl;
-  be.rhs()->visit(*this);
+  be.rhs()->visit(this);
   out_ << "\t" << reinterpret_cast<long>(&be) << " -> " << reinterpret_cast<long>(be.rhs().get()) << std::endl;
 }
 
 void ToDotVisitor::visitBinaryOpr(BinaryOperator const &) { out_ << "BinOp"; }
 
 void ToDotVisitor::visitTernaryExpr(TernaryExpression const &te) {
-  te.a()->visit(*this);
+  te.a()->visit(this);
   out_ << "\t" << reinterpret_cast<long>(&te) << " -> " << reinterpret_cast<long>(te.a().get()) << std::endl;
-  te.b()->visit(*this);
+  te.b()->visit(this);
   out_ << "\t" << reinterpret_cast<long>(&te) << " -> " << reinterpret_cast<long>(te.b().get()) << std::endl;
-  te.c()->visit(*this);
+  te.c()->visit(this);
   out_ << "\t" << reinterpret_cast<long>(&te) << " -> " << reinterpret_cast<long>(te.c().get()) << std::endl;
 }
 

@@ -10,21 +10,21 @@ void FixWidthVisitor::visitNode(const Node&) {}
 
 void FixWidthVisitor::visitTerminal(const Terminal&) {}
 
-void FixWidthVisitor::visitUnaryExpr(const UnaryExpression& u) { u.child()->visit(*this); }
+void FixWidthVisitor::visitUnaryExpr(const UnaryExpression& u) { u.child()->visit(this); }
 
 void FixWidthVisitor::visitUnaryOpr(const UnaryOperator&) {}
 
 void FixWidthVisitor::visitBinaryExpr(const BinaryExpression& b) {
-  b.lhs()->visit(*this);
-  b.rhs()->visit(*this);
+  b.lhs()->visit(this);
+  b.rhs()->visit(this);
 }
 
 void FixWidthVisitor::visitBinaryOpr(const BinaryOperator&) {}
 
 void FixWidthVisitor::visitTernaryExpr(const TernaryExpression& t) {
-  t.a()->visit(*this);
-  t.b()->visit(*this);
-  t.c()->visit(*this);
+  t.a()->visit(this);
+  t.b()->visit(this);
+  t.c()->visit(this);
 }
 
 void FixWidthVisitor::visitPlaceholder(const Placeholder& pl) {
