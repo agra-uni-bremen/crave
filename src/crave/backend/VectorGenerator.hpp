@@ -109,7 +109,7 @@ struct VectorGenerator {
     return true;
   }
 
-  void reset(std::vector<VectorConstraintPtr>& v) {
+  void reset(const std::vector<VectorConstraintPtr>& v) {
     vector_solvers.clear();
     BOOST_FOREACH(VectorConstraintPtr vc, v) { addConstraint(vc); }
   }
