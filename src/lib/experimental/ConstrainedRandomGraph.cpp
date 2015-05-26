@@ -21,7 +21,8 @@ void Selector::accept(NodeVisitor& v) { v.visitSelector(*this); }
 void Sequence::accept(NodeVisitor& v) { v.visitSequence(*this); }
 
 struct Executor : NodeVisitor {
-  Executor(NodePtr r) : m_root(r), m_rules(global_rule_map), m_id(0), m_path_count(0) {}
+  Executor(NodePtr r)
+      : m_root(r), m_rules(global_rule_map), m_id(0), m_path_count(0) {}
 
   virtual void visitTerminal(Terminal&);
   virtual void visitSelector(Selector&);
@@ -64,28 +65,32 @@ void Executor::dfs(int v) {
     BOOST_ASSERT_MSG(v == 2, "Invalid end of unfolded sequence");
     m_path_count++;
     // reset coverage of all rand_objs on the new path
-    BOOST_FOREACH(int i, path) {
-      if (m_main_to_rule_map.find(i) != m_main_to_rule_map.end()) m_main_to_rule_map[i]->reset_coverage();
+    BOOST_FOREACH (int i, path) {
+      if (m_main_to_rule_map.find(i) != m_main_to_rule_map.end())
+        m_main_to_rule_map[i]->reset_coverage();
     }
     int iter_count = 0;
     while (true) {  // repeat until path is covered
       iter_count++;
-      BOOST_FOREACH(int i, path) {
-        if (m_actions.find(i) != m_actions.end() && m_actions[i]) m_actions[i]();
+      BOOST_FOREACH (int i, path) {
+        if (m_actions.find(i) != m_actions.end() && m_actions[i])
+          m_actions[i]();
       }
       bool path_covered = true;
-      BOOST_FOREACH(int i, path) {
-        if (m_main_to_rule_map.find(i) != m_main_to_rule_map.end() && !m_main_to_rule_map[i]->is_rand_obj_covered()) {
+      BOOST_FOREACH (int i, path) {
+        if (m_main_to_rule_map.find(i) != m_main_to_rule_map.end() &&
+            !m_main_to_rule_map[i]->is_rand_obj_covered()) {
           path_covered = false;
           break;
         }
       }
       if (path_covered) break;
     }
-    LOG(INFO) << "Path " << m_path_count << " is covered after " << iter_count << " iteration(s)";
+    LOG(INFO) << "Path " << m_path_count << " is covered after " << iter_count
+              << " iteration(s)";
   } else {
     std::vector<int>& adj = m_adj[v];
-    BOOST_FOREACH(int i, adj) { dfs(i); }
+    BOOST_FOREACH (int i, adj) { dfs(i); }
   }
   path.pop_back();
 }
@@ -120,7 +125,7 @@ void Executor::visitSelector(Selector& nt) {
 
   make_edge(start, start + 1);
 
-  BOOST_FOREACH(NodePtr n, nt.children) {
+  BOOST_FOREACH (NodePtr n, nt.children) {
     n->accept(*this);
     result_type& r = m_stack.top();
     m_stack.pop();
@@ -148,7 +153,7 @@ void Executor::visitSequence(Sequence& nt) {
   make_edge(start, start + 1);
 
   int last = start + 1;
-  BOOST_FOREACH(NodePtr n, nt.children) {
+  BOOST_FOREACH (NodePtr n, nt.children) {
     n->accept(*this);
     result_type& r = m_stack.top();
     m_stack.pop();
@@ -234,8 +239,8 @@ void test4() {
   NAMED_RULE(i);
   NAMED_RULE(j);
 
-  context(a = b | c | d)
-  (b = c >> d >> e)(c = f | g | (i >> j) | e)(d = i >> c >> h)(g = i | j)(h = (i >> j) | (j >> i));
+  context(a = b | c | d)(b = c >> d >> e)(c = f | g | (i >> j) | e)(
+      d = i >> c >> h)(g = i | j)(h = (i >> j) | (j >> i));
 
   context.display_graph(a);
 }

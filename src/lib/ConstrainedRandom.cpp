@@ -1,7 +1,5 @@
 // Copyright 2014 The CRAVE developers. All rights reserved.//
 
-
-
 #include <glog/logging.h>
 #include <boost/filesystem.hpp>
 
@@ -45,12 +43,10 @@ struct random_bit_gen {
 
 boost::function0<bool> random_bit = random_bit_gen();
 
-void set_global_seed(unsigned int s) {
-  rng.seed(s);
-}
+void set_global_seed(unsigned int s) { rng.seed(s); }
 
 void set_solver_backend(std::string const& type) {
-    FactoryMetaSMT::setSolverType(type);
+  FactoryMetaSMT::setSolverType(type);
 }
 
 std::string config_file_name = "crave.cfg";
@@ -94,7 +90,7 @@ void init(std::string const& cfg_file) {
 std::ostream& rand_obj::print_dot_graph(std::ostream& os, bool root = true) {
   if (root) os << "digraph AST {" << std::endl;
   for (uint i = 0; i < objChildren.size(); i++) {
-      objChildren[i]->print_dot_graph(os, false);
+    objChildren[i]->print_dot_graph(os, false);
   }
   constraint.printDotGraph(os, false);
   if (root) os << "}" << std::endl;

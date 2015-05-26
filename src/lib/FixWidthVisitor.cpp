@@ -10,7 +10,9 @@ void FixWidthVisitor::visitNode(const Node&) {}
 
 void FixWidthVisitor::visitTerminal(const Terminal&) {}
 
-void FixWidthVisitor::visitUnaryExpr(const UnaryExpression& u) { u.child()->visit(this); }
+void FixWidthVisitor::visitUnaryExpr(const UnaryExpression& u) {
+  u.child()->visit(this);
+}
 
 void FixWidthVisitor::visitUnaryOpr(const UnaryOperator&) {}
 
@@ -85,7 +87,8 @@ void FixWidthVisitor::visitExtendExpr(const ExtendExpression& e) {
   stack_entry entry;
   pop(entry);
 
-  exprStack_.push(std::make_pair(new ExtendExpression(entry.first, e.value()), entry.second));
+  exprStack_.push(std::make_pair(new ExtendExpression(entry.first, e.value()),
+                                 entry.second));
 }
 
 void FixWidthVisitor::visitAndOpr(const AndOpr& a) {
@@ -169,56 +172,64 @@ void FixWidthVisitor::visitPlusOpr(const PlusOpr& p) {
   stack_entry lhs, rhs;
   evalBinExpr(p, lhs, rhs);
 
-  exprStack_.push(std::make_pair(new PlusOpr(lhs.first, rhs.first), lhs.second));
+  exprStack_.push(
+      std::make_pair(new PlusOpr(lhs.first, rhs.first), lhs.second));
 }
 
 void FixWidthVisitor::visitMinusOpr(const MinusOpr& m) {
   stack_entry lhs, rhs;
   evalBinExpr(m, lhs, rhs);
 
-  exprStack_.push(std::make_pair(new MinusOpr(lhs.first, rhs.first), lhs.second));
+  exprStack_.push(
+      std::make_pair(new MinusOpr(lhs.first, rhs.first), lhs.second));
 }
 
 void FixWidthVisitor::visitMultipliesOpr(const MultipliesOpr& m) {
   stack_entry lhs, rhs;
   evalBinExpr(m, lhs, rhs);
 
-  exprStack_.push(std::make_pair(new MultipliesOpr(lhs.first, rhs.first), lhs.second));
+  exprStack_.push(
+      std::make_pair(new MultipliesOpr(lhs.first, rhs.first), lhs.second));
 }
 
 void FixWidthVisitor::visitDevideOpr(const DevideOpr& d) {
   stack_entry lhs, rhs;
   evalBinExpr(d, lhs, rhs);
 
-  exprStack_.push(std::make_pair(new DevideOpr(lhs.first, rhs.first), lhs.second));
+  exprStack_.push(
+      std::make_pair(new DevideOpr(lhs.first, rhs.first), lhs.second));
 }
 
 void FixWidthVisitor::visitModuloOpr(const ModuloOpr& m) {
   stack_entry lhs, rhs;
   evalBinExpr(m, lhs, rhs);
 
-  exprStack_.push(std::make_pair(new ModuloOpr(lhs.first, rhs.first), lhs.second));
+  exprStack_.push(
+      std::make_pair(new ModuloOpr(lhs.first, rhs.first), lhs.second));
 }
 
 void FixWidthVisitor::visitShiftLeftOpr(const ShiftLeftOpr& shl) {
   stack_entry lhs, rhs;
   evalBinExpr(shl, lhs, rhs);
 
-  exprStack_.push(std::make_pair(new ShiftLeftOpr(lhs.first, rhs.first), lhs.second));
+  exprStack_.push(
+      std::make_pair(new ShiftLeftOpr(lhs.first, rhs.first), lhs.second));
 }
 
 void FixWidthVisitor::visitShiftRightOpr(const ShiftRightOpr& shr) {
   stack_entry lhs, rhs;
   evalBinExpr(shr, lhs, rhs);
 
-  exprStack_.push(std::make_pair(new ShiftRightOpr(lhs.first, rhs.first), lhs.second));
+  exprStack_.push(
+      std::make_pair(new ShiftRightOpr(lhs.first, rhs.first), lhs.second));
 }
 
 void FixWidthVisitor::visitVectorAccess(const VectorAccess& va) {
   stack_entry lhs, rhs;
   evalBinExpr(va, lhs, rhs, false);
 
-  exprStack_.push(std::make_pair(new VectorAccess(lhs.first, rhs.first), lhs.second));
+  exprStack_.push(
+      std::make_pair(new VectorAccess(lhs.first, rhs.first), lhs.second));
 }
 
 void FixWidthVisitor::visitForEach(const ForEach& fe) {
@@ -241,7 +252,8 @@ void FixWidthVisitor::visitIfThenElse(const IfThenElse& ite) {
   stack_entry a, b, c;
   evalTernExpr(ite, a, b, c);
 
-  exprStack_.push(std::make_pair(new IfThenElse(a.first, b.first, c.first), a.second));
+  exprStack_.push(
+      std::make_pair(new IfThenElse(a.first, b.first, c.first), a.second));
 }
 
 void FixWidthVisitor::visitBitslice(const Bitslice& b) {
@@ -250,7 +262,8 @@ void FixWidthVisitor::visitBitslice(const Bitslice& b) {
   stack_entry e;
   pop(e);
 
-  exprStack_.push(std::make_pair(new Bitslice(e.first, b.r(), b.l()), b.r() - b.l() + 1));
+  exprStack_.push(
+      std::make_pair(new Bitslice(e.first, b.r(), b.l()), b.r() - b.l() + 1));
 }
 
 }  // end namespace crave

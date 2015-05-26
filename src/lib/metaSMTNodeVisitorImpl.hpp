@@ -27,14 +27,22 @@ using metaSMT::evaluate;
 
 extern boost::mt19937 rng;
 struct RNG {
-  unsigned operator()(unsigned i) { return boost::uniform_int<>(0, i - 1)(rng); }
+  unsigned operator()(unsigned i) {
+    return boost::uniform_int<>(0, i - 1)(rng);
+  }
 } rng_;
 
 template <typename SolverType>
 class metaSMTVisitorImpl : public metaSMTVisitor {
  public:
   metaSMTVisitorImpl()
-      : metaSMTVisitor(), solver_(), exprStack_(), terminals_(), softs_(), assumptions_(), suggestions_() {}
+      : metaSMTVisitor(),
+        solver_(),
+        exprStack_(),
+        terminals_(),
+        softs_(),
+        assumptions_(),
+        suggestions_() {}
 
   virtual void visitNode(Node const &);
   virtual void visitTerminal(Terminal const &);
@@ -81,10 +89,12 @@ class metaSMTVisitorImpl : public metaSMTVisitor {
   virtual void makeSuggestion(Node const &);
   virtual void makeAssumption(Node const &);
   virtual std::vector<unsigned int> analyseSofts(bool exact);
-  virtual std::vector<std::vector<unsigned int> > analyseContradiction(std::map<unsigned int, NodePtr> const &);
+  virtual std::vector<std::vector<unsigned int> > analyseContradiction(
+      std::map<unsigned int, NodePtr> const &);
   virtual bool solve(bool ignoreSofts);
   virtual bool read(Node const &var, AssignResult &);
-  virtual bool readVector(const std::vector<VariablePtr> &vec, __rand_vec_base *rand_vec);
+  virtual bool readVector(const std::vector<VariablePtr> &vec,
+                          __rand_vec_base *rand_vec);
 
  private:  // typedefs
   typedef typename SolverType::result_type result_type;
@@ -95,8 +105,10 @@ class metaSMTVisitorImpl : public metaSMTVisitor {
   inline void pop(stack_entry &fst);
   inline void pop2(stack_entry &fst, stack_entry &snd);
   inline void pop3(stack_entry &fst, stack_entry &snd, stack_entry &trd);
-  void evalBinExpr(BinaryExpression const &expr, stack_entry &fst, stack_entry &snd);
-  void evalTernExpr(TernaryExpression const &expr, stack_entry &fst, stack_entry &snd, stack_entry &trd);
+  void evalBinExpr(BinaryExpression const &expr, stack_entry &fst,
+                   stack_entry &snd);
+  void evalTernExpr(TernaryExpression const &expr, stack_entry &fst,
+                    stack_entry &snd, stack_entry &trd);
 
  private:  // data
   SolverType solver_;
@@ -115,7 +127,8 @@ inline void metaSMTVisitorImpl<SolverType>::pop(stack_entry &fst) {
 }
 
 template <typename SolverType>
-inline void metaSMTVisitorImpl<SolverType>::pop2(stack_entry &fst, stack_entry &snd) {
+inline void metaSMTVisitorImpl<SolverType>::pop2(stack_entry &fst,
+                                                 stack_entry &snd) {
   assert(exprStack_.size() >= 2);
   fst = exprStack_.top();
   exprStack_.pop();
@@ -124,7 +137,9 @@ inline void metaSMTVisitorImpl<SolverType>::pop2(stack_entry &fst, stack_entry &
 }
 
 template <typename SolverType>
-inline void metaSMTVisitorImpl<SolverType>::pop3(stack_entry &fst, stack_entry &snd, stack_entry &trd) {
+inline void metaSMTVisitorImpl<SolverType>::pop3(stack_entry &fst,
+                                                 stack_entry &snd,
+                                                 stack_entry &trd) {
   assert(exprStack_.size() >= 3);
   fst = exprStack_.top();
   exprStack_.pop();
@@ -135,13 +150,17 @@ inline void metaSMTVisitorImpl<SolverType>::pop3(stack_entry &fst, stack_entry &
 }
 
 template <typename SolverType>
-void metaSMTVisitorImpl<SolverType>::evalBinExpr(BinaryExpression const &expr, stack_entry &fst, stack_entry &snd) {
+void metaSMTVisitorImpl<SolverType>::evalBinExpr(BinaryExpression const &expr,
+                                                 stack_entry &fst,
+                                                 stack_entry &snd) {
   visitBinaryExpr(expr);
   pop2(snd, fst);
 }
 
 template <typename SolverType>
-void metaSMTVisitorImpl<SolverType>::evalTernExpr(TernaryExpression const &expr, stack_entry &fst, stack_entry &snd,
+void metaSMTVisitorImpl<SolverType>::evalTernExpr(TernaryExpression const &expr,
+                                                  stack_entry &fst,
+                                                  stack_entry &snd,
                                                   stack_entry &trd) {
   visitTernaryExpr(expr);
   pop3(trd, snd, fst);
@@ -162,7 +181,8 @@ template <typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitUnaryOpr(UnaryOperator const &) {}
 
 template <typename SolverType>
-void metaSMTVisitorImpl<SolverType>::visitBinaryExpr(BinaryExpression const &be) {
+void metaSMTVisitorImpl<SolverType>::visitBinaryExpr(
+    BinaryExpression const &be) {
   be.lhs()->visit(this);
   be.rhs()->visit(this);
 }
@@ -171,7 +191,8 @@ template <typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitBinaryOpr(BinaryOperator const &) {}
 
 template <typename SolverType>
-void metaSMTVisitorImpl<SolverType>::visitTernaryExpr(TernaryExpression const &te) {
+void metaSMTVisitorImpl<SolverType>::visitTernaryExpr(
+    TernaryExpression const &te) {
   te.a()->visit(this);
   te.b()->visit(this);
   te.c()->visit(this);
@@ -185,7 +206,8 @@ void metaSMTVisitorImpl<SolverType>::visitVariableExpr(VariableExpr const &ve) {
   typename result_map::iterator ite(terminals_.lower_bound(ve.id()));
 
   result_type result;
-  if (ite != terminals_.end() && !(terminals_.key_comp()(ve.id(), ite->first))) {
+  if (ite != terminals_.end() &&
+      !(terminals_.key_comp()(ve.id(), ite->first))) {
     // &t already exists
     result = ite->second;
   } else {
@@ -201,9 +223,13 @@ void metaSMTVisitorImpl<SolverType>::visitVariableExpr(VariableExpr const &ve) {
 
 template <typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitConstant(Constant const &c) {
-  result_type result = c.isBool() ? (c.value() ? evaluate(solver_, preds::True) : evaluate(solver_, preds::False))
-                                  : (c.sign() ? evaluate(solver_, qf_bv::bvsint(c.value(), c.bitsize()))
-                                              : evaluate(solver_, qf_bv::bvuint(c.value(), c.bitsize())));
+  result_type result =
+      c.isBool()
+          ? (c.value() ? evaluate(solver_, preds::True)
+                       : evaluate(solver_, preds::False))
+          : (c.sign()
+                 ? evaluate(solver_, qf_bv::bvsint(c.value(), c.bitsize()))
+                 : evaluate(solver_, qf_bv::bvuint(c.value(), c.bitsize())));
   exprStack_.push(std::make_pair(result, c.sign()));
 }
 
@@ -230,7 +256,8 @@ void metaSMTVisitorImpl<SolverType>::visitNegOpr(NegOpr const &o) {
 }
 
 template <typename SolverType>
-void metaSMTVisitorImpl<SolverType>::visitComplementOpr(ComplementOpr const &o) {
+void metaSMTVisitorImpl<SolverType>::visitComplementOpr(
+    ComplementOpr const &o) {
   visitUnaryExpr(o);
 
   stack_entry entry;
@@ -248,18 +275,20 @@ void metaSMTVisitorImpl<SolverType>::visitInside(Inside const &in) {
   pop(entry);
 
   result_type result = evaluate(solver_, preds::False);
-  BOOST_FOREACH(Constant c, in.collection()) {
+  BOOST_FOREACH (Constant c, in.collection()) {
     stack_entry constExpr;
     c.visit(this);
     pop(constExpr);
-    result = evaluate(solver_, preds::Or(result, preds::equal(entry.first, constExpr.first)));
+    result = evaluate(
+        solver_, preds::Or(result, preds::equal(entry.first, constExpr.first)));
   }
 
   exprStack_.push(std::make_pair(result, false));
 }
 
 template <typename SolverType>
-void metaSMTVisitorImpl<SolverType>::visitExtendExpr(ExtendExpression const &e) {
+void metaSMTVisitorImpl<SolverType>::visitExtendExpr(
+    ExtendExpression const &e) {
   visitUnaryExpr(e);
 
   stack_entry entry;
@@ -293,7 +322,8 @@ void metaSMTVisitorImpl<SolverType>::visitOrOpr(OrOpr const &o) {
 }
 
 template <typename SolverType>
-void metaSMTVisitorImpl<SolverType>::visitLogicalAndOpr(LogicalAndOpr const &o) {
+void metaSMTVisitorImpl<SolverType>::visitLogicalAndOpr(
+    LogicalAndOpr const &o) {
   stack_entry fst, snd;
   evalBinExpr(o, fst, snd);
 
@@ -353,9 +383,11 @@ void metaSMTVisitorImpl<SolverType>::visitLessOpr(LessOpr const &o) {
   } else if (!(lhs_signed || rhs_signed)) {
     result = evaluate(solver_, qf_bv::bvult(lhs, rhs));
   } else if (lhs_signed) {
-    result = evaluate(solver_, qf_bv::bvslt(qf_bv::sign_extend(1, lhs), qf_bv::zero_extend(1, rhs)));
+    result = evaluate(solver_, qf_bv::bvslt(qf_bv::sign_extend(1, lhs),
+                                            qf_bv::zero_extend(1, rhs)));
   } else {
-    result = evaluate(solver_, qf_bv::bvslt(qf_bv::zero_extend(1, lhs), qf_bv::sign_extend(1, rhs)));
+    result = evaluate(solver_, qf_bv::bvslt(qf_bv::zero_extend(1, lhs),
+                                            qf_bv::sign_extend(1, rhs)));
   }
   exprStack_.push(std::make_pair(result, false));
 }
@@ -376,9 +408,11 @@ void metaSMTVisitorImpl<SolverType>::visitLessEqualOpr(LessEqualOpr const &o) {
   } else if (!(lhs_signed || rhs_signed)) {
     result = evaluate(solver_, qf_bv::bvule(lhs, rhs));
   } else if (lhs_signed) {
-    result = evaluate(solver_, qf_bv::bvsle(qf_bv::sign_extend(1, lhs), qf_bv::zero_extend(1, rhs)));
+    result = evaluate(solver_, qf_bv::bvsle(qf_bv::sign_extend(1, lhs),
+                                            qf_bv::zero_extend(1, rhs)));
   } else {
-    result = evaluate(solver_, qf_bv::bvsle(qf_bv::zero_extend(1, lhs), qf_bv::sign_extend(1, rhs)));
+    result = evaluate(solver_, qf_bv::bvsle(qf_bv::zero_extend(1, lhs),
+                                            qf_bv::sign_extend(1, rhs)));
   }
   exprStack_.push(std::make_pair(result, false));
 }
@@ -399,15 +433,18 @@ void metaSMTVisitorImpl<SolverType>::visitGreaterOpr(GreaterOpr const &o) {
   } else if (!(lhs_signed || rhs_signed)) {
     result = evaluate(solver_, qf_bv::bvugt(lhs, rhs));
   } else if (lhs_signed) {
-    result = evaluate(solver_, qf_bv::bvsgt(qf_bv::sign_extend(1, lhs), qf_bv::zero_extend(1, rhs)));
+    result = evaluate(solver_, qf_bv::bvsgt(qf_bv::sign_extend(1, lhs),
+                                            qf_bv::zero_extend(1, rhs)));
   } else {
-    result = evaluate(solver_, qf_bv::bvsgt(qf_bv::zero_extend(1, lhs), qf_bv::sign_extend(1, rhs)));
+    result = evaluate(solver_, qf_bv::bvsgt(qf_bv::zero_extend(1, lhs),
+                                            qf_bv::sign_extend(1, rhs)));
   }
   exprStack_.push(std::make_pair(result, false));
 }
 
 template <typename SolverType>
-void metaSMTVisitorImpl<SolverType>::visitGreaterEqualOpr(GreaterEqualOpr const &o) {
+void metaSMTVisitorImpl<SolverType>::visitGreaterEqualOpr(
+    GreaterEqualOpr const &o) {
   stack_entry rhs_p, lhs_p;
   evalBinExpr(o, lhs_p, rhs_p);
 
@@ -422,9 +459,11 @@ void metaSMTVisitorImpl<SolverType>::visitGreaterEqualOpr(GreaterEqualOpr const 
   } else if (!(lhs_signed || rhs_signed)) {
     result = evaluate(solver_, qf_bv::bvuge(lhs, rhs));
   } else if (lhs_signed) {
-    result = evaluate(solver_, qf_bv::bvsge(qf_bv::sign_extend(1, lhs), qf_bv::zero_extend(1, rhs)));
+    result = evaluate(solver_, qf_bv::bvsge(qf_bv::sign_extend(1, lhs),
+                                            qf_bv::zero_extend(1, rhs)));
   } else {
-    result = evaluate(solver_, qf_bv::bvsge(qf_bv::zero_extend(1, lhs), qf_bv::sign_extend(1, rhs)));
+    result = evaluate(solver_, qf_bv::bvsge(qf_bv::zero_extend(1, lhs),
+                                            qf_bv::sign_extend(1, rhs)));
   }
   exprStack_.push(std::make_pair(result, false));
 }
@@ -448,7 +487,8 @@ void metaSMTVisitorImpl<SolverType>::visitMinusOpr(MinusOpr const &o) {
 }
 
 template <typename SolverType>
-void metaSMTVisitorImpl<SolverType>::visitMultipliesOpr(MultipliesOpr const &o) {
+void metaSMTVisitorImpl<SolverType>::visitMultipliesOpr(
+    MultipliesOpr const &o) {
   stack_entry fst, snd;
   evalBinExpr(o, fst, snd);
 
@@ -472,9 +512,11 @@ void metaSMTVisitorImpl<SolverType>::visitDevideOpr(DevideOpr const &o) {
   } else if (!(lhs_signed || rhs_signed)) {
     result = evaluate(solver_, qf_bv::bvudiv(lhs, rhs));
   } else if (lhs_signed) {
-    result = evaluate(solver_, qf_bv::bvsdiv(qf_bv::sign_extend(1, lhs), qf_bv::zero_extend(1, rhs)));
+    result = evaluate(solver_, qf_bv::bvsdiv(qf_bv::sign_extend(1, lhs),
+                                             qf_bv::zero_extend(1, rhs)));
   } else {
-    result = evaluate(solver_, qf_bv::bvsdiv(qf_bv::zero_extend(1, lhs), qf_bv::sign_extend(1, rhs)));
+    result = evaluate(solver_, qf_bv::bvsdiv(qf_bv::zero_extend(1, lhs),
+                                             qf_bv::sign_extend(1, rhs)));
   }
   exprStack_.push(std::make_pair(result, lhs_signed || rhs_signed));
 }
@@ -507,7 +549,8 @@ void metaSMTVisitorImpl<SolverType>::visitShiftLeftOpr(ShiftLeftOpr const &o) {
 }
 
 template <typename SolverType>
-void metaSMTVisitorImpl<SolverType>::visitShiftRightOpr(ShiftRightOpr const &o) {
+void metaSMTVisitorImpl<SolverType>::visitShiftRightOpr(
+    ShiftRightOpr const &o) {
   stack_entry fst, snd;
   evalBinExpr(o, fst, snd);
 
@@ -520,8 +563,11 @@ void metaSMTVisitorImpl<SolverType>::visitIfThenElse(IfThenElse const &ite) {
   stack_entry fst, snd, trd;
   evalTernExpr(ite, fst, snd, trd);
 
-  result_type result = evaluate(solver_, preds::Ite(preds::equal(fst.first, preds::True), snd.first, trd.first));
-  exprStack_.push(std::make_pair(result, fst.second || snd.second || trd.second));
+  result_type result = evaluate(
+      solver_,
+      preds::Ite(preds::equal(fst.first, preds::True), snd.first, trd.first));
+  exprStack_.push(
+      std::make_pair(result, fst.second || snd.second || trd.second));
 }
 
 template <typename SolverType>
@@ -531,14 +577,16 @@ void metaSMTVisitorImpl<SolverType>::visitBitslice(Bitslice const &b) {
   stack_entry entry;
   pop(entry);
 
-  result_type result = evaluate(solver_, qf_bv::extract(b.r(), b.l(), entry.first));
+  result_type result =
+      evaluate(solver_, qf_bv::extract(b.r(), b.l(), entry.first));
 
   exprStack_.push(std::make_pair(result, false));
 }
 
 template <typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitVectorAccess(VectorAccess const &o) {
-  throw std::runtime_error("VectorAccess is not allowed in metaSMTNodeVisitor.");
+  throw std::runtime_error(
+      "VectorAccess is not allowed in metaSMTNodeVisitor.");
 }
 template <typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitVectorExpr(VectorExpr const &ve) {
@@ -590,11 +638,13 @@ void metaSMTVisitorImpl<SolverType>::makeAssumption(Node const &expr) {
   stack_entry entry;
   pop(entry);
 
-  assumptions_.push_back(evaluate(solver_, preds::equal(entry.first, preds::True)));
+  assumptions_.push_back(
+      evaluate(solver_, preds::equal(entry.first, preds::True)));
 }
 
 template <typename SolverType>
-std::vector<unsigned int> metaSMTVisitorImpl<SolverType>::analyseSofts(bool exact) {
+std::vector<unsigned int> metaSMTVisitorImpl<SolverType>::analyseSofts(
+    bool exact) {
   std::vector<unsigned int> result;
   // implements soft constraint semantics of the HVL e
   for (unsigned int i = 0; i < softs_.size(); i++) {
@@ -612,14 +662,15 @@ std::vector<unsigned int> metaSMTVisitorImpl<SolverType>::analyseSofts(bool exac
 }
 
 template <typename SolverType>
-std::vector<std::vector<unsigned int> > metaSMTVisitorImpl<SolverType>::analyseContradiction(
+std::vector<std::vector<unsigned int> >
+metaSMTVisitorImpl<SolverType>::analyseContradiction(
     std::map<unsigned int, NodePtr> const &s) {
   std::vector<std::vector<unsigned int> > results;
   std::map<unsigned int, result_type> result_map;
 
   typedef std::pair<unsigned int, NodePtr> NodePair;
 
-  BOOST_FOREACH(NodePair entry, s) {
+  BOOST_FOREACH (NodePair entry, s) {
     entry.second->visit(this);
     stack_entry st_entry;
     pop(st_entry);
@@ -629,7 +680,8 @@ std::vector<std::vector<unsigned int> > metaSMTVisitorImpl<SolverType>::analyseC
     result_map.insert(std::make_pair(entry.first, var));
   }
 
-  results = metaSMT::analyze_conflicts(solver_, result_map, metaSMT::evaluate(solver_, preds::True), results);
+  results = metaSMT::analyze_conflicts(
+      solver_, result_map, metaSMT::evaluate(solver_, preds::True), results);
 
   return results;
 }
@@ -642,9 +694,9 @@ bool metaSMTVisitorImpl<SolverType>::solve(bool ignoreSofts) {
   std::random_shuffle(suggestions_.begin(), suggestions_.end(), rng_);
 
   for (int k = suggestions_.size(); k >= 0; --k) {
-
-    for (typename std::vector<result_type>::const_iterator ite = assumptions_.begin(); ite != assumptions_.end();
-         ++ite) {
+    for (typename std::vector<result_type>::const_iterator ite =
+             assumptions_.begin();
+         ite != assumptions_.end(); ++ite) {
       metaSMT::assumption(solver_, *ite);
     }
 
@@ -655,7 +707,8 @@ bool metaSMTVisitorImpl<SolverType>::solve(bool ignoreSofts) {
     for (int i = 0; i < k; i++) metaSMT::assumption(solver_, suggestions_[i]);
 
     if (!ignoreSofts) {
-      BOOST_FOREACH(typename std::vector<result_type>::value_type const & item, softs_) {
+      BOOST_FOREACH (typename std::vector<result_type>::value_type const &item,
+                     softs_) {
         metaSMT::assumption(solver_, preds::equal(item, preds::True));
       }
     }
@@ -687,12 +740,11 @@ bool metaSMTVisitorImpl<SolverType>::read(Node const &v, AssignResult &assign) {
 }
 
 template <typename SolverType>
-bool metaSMTVisitorImpl<SolverType>::readVector(const std::vector<VariablePtr> &vec, __rand_vec_base *rand_vec) {
-
+bool metaSMTVisitorImpl<SolverType>::readVector(
+    const std::vector<VariablePtr> &vec, __rand_vec_base *rand_vec) {
   unsigned int i = 0;
   std::vector<std::string> sv;
-  BOOST_FOREACH(VariablePtr var, vec) {
-
+  BOOST_FOREACH (VariablePtr var, vec) {
     typename result_map::const_iterator ite(terminals_.find(var->id()));
     if (ite == terminals_.end()) return false;
 
