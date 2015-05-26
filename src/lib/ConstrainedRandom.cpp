@@ -1,10 +1,12 @@
 // Copyright 2014 The CRAVE developers. All rights reserved.//
 
-#include <ctime>
 
-#include <boost/filesystem.hpp>
 
 #include <glog/logging.h>
+#include <boost/filesystem.hpp>
+
+#include <ctime>
+#include <string>
 
 #include "../crave/backend/FactoryMetaSMT.hpp"
 #include "../crave/ConstrainedRandom.hpp"
@@ -15,7 +17,7 @@ namespace crave {
 
 VariableContainer variables;
 
-//VariableContainer& variable_container() { return variables; }
+//  VariableContainer& variable_container() { return variables; }
 
 int new_var_id() {
   static int var_ID = 0;
@@ -45,9 +47,11 @@ boost::function0<bool> random_bit = random_bit_gen();
 
 void set_global_seed(unsigned int s) {
   rng.seed(s);
-};
+}
 
-void set_solver_backend(std::string const& type) { FactoryMetaSMT::setSolverType(type); }
+void set_solver_backend(std::string const& type) {
+    FactoryMetaSMT::setSolverType(type);
+}
 
 std::string config_file_name = "crave.cfg";
 std::string const& get_config_file_name() { return config_file_name; }
@@ -56,7 +60,6 @@ void set_config_file_name(std::string const& str) { config_file_name = str; }
 void init() { init(get_config_file_name()); }
 
 void init(std::string const& cfg_file) {
-
   CraveSetting cSettings(cfg_file);
   cSettings.load();
 
@@ -90,7 +93,9 @@ void init(std::string const& cfg_file) {
 
 std::ostream& rand_obj::print_dot_graph(std::ostream& os, bool root = true) {
   if (root) os << "digraph AST {" << std::endl;
-  for (uint i = 0; i < objChildren.size(); i++) objChildren[i]->print_dot_graph(os, false);
+  for (uint i = 0; i < objChildren.size(); i++) {
+      objChildren[i]->print_dot_graph(os, false);
+  }
   constraint.printDotGraph(os, false);
   if (root) os << "}" << std::endl;
   return os;
