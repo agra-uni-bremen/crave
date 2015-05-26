@@ -84,7 +84,7 @@ class metaSMTVisitorImpl : public metaSMTVisitor {
   virtual std::vector<std::vector<unsigned int> > analyseContradiction(std::map<unsigned int, NodePtr> const &);
   virtual bool solve(bool ignoreSofts);
   virtual bool read(Node const &var, AssignResult &);
-  virtual bool readVector(std::vector<VariablePtr> &vec, __rand_vec_base &rand_vec);
+  virtual bool readVector(const std::vector<VariablePtr> &vec, __rand_vec_base &rand_vec);
 
  private:  // typedefs
   typedef typename SolverType::result_type result_type;
@@ -687,7 +687,7 @@ bool metaSMTVisitorImpl<SolverType>::read(Node const &v, AssignResult &assign) {
 }
 
 template <typename SolverType>
-bool metaSMTVisitorImpl<SolverType>::readVector(std::vector<VariablePtr> &vec, __rand_vec_base &rand_vec) {
+bool metaSMTVisitorImpl<SolverType>::readVector(const std::vector<VariablePtr> &vec, __rand_vec_base &rand_vec) {
 
   unsigned int i = 0;
   std::vector<std::string> sv;

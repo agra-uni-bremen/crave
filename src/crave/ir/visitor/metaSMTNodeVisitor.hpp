@@ -32,7 +32,7 @@ class metaSMTVisitor : public NodeVisitor {
       std::map<unsigned int, NodePtr> const&) = 0;
   virtual bool solve(bool ignoreSofts = true) = 0;
   virtual bool read(Node const&, AssignResult&) = 0;
-  virtual bool readVector(std::vector<VariablePtr>& vec,
+  virtual bool readVector(const std::vector<VariablePtr>& vec,
                           __rand_vec_base& rand_vec) = 0;
 };
 
