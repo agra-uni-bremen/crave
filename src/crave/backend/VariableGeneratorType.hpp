@@ -36,7 +36,7 @@ struct VariableGenerator {
   }
 
   template <typename T>
-  bool read(const Variable<T> &var, T* value) {
+  bool read (const Variable<T> &var, T* value) const {
     BOOST_FOREACH(VarSolverPtr vs, solvers) {
       if (vs->read(var, value)) return true;
     }

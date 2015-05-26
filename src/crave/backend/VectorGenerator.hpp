@@ -17,7 +17,7 @@ struct VectorSolver {
   typedef boost::intrusive_ptr<VariableExpr> VariablePtr;
   typedef std::vector<VariablePtr> VectorElements;
 
-  VectorSolver(int vector_id_, VariableGenerator& var_gen_)
+  VectorSolver(int vector_id_, const VariableGenerator& var_gen_)
       : constraints(),
         vector_id(vector_id_),
         solver(FactoryMetaSMT::getNewInstance()),
@@ -90,7 +90,7 @@ struct VectorSolver {
   SolverPtr solver;
   VectorElements vec_elements;
 
-  VariableGenerator& var_gen;
+  const VariableGenerator& var_gen;
 };
 
 /*
@@ -130,7 +130,7 @@ struct VectorGenerator {
 
  private:
   VectorSolverMap vector_solvers;
-  VariableGenerator& var_gen;
+  const VariableGenerator& var_gen;
 };
 
 }  // namespace crave
