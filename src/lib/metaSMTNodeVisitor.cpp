@@ -1,14 +1,18 @@
 // Copyright 2014 The CRAVE developers. All rights reserved.//
 
-#include "../crave/ir/visitor/metaSMTNodeVisitor.hpp"
-#include "../crave/backend/FactoryMetaSMT.hpp"
-#include "metaSMTNodeVisitorImpl.hpp"
+#include <glog/logging.h>
 
 #include <metaSMT/BitBlast.hpp>
 #include <metaSMT/DirectSolver_Context.hpp>
 #include <metaSMT/UnpackFuture_Context.hpp>
 
-#include <glog/logging.h>
+#include <string>
+
+#include "../crave/ir/visitor/metaSMTNodeVisitor.hpp"
+#include "../crave/backend/FactoryMetaSMT.hpp"
+#include "metaSMTNodeVisitorImpl.hpp"
+
+
 
 #define DEFINE_SOLVER(inCrave, inMetaSMT)                      \
   namespace crave {                                            \

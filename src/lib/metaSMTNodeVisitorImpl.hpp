@@ -19,6 +19,7 @@
 #include <stack>
 #include <utility>
 #include <vector>
+#include <string>
 
 namespace crave {
 namespace preds = metaSMT::logic;
