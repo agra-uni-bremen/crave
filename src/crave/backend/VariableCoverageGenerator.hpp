@@ -13,17 +13,17 @@ struct VariableCoverageGenerator : VariableGenerator {
       : VariableGenerator(vcon) {}
 
   virtual void reset(std::vector<ConstraintPartition>& partitions) {
-    solvers.clear();
+    solvers_.clear();
 
     BOOST_FOREACH(ConstraintPartition& partition, partitions) {
-      VarSolverPtr vs(new VariableCoverageSolver(var_ctn, partition));
-      solvers.push_back(vs);
+      VarSolverPtr vs(new VariableCoverageSolver(var_ctn_, partition));
+      solvers_.push_back(vs);
     }
   }
 
   virtual bool solve() {
     bool res = false;
-    BOOST_FOREACH(VarSolverPtr vs, solvers) {
+    BOOST_FOREACH(VarSolverPtr vs, solvers_) {
       if (vs->solve())
         res = true;  // one solver has hitted an uncovered constraint
                      // -> everything ok,

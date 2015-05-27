@@ -17,19 +17,19 @@ struct VariableGenerator {
   typedef boost::shared_ptr<VariableSolver> VarSolverPtr;
 
   explicit VariableGenerator(VariableContainer* vcon)
-      : var_ctn(vcon), solvers() {}
+      : var_ctn_(vcon), solvers_() {}
 
   virtual void reset(std::vector<ConstraintPartition>& partitions) {
-    solvers.clear();
+    solvers_.clear();
 
     BOOST_FOREACH(ConstraintPartition& partition, partitions) {
-      VarSolverPtr vs(new VariableDefaultSolver(var_ctn, partition));
-      solvers.push_back(vs);
+      VarSolverPtr vs(new VariableDefaultSolver(var_ctn_, partition));
+      solvers_.push_back(vs);
     }
   }
 
   virtual bool solve() {
-    BOOST_FOREACH(VarSolverPtr vs, solvers) {
+    BOOST_FOREACH(VarSolverPtr vs, solvers_) {
       if (!vs->solve()) return false;
     }
     return true;
@@ -37,7 +37,7 @@ struct VariableGenerator {
 
   template <typename T>
   bool read(const Variable<T> &var, T* value) const {
-    BOOST_FOREACH(VarSolverPtr vs, solvers) {
+    BOOST_FOREACH(VarSolverPtr vs, solvers_) {
       if (vs->read(var, value)) return true;
     }
     return false;
@@ -46,7 +46,7 @@ struct VariableGenerator {
   std::vector<std::vector<std::string> > analyseContradiction() {
     std::vector<std::vector<std::string> > str_vec;
 
-    BOOST_FOREACH(VarSolverPtr vs, solvers) {
+    BOOST_FOREACH(VarSolverPtr vs, solvers_) {
       std::vector<std::vector<std::string> > c = vs->getContradictions();
       if (!c.empty()) str_vec.insert(str_vec.end(), c.begin(), c.end());
     }
@@ -56,7 +56,7 @@ struct VariableGenerator {
   std::vector<std::string> getInactiveSofts() const {
     std::vector<std::string> str_vec;
 
-    BOOST_FOREACH(VarSolverPtr vs, solvers) {
+    BOOST_FOREACH(VarSolverPtr vs, solvers_) {
       std::vector<std::string> c = vs->getInactiveSofts();
       if (!c.empty()) str_vec.insert(str_vec.end(), c.begin(), c.end());
     }
@@ -64,7 +64,7 @@ struct VariableGenerator {
   }
 
  protected:
-  VariableContainer* var_ctn;
-  std::vector<VarSolverPtr> solvers;
+  VariableContainer* var_ctn_;
+  std::vector<VarSolverPtr> solvers_;
 };
 }  // namespace crave
