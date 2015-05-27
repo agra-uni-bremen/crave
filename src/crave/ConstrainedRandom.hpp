@@ -33,7 +33,7 @@ class rand_obj : public rand_obj_base {
     if (!gen_base_children()) return false;
     if (rebuild_) {
       constraint_.reset();
-      gather_constraints(constraint_);
+      gather_constraints(&constraint_);
       constraint_.rebuild();
       rebuild_ = false;
     }
@@ -44,7 +44,7 @@ class rand_obj : public rand_obj_base {
     if (!gen_base_children()) return false;
     if (rebuild_) {
       constraint_.reset();
-      gather_constraints(constraint_);
+      gather_constraints(&constraint_);
       constraint_.rebuild();
       rebuild_ = false;
     }
@@ -101,11 +101,11 @@ class rand_obj : public rand_obj_base {
     return true;
   }
 
-  void gather_constraints(Generator& gen) {
+  void gather_constraints(Generator *gen) {
     for (uint i = 0; i < objChildren_.size(); i++) {
       objChildren_[i]->gather_constraints(gen);
     }
-    gen.merge(constraint_);
+    gen->merge(constraint_);
   }
 
  public:
