@@ -27,7 +27,7 @@ struct Vector
 
   typedef value_type_ value_type;
 
-  int id() const { return boost::proto::value(*this).id; }
+  int id() const { return boost::proto::value(*this).id_; }
 
   const Variable<unsigned int>& size() const { return size_; }
 

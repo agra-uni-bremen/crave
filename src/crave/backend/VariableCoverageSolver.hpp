@@ -13,18 +13,18 @@ struct VariableCoverageSolver : VariableSolver {
   VariableCoverageSolver(VariableContainer *vcon,
                          const ConstraintPartition& cp)
       : VariableSolver(vcon, cp) {
-    LOG(INFO) << "Create coverage solver for partition " << constr_pttn;
+    LOG(INFO) << "Create coverage solver for partition " << constr_pttn_;
 
-    BOOST_FOREACH(ConstraintPtr c, constr_pttn) {
+    BOOST_FOREACH(ConstraintPtr c, constr_pttn_) {
       if (c->isSoft()) {
         continue;  // coverage solver ignores soft constraints for now
       }
-      if (!c->isCover()) solver->makeAssertion(*c->expr());
+      if (!c->isCover()) solver_->makeAssertion(*c->expr());
     }
   }
 
   virtual bool solve() {
-    BOOST_FOREACH(ConstraintPtr c, constr_pttn) {
+    BOOST_FOREACH(ConstraintPtr c, constr_pttn_) {
       if (!c->isCover()) continue;
       if (covered_set_.find(c->name()) != covered_set_.end()) {
         continue;  // alread covered
@@ -32,19 +32,19 @@ struct VariableCoverageSolver : VariableSolver {
       // try solve
       BOOST_FOREACH(VariableContainer::ReadRefPair pair,
                      var_ctn_->read_references) {
-        if (constr_pttn.containsVar(pair.first)) {
-          solver->makeAssumption(*pair.second->expr());
+        if (constr_pttn_.containsVar(pair.first)) {
+          solver_->makeAssumption(*pair.second->expr());
         }
       }
-      solver->makeAssumption(*c->expr());
-      if (solver->solve()) {
-        LOG(INFO) << "Solve partition " << constr_pttn << " hitting constraint "
+      solver_->makeAssumption(*c->expr());
+      if (solver_->solve()) {
+        LOG(INFO) << "Solve partition " << constr_pttn_ << " hitting constraint "
                   << c->name();
         covered_set_.insert(c->name());
         BOOST_FOREACH(VariableContainer::WriteRefPair pair,
                        var_ctn_->write_references) {
-          if (constr_pttn.containsVar(pair.first)) {
-            solver->read(*var_ctn_->variables[pair.first], *pair.second);
+          if (constr_pttn_.containsVar(pair.first)) {
+            solver_->read(*var_ctn_->variables[pair.first], *pair.second);
           }
         }
         return true;

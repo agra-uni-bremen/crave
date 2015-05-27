@@ -66,7 +66,7 @@ struct Context
   result_type operator()(boost::proto::tag::terminal,
                          vector_tag<value_type> const& tag) {
     std::map<int, result_type>::const_iterator ite =
-        vector_variables_.find(tag.id);
+        vector_variables_.find(tag.id_);
 
     if (ite != vector_variables_.end()) {
       return ite->second;
@@ -74,8 +74,8 @@ struct Context
       unsigned width = bitsize_traits<value_type>::value;
       bool sign = crave::is_signed<value_type>::value;
 
-      result_type vec = new VectorExpr(tag.id, width, sign);
-      vector_variables_.insert(std::make_pair(tag.id, vec));
+      result_type vec = new VectorExpr(tag.id_, width, sign);
+      vector_variables_.insert(std::make_pair(tag.id_, vec));
       return vec;
     }
   }
@@ -359,8 +359,8 @@ struct Context
 
       result_type in_ranges;
       BOOST_FOREACH(weighted_range<Integer> const& r, dist.ranges()) {
-        result_type left(new Constant(r.left, width, sign));
-        result_type right(new Constant(r.right, width, sign));
+        result_type left(new Constant(r.left_, width, sign));
+        result_type right(new Constant(r.right_, width, sign));
         result_type left_cond(new LessEqualOpr(left, tmp_var));
         result_type right_cond(new LessEqualOpr(tmp_var, right));
         result_type in_range(new LogicalAndOpr(left_cond, right_cond));

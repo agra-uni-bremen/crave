@@ -70,7 +70,7 @@ void FactoryMetaSMT::setSolverType(std::string const& type) {
 
 #define TRY_GET_SOLVER(solver)                                             \
   if (!FactorySolver<solver>::isDefined()) {                               \
-    solver_type = UNDEFINED_SOLVER;                                        \
+    solver_type_ = UNDEFINED_SOLVER;                                        \
     LOG(INFO) << #solver                                                   \
               << " has not been defined, another solver will be selected"; \
     return getNewInstance();                                               \
@@ -79,7 +79,7 @@ void FactoryMetaSMT::setSolverType(std::string const& type) {
 
 #define TRY_GET_SOLVER_WHEN_UNDEFINED(solver)                   \
   if (FactorySolver<solver>::isDefined()) {                     \
-    solver_type = solver;                                       \
+    solver_type_ = solver;                                       \
     LOG(INFO) << #solver << " has been automatically selected"; \
     return getNewInstance();                                    \
   }

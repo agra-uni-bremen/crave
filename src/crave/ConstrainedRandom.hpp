@@ -133,7 +133,7 @@ class rand_obj : public rand_obj_base {
       }                                                               \
       std::set<int> s;                                                \
       BOOST_PP_SEQ_FOR_EACH(INSERT, s, __VA_ARGS__);                  \
-      parent->constraint(inside(var, s));                             \
+      parent->constraint_(inside(var, s));                             \
     }                                                                 \
   };                                                                  \
 }  // namespace crave
