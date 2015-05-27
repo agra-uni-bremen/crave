@@ -1,11 +1,6 @@
 // Copyright 2014 The CRAVE developers. All rights reserved.//
 
 #pragma once
-
-#include "../crave/ir/visitor/metaSMTNodeVisitor.hpp"
-#include "../crave/frontend/AssignResult.hpp"
-#include "../crave/frontend/RandomBase.hpp"
-
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/mersenne_twister.hpp>
@@ -19,6 +14,11 @@
 #include <stack>
 #include <utility>
 #include <vector>
+#include <string>
+
+#include "../crave/ir/visitor/metaSMTNodeVisitor.hpp"
+#include "../crave/frontend/AssignResult.hpp"
+#include "../crave/frontend/RandomBase.hpp"
 
 namespace crave {
 namespace preds = metaSMT::logic;
@@ -275,7 +275,7 @@ void metaSMTVisitorImpl<SolverType>::visitInside(Inside const &in) {
   pop(entry);
 
   result_type result = evaluate(solver_, preds::False);
-  BOOST_FOREACH (Constant c, in.collection()) {
+  BOOST_FOREACH(Constant c, in.collection()) {
     stack_entry constExpr;
     c.visit(this);
     pop(constExpr);
@@ -670,7 +670,7 @@ metaSMTVisitorImpl<SolverType>::analyseContradiction(
 
   typedef std::pair<unsigned int, NodePtr> NodePair;
 
-  BOOST_FOREACH (NodePair entry, s) {
+  BOOST_FOREACH(NodePair entry, s) {
     entry.second->visit(this);
     stack_entry st_entry;
     pop(st_entry);
@@ -707,7 +707,7 @@ bool metaSMTVisitorImpl<SolverType>::solve(bool ignoreSofts) {
     for (int i = 0; i < k; i++) metaSMT::assumption(solver_, suggestions_[i]);
 
     if (!ignoreSofts) {
-      BOOST_FOREACH (typename std::vector<result_type>::value_type const &item,
+      BOOST_FOREACH(typename std::vector<result_type>::value_type const &item,
                      softs_) {
         metaSMT::assumption(solver_, preds::equal(item, preds::True));
       }
@@ -744,7 +744,7 @@ bool metaSMTVisitorImpl<SolverType>::readVector(
     const std::vector<VariablePtr> &vec, __rand_vec_base *rand_vec) {
   unsigned int i = 0;
   std::vector<std::string> sv;
-  BOOST_FOREACH (VariablePtr var, vec) {
+  BOOST_FOREACH(VariablePtr var, vec) {
     typename result_map::const_iterator ite(terminals_.find(var->id()));
     if (ite == terminals_.end()) return false;
 
