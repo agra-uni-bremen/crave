@@ -89,8 +89,8 @@ class rand_vec : public __rand_vec<T>, public rand_base {
     return true;
   }
 
-  virtual void gather_values(std::vector<int64_t>& ch) {
-    ch.push_back(this->size());
+  virtual void gather_values(std::vector<int64_t> *ch) {
+    ch->push_back(this->size());
   }
 };
 
