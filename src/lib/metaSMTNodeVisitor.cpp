@@ -57,19 +57,19 @@ DEFINE_SOLVER(crave::CUDD,
 
 namespace crave {
 
-SolverTypes FactoryMetaSMT::solver_type = UNDEFINED_SOLVER;  // default solver
+SolverTypes FactoryMetaSMT::solver_type_ = UNDEFINED_SOLVER;  // default solver
 
 void FactoryMetaSMT::setSolverType(std::string const& type) {
   if (type == "Boolector")
-    solver_type = BOOLECTOR;
+    solver_type_ = BOOLECTOR;
   else if (type == "CVC4")
-    solver_type = CVC4;
+    solver_type_ = CVC4;
   else if (type == "Z3")
-    solver_type = Z3;
+    solver_type_ = Z3;
   else if (type == "SWORD")
-    solver_type = SWORD;
+    solver_type_ = SWORD;
   else if (type == "Cudd")
-    solver_type = CUDD;
+    solver_type_ = CUDD;
 }
 
 #define TRY_GET_SOLVER(solver)                                             \
@@ -89,7 +89,7 @@ void FactoryMetaSMT::setSolverType(std::string const& type) {
   }
 
 metaSMTVisitor* FactoryMetaSMT::getNewInstance() {
-  switch (solver_type) {
+  switch (solver_type_) {
     case BOOLECTOR:
       TRY_GET_SOLVER(BOOLECTOR);
     case CVC4:

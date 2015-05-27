@@ -18,7 +18,7 @@ struct FactoryMetaSMT {
     **/
   static metaSMTVisitor* getNewInstance();
 
-  static SolverTypes solver_type;
+  static SolverTypes solver_type_;
 };
 
 template <SolverTypes solver_type>
