@@ -3,6 +3,7 @@
 #include "../crave/ir/visitor/EvalVisitor.hpp"
 
 #include <stdexcept>
+#include <set>
 
 namespace crave {
 
