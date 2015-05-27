@@ -46,9 +46,9 @@ class crv_variable_base : public crv_variable_base_ {
   }
 
  protected:
-  crv_variable_base() : var(value), value(), bound_var() {}
+  crv_variable_base() : var(&value), value(), bound_var() {}
   crv_variable_base(const crv_variable_base& other)
-      : var(value),
+      : var(&value),
         value(other.value),
         bound_var(other.bound_var),
         crv_variable_base_(other) {}

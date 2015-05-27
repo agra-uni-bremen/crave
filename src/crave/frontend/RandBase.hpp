@@ -36,11 +36,11 @@ class randv_base : public rand_base {
   WriteReference<T> const& operator()() const { return var; }
 
  protected:
-  explicit randv_base(rand_obj_base* parent) : var(value) {
+  explicit randv_base(rand_obj_base* parent) : var(&value) {
     if (parent != 0) parent->add_base_child(this);
   }
 
-  randv_base(const randv_base& other) : var(value), value(other.value) {}
+  randv_base(const randv_base& other) : var(&value), value(other.value) {}
   WriteReference<T> var;
   T value;
 };

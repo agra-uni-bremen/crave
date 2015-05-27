@@ -9,9 +9,9 @@ namespace crave {
 
 template <typename value_type>
 struct write_ref_tag : public var_tag<value_type> {
-  write_ref_tag(int id_, value_type& ref_)
+  write_ref_tag(int id_, value_type *ref_)
       : var_tag<value_type>(id_), ref(ref_) {}
-  value_type& ref;
+  value_type *ref;
 };
 
 template <typename value_type_>
@@ -21,7 +21,7 @@ struct WriteReference
   typedef Constraint<typename boost::proto::terminal<
       write_ref_tag<value_type_> >::type> base_type;
 
-  explicit WriteReference(value_type_& ref)
+  explicit WriteReference(value_type_ *ref)
       : base_type(boost::proto::make_expr<boost::proto::tag::terminal>(
             write_ref_tag<value_type_>(new_var_id(), ref))) {}
 
