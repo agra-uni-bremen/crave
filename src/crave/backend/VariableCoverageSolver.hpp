@@ -31,7 +31,7 @@ struct VariableCoverageSolver : VariableSolver {
       }
       // try solve
       BOOST_FOREACH(VariableContainer::ReadRefPair pair,
-                     var_ctn->read_references) {
+                     var_ctn_->read_references) {
         if (constr_pttn.containsVar(pair.first)) {
           solver->makeAssumption(*pair.second->expr());
         }
@@ -42,9 +42,9 @@ struct VariableCoverageSolver : VariableSolver {
                   << c->name();
         covered_set_.insert(c->name());
         BOOST_FOREACH(VariableContainer::WriteRefPair pair,
-                       var_ctn->write_references) {
+                       var_ctn_->write_references) {
           if (constr_pttn.containsVar(pair.first)) {
-            solver->read(*var_ctn->variables[pair.first], *pair.second);
+            solver->read(*var_ctn_->variables[pair.first], *pair.second);
           }
         }
         return true;

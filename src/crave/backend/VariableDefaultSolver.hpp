@@ -15,14 +15,14 @@ struct VariableDefaultSolver : VariableSolver {
   VariableDefaultSolver(VariableContainer *vcon,
                         const ConstraintPartition& cp)
       : VariableSolver(vcon, cp) {
-    LOG(INFO) << "Create solver for partition " << constr_pttn;
+    LOG(INFO) << "Create solver for partition " << constr_pttn_;
 
-    BOOST_FOREACH(ConstraintPtr c, constr_pttn) {
+    BOOST_FOREACH(ConstraintPtr c, constr_pttn_) {
       if (c->isCover()) continue;  // default solver ignores cover constraints
       if (c->isSoft()) {
-        solver->makeSoftAssertion(*c->expr());
+        solver_->makeSoftAssertion(*c->expr());
       } else {
-        solver->makeAssertion(*c->expr());
+        solver_->makeAssertion(*c->expr());
       }
     }
     analyseHards();
@@ -45,22 +45,22 @@ struct VariableDefaultSolver : VariableSolver {
   virtual bool solve() {
     if (!contradictions_.empty()) return false;
     BOOST_FOREACH(VariableContainer::ReadRefPair pair,
-                   var_ctn->read_references) {
-      if (constr_pttn.containsVar(pair.first)) {
-        solver->makeAssumption(*pair.second->expr());
+                   var_ctn_->read_references) {
+      if (constr_pttn_.containsVar(pair.first)) {
+        solver_->makeAssumption(*pair.second->expr());
       }
     }
     BOOST_FOREACH(VariableContainer::ReadRefPair pair,
-                   var_ctn->dist_references) {
-      if (constr_pttn.containsVar(pair.first)) {
-        solver->makeSuggestion(*pair.second->expr());
+                   var_ctn_->dist_references) {
+      if (constr_pttn_.containsVar(pair.first)) {
+        solver_->makeSuggestion(*pair.second->expr());
       }
     }
-    if (solver->solve()) {
+    if (solver_->solve()) {
       BOOST_FOREACH(VariableContainer::WriteRefPair pair,
-                     var_ctn->write_references) {
-        if (constr_pttn.containsVar(pair.first)) {
-          solver->read(*var_ctn->variables[pair.first], *pair.second);
+                     var_ctn_->write_references) {
+        if (constr_pttn_.containsVar(pair.first)) {
+          solver_->read(*var_ctn_->variables[pair.first], *pair.second);
         }
       }
       return true;
@@ -76,7 +76,7 @@ struct VariableDefaultSolver : VariableSolver {
     std::vector<std::string> out;
     std::vector<std::vector<unsigned int> > results;
 
-    BOOST_FOREACH(ConstraintPtr c, constr_pttn) {
+    BOOST_FOREACH(ConstraintPtr c, constr_pttn_) {
       if (!c->isSoft() && !c->isCover()) {
         s.insert(std::make_pair(s.size(), c->expr()));
         out.push_back(c->name());
@@ -93,11 +93,11 @@ struct VariableDefaultSolver : VariableSolver {
   }
 
   void analyseSofts() {
-    std::vector<unsigned int> result = solver->analyseSofts();
+    std::vector<unsigned int> result = solver_->analyseSofts();
     std::vector<unsigned int>::iterator ite = result.begin();
     unsigned cnt = 0;
 
-    BOOST_FOREACH(ConstraintPtr c, constr_pttn) {
+    BOOST_FOREACH(ConstraintPtr c, constr_pttn_) {
       if (ite == result.end()) break;
       if (c->isSoft()) {
         if (*ite == cnt) {
