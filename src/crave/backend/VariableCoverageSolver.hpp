@@ -26,7 +26,7 @@ struct VariableCoverageSolver : VariableSolver {
   virtual bool solve() {
     BOOST_FOREACH(ConstraintPtr c, constr_pttn) {
       if (!c->isCover()) continue;
-      if (covered_set.find(c->name()) != covered_set.end()) {
+      if (covered_set_.find(c->name()) != covered_set_.end()) {
         continue;  // alread covered
       }
       // try solve
@@ -40,7 +40,7 @@ struct VariableCoverageSolver : VariableSolver {
       if (solver->solve()) {
         LOG(INFO) << "Solve partition " << constr_pttn << " hitting constraint "
                   << c->name();
-        covered_set.insert(c->name());
+        covered_set_.insert(c->name());
         BOOST_FOREACH(VariableContainer::WriteRefPair pair,
                        var_ctn->write_references) {
           if (constr_pttn.containsVar(pair.first)) {
@@ -54,6 +54,6 @@ struct VariableCoverageSolver : VariableSolver {
   }
 
  private:
-  std::set<std::string> covered_set;
+  std::set<std::string> covered_set_;
 };
 }  // namespace crave
