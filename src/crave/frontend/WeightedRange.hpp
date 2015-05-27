@@ -7,25 +7,25 @@ namespace crave {
 template <typename T>
 struct weighted_range {
   weighted_range(T l, T r, unsigned w)
-      : left(l), right(r), weight(w), accumWeight(0) {}
+      : left_(l), right_(r), weight_(w), accumWeight_(0) {}
 
   bool operator<(const weighted_range<T>& other) const {
-    if (left < other.left) return true;
-    if (left > other.left) return false;
-    if (right < other.right) return true;
+    if (left_ < other.left_) return true;
+    if (left_ > other.left_) return false;
+    if (right_ < other.right_) return true;
     return false;
   }
 
   bool overlap(const weighted_range<T>& other) const {
-    if (left < other.left) return right >= other.left;
-    if (left > other.left) return left <= other.right;
+    if (left_ < other.left_) return right_ >= other.left_;
+    if (left_ > other.left_) return left_ <= other.right_;
     return false;
   }
 
-  T left;
-  T right;
-  unsigned weight;
-  unsigned accumWeight;
+  T left_;
+  T right_;
+  unsigned weight_;
+  unsigned accumWeight_;
 };
 
 template <typename T>

@@ -45,14 +45,14 @@ struct distribution : Node {
     weighted_range<T> selected = ranges_.back();
     if (ranges_.size() > 1) {
       unsigned r =
-          boost::uniform_int<unsigned>(0, selected.accumWeight - 1)(rng);
+          boost::uniform_int<unsigned>(0, selected.accumWeight_ - 1)(rng);
       for (uint i = 0; i < ranges_.size(); i++)
-        if (r < ranges_[i].accumWeight) {
+        if (r < ranges_[i].accumWeight_) {
           selected = ranges_[i];
           break;
         }
     }
-    return boost::uniform_int<T>(selected.left, selected.right)(rng);
+    return boost::uniform_int<T>(selected.left_, selected.right_)(rng);
   }
 
  private:
@@ -62,9 +62,9 @@ struct distribution : Node {
         throw std::runtime_error("Overlapping range exists.");
       }
     if (ranges_.empty()) {
-      wr.accumWeight = wr.weight;
+      wr.accumWeight_ = wr.weight_;
     } else {
-      wr.accumWeight = ranges_.back().accumWeight + wr.weight;
+      wr.accumWeight_ = ranges_.back().accumWeight_ + wr.weight_;
     }
     ranges_.push_back(wr);
   }
