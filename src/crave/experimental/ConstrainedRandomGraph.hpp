@@ -48,10 +48,10 @@ struct Rule {
   }
 
   bool is_rand_obj_covered() const {
-    return m_rand_obj == 0 || m_rand_obj->constraint.isCovered();
+    return m_rand_obj == 0 || m_rand_obj->constraint_.isCovered();
   }
   void reset_coverage() {
-    if (m_rand_obj) m_rand_obj->constraint.resetCoverage();
+    if (m_rand_obj) m_rand_obj->constraint_.resetCoverage();
   }
 
  private:

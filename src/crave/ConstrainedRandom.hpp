@@ -25,68 +25,68 @@ void init(std::string const&);
 
 class rand_obj : public rand_obj_base {
  public:
-  explicit rand_obj(rand_obj* parent_ = 0) : parent(parent_), rebuild(false) {
-    if (parent != 0) parent->add_obj_child(this);
+  explicit rand_obj(rand_obj* parent_ = 0) : parent_(parent_), rebuild_(false) {
+    if (parent_ != 0) parent_->add_obj_child(this);
   }
 
   virtual bool next() {
     if (!gen_base_children()) return false;
-    if (rebuild) {
-      constraint.reset();
-      gather_constraints(constraint);
-      constraint.rebuild();
-      rebuild = false;
+    if (rebuild_) {
+      constraint_.reset();
+      gather_constraints(constraint_);
+      constraint_.rebuild();
+      rebuild_ = false;
     }
-    return constraint.next();
+    return constraint_.next();
   }
 
   virtual bool next_cov() {
     if (!gen_base_children()) return false;
-    if (rebuild) {
-      constraint.reset();
-      gather_constraints(constraint);
-      constraint.rebuild();
-      rebuild = false;
+    if (rebuild_) {
+      constraint_.reset();
+      gather_constraints(constraint_);
+      constraint_.rebuild();
+      rebuild_ = false;
     }
-    return constraint.nextCov();
+    return constraint_.nextCov();
   }
 
   virtual void gather_values(std::vector<int64_t>& ch) {
-    for (std::vector<rand_base*>::const_iterator i = baseChildren.begin();
-         i != baseChildren.end(); ++i)
+    for (std::vector<rand_base*>::const_iterator i = baseChildren_.begin();
+         i != baseChildren_.end(); ++i)
       (*i)->gather_values(ch);
-    for (std::vector<rand_obj*>::const_iterator i = objChildren.begin();
-         i != objChildren.end(); ++i) {
+    for (std::vector<rand_obj*>::const_iterator i = objChildren_.begin();
+         i != objChildren_.end(); ++i) {
       (*i)->gather_values(ch);
     }
   }
 
-  virtual void add_base_child(rand_base* rb) { baseChildren.push_back(rb); }
+  virtual void add_base_child(rand_base* rb) { baseChildren_.push_back(rb); }
 
   void request_rebuild() {
-    rebuild = true;
-    if (parent != 0) parent->request_rebuild();
+    rebuild_ = true;
+    if (parent_ != 0) parent_->request_rebuild();
   }
 
   void add_obj_child(rand_obj* ro) {
-    objChildren.push_back(ro);
+    objChildren_.push_back(ro);
     request_rebuild();
   }
 
   bool enable_constraint(std::string name) {
-    bool res = constraint.enableConstraint(name);
-    if (constraint.isChanged()) request_rebuild();
+    bool res = constraint_.enableConstraint(name);
+    if (constraint_.isChanged()) request_rebuild();
     return res;
   }
 
   bool disable_constraint(std::string name) {
-    bool res = constraint.disableConstraint(name);
-    if (constraint.isChanged()) request_rebuild();
+    bool res = constraint_.disableConstraint(name);
+    if (constraint_.isChanged()) request_rebuild();
     return res;
   }
 
   bool is_constraint_enabled(std::string name) {
-    return constraint.isConstraintEnabled(name);
+    return constraint_.isConstraintEnabled(name);
   }
 
   std::ostream& print_dot_graph(std::ostream&, bool);
@@ -94,28 +94,28 @@ class rand_obj : public rand_obj_base {
 
  protected:
   bool gen_base_children() {
-    for (uint i = 0; i < baseChildren.size(); i++)
-      if (!baseChildren[i]->next()) return false;
-    for (uint i = 0; i < objChildren.size(); i++)
-      if (!objChildren[i]->gen_base_children()) return false;
+    for (uint i = 0; i < baseChildren_.size(); i++)
+      if (!baseChildren_[i]->next()) return false;
+    for (uint i = 0; i < objChildren_.size(); i++)
+      if (!objChildren_[i]->gen_base_children()) return false;
     return true;
   }
 
   void gather_constraints(Generator& gen) {
-    for (uint i = 0; i < objChildren.size(); i++) {
-      objChildren[i]->gather_constraints(gen);
+    for (uint i = 0; i < objChildren_.size(); i++) {
+      objChildren_[i]->gather_constraints(gen);
     }
-    gen.merge(constraint);
+    gen.merge(constraint_);
   }
 
  public:
-  Generator constraint;
+  Generator constraint_;
 
  protected:
-  std::vector<rand_base*> baseChildren;
-  std::vector<rand_obj*> objChildren;
-  rand_obj* parent;
-  bool rebuild;
+  std::vector<rand_base*> baseChildren_;
+  std::vector<rand_obj*> objChildren_;
+  rand_obj* parent_;
+  bool rebuild_;
 };
 
 }  // end namespace crave

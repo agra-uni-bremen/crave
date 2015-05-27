@@ -44,7 +44,7 @@ class my_rand_obj : public rand_obj {
   randv<color_enum> color;
   randv<int> x;
 
-  my_rand_obj(rand_obj* parent = 0) : rand_obj(parent), color(this), x(this) { constraint(color() == x()); }
+  my_rand_obj(rand_obj* parent = 0) : rand_obj(parent), color(this), x(this) { constraint_(color() == x()); }
 };
 
 BOOST_AUTO_TEST_CASE(t_rand_enum) {
@@ -64,7 +64,7 @@ class tall_rand_enum_obj : public rand_obj {
   randv<football_enum> player;
 
   tall_rand_enum_obj(rand_obj* parent = 0) : rand_obj(parent), player(this) {
-    constraint(player() == GK && player() != CF);
+    constraint_(player() == GK && player() != CF);
   }
 };
 
@@ -72,7 +72,7 @@ class tall_rand_enum_obj_gt : public rand_obj {
  public:
   randv<football_enum> player;
 
-  tall_rand_enum_obj_gt(rand_obj* parent = 0) : rand_obj(parent), player(this) { constraint(player() > AM); }
+  tall_rand_enum_obj_gt(rand_obj* parent = 0) : rand_obj(parent), player(this) { constraint_(player() > AM); }
 };
 
 BOOST_AUTO_TEST_CASE(enum_no_overflow) {
@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(enum_gt) {
 
 class item : public rand_obj {
  public:
-  item(rand_obj* parent) : rand_obj(parent), a(this), b(this), c(this) { constraint(a() + b() == c()); }
+  item(rand_obj* parent) : rand_obj(parent), a(this), b(this), c(this) { constraint_(a() + b() == c()); }
 
  public:
   randv<int> a;
@@ -105,14 +105,14 @@ class item : public rand_obj {
 class item1 : public item {
  public:
   item1(rand_obj* parent) : item(parent) {
-    constraint(10 <= a() && a() <= 20);
-    constraint(a() + b() + c() <= 200);
+    constraint_(10 <= a() && a() <= 20);
+    constraint_(a() + b() + c() <= 200);
   }
 };
 
 class item2 : public item1 {
  public:
-  item2(rand_obj* parent) : item1(parent), d(this) { constraint(a() + b() + c() == 100); }
+  item2(rand_obj* parent) : item1(parent), d(this) { constraint_(a() + b() + c() == 100); }
   randv<int> d;
 };
 
@@ -144,12 +144,12 @@ BOOST_AUTO_TEST_CASE(t4) {
 class obj : public rand_obj {
  public:
   obj(rand_obj* parent) : rand_obj(parent), a(this), b(this), c(this), d(this), e(this), f(this) {
-    constraint(dist(a(), distribution<int>::simple_range(-20, -10)));
-    constraint(dist(b(), distribution<unsigned int>::simple_range(10, 20)));
-    constraint(dist(c(), distribution<short>::simple_range(-20, -10)));
-    constraint(dist(d(), distribution<unsigned short>::simple_range(10, 20)));
-    constraint("e", dist(e(), distribution<char>::simple_range('a', 'z')));
-    constraint("f", dist(f(), distribution<unsigned char>::simple_range('A', 'Z')));
+    constraint_(dist(a(), distribution<int>::simple_range(-20, -10)));
+    constraint_(dist(b(), distribution<unsigned int>::simple_range(10, 20)));
+    constraint_(dist(c(), distribution<short>::simple_range(-20, -10)));
+    constraint_(dist(d(), distribution<unsigned short>::simple_range(10, 20)));
+    constraint_("e", dist(e(), distribution<char>::simple_range('a', 'z')));
+    constraint_("f", dist(f(), distribution<unsigned char>::simple_range('A', 'Z')));
   }
   randv<int> a;
   randv<unsigned int> b;
@@ -169,18 +169,18 @@ class obj1 : public obj {
   obj1(rand_obj* parent) : obj(parent) {
     disable_constraint("e");
     disable_constraint("f");
-    constraint(dist(e(), distribution<char>::simple_range('A', 'Z')));
-    constraint(dist(f(), distribution<unsigned char>::simple_range('a', 'z')));
+    constraint_(dist(e(), distribution<char>::simple_range('A', 'Z')));
+    constraint_(dist(f(), distribution<unsigned char>::simple_range('a', 'z')));
   }
 };
 
 class obj2 : public rand_obj {
  public:
   obj2(rand_obj* parent) : rand_obj(parent), g(this), h(this), i(this), j(this), k(this), l(this) {
-    constraint(dist(g(), distribution<long>::simple_range(-20, -10)));
-    constraint(dist(h(), distribution<unsigned long>::simple_range(10, 20)));
-    constraint(dist(i(), distribution<long long>::simple_range(-20, -10)));
-    constraint(dist(j(), distribution<unsigned long long>::simple_range(10, 20)));
+    constraint_(dist(g(), distribution<long>::simple_range(-20, -10)));
+    constraint_(dist(h(), distribution<unsigned long>::simple_range(10, 20)));
+    constraint_(dist(i(), distribution<long long>::simple_range(-20, -10)));
+    constraint_(dist(j(), distribution<unsigned long long>::simple_range(10, 20)));
   }
   randv<long> g;
   randv<unsigned long> h;
@@ -236,8 +236,8 @@ BOOST_AUTO_TEST_CASE(t5) {
 
 struct Item1 : public rand_obj {
   Item1() : x(this), pivot(0) {
-    constraint("c1", x() * x() >= 24);
-    constraint("c2", x() <= reference(pivot));
+    constraint_("c1", x() * x() >= 24);
+    constraint_("c2", x() <= reference(pivot));
   }
 
   bool next() {
@@ -246,7 +246,7 @@ struct Item1 : public rand_obj {
     while (lower < upper) {
       std::cout << lower << " " << upper << std::endl;
       pivot = (upper + lower) / 2;
-      if (constraint.next())
+      if (constraint_.next())
         upper = x;
       else
         lower = pivot + 1;
@@ -267,11 +267,11 @@ BOOST_AUTO_TEST_CASE(binary_search_test) {
 
 struct Item2 : public rand_obj {
   Item2() : i(), address(this), data(this) {
-    constraint(address() % 4 == 0);
-    constraint(address() <= 1000u);
-    constraint(data().size() == 4);
-    constraint(foreach(data(), -50 <= data()[i] && data()[i] <= 50));
-    constraint(foreach(data(), data()[i - 1] <= data()[i]));
+    constraint_(address() % 4 == 0);
+    constraint_(address() <= 1000u);
+    constraint_(data().size() == 4);
+    constraint_(foreach(data(), -50 <= data()[i] && data()[i] <= 50));
+    constraint_(foreach(data(), data()[i - 1] <= data()[i]));
   }
 
   placeholder i;

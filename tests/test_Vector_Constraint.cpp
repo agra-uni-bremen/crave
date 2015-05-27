@@ -20,9 +20,9 @@ BOOST_FIXTURE_TEST_SUITE(Vector_Constraint_t, Context_Fixture)
 
 struct Item : public rand_obj {
   Item() : i_(), v(this) {
-    constraint(30 <= v().size() && v().size() <= 50);
-    constraint(foreach(v(), v()[i_] == v()[i_ - 1] + v()[i_ - 2]));
-    constraint(foreach(v(), if_then(i_ <= 1, v()[i_] == i_)));
+    constraint_(30 <= v().size() && v().size() <= 50);
+    constraint_(foreach(v(), v()[i_] == v()[i_ - 1] + v()[i_ - 2]));
+    constraint_(foreach(v(), if_then(i_ <= 1, v()[i_] == i_)));
   }
 
   placeholder i_;
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(free_vector_test) {
 }
 
 struct Item2 : public rand_obj {
-  Item2() : idx(), v(this) { constraint(foreach(v(), 100 <= v()[idx] && v()[idx] <= 200)); }
+  Item2() : idx(), v(this) { constraint_(foreach(v(), 100 <= v()[idx] && v()[idx] <= 200)); }
 
   placeholder idx;
   rand_vec<unsigned int> v;
@@ -75,10 +75,10 @@ BOOST_AUTO_TEST_CASE(default_size_test) {
 
 struct Item3 : public rand_obj {
   Item3() : i(), v(this) {
-    constraint(v().size() == 100);
-    constraint(foreach(v(), v()[i] < 100));
-    constraint(foreach(v(), v()[i] >= 0));
-    constraint(unique(v()));
+    constraint_(v().size() == 100);
+    constraint_(foreach(v(), v()[i] < 100));
+    constraint_(foreach(v(), v()[i] >= 0));
+    constraint_(unique(v()));
   }
 
   placeholder i;
@@ -127,9 +127,9 @@ BOOST_AUTO_TEST_CASE(soft_unique_test) {
 
 struct Item4 : public rand_obj {
   Item4() : _i(), v(this) {
-    constraint(v().size() == 10);
-    constraint("c1", foreach(v(), v()[_i] <= 100));
-    constraint("c2", foreach(v(), v()[_i] > 100));
+    constraint_(v().size() == 10);
+    constraint_("c1", foreach(v(), v()[_i] <= 100));
+    constraint_("c2", foreach(v(), v()[_i] > 100));
   }
 
   placeholder _i;
@@ -156,10 +156,10 @@ BOOST_AUTO_TEST_CASE(constraint_management_test) {
 
 struct Item5 : public rand_obj {
   Item5() : x(), v(this) {
-    constraint(v().size() == 50);
-    constraint(foreach(v(), if_then(x < 25, v()[x] == x)));
-    constraint(foreach(v(), if_then(x == 25, v()[x] == 0)));
-    constraint(foreach(v(), if_then(x > 25, v()[x] + x == 200)));
+    constraint_(v().size() == 50);
+    constraint_(foreach(v(), if_then(x < 25, v()[x] == x)));
+    constraint_(foreach(v(), if_then(x == 25, v()[x] == 0)));
+    constraint_(foreach(v(), if_then(x > 25, v()[x] + x == 200)));
   }
 
   placeholder x;
@@ -168,7 +168,7 @@ struct Item5 : public rand_obj {
 
 BOOST_AUTO_TEST_CASE(index_constraint_test) {
   Item5 it;
-  it.constraint.printDotGraph(std::cout);
+  it.constraint_.printDotGraph(std::cout);
   it.next();
   BOOST_REQUIRE(it.v.size() == 50);
   for (uint i = 0; i < it.v.size(); i++) {

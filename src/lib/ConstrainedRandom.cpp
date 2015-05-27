@@ -89,10 +89,10 @@ void init(std::string const& cfg_file) {
 
 std::ostream& rand_obj::print_dot_graph(std::ostream& os, bool root = true) {
   if (root) os << "digraph AST {" << std::endl;
-  for (uint i = 0; i < objChildren.size(); i++) {
-    objChildren[i]->print_dot_graph(os, false);
+  for (uint i = 0; i < objChildren_.size(); i++) {
+    objChildren_[i]->print_dot_graph(os, false);
   }
-  constraint.printDotGraph(os, false);
+  constraint_.printDotGraph(os, false);
   if (root) os << "}" << std::endl;
   return os;
 }

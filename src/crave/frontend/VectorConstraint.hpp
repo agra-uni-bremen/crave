@@ -10,8 +10,8 @@ namespace crave {
 
 template <typename value_type>
 struct vector_tag {
-  explicit vector_tag(int id_) : id(id_) {}
-  int id;
+  explicit vector_tag(int id) : id_(id) {}
+  int id_;
 };
 
 template <typename value_type_>
@@ -29,9 +29,9 @@ struct Vector
 
   int id() const { return boost::proto::value(*this).id; }
 
-  const Variable<unsigned int>& size() const { return _size; }
+  const Variable<unsigned int>& size() const { return size_; }
 
  private:
-  Variable<unsigned int> _size;
+  Variable<unsigned int> size_;
 };
 }  // namespace crave
