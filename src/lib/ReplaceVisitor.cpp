@@ -3,6 +3,7 @@
 #include "../crave/ir/visitor/ReplaceVisitor.hpp"
 
 #include <stdexcept>
+#include <map>
 
 namespace crave {
 
@@ -319,7 +320,7 @@ void ReplaceVisitor::visitVectorAccess(VectorAccess const& v) {
   int l_val, i;
   evalBinSubscript(l_val, i);
 
-  if (0 <= i && i < (int)variables_->size()) {
+  if (0 <= i && i < static_cast<int>(variables_->size())) {
     VectorExpr& vec = *static_cast<VectorExpr*>(lhs.get());
     VariableExpr& var = *static_cast<VariableExpr*>(variables_->at(i).get());
     variables_->at(i) = new VariableExpr(var.id(), vec.bitsize(), vec.sign());
