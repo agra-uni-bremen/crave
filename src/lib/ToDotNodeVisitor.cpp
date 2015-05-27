@@ -365,4 +365,4 @@ void ToDotVisitor::visitBitslice(Bitslice const &b) {
   visitUnaryExpr(b);
 }
 
-}  // namespace crave
+}  // end crave namespace

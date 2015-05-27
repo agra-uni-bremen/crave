@@ -3,7 +3,6 @@
 #include "../crave/ir/visitor/ReplaceVisitor.hpp"
 
 #include <stdexcept>
-#include <map>
 
 namespace crave {
 
