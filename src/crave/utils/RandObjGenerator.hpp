@@ -55,7 +55,7 @@ bool rand_obj_gen::generate() {
     elapsed_gen_times_[i] = std::clock() - start;
 
     std::vector<int64_t> values;
-    obj_->gather_values(values);
+    obj_->gather_values(&values);
     solutions_[i].insert(solutions_[i].begin(), values.begin(), values.end());
   }
 

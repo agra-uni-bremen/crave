@@ -84,8 +84,8 @@ namespace crave {
 
 #define RANDV_PRIM_INTERFACE(Typename)           \
  public:                                         \
-  void gather_values(std::vector<int64_t>& ch) { \
-    ch.push_back(static_cast<int64_t>(value));   \
+  void gather_values(std::vector<int64_t> *ch) { \
+    ch->push_back(static_cast<int64_t>(value));   \
   }                                              \
   bool next() {                                  \
     static distribution<Typename> dist;          \

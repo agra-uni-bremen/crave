@@ -51,7 +51,7 @@ class rand_obj : public rand_obj_base {
     return constraint_.nextCov();
   }
 
-  virtual void gather_values(std::vector<int64_t>& ch) {
+  virtual void gather_values(std::vector<int64_t> *ch) {
     for (std::vector<rand_base*>::const_iterator i = baseChildren_.begin();
          i != baseChildren_.end(); ++i)
       (*i)->gather_values(ch);

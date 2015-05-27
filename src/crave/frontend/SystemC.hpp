@@ -49,8 +49,8 @@ struct bitsize_traits<T, typename boost::enable_if<is_sysc_dt<T> >::type>
 
 #define RANDV_SCDT_PRIM_INTERFACE(Typename)       \
  public:                                          \
-  void gather_values(std::vector<int64_t>& ch) {  \
-    ch.insert(ch.end(), this->value.to_int64());  \
+  void gather_values(std::vector<int64_t> *ch) {  \
+    ch->insert(ch->end(), this->value.to_int64());  \
   }                                               \
   bool next() {                                   \
     static distribution<int64_t> dist;            \
