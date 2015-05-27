@@ -37,37 +37,37 @@ struct Generator {
 
   template <typename Expr>
   Generator& operator()(Expr expr) {
-    constr_mng_.makeConstraint(expr, ctx_);
+    constr_mng_.makeConstraint(expr, &ctx_);
     return *this;
   }
 
   template <typename Expr>
   Generator& operator()(std::string constraint_name, Expr expr) {
-    constr_mng_.makeConstraint(constraint_name, expr, ctx_);
+    constr_mng_.makeConstraint(constraint_name, expr, &ctx_);
     return *this;
   }
 
   template <typename Expr>
   Generator& soft(Expr e) {
-    constr_mng_.makeConstraint(e, ctx_, true);
+    constr_mng_.makeConstraint(e, &ctx_, true);
     return *this;
   }
 
   template <typename Expr>
   Generator& soft(std::string name, Expr e) {
-    constr_mng_.makeConstraint(name, e, ctx_, true);
+    constr_mng_.makeConstraint(name, e, &ctx_, true);
     return *this;
   }
 
   template <typename Expr>
   Generator& cover(Expr e) {
-    constr_mng_.makeConstraint(e, ctx_, false, true);
+    constr_mng_.makeConstraint(e, &ctx_, false, true);
     return *this;
   }
 
   template <typename Expr>
   Generator& cover(std::string name, Expr e) {
-    constr_mng_.makeConstraint(name, e, ctx_, false, true);
+    constr_mng_.makeConstraint(name, e, &ctx_, false, true);
     return *this;
   }
 

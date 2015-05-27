@@ -239,7 +239,7 @@ struct ConstraintManager {
 
   template <typename Expr>
   ConstraintPtr makeConstraint(std::string const& name, int c_id, Expr e,
-                               Context& ctx, bool const soft = false,
+                               Context *ctx, bool const soft = false,
                                bool const cover = false) {
     LOG(INFO) << "New " << (soft ? "soft " : "") << (cover ? "cover " : "")
               << "constraint " << name << " in set " << id_;
@@ -249,7 +249,7 @@ struct ConstraintManager {
     }
 
     FixWidthVisitor fwv;
-    NodePtr n(fwv.fixWidth(*boost::proto::eval(e, ctx)));
+    NodePtr n(fwv.fixWidth(*boost::proto::eval(e, *ctx)));
 
     GetSupportSetVisitor gssv;
     n->visit(&gssv);
@@ -277,7 +277,7 @@ struct ConstraintManager {
   }
 
   ConstraintPtr makeConstraint(std::string const& name, int c_id, NodePtr n,
-                               Context& ctx, bool const soft = false,
+                               Context *ctx, bool const soft = false,
                                bool const cover = false) {
     LOG(INFO) << "New " << (soft ? "soft " : "") << (cover ? "cover " : "")
               << "constraint " << name << " in set " << id_;
@@ -312,14 +312,14 @@ struct ConstraintManager {
   }
 
   template <typename Expr>
-  ConstraintPtr makeConstraint(std::string const& name, Expr e, Context& ctx,
+  ConstraintPtr makeConstraint(std::string const& name, Expr e, Context *ctx,
                                bool const soft = false,
                                bool const cover = false) {
     return makeConstraint(name, new_constraint_id(), e, ctx, soft, cover);
   }
 
   template <typename Expr>
-  ConstraintPtr makeConstraint(Expr e, Context& ctx, bool const soft = false,
+  ConstraintPtr makeConstraint(Expr e, Context *ctx, bool const soft = false,
                                bool const cover = false) {
     int id = new_constraint_id();
     return makeConstraint("constraint_" + boost::lexical_cast<std::string>(id),

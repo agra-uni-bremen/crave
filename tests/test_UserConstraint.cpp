@@ -14,10 +14,10 @@ BOOST_AUTO_TEST_CASE(constraint_partitioning) {
   ConstraintPartitioner cp;
   ConstraintManager cm1, cm2;
   Context ctx(&crave::variables);
-  cm1.makeConstraint(a() > b(), ctx);
-  cm1.makeConstraint(c() > d(), ctx);
-  cm1.makeConstraint(e() > 1, ctx);
-  cm2.makeConstraint(a() != e(), ctx);
+  cm1.makeConstraint(a() > b(), &ctx);
+  cm1.makeConstraint(c() > d(), &ctx);
+  cm1.makeConstraint(e() > 1, &ctx);
+  cm2.makeConstraint(a() != e(), &ctx);
 
   cp.reset();
   cp.mergeConstraints(cm1);
