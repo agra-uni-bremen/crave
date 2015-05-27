@@ -9,6 +9,7 @@
 #include <metaSMT/UnpackFuture_Context.hpp>
 
 #include <glog/logging.h>
+#include <string>
 
 #define DEFINE_SOLVER(inCrave, inMetaSMT)                      \
   namespace crave {                                            \
@@ -21,7 +22,7 @@
       return new metaSMTVisitorImpl<SolverType>();             \
     }                                                          \
   };                                                           \
-  }
+}  // namespace crave
 
 #ifdef metaSMT_USE_Boolector
 #include <metaSMT/backend/Boolector.hpp>
@@ -74,8 +75,8 @@ void FactoryMetaSMT::setSolverType(std::string const& type) {
     LOG(INFO) << #solver                                                   \
               << " has not been defined, another solver will be selected"; \
     return getNewInstance();                                               \
-  } else                                                                   \
-    return FactorySolver<solver>::getNewInstance();
+  } else  {                                                                 \
+    return FactorySolver<solver>::getNewInstance(); }
 
 #define TRY_GET_SOLVER_WHEN_UNDEFINED(solver)                   \
   if (FactorySolver<solver>::isDefined()) {                     \
@@ -106,4 +107,4 @@ metaSMTVisitor* FactoryMetaSMT::getNewInstance() {
   }
 }
 
-}  // end crave namespace
+}  // namespace crave
