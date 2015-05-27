@@ -38,7 +38,8 @@ struct VariableCoverageSolver : VariableSolver {
       }
       solver_->makeAssumption(*c->expr());
       if (solver_->solve()) {
-        LOG(INFO) << "Solve partition " << constr_pttn_ << " hitting constraint "
+        LOG(INFO) << "Solve partition " << constr_pttn_
+                  << " hitting constraint "
                   << c->name();
         covered_set_.insert(c->name());
         BOOST_FOREACH(VariableContainer::WriteRefPair pair,
