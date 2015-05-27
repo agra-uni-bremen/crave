@@ -17,12 +17,12 @@ struct VectorSolver {
   typedef boost::intrusive_ptr<VariableExpr> VariablePtr;
   typedef std::vector<VariablePtr> VectorElements;
 
-  VectorSolver(int vector_id_, const VariableGenerator& var_gen_)
+  VectorSolver(int vector_id, const VariableGenerator& var_gen)
       : constraints_(),
-        vector_id_(vector_id_),
+        vector_id_(vector_id),
         solver_(FactoryMetaSMT::getNewInstance()),
         vec_elements_(),
-        var_gen_(var_gen_) {}
+        var_gen_(var_gen) {}
 
   void addConstraint(VectorConstraintPtr vc) { constraints_.push_back(vc); }
 
@@ -99,8 +99,8 @@ struct VectorSolver {
 struct VectorGenerator {
   typedef std::map<int, VectorSolver> VectorSolverMap;
 
-  explicit VectorGenerator(const VariableGenerator& var_gen_)
-      : vector_solvers_(), var_gen_(var_gen_) {}
+  explicit VectorGenerator(const VariableGenerator& var_gen)
+      : vector_solvers_(), var_gen_(var_gen) {}
 
   bool solve() {
     BOOST_FOREACH(VectorSolverMap::value_type& c_pair, vector_solvers_) {
@@ -128,7 +128,7 @@ struct VectorGenerator {
     }
   }
 
- private: 
+ private:
   VectorSolverMap vector_solvers_;
   const VariableGenerator& var_gen_;
 };

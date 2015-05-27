@@ -25,7 +25,7 @@ void init(std::string const&);
 
 class rand_obj : public rand_obj_base {
  public:
-  explicit rand_obj(rand_obj* parent_ = 0) : parent_(parent_), rebuild_(false) {
+  explicit rand_obj(rand_obj* parent = 0) : parent_(parent), rebuild_(false) {
     if (parent_ != 0) parent_->add_obj_child(this);
   }
 
