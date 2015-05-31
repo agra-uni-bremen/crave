@@ -32,23 +32,23 @@ class rand_obj : public rand_obj_base {
   virtual bool next() {
     if (!gen_base_children()) return false;
     if (rebuild_) {
-      constraint_.reset();
-      gather_constraints(&constraint_);
-      constraint_.rebuild();
+      constraint.reset();
+      gather_constraints(&constraint);
+      constraint.rebuild();
       rebuild_ = false;
     }
-    return constraint_.next();
+    return constraint.next();
   }
 
   virtual bool next_cov() {
     if (!gen_base_children()) return false;
     if (rebuild_) {
-      constraint_.reset();
-      gather_constraints(&constraint_);
-      constraint_.rebuild();
+      constraint.reset();
+      gather_constraints(&constraint);
+      constraint.rebuild();
       rebuild_ = false;
     }
-    return constraint_.nextCov();
+    return constraint.nextCov();
   }
 
   virtual void gather_values(std::vector<int64_t> *ch) {
@@ -74,19 +74,19 @@ class rand_obj : public rand_obj_base {
   }
 
   bool enable_constraint(std::string name) {
-    bool res = constraint_.enableConstraint(name);
-    if (constraint_.isChanged()) request_rebuild();
+    bool res = constraint.enableConstraint(name);
+    if (constraint.isChanged()) request_rebuild();
     return res;
   }
 
   bool disable_constraint(std::string name) {
-    bool res = constraint_.disableConstraint(name);
-    if (constraint_.isChanged()) request_rebuild();
+    bool res = constraint.disableConstraint(name);
+    if (constraint.isChanged()) request_rebuild();
     return res;
   }
 
   bool is_constraint_enabled(std::string name) {
-    return constraint_.isConstraintEnabled(name);
+    return constraint.isConstraintEnabled(name);
   }
 
   std::ostream& print_dot_graph(std::ostream&, bool);
@@ -105,11 +105,11 @@ class rand_obj : public rand_obj_base {
     for (uint i = 0; i < objChildren_.size(); i++) {
       objChildren_[i]->gather_constraints(gen);
     }
-    gen->merge(constraint_);
+    gen->merge(constraint);
   }
 
  public:
-  Generator constraint_;
+  Generator constraint;
 
  protected:
   std::vector<rand_base*> baseChildren_;
@@ -133,7 +133,7 @@ class rand_obj : public rand_obj_base {
       }                                                               \
       std::set<int> s;                                                \
       BOOST_PP_SEQ_FOR_EACH(INSERT, s, __VA_ARGS__);                  \
-      parent->constraint_(inside(var, s));                             \
+      parent->constraint(inside(var, s));                             \
     }                                                                 \
   };                                                                  \
 }  // namespace crave

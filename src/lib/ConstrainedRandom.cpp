@@ -92,7 +92,7 @@ std::ostream& rand_obj::print_dot_graph(std::ostream& os, bool root = true) {
   for (uint i = 0; i < objChildren_.size(); i++) {
     objChildren_[i]->print_dot_graph(os, false);
   }
-  constraint_.printDotGraph(os, false);
+  constraint.printDotGraph(os, false);
   if (root) os << "}" << std::endl;
   return os;
 }
