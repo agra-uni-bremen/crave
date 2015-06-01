@@ -52,11 +52,11 @@ BOOST_FIXTURE_TEST_SUITE(Constraint_Management_t, Context_Fixture)
 class Item : public rand_obj {
  public:
   Item() : rand_obj(), a(this), b(this) {
-    constraint_("sum", a() + b() == 4);
-    constraint_("product", a() * b() == 4);
-    constraint_(a() < 10);
-    constraint_(b() < 10);
-    constraint_("x", a() != 2);
+    constraint("sum", a() + b() == 4);
+    constraint("product", a() * b() == 4);
+    constraint(a() < 10);
+    constraint(b() < 10);
+    constraint("x", a() != 2);
   }
   randv<uint> a;
   randv<uint> b;
@@ -115,9 +115,9 @@ BOOST_AUTO_TEST_CASE(t1) {
 class Item1 : public rand_obj {
  public:
   Item1() : rand_obj(), a(this) {
-    constraint_("abc", a() == 4);
-    constraint_("def", a() == 3);
-    constraint_("abc", a() == 3);
+    constraint("abc", a() == 4);
+    constraint("def", a() == 3);
+    constraint("abc", a() == 3);
   }
   randv<uint> a;
 };
@@ -127,10 +127,10 @@ BOOST_AUTO_TEST_CASE(t2) { BOOST_CHECK_THROW(Item1 it, std::runtime_error); }
 class ItemPythagoras : public rand_obj {
  public:
   ItemPythagoras() : rand_obj(), a(this), b(this), c(this) {
-    constraint_("pythagoras", a() * a() + b() * b() == c() * c());
+    constraint("pythagoras", a() * a() + b() * b() == c() * c());
     // constraint("div-zero", a() > 0 && b() > 0);
-    constraint_(a() > 0);
-    constraint_(b() > 0);
+    constraint(a() > 0);
+    constraint(b() > 0);
   }
   randv<unsigned char> a;
   randv<unsigned char> b;
@@ -159,11 +159,11 @@ BOOST_AUTO_TEST_CASE(Pythagoras) {
 class ItemPacketBaseConstraint : public rand_obj {
  public:
   ItemPacketBaseConstraint() : rand_obj(), i_(), src_addr(this), dest_addr(this), msg_length(this), msg(this) {
-    constraint_(msg_length() < 80);
-    constraint_(msg_length() > 2);
-    constraint_(src_addr() != dest_addr());
-    constraint_(msg().size() == msg_length());
-    constraint_(foreach(msg(), msg()[i_] >= ' ' && msg()[i_] <= 'z'));
+    constraint(msg_length() < 80);
+    constraint(msg_length() > 2);
+    constraint(src_addr() != dest_addr());
+    constraint(msg().size() == msg_length());
+    constraint(foreach(msg(), msg()[i_] >= ' ' && msg()[i_] <= 'z'));
   }
 
   placeholder i_;
@@ -176,8 +176,8 @@ class ItemPacketBaseConstraint : public rand_obj {
 class ItemPacketHierConstraint : public ItemPacketBaseConstraint {
  public:
   ItemPacketHierConstraint() : ItemPacketBaseConstraint(), dest_min(this), dest_max(this) {
-    constraint_((dest_addr() > dest_min()) && (dest_addr() < dest_max()));
-    constraint_(((src_addr() > (dest_addr() + 0x100000)) && (src_addr() < (dest_addr() + 0x200000))) ||
+    constraint((dest_addr() > dest_min()) && (dest_addr() < dest_max()));
+    constraint(((src_addr() > (dest_addr() + 0x100000)) && (src_addr() < (dest_addr() + 0x200000))) ||
                ((src_addr() < (dest_addr() - 0x10000)) && (src_addr() > (dest_addr() - 0xfffff))));
   }
   randv<uint> dest_min;
@@ -390,9 +390,9 @@ BOOST_AUTO_TEST_CASE(conflict_with_softs_t2) {
 class Item2 : public rand_obj {
  public:
   Item2() : rand_obj(), a(this), b(this) {
-    constraint_("d1", dist(a(), distribution<uint>::create(range<uint>(10, 20))));
-    constraint_("d2", dist(a(), distribution<uint>::create(range<uint>(30, 50))));
-    constraint_(b() == a() * 5);
+    constraint("d1", dist(a(), distribution<uint>::create(range<uint>(10, 20))));
+    constraint("d2", dist(a(), distribution<uint>::create(range<uint>(30, 50))));
+    constraint(b() == a() * 5);
   }
   randv<uint> a;
   randv<uint> b;
@@ -421,9 +421,9 @@ BOOST_AUTO_TEST_CASE(multi_distributions) {
 class Item3 : public rand_obj {
  public:
   Item3(rand_obj* parent) : rand_obj(parent), a(this), b(this) {
-    constraint_(a() == b());
-    constraint_(a() <= 5);
-    constraint_("c1", b() != 5);
+    constraint(a() == b());
+    constraint(a() <= 5);
+    constraint("c1", b() != 5);
   }
   randv<uint> a;
   randv<uint> b;
@@ -432,8 +432,8 @@ class Item3 : public rand_obj {
 class Item4 : public rand_obj {
  public:
   Item4(rand_obj* parent = 0) : rand_obj(parent), item(this), c(this) {
-    constraint_(c() >= 5);
-    constraint_("c2", item.a() == c());
+    constraint(c() >= 5);
+    constraint("c2", item.a() == c());
   }
   Item3 item;
   randv<uint> c;
