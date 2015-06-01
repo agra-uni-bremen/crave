@@ -32,9 +32,9 @@ struct Context
   typedef NodePtr result_type;
 
  private:
-  typedef std::pair<int, boost::shared_ptr<crave::ReferenceExpression>>
+  typedef std::pair<int, boost::shared_ptr<crave::ReferenceExpression> >
       ReadRefPair;
-  typedef std::pair<int, boost::shared_ptr<crave::AssignResult>> WriteRefPair;
+  typedef std::pair<int, boost::shared_ptr<crave::AssignResult> > WriteRefPair;
 
  public:
   explicit Context(VariableContainer* vars)
@@ -96,7 +96,7 @@ struct Context
     if (ite != variables_.end()) {
       return ite->second;
     } else {
-      result_type var = new_var(static_cast<var_tag<value_type>>(ref));
+      result_type var = new_var(static_cast<var_tag<value_type> >(ref));
 
       write_references_.push_back(std::make_pair(
           ref.id, boost::shared_ptr<crave::AssignResult>(
@@ -281,7 +281,7 @@ struct Context
     if (ite != variables_.end()) {
       return ite->second;
     } else {
-      result_type var = new_var(static_cast<var_tag<Integer>>(ref));
+      result_type var = new_var(static_cast<var_tag<Integer> >(ref));
 
       boost::shared_ptr<crave::ReferenceExpression> refExpr(
           new ReferenceExpressionImpl<Integer>(ref.ref, var));
@@ -344,9 +344,9 @@ struct Context
                          WriteReference<Integer> const& var_term,
                          Expr const& dist_expr) {
     result_type node = boost::proto::eval(dist_expr, *this);
-    if (boost::dynamic_pointer_cast<distribution<Integer>>(node) != 0) {
+    if (boost::dynamic_pointer_cast<distribution<Integer> >(node) != 0) {
       distribution<Integer>& dist =
-          *(boost::dynamic_pointer_cast<distribution<Integer>>(node));
+          *(boost::dynamic_pointer_cast<distribution<Integer> >(node));
 
       unsigned width = bitsize_traits<Integer>::value;
       bool sign = crave::is_signed<Integer>::value;

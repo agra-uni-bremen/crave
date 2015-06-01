@@ -21,8 +21,8 @@ struct read_ref_tag : public var_tag<value_type> {
 
 template <typename value_type_>
 struct ReadReference
-    : public Constraint<typename terminal<read_ref_tag<value_type_>>::type> {
-  typedef Constraint<typename terminal<read_ref_tag<value_type_>>::type>
+    : public Constraint<typename terminal<read_ref_tag<value_type_> >::type> {
+  typedef Constraint<typename terminal<read_ref_tag<value_type_> >::type>
       base_type;
   explicit ReadReference(value_type_ const& ref)
       : base_type(make_expr<boost::proto::tag::terminal>(
@@ -35,7 +35,7 @@ struct ReadReference
 
 template <typename T>
 typename boost::proto::result_of::make_expr<
-    boost::proto::tag::terminal, Constraint_Domain, read_ref_tag<T>>::type
+    boost::proto::tag::terminal, Constraint_Domain, read_ref_tag<T> >::type
 reference(T const& ref) {
   return make_expr<boost::proto::tag::terminal, Constraint_Domain>(
       read_ref_tag<T>(new_var_id(), ref));
