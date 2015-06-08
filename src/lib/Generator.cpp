@@ -46,7 +46,7 @@ namespace crave {
         resetCoverage();
     }
 
-    void Generator::rebuild(bool selfInclude = false) {
+    void Generator::rebuild(bool selfInclude) {
         if (selfInclude) merge(*this);
         constr_pttn_.partition();
         // currently, every hard/soft/cover constraint is considered for
@@ -89,7 +89,7 @@ namespace crave {
         vec_cov_gen_.reset(constr_pttn_.getVectorConstraints());
     }
 
-    std::ostream& Generator::printDotGraph(std::ostream& os, bool root = true) {
+    std::ostream& Generator::printDotGraph(std::ostream& os, bool root) {
         if (root) os << "digraph AST {" << std::endl;
         constr_mng_.printDotGraph(os);
         if (root) os << "}" << std::endl;

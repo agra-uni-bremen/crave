@@ -1,4 +1,4 @@
-#include "UserConstraint.hpp"
+#include "../crave/ir/UserConstraint.hpp"
 
 namespace crave {
 
@@ -34,7 +34,7 @@ namespace crave {
         enabled_ = false;
     }
 
-    virtual bool UserConstraint::isVectorConstraint() {
+    bool UserConstraint::isVectorConstraint() {
         return false;
     }
 

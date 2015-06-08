@@ -21,7 +21,10 @@ struct ConstraintManager {
 
   typedef std::map<std::string, ConstraintPtr> ConstraintMap;
 
-  ConstraintManager();
+  ConstraintManager() : changed_(false) {
+    static unsigned ID = 0;
+    id_ = ++ID;
+  }
 
   template <typename ostream>
   friend ostream& operator<<(ostream& os, const ConstraintManager& set) {
@@ -36,15 +39,48 @@ struct ConstraintManager {
     return os;
   }
 
-  bool enableConstraint(std::string const& key);
+  bool enableConstraint(std::string const& key) {
+    LOG(INFO) << "Enable constraint " << key << " in set " << id_ << ": ";
+    ConstraintMap::iterator ite = constr_map_.find(key);
+    if (ite != constr_map_.end()) {
+      if (!ite->second->isEnabled()) {
+        LOG(INFO) << "  ok";
+        ite->second->enable();
+        changed_ = true;
+      } else {
+        LOG(INFO) << "  already enabled";
+      }
+      return true;
+    }
+    LOG(INFO) << "not found";
+    return false;
+  }
 
-  bool disableConstraint(std::string const& key);
-  
-  bool isConstraintEnabled(std::string const& key);
+  bool disableConstraint(std::string const& key) {
+    LOG(INFO) << "Disable constraint " << key << " in set " << id_ << ": ";
+    ConstraintMap::iterator ite = constr_map_.find(key);
+    if (ite != constr_map_.end()) {
+      if (ite->second->isEnabled()) {
+        LOG(INFO) << "  ok";
+        ite->second->disable();
+        changed_ = true;
+      } else {
+        LOG(INFO) << "  already enabled";
+      }
+      return true;
+    }
+    LOG(INFO) << "  not found";
+    return false;
+  }
 
-  bool isChanged() const;
+  bool isConstraintEnabled(std::string const& key) {
+    ConstraintMap::iterator ite = constr_map_.find(key);
+    return ite != constr_map_.end() && ite->second->isEnabled();
+  }
 
-  void resetChanged();
+  bool isChanged() const { return changed_; }
+
+  void resetChanged() { changed_ = false; }
 
   template <typename Expr>
   ConstraintPtr makeConstraint(std::string const& name, int c_id, Expr e,
@@ -98,7 +134,20 @@ struct ConstraintManager {
                           id, e, ctx, soft, cover);
   }
 
-  std::ostream& printDotGraph(std::ostream& os);
+  std::ostream& printDotGraph(std::ostream& os) {
+    ToDotVisitor visitor(os);
+
+    BOOST_FOREACH(ConstraintPtr c, constraints_) {
+      int32_t a = reinterpret_cast<int32_t>(&*c);
+      int32_t b = reinterpret_cast<int32_t>(&(*c->expr()));
+      os << "\t" << a << " [label=\"" << c->name()
+         << (c->isSoft() ? " soft" : "") << (c->isCover() ? " cover" : "")
+         << (!c->isEnabled() ? " disabled" : "") << "\"]" << std::endl;
+      os << "\t" << a << " -> " << b << std::endl;
+      c->expr()->visit(visitor);
+    }
+    return os;
+  }
 
  private:
   unsigned id_;

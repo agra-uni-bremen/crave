@@ -1,4 +1,4 @@
-#include "VariableCoverageGenerator.hpp"
+#include "../crave/backend/VariableCoverageGenerator.hpp"
 
 namespace crave {
 
@@ -15,7 +15,7 @@ namespace crave {
         }
     }
 
-    virtual bool VariableCoverageGenerator::solve() {
+    bool VariableCoverageGenerator::solve() {
         bool res = false;
 
         BOOST_FOREACH(VarSolverPtr vs, solvers_) {

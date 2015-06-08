@@ -1,6 +1,9 @@
-#include "ConstraintPartition.hpp"
+#include "../crave/ir/ConstraintPartition.hpp"
 
 namespace crave {
+
+    typedef ConstraintList::iterator iterator;
+    typedef ConstraintList::const_iterator const_iterator;
 
     iterator ConstraintPartition::begin() {
         return constraints_.begin();

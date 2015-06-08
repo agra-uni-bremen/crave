@@ -7,7 +7,6 @@ SET(CRAVE_LIB_SRC
   metaSMTNodeVisitor.cpp
   ReplaceVisitor.cpp
   ToDotNodeVisitor.cpp
-  ConstraintManager.cpp
   CraveSettings.cpp
   Generator.cpp
   SettingType.cpp
