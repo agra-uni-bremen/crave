@@ -2,7 +2,7 @@
 
 namespace crave {
 
-    explicit VariableCoverageGenerator::VariableCoverageGenerator(VariableContainer* vcon)
+    VariableCoverageGenerator::VariableCoverageGenerator(VariableContainer* vcon)
     : VariableGenerator(vcon) {
     }
 

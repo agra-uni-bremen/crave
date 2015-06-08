@@ -1,8 +1,9 @@
-#include "SettingsType.hpp"
+#include "../crave/utils/SettingsType.hpp"
 
 namespace crave {
 
-    explicit Setting::Setting(std::string const& filename) : filename_(filename) {
+    typedef boost::property_tree::ptree ptree;
+    Setting::Setting(std::string const& filename) : filename_(filename) {
     }
 
     void Setting::load() {
@@ -30,7 +31,7 @@ namespace crave {
         return tree;
     }
 
-    explicit LoggerSetting::LoggerSetting(std::string const& filename)
+    LoggerSetting::LoggerSetting(std::string const& filename)
     : Setting(filename),
     module_name_("logger"),
     file_(),

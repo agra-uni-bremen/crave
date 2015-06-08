@@ -1,8 +1,8 @@
-#include "CraveSettings.hpp"
+#include "../crave/utils/CraveSettings.hpp"
 
 namespace crave {
 
-    explicit CraveSetting::CraveSetting(std::string const& filename)
+    CraveSetting::CraveSetting(std::string const& filename)
     : Setting(filename),
     module_name_("crave"),
     backend_(),
