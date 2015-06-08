@@ -7,6 +7,19 @@ SET(CRAVE_LIB_SRC
   metaSMTNodeVisitor.cpp
   ReplaceVisitor.cpp
   ToDotNodeVisitor.cpp
+  ConstraintManager.cpp
+  CraveSettings.cpp
+  Generator.cpp
+  SettingType.cpp
+  VariableCoverageGenerator.cpp
+  ConstraintPartition.cpp
+  Evaluator.cpp
+  RandObjGenerator.cpp
+  UserConstraint.cpp
+  CraveSettings.cpp
+  Evaluator.cpp
+  RandObjGenerator.cpp
+  SettingType.cpp
 )
 
 if (CRAVE_ENABLE_EXPERIMENTAL)
