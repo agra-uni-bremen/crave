@@ -12,15 +12,7 @@ namespace crave {
 
 struct Generator {
  public:
-  Generator()
-      : constr_mng_(),
-        var_ctn_(&crave::variables),
-        ctx_(var_ctn_),
-        var_gen_(var_ctn_),
-        vec_gen_(var_gen_),
-        var_cov_gen_(var_ctn_),
-        vec_cov_gen_(var_cov_gen_),
-        covered_(false) {}
+  Generator();
 
   template <typename Expr>
   explicit Generator(Expr expr)
@@ -71,92 +63,35 @@ struct Generator {
     return *this;
   }
 
-  bool enableConstraint(std::string const& name) {
-    return constr_mng_.enableConstraint(name);
-  }
+  bool enableConstraint(std::string const& name);
 
-  bool disableConstraint(std::string const& name) {
-    return constr_mng_.disableConstraint(name);
-  }
+  bool disableConstraint(std::string const& name);
 
-  bool isConstraintEnabled(std::string const& name) {
-    return constr_mng_.isConstraintEnabled(name);
-  }
+  bool isConstraintEnabled(std::string const& name);
 
-  bool isChanged() { return constr_mng_.isChanged(); }
+  bool isChanged();
 
-  Generator& operator()() {
-    if (!next()) {
-      throw std::runtime_error("Generator constraint unsatisfiable.");
-    }
-    return *this;
-  }
+  Generator& operator()();
 
-  void merge(const Generator& other) {
-    constr_pttn_.mergeConstraints(other.constr_mng_);
-  }
+  void merge(const Generator& other);
 
-  void reset() {
-    constr_mng_.resetChanged();
-    constr_pttn_.reset();
-    resetCoverage();
-  }
+  void reset();
 
-  void rebuild(bool selfInclude = false) {
-    if (selfInclude) merge(*this);
-    constr_pttn_.partition();
-    // currently, every hard/soft/cover constraint is considered for
-    // partitioning, this is suboptimal.
-    var_gen_.reset(constr_pttn_.getPartitions());
-    vec_gen_.reset(constr_pttn_.getVectorConstraints());
-    var_cov_gen_.reset(constr_pttn_.getPartitions());
-    vec_cov_gen_.reset(constr_pttn_.getVectorConstraints());
-  }
+  void rebuild(bool selfInclude = false);
 
-  bool next() {
-    if (constr_mng_.isChanged()) {
-      reset();
-      rebuild(true);
-    }
-    return var_gen_.solve() && vec_gen_.solve();
-  }
+  bool next();
 
-  bool nextCov() {
-    if (constr_mng_.isChanged()) {
-      reset();
-      rebuild(true);
-    }
-    if (!covered_) {
-      if (var_cov_gen_.solve() && vec_cov_gen_.solve())
-        return true;
-      else
-        covered_ = true;
-    }
-    return next();
-  }
+  bool nextCov();
 
-  bool isCovered() { return covered_; }
+  bool isCovered();
 
-  void resetCoverage() {
-    covered_ = false;
-    var_cov_gen_.reset(constr_pttn_.getPartitions());
-    vec_cov_gen_.reset(constr_pttn_.getVectorConstraints());
-  }
+  void resetCoverage();
 
-  std::ostream& printDotGraph(std::ostream& os, bool root = true) {
-    if (root) os << "digraph AST {" << std::endl;
-    constr_mng_.printDotGraph(os);
-    if (root) os << "}" << std::endl;
-    return os;
-  }
+  std::ostream& printDotGraph(std::ostream& os, bool root = true);
 
-  std::vector<std::vector<std::string> > analyseContradiction() {
-    return var_gen_.analyseContradiction();
-  }
+  std::vector<std::vector<std::string> > analyseContradiction();
 
-  std::vector<std::string> getInactiveSofts() {
-    return var_gen_.getInactiveSofts();
-  }
+  std::vector<std::string> getInactiveSofts();
 
   template <typename T>
   T operator[](Variable<T> const& var) {
