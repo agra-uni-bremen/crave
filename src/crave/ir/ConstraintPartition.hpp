@@ -25,23 +25,17 @@ struct ConstraintPartition {
   typedef ConstraintList::size_type size_type;
   typedef ConstraintList::value_type value_type;
 
-  iterator begin() { return constraints_.begin(); }
+  iterator begin();
 
-  const_iterator begin() const { return constraints_.begin(); }
+  const_iterator begin() const;
 
-  iterator end() { return constraints_.end(); }
+  iterator end();
 
-  const_iterator end() const { return constraints_.end(); }
+  const_iterator end() const;
 
-  void add(ConstraintPtr c) {
-    iterator ite = constraints_.begin();
-    while (ite != constraints_.end() && ((*ite)->id() > c->id())) ite++;
-    constraints_.insert(ite, c);
-  }
+  void add(ConstraintPtr c);
 
-  bool containsVar(int id) {
-    return support_vars_.find(id) != support_vars_.end();
-  }
+  bool containsVar(int id);
 
   template <typename ostream>
   friend ostream& operator<<(ostream& os, const ConstraintPartition& cp) {
