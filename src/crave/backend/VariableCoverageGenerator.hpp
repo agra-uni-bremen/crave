@@ -8,29 +8,11 @@
 
 namespace crave {
 
-struct VariableCoverageGenerator : VariableGenerator {
-  explicit VariableCoverageGenerator(VariableContainer* vcon)
-      : VariableGenerator(vcon) {}
+    struct VariableCoverageGenerator : VariableGenerator {
+        explicit VariableCoverageGenerator(VariableContainer* vcon);
 
-  virtual void reset(std::vector<ConstraintPartition>& partitions) {
-    solvers_.clear();
+        virtual void reset(std::vector<ConstraintPartition>& partitions);
 
-    BOOST_FOREACH(ConstraintPartition& partition, partitions) {
-      VarSolverPtr vs(new VariableCoverageSolver(var_ctn_, partition));
-      solvers_.push_back(vs);
-    }
-  }
-
-  virtual bool solve() {
-    bool res = false;
-    BOOST_FOREACH(VarSolverPtr vs, solvers_) {
-      if (vs->solve())
-        res = true;  // one solver has hitted an uncovered constraint
-                     // -> everything ok,
-                     // from covered solvers, the last
-                     // solutions will be reused.
-    }
-    return res;
-  }
-};
-}  // namespace crave
+        virtual bool solve();
+    };
+} // namespace crave
