@@ -23,21 +23,19 @@ class Evaluator {
     assignments_[var.id()] = Constant(value, width, sign);
   }
 
-  void assign(unsigned id, Constant c) { assignments_[id] = c; }
+  void assign(unsigned id, Constant c);
 
   template <typename Expr>
   bool evaluate(Expr expr) {
     return evaluate(make_expression(expr));
   }
-  bool evaluate(expression const& expr) {
-    return visitor_.evaluate(*boost::proto::value(expr));
-  }
+  bool evaluate(expression const& expr);
 
   template <typename Integer>
   Integer result() const {
     return static_cast<Integer>(visitor_.result().value());
   }
-  uint64_t result() const { return result<uint64_t>(); }
+  uint64_t result() const;
 
  private:
   eval_map assignments_;

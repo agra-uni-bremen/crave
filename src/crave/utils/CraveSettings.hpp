@@ -5,7 +5,6 @@
 #include <fstream>
 #include <set>
 #include <string>
-
 #include "Settings.hpp"
 
 namespace crave {
