@@ -11,27 +11,16 @@
 namespace crave {
 class CraveSetting : public Setting {
  public:
-  explicit CraveSetting(std::string const& filename)
-      : Setting(filename),
-        module_name_("crave"),
-        backend_(),
-        seed_(),
-        BACKEND("backend"),
-        SEED("seed") {}
+  explicit CraveSetting(std::string const& filename);
 
  private:
-  virtual void load_(const ptree& tree) {
-    backend_ = tree.get(module_name_ + "." + BACKEND, "Boolector");
-    seed_ = tree.get(module_name_ + "." + SEED, 42);
-  }
-  virtual void save_(ptree* tree) const {
-    tree->put(module_name_ + "." + BACKEND, backend_);
-    tree->put(module_name_ + "." + SEED, seed_);
-  }
+  virtual void load_(const ptree& tree);
+  
+  virtual void save_(ptree* tree) const;
 
  public:
-  std::string const& get_backend() const { return backend_; }
-  unsigned int get_seed() const { return seed_; }
+  std::string const& get_backend() const;
+  unsigned int get_seed() const;
 
  private:
   std::string module_name_;
