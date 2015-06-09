@@ -37,8 +37,6 @@ struct ConstraintManager;
 struct ConstraintPartitioner;
 
 struct UserConstraint;
-//typedef boost::shared_ptr<UserConstraint> ConstraintPtr;
-typedef std::list<ConstraintPtr> ConstraintList;
 
 struct UserVectorConstraint;
 typedef boost::shared_ptr<UserVectorConstraint> VectorConstraintPtr;
