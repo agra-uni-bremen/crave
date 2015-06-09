@@ -1,5 +1,4 @@
 #include "../crave/backend/VariableGeneratorType.hpp"
-#include "../crave/SystemC.hpp"
 
 namespace crave {
 
@@ -63,9 +62,9 @@ namespace crave {
     template bool VariableGenerator::read(const Variable<long long> &var, long long* value) const;
     template bool VariableGenerator::read(const Variable<unsigned long long> &var, unsigned long long* value) const;
     //SYSTEMC
-    template bool VariableGenerator::read(const Variable<sc_dt::sc_bv<4> > &var, sc_dt::sc_bv<4>* value) const;
-    template bool VariableGenerator::read(const Variable<sc_dt::sc_uint<2> > &var, sc_dt::sc_uint<2>* value) const;
-    template bool VariableGenerator::read(const Variable<sc_dt::sc_int<4> > &var, sc_dt::sc_int<4>* value) const;
+    //template bool VariableGenerator::read(const Variable<sc_dt::sc_bv<4> > &var, sc_dt::sc_bv<4>* value) const;
+    //template bool VariableGenerator::read(const Variable<sc_dt::sc_uint<2> > &var, sc_dt::sc_uint<2>* value) const;
+    //template bool VariableGenerator::read(const Variable<sc_dt::sc_int<4> > &var, sc_dt::sc_int<4>* value) const;
 
 
 }
