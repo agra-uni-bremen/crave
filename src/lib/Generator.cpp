@@ -2,19 +2,6 @@
 
 namespace crave {
 
-    template <typename Expr>
-  Generator::Generator(Expr expr)
-      : constr_mng_(),
-        var_ctn_(&crave::variables),
-        ctx_(var_ctn_),
-        var_gen_(var_ctn_),
-        vec_gen_(var_gen_),
-        var_cov_gen_(var_ctn_),
-        vec_cov_gen_(var_cov_gen_),
-        covered_(false) {
-    (*this)(expr);
-  }
-    
     Generator::Generator()
     : constr_mng_(),
     var_ctn_(&crave::variables),
