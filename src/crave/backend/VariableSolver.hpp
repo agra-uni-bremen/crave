@@ -13,10 +13,7 @@ namespace crave {
 struct VariableSolver {
   friend struct VariableGenerator;
 
-  VariableSolver(VariableContainer* vcon, const ConstraintPartition& cp)
-      : var_ctn_(vcon),
-        constr_pttn_(cp),
-        solver_(FactoryMetaSMT::getNewInstance()) {}
+  VariableSolver(VariableContainer* vcon, const ConstraintPartition& cp);
 
   virtual bool solve() = 0;
 
@@ -32,11 +29,9 @@ struct VariableSolver {
     return true;
   }
 
-  std::vector<std::vector<std::string> > getContradictions() {
-    return contradictions_;
-  }
+  std::vector<std::vector<std::string> > getContradictions();
 
-  std::vector<std::string> getInactiveSofts() const { return inactive_softs_; }
+  std::vector<std::string> getInactiveSofts() const;
 
  protected:
   VariableContainer *var_ctn_;

@@ -21,6 +21,7 @@ SET(CRAVE_LIB_SRC
   VariableCoverageSolver.cpp
   VariableDefaultSolver.cpp
   VariableGeneratorType.cpp
+  VariableSolver.cpp
 )
 
 if (CRAVE_ENABLE_EXPERIMENTAL)
