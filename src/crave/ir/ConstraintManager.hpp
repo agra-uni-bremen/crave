@@ -36,48 +36,15 @@ struct ConstraintManager {
     return os;
   }
 
-  bool enableConstraint(std::string const& key) {
-    LOG(INFO) << "Enable constraint " << key << " in set " << id_ << ": ";
-    ConstraintMap::iterator ite = constr_map_.find(key);
-    if (ite != constr_map_.end()) {
-      if (!ite->second->isEnabled()) {
-        LOG(INFO) << "  ok";
-        ite->second->enable();
-        changed_ = true;
-      } else {
-        LOG(INFO) << "  already enabled";
-      }
-      return true;
-    }
-    LOG(INFO) << "not found";
-    return false;
-  }
+  bool enableConstraint(std::string const& key);
 
-  bool disableConstraint(std::string const& key) {
-    LOG(INFO) << "Disable constraint " << key << " in set " << id_ << ": ";
-    ConstraintMap::iterator ite = constr_map_.find(key);
-    if (ite != constr_map_.end()) {
-      if (ite->second->isEnabled()) {
-        LOG(INFO) << "  ok";
-        ite->second->disable();
-        changed_ = true;
-      } else {
-        LOG(INFO) << "  already enabled";
-      }
-      return true;
-    }
-    LOG(INFO) << "  not found";
-    return false;
-  }
+  bool disableConstraint(std::string const& key);
 
-  bool isConstraintEnabled(std::string const& key) {
-    ConstraintMap::iterator ite = constr_map_.find(key);
-    return ite != constr_map_.end() && ite->second->isEnabled();
-  }
+  bool isConstraintEnabled(std::string const& key);
 
-  bool isChanged() const { return changed_; }
+  bool isChanged() const;
 
-  void resetChanged() { changed_ = false; }
+  void resetChanged();
 
   template <typename Expr>
   ConstraintPtr makeConstraint(std::string const& name, int c_id, Expr e,
@@ -120,38 +87,7 @@ struct ConstraintManager {
 
   ConstraintPtr makeConstraint(std::string const& name, int c_id, NodePtr n,
                                Context *ctx, bool const soft = false,
-                               bool const cover = false) {
-    LOG(INFO) << "New " << (soft ? "soft " : "") << (cover ? "cover " : "")
-              << "constraint " << name << " in set " << id_;
-
-    if (constr_map_.find(name) != constr_map_.end()) {
-      throw std::runtime_error(name + "Constraint already exists.");
-    }
-
-    GetSupportSetVisitor gssv;
-    n->visit(&gssv);
-
-    ConstraintPtr c(
-        boost::dynamic_pointer_cast<ForEach>(n) != 0
-            ? new UserVectorConstraint(c_id, n, name, gssv.getSupportVars(),
-                                       false, soft, cover)
-            : (boost::dynamic_pointer_cast<Unique>(n) != 0
-                   ? new UserVectorConstraint(c_id, n, name,
-                                              gssv.getSupportVars(), true, soft,
-                                              cover)
-                   : new UserConstraint(c_id, n, name, gssv.getSupportVars(),
-                                        soft, cover)));
-
-    assert(!c->isSoft() ||
-           !c->isCover());  // soft cover constraint not defined/supported yet
-    assert(!c->isVectorConstraint() ||
-           !c->isCover());  // cover vector constraint not defined/supported yet
-
-    changed_ = true;
-    constraints_.push_back(c);
-
-    return constr_map_[name] = c;
-  }
+                               bool const cover = false);
 
   template <typename Expr>
   ConstraintPtr makeConstraint(std::string const& name, Expr e, Context *ctx,
@@ -168,19 +104,7 @@ struct ConstraintManager {
                           id, e, ctx, soft, cover);
   }
 
-  std::ostream& printDotGraph(std::ostream& os) {
-    ToDotVisitor visitor(os);
-    BOOST_FOREACH(ConstraintPtr c, constraints_) {
-      long a = reinterpret_cast<long>(&*c);
-      long b = reinterpret_cast<long>(&(*c->expr()));
-      os << "\t" << a << " [label=\"" << c->name()
-         << (c->isSoft() ? " soft" : "") << (c->isCover() ? " cover" : "")
-         << (!c->isEnabled() ? " disabled" : "") << "\"]" << std::endl;
-      os << "\t" << a << " -> " << b << std::endl;
-      c->expr()->visit(&visitor);
-    }
-    return os;
-  }
+  std::ostream& printDotGraph(std::ostream& os);
 
  private:
   unsigned id_;
