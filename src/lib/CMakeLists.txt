@@ -24,6 +24,7 @@ SET(CRAVE_LIB_SRC
   VariableSolver.cpp
   VectorGenerator.cpp
   ConstrainedRandom.cpp
+  UserVectorConstraint.cpp
 )
 
 if (CRAVE_ENABLE_EXPERIMENTAL)

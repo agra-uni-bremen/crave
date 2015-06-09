@@ -17,14 +17,12 @@ struct UserVectorConstraint : UserConstraint {
   UserVectorConstraint(unsigned const id, expression const expr,
                        std::string const& name, std::set<int> support_vars,
                        bool const unique, bool const soft = false,
-                       bool const cover = false, bool const enabled = true)
-      : UserConstraint(id, expr, name, support_vars, soft, cover, enabled),
-        unique_(unique) {}
+                       bool const cover = false, bool const enabled = true);
 
  public:
-  bool isUnique() { return unique_; }
-  int getVectorId() { return *support_vars_.begin(); }
-  bool isVectorConstraint() { return true; }
+  bool isUnique();
+  int getVectorId();
+  bool isVectorConstraint();
 
  protected:
   bool unique_;
