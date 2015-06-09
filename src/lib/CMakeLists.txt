@@ -22,6 +22,7 @@ SET(CRAVE_LIB_SRC
   VariableDefaultSolver.cpp
   VariableGeneratorType.cpp
   VariableSolver.cpp
+  VectorGenerator.cpp
 )
 
 if (CRAVE_ENABLE_EXPERIMENTAL)
