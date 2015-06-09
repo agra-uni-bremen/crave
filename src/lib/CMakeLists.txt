@@ -18,6 +18,7 @@ SET(CRAVE_LIB_SRC
   Evaluator.cpp
   RandObjGenerator.cpp
   SettingType.cpp
+  VariableCoverageSolver.cpp
 )
 
 if (CRAVE_ENABLE_EXPERIMENTAL)
