@@ -16,24 +16,11 @@ namespace crave {
 struct VariableGenerator {
   typedef boost::shared_ptr<VariableSolver> VarSolverPtr;
 
-  explicit VariableGenerator(VariableContainer* vcon)
-      : var_ctn_(vcon), solvers_() {}
+  explicit VariableGenerator(VariableContainer* vcon);
 
-  virtual void reset(std::vector<ConstraintPartition>& partitions) {
-    solvers_.clear();
+  virtual void reset(std::vector<ConstraintPartition>& partitions);
 
-    BOOST_FOREACH(ConstraintPartition& partition, partitions) {
-      VarSolverPtr vs(new VariableDefaultSolver(var_ctn_, partition));
-      solvers_.push_back(vs);
-    }
-  }
-
-  virtual bool solve() {
-    BOOST_FOREACH(VarSolverPtr vs, solvers_) {
-      if (!vs->solve()) return false;
-    }
-    return true;
-  }
+  virtual bool solve();
 
   template <typename T>
   bool read(const Variable<T> &var, T* value) const {
@@ -43,25 +30,9 @@ struct VariableGenerator {
     return false;
   }
 
-  std::vector<std::vector<std::string> > analyseContradiction() {
-    std::vector<std::vector<std::string> > str_vec;
+  std::vector<std::vector<std::string> > analyseContradiction();
 
-    BOOST_FOREACH(VarSolverPtr vs, solvers_) {
-      std::vector<std::vector<std::string> > c = vs->getContradictions();
-      if (!c.empty()) str_vec.insert(str_vec.end(), c.begin(), c.end());
-    }
-    return str_vec;
-  }
-
-  std::vector<std::string> getInactiveSofts() const {
-    std::vector<std::string> str_vec;
-
-    BOOST_FOREACH(VarSolverPtr vs, solvers_) {
-      std::vector<std::string> c = vs->getInactiveSofts();
-      if (!c.empty()) str_vec.insert(str_vec.end(), c.begin(), c.end());
-    }
-    return str_vec;
-  }
+  std::vector<std::string> getInactiveSofts() const;
 
  protected:
   VariableContainer* var_ctn_;
