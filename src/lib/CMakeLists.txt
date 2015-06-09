@@ -27,6 +27,7 @@ SET(CRAVE_LIB_SRC
   UserVectorConstraint.cpp
   UserConstraintType.cpp
   ConstraintManager.cpp
+  ConstraintPartitioner.cpp
 )
 
 if (CRAVE_ENABLE_EXPERIMENTAL)
