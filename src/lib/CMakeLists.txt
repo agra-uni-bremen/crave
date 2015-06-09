@@ -23,6 +23,7 @@ SET(CRAVE_LIB_SRC
   VariableGeneratorType.cpp
   VariableSolver.cpp
   VectorGenerator.cpp
+  ConstrainedRandom.cpp
 )
 
 if (CRAVE_ENABLE_EXPERIMENTAL)
