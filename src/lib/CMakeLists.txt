@@ -26,6 +26,7 @@ SET(CRAVE_LIB_SRC
   ConstrainedRandom.cpp
   UserVectorConstraint.cpp
   UserConstraintType.cpp
+  ConstraintManager.cpp
 )
 
 if (CRAVE_ENABLE_EXPERIMENTAL)
