@@ -1,4 +1,5 @@
 #include "../crave/backend/VariableCoverageGenerator.hpp"
+#include "../crave/backend/VariableCoverageSolver.hpp"
 
 namespace crave {
 

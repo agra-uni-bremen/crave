@@ -14,7 +14,6 @@ SET(CRAVE_LIB_SRC
   ConstraintPartition.cpp
   Evaluator.cpp
   RandObjGenerator.cpp
-  UserConstraint.cpp
   CraveSettings.cpp
   Evaluator.cpp
   RandObjGenerator.cpp
