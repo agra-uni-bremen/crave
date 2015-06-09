@@ -27,7 +27,7 @@ namespace crave {
         constraints_.insert(ite, c);
     }
 
-    bool ConstraintPartition::containsVar(int id) {
+    bool ConstraintPartition::containsVar(int id) const {
         return support_vars_.find(id) != support_vars_.end();
     }
 }

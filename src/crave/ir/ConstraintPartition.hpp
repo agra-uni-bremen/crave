@@ -35,7 +35,7 @@ struct ConstraintPartition {
 
   void add(ConstraintPtr c);
 
-  bool containsVar(int id);
+  bool containsVar(int id) const;
 
   template <typename ostream>
   friend ostream& operator<<(ostream& os, const ConstraintPartition& cp) {

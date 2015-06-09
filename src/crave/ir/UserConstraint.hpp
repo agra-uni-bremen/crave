@@ -17,6 +17,10 @@
 #include <set>
 
 #include "UserConstraintType.hpp"
+#include "UserVectorConstraint.hpp"
+#include "ConstraintPartition.hpp"
+
+
 #include "Context.hpp"
 #include "Node.hpp"
 #include "visitor/FixWidthVisitor.hpp"
@@ -38,76 +42,6 @@ typedef std::list<ConstraintPtr> ConstraintList;
 struct UserVectorConstraint;
 typedef boost::shared_ptr<UserVectorConstraint> VectorConstraintPtr;
 
-/**
- *
- */
-struct UserVectorConstraint : UserConstraint {
-  friend struct ConstraintManager;
-  friend struct ConstraintPartitioner;
-
- protected:
-  UserVectorConstraint(unsigned const id, expression const expr,
-                       std::string const& name, std::set<int> support_vars,
-                       bool const unique, bool const soft = false,
-                       bool const cover = false, bool const enabled = true)
-      : UserConstraint(id, expr, name, support_vars, soft, cover, enabled),
-        unique_(unique) {}
-
- public:
-  bool isUnique() { return unique_; }
-  int getVectorId() { return *support_vars_.begin(); }
-  bool isVectorConstraint() { return true; }
-
- protected:
-  bool unique_;
-};
-
-/**
- *
- */
-struct ConstraintPartition {
-  friend struct ConstraintPartitioner;
-
-  ConstraintPartition() {}
-
-  typedef ConstraintList::iterator iterator;
-  typedef ConstraintList::const_iterator const_iterator;
-  typedef ConstraintList::reference reference;
-  typedef ConstraintList::const_reference const_reference;
-  typedef ConstraintList::size_type size_type;
-  typedef ConstraintList::value_type value_type;
-
-  iterator begin() { return constraints_.begin(); }
-
-  const_iterator begin() const { return constraints_.begin(); }
-
-  iterator end() { return constraints_.end(); }
-
-  const_iterator end() const { return constraints_.end(); }
-
-  void add(ConstraintPtr c) {
-    iterator ite = constraints_.begin();
-    while (ite != constraints_.end() && ((*ite)->id() > c->id())) ite++;
-    constraints_.insert(ite, c);
-  }
-
-  bool containsVar(int id) const {
-    return support_vars_.find(id) != support_vars_.end();
-  }
-
-  template <typename ostream>
-  friend ostream& operator<<(ostream& os, const ConstraintPartition& cp) {
-    os << "[ ";
-    BOOST_FOREACH(ConstraintPtr c, cp) { os << c->name() << " "; }
-    os << "]";
-    os << std::flush;
-    return os;
-  }
-
- private:
-  ConstraintList constraints_;
-  std::set<int> support_vars_;
-};
 
 /**
  *
@@ -381,5 +315,6 @@ struct ConstraintPartitioner {
   std::vector<ConstraintPartition> partitions_;
   std::vector<VectorConstraintPtr> vec_constraints_;
 };
+
 
 }  // end namespace crave

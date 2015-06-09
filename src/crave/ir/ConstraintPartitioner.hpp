@@ -8,7 +8,8 @@
 #include <set>
 
 #include "Context.hpp"
-
+#include "ConstraintManager.hpp"
+/*
 namespace crave {
 
 typedef boost::shared_ptr<UserVectorConstraint> VectorConstraintPtr;
@@ -106,5 +107,9 @@ struct ConstraintPartitioner {
   // results
   std::vector<ConstraintPartition> partitions_;
   std::vector<VectorConstraintPtr> vec_constraints_;
-};
+};*/
+
+
+
+
 }  // namespace crave
