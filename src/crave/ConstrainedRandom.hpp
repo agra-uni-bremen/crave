@@ -25,88 +25,33 @@ void init(std::string const&);
 
 class rand_obj : public rand_obj_base {
  public:
-  explicit rand_obj(rand_obj* parent = 0) : parent_(parent), rebuild_(false) {
-    if (parent_ != 0) parent_->add_obj_child(this);
-  }
+  explicit rand_obj(rand_obj* parent = 0);
 
-  virtual bool next() {
-    if (!gen_base_children()) return false;
-    if (rebuild_) {
-      constraint.reset();
-      gather_constraints(&constraint);
-      constraint.rebuild();
-      rebuild_ = false;
-    }
-    return constraint.next();
-  }
+  virtual bool next();
 
-  virtual bool next_cov() {
-    if (!gen_base_children()) return false;
-    if (rebuild_) {
-      constraint.reset();
-      gather_constraints(&constraint);
-      constraint.rebuild();
-      rebuild_ = false;
-    }
-    return constraint.nextCov();
-  }
+  virtual bool next_cov();
 
-  virtual void gather_values(std::vector<int64_t> *ch) {
-    for (std::vector<rand_base*>::const_iterator i = baseChildren_.begin();
-         i != baseChildren_.end(); ++i)
-      (*i)->gather_values(ch);
-    for (std::vector<rand_obj*>::const_iterator i = objChildren_.begin();
-         i != objChildren_.end(); ++i) {
-      (*i)->gather_values(ch);
-    }
-  }
+  virtual void gather_values(std::vector<int64_t> *ch);
 
-  virtual void add_base_child(rand_base* rb) { baseChildren_.push_back(rb); }
+  virtual void add_base_child(rand_base* rb);
 
-  void request_rebuild() {
-    rebuild_ = true;
-    if (parent_ != 0) parent_->request_rebuild();
-  }
+  void request_rebuild();
 
-  void add_obj_child(rand_obj* ro) {
-    objChildren_.push_back(ro);
-    request_rebuild();
-  }
+  void add_obj_child(rand_obj* ro);
 
-  bool enable_constraint(std::string name) {
-    bool res = constraint.enableConstraint(name);
-    if (constraint.isChanged()) request_rebuild();
-    return res;
-  }
+  bool enable_constraint(std::string name);
 
-  bool disable_constraint(std::string name) {
-    bool res = constraint.disableConstraint(name);
-    if (constraint.isChanged()) request_rebuild();
-    return res;
-  }
+  bool disable_constraint(std::string name);
 
-  bool is_constraint_enabled(std::string name) {
-    return constraint.isConstraintEnabled(name);
-  }
+  bool is_constraint_enabled(std::string name);
 
   std::ostream& print_dot_graph(std::ostream&, bool);
   void display_constraints();
 
  protected:
-  bool gen_base_children() {
-    for (uint i = 0; i < baseChildren_.size(); i++)
-      if (!baseChildren_[i]->next()) return false;
-    for (uint i = 0; i < objChildren_.size(); i++)
-      if (!objChildren_[i]->gen_base_children()) return false;
-    return true;
-  }
+  bool gen_base_children();
 
-  void gather_constraints(Generator *gen) {
-    for (uint i = 0; i < objChildren_.size(); i++) {
-      objChildren_[i]->gather_constraints(gen);
-    }
-    gen->merge(constraint);
-  }
+  void gather_constraints(Generator *gen);
 
  public:
   Generator constraint;
