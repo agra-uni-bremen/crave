@@ -20,14 +20,7 @@ struct UserConstraint {
   UserConstraint(unsigned const id, expression const expr,
                  std::string const& name, std::set<int> support_vars,
                  bool const soft = false, bool const cover = false,
-                 bool const enabled = true)
-      : id_(id),
-        expr_(expr),
-        name_(name),
-        support_vars_(support_vars),
-        soft_(soft),
-        cover_(cover),
-        enabled_(enabled) {}
+                 bool const enabled = true);
 
  public:
   virtual ~UserConstraint() {}
@@ -41,23 +34,23 @@ struct UserConstraint {
     return os;
   }
 
-  unsigned id() const { return id_; }
+  unsigned id() const;
 
-  expression const& expr() const { return expr_; }
+  expression const& expr() const;
 
-  std::string name() const { return name_; }
+  std::string name() const;
 
-  bool isSoft() const { return soft_; }
+  bool isSoft() const;
 
-  bool isCover() const { return cover_; }
+  bool isCover() const;
 
-  bool isEnabled() const { return enabled_; }
+  bool isEnabled() const;
 
-  void enable() { enabled_ = true; }
+  void enable();
 
-  void disable() { enabled_ = false; }
+  void disable();
 
-  virtual bool isVectorConstraint() { return false; }
+  virtual bool isVectorConstraint();
 
  protected:
   unsigned id_;
