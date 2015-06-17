@@ -29,6 +29,7 @@ SET(CRAVE_LIB_SRC
   ConstraintManager.cpp
   ConstraintPartitioner.cpp
   Operators.cpp
+  Distribution.cpp
 )
 
 if (CRAVE_ENABLE_EXPERIMENTAL)

@@ -75,22 +75,13 @@ struct distribution : Node {
 
 template <>
 struct distribution<bool> : Node {
-  explicit distribution(const double prob = 0.5) : prob_(prob) {}
+  explicit distribution(const double prob = 0.5);
 
-  static distribution create(const double prob) {
-    distribution dist(prob);
-    return dist;
-  }
+  static distribution create(const double prob);
 
-  bool nextValue() const {
-    boost::uniform_01<> dist;
-    return dist(rng) <= prob_;
-  }
+  bool nextValue() const;
 
-  std::vector<weighted_range<bool> >& ranges() {
-    static std::vector<weighted_range<bool> > v;
-    return v;
-  }
+  std::vector<weighted_range<bool> >& ranges();
 
  private:
   double prob_;
