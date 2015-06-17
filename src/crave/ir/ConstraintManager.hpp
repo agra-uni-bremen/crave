@@ -24,18 +24,6 @@ struct ConstraintManager {
 
   ConstraintManager();
 
-  template <typename ostream>
-  friend ostream& operator<<(ostream& os, const ConstraintManager& set) {
-    os << "Set " << set.id_ << " has " << set.constraints_.size()
-       << " constraint(s) and has " << (set.changed_ ? "" : "not ") << "changed"
-       << std::endl;
-    BOOST_FOREACH(ConstraintPtr item, set.constraints_) {
-      os << item << std::endl;
-    }
-    os << std::flush;
-    return os;
-  }
-
   bool enableConstraint(std::string const& key);
 
   bool disableConstraint(std::string const& key);
@@ -112,4 +100,7 @@ struct ConstraintManager {
   ConstraintList constraints_;
   bool changed_;
 };
+
+  template <typename ostream>
+  ostream& operator<<(ostream& os, const ConstraintManager& set);
 }  // namespace crave

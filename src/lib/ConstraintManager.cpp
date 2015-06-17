@@ -3,6 +3,18 @@
 
 namespace crave {
 
+    template <typename ostream>
+    ostream& operator<<(ostream& os, const ConstraintManager& set) {
+    os << "Set " << set.id_ << " has " << set.constraints_.size()
+       << " constraint(s) and has " << (set.changed_ ? "" : "not ") << "changed"
+       << std::endl;
+    BOOST_FOREACH(ConstraintPtr item, set.constraints_) {
+      os << item << std::endl;
+    }
+    os << std::flush;
+    return os;
+  }
+    
     ConstraintManager::ConstraintManager() : changed_(false) {
         static unsigned ID = 0;
         id_ = ++ID;
