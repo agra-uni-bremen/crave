@@ -33,11 +33,7 @@ OUT& operator<<(OUT& out, vector_tag<value_type> const& tag) {
 }
 
 template <typename OUT>
-OUT& operator<<(OUT& out, placeholder_tag const& tag) {
-  out << "placeholder<" << tag.id << ">";
-  return out;
-}
-
+OUT& operator<<(OUT& out, placeholder_tag const& tag);
 
 // special operators
 
@@ -67,37 +63,23 @@ boost::proto::terminal<operator_unique>::type const unique = {};
 boost::proto::terminal<operator_bitslice>::type const bitslice = {};
 
 template <typename OUT>
-OUT& operator<<(OUT& out, operator_inside const& tag) {
-  return out << "inside";
-}
+OUT& operator<<(OUT& out, operator_inside const& tag);
 
 template <typename OUT>
-OUT& operator<<(OUT& out, operator_dist const& tag) {
-  return out << "dist";
-}
+OUT& operator<<(OUT& out, operator_dist const& tag);
 
 template <typename OUT>
-OUT& operator<<(OUT& out, operator_if_then const& tag) {
-  return out << "if_then";
-}
+OUT& operator<<(OUT& out, operator_if_then const& tag);
 
 template <typename OUT>
-OUT& operator<<(OUT& out, operator_if_then_else const& tag) {
-  return out << static_cast<operator_if_then>(tag) << "_else";
-}
+OUT& operator<<(OUT& out, operator_if_then_else const& tag);
 
 template <typename OUT>
-OUT& operator<<(OUT& out, operator_foreach const& tag) {
-  return out << "foreach";
-}
+OUT& operator<<(OUT& out, operator_foreach const& tag);
 
 template <typename OUT>
-OUT& operator<<(OUT& out, operator_unique const& tag) {
-  return out << "unique";
-}
+OUT& operator<<(OUT& out, operator_unique const& tag);
 
 template <typename OUT>
-OUT& operator<<(OUT& out, operator_bitslice const& tag) {
-  return out << "bitslice";
-}
+OUT& operator<<(OUT& out, operator_bitslice const& tag);
 }  // namespace crave
