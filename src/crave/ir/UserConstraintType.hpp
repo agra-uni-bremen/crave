@@ -31,17 +31,7 @@ namespace crave {
         virtual ~UserConstraint() {
         }
 
-        template <typename ostream>
-        friend ostream& operator<<(ostream& os, const UserConstraint& constr) {
-            os << constr.name_ << " is a " << (constr.soft_ ? "soft" : "hard")
-                    << " constraint and " << (constr.enabled_ ? "enabled" : "disabled");
-            os << ", support vars =";
 
-            BOOST_FOREACH(int item, constr.support_vars_) {
-                os << " " << item;
-            }
-            return os;
-        }
 
         unsigned id() const;
 
@@ -70,6 +60,9 @@ namespace crave {
         bool cover_;
         bool enabled_;
     };
+
+    template <typename ostream>
+    ostream& operator<<(ostream& os, const UserConstraint& constr);
     
     typedef boost::shared_ptr<UserConstraint> ConstraintPtr;
     typedef std::list<ConstraintPtr> ConstraintList;
