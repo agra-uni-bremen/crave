@@ -30,6 +30,7 @@ SET(CRAVE_LIB_SRC
   ConstraintPartitioner.cpp
   Operators.cpp
   Distribution.cpp
+  RandomBase.cpp
 )
 
 if (CRAVE_ENABLE_EXPERIMENTAL)

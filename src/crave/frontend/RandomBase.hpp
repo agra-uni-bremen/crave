@@ -25,7 +25,7 @@ class __rand_vec_base {
   virtual Variable<unsigned int> const& size_var() const = 0;
 };
 
-static std::map<int, __rand_vec_base*> vectorBaseMap;
+extern std::map<int, __rand_vec_base*> vectorBaseMap;
 
 template <typename T1, typename T2>
 class __rand_vec_base1 : public __rand_vec_base {
