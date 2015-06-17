@@ -26,6 +26,9 @@ namespace crave {
             }
             return os;
         }
+        
+        template std::ostream& operator<< <std::ostream>(std::ostream& os, const UserConstraint& constr);
+        
 
     unsigned UserConstraint::id() const {
         return id_;

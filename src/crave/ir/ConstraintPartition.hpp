@@ -36,19 +36,17 @@ struct ConstraintPartition {
   void add(ConstraintPtr c);
 
   bool containsVar(int id) const;
-
+  
   template <typename ostream>
-  friend ostream& operator<<(ostream& os, const ConstraintPartition& cp) {
-    os << "[ ";
+  friend ostream& operator<<(ostream& os, const ConstraintPartition& cp);
 
-    BOOST_FOREACH(ConstraintPtr c, cp) { os << c->name() << " "; }
-    os << "]";
-    os << std::flush;
-    return os;
-  }
+  
 
  private:
   ConstraintList constraints_;
   std::set<int> support_vars_;
 };
+
+template <typename ostream>
+ostream& operator<<(ostream& os, const ConstraintPartition& cp);
 }  // namespace crave

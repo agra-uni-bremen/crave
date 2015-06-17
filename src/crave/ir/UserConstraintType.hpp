@@ -12,8 +12,6 @@
 
 namespace crave {
 
-    
-
     struct UserConstraint {
         friend struct ConstraintManager;
         friend struct ConstraintPartitioner;
@@ -51,6 +49,9 @@ namespace crave {
 
         virtual bool isVectorConstraint();
 
+        template <typename ostream>
+        friend ostream& operator<<(ostream& os, const UserConstraint& constr);
+
     protected:
         unsigned id_;
         expression expr_;
@@ -63,7 +64,7 @@ namespace crave {
 
     template <typename ostream>
     ostream& operator<<(ostream& os, const UserConstraint& constr);
-    
+
     typedef boost::shared_ptr<UserConstraint> ConstraintPtr;
     typedef std::list<ConstraintPtr> ConstraintList;
 } // namespace crave

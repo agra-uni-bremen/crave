@@ -14,6 +14,7 @@ namespace crave {
     os << std::flush;
     return os;
   }
+    template std::ostream& operator<< <std::ostream>(std::ostream& os, const ConstraintManager& set);
     
     ConstraintManager::ConstraintManager() : changed_(false) {
         static unsigned ID = 0;

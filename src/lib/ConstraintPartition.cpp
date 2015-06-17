@@ -1,7 +1,23 @@
 #include "../crave/ir/ConstraintPartition.hpp"
+#include <ostream>
 
 namespace crave {
 
+    template <typename ostream>
+    ostream& operator<<(ostream& os, const ConstraintPartition& cp) {
+        os << "[ ";
+
+        BOOST_FOREACH(ConstraintPtr c, cp) {
+            os << c->name() << " ";
+        }
+        os << "]";
+        os << std::flush;
+        return os;
+    }
+    
+    
+    template std::ostream& operator<< <std::ostream>(std::ostream& os, const ConstraintPartition& cp);
+    
     typedef ConstraintList::iterator iterator;
     typedef ConstraintList::const_iterator const_iterator;
 

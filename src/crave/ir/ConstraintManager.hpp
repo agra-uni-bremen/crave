@@ -93,6 +93,9 @@ struct ConstraintManager {
   }
 
   std::ostream& printDotGraph(std::ostream& os);
+  
+  template <typename ostream>
+  friend ostream& operator<<(ostream& os, const ConstraintManager& set);
 
  private:
   unsigned id_;
