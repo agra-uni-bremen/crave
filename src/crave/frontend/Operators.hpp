@@ -1,6 +1,10 @@
 // Copyright 2014 The CRAVE developers. All rights reserved.
 
 #pragma once
+#include "../frontend/ReadReference.hpp"
+#include "../frontend/WriteReference.hpp"
+#include "../frontend/VectorConstraint.hpp"
+#include "../frontend/PlaceHolder.hpp"
 
 namespace crave {
 
@@ -33,6 +37,7 @@ OUT& operator<<(OUT& out, placeholder_tag const& tag) {
   out << "placeholder<" << tag.id << ">";
   return out;
 }
+
 
 // special operators
 

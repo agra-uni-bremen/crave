@@ -28,6 +28,7 @@ SET(CRAVE_LIB_SRC
   UserConstraintType.cpp
   ConstraintManager.cpp
   ConstraintPartitioner.cpp
+  Operators.cpp
 )
 
 if (CRAVE_ENABLE_EXPERIMENTAL)
