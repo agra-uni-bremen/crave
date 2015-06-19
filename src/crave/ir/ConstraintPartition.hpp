@@ -5,7 +5,7 @@
 #include <boost/shared_ptr.hpp>
 #include <list>
 #include <set>
-
+#include <map>
 #include "UserConstraintType.hpp"
 
 namespace crave {
@@ -39,6 +39,7 @@ struct ConstraintPartition {
   
   template <typename ostream>
   friend ostream& operator<<(ostream& os, const ConstraintPartition& cp);
+  std::map<int, ConstraintList>  singleVariableConstraintMap_;
 
   
 

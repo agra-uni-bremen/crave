@@ -64,6 +64,21 @@ namespace crave {
 
       while (ite != lc->end()) {
         c = *ite;
+        if(c->support_vars_.size() == 1)
+        {
+            unsigned int varID = (*(c->support_vars_.begin()));
+            if(cp->singleVariableConstraintMap_.count(varID))
+            {
+                auto &value = cp->singleVariableConstraintMap_.at(varID);
+                value.push_back(c);            
+            }   
+            else
+            {
+                ConstraintList tmp;
+                tmp.push_back(c);
+                cp->singleVariableConstraintMap_[varID] = tmp;
+            }
+        }
         std::vector<int> v_intersection;
         std::set_intersection(cp->support_vars_.begin(),
                               cp->support_vars_.end(),

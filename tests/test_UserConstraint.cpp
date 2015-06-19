@@ -9,51 +9,64 @@ using namespace crave;
 
 BOOST_FIXTURE_TEST_SUITE(UserConstraint, Context_Fixture)
 
+BOOST_AUTO_TEST_CASE(constraint_SingleVariableConstraint) {
+    randv<unsigned> a;
+    ConstraintPartitioner cp;
+    ConstraintManager cm1;
+    Context ctx(&crave::variables);
+    cm1.makeConstraint(a() > 1, &ctx);
+    cp.reset();
+    cp.mergeConstraints(cm1);
+    cp.partition();
+    BOOST_CHECK_EQUAL(cp.getPartitions().size(), 1);
+    BOOST_CHECK_EQUAL(cp.getPartitions().at(0).singleVariableConstraintMap_.size(), 1);
+}
+
 BOOST_AUTO_TEST_CASE(constraint_partitioning) {
-  randv<unsigned> a, b, c, d, e;
-  ConstraintPartitioner cp;
-  ConstraintManager cm1, cm2;
-  Context ctx(&crave::variables);
-  cm1.makeConstraint(a() > b(), &ctx);
-  cm1.makeConstraint(c() > d(), &ctx);
-  cm1.makeConstraint(e() > 1, &ctx);
-  cm2.makeConstraint(a() != e(), &ctx);
+    randv<unsigned> a, b, c, d, e;
+    ConstraintPartitioner cp;
+    ConstraintManager cm1, cm2;
+    Context ctx(&crave::variables);
+    cm1.makeConstraint(a() > b(), &ctx);
+    cm1.makeConstraint(c() > d(), &ctx);
+    cm1.makeConstraint(e() > 1, &ctx);
+    cm2.makeConstraint(a() != e(), &ctx);
 
-  cp.reset();
-  cp.mergeConstraints(cm1);
-  cp.partition();
-  BOOST_CHECK_EQUAL(cp.getPartitions().size(), 3);
+    cp.reset();
+    cp.mergeConstraints(cm1);
+    cp.partition();
+    BOOST_CHECK_EQUAL(cp.getPartitions().size(), 3);
 
-  cp.reset();
-  cp.mergeConstraints(cm1);
-  cp.mergeConstraints(cm2);
-  cp.partition();
-  BOOST_CHECK_EQUAL(cp.getPartitions().size(), 2);
+    cp.reset();
+    cp.mergeConstraints(cm1);
+    cp.mergeConstraints(cm2);
+    cp.partition();
+    BOOST_CHECK_EQUAL(cp.getPartitions().size(), 2);
 }
 
 BOOST_AUTO_TEST_CASE(constraint_expression_mixing) {
-  randv<unsigned> x, y, z, t;
-  expression e1 = make_expression(x() + y());
-  expression e2 = make_expression(z() + t() > 10);
+    randv<unsigned> x, y, z, t;
+    expression e1 = make_expression(x() + y());
+    expression e2 = make_expression(z() + t() > 10);
 
-  Evaluator evaluator;
-  evaluator.assign(x(), 8);
-  evaluator.assign(y(), 1);
-  evaluator.assign(z(), 8);
-  evaluator.assign(t(), 3);
+    Evaluator evaluator;
+    evaluator.assign(x(), 8);
+    evaluator.assign(y(), 1);
+    evaluator.assign(z(), 8);
+    evaluator.assign(t(), 3);
 
-  BOOST_REQUIRE(evaluator.evaluate((x() > z()) && (e1 <= 10) && e2));
-  BOOST_CHECK(!evaluator.result<bool>());
+    BOOST_REQUIRE(evaluator.evaluate((x() > z()) && (e1 <= 10) && e2));
+    BOOST_CHECK(!evaluator.result<bool>());
 
-  evaluator.assign(x(), 9);
+    evaluator.assign(x(), 9);
 
-  BOOST_REQUIRE(evaluator.evaluate((x() > z()) && (e1 + 1 <= 11) && e2));
-  BOOST_CHECK(evaluator.result<bool>());
+    BOOST_REQUIRE(evaluator.evaluate((x() > z()) && (e1 + 1 <= 11) && e2));
+    BOOST_CHECK(evaluator.result<bool>());
 
-  BOOST_REQUIRE(evaluator.evaluate(e1 * e1));
-  BOOST_CHECK_EQUAL(evaluator.result<unsigned>(), 100);
+    BOOST_REQUIRE(evaluator.evaluate(e1 * e1));
+    BOOST_CHECK_EQUAL(evaluator.result<unsigned>(), 100);
 }
 
-BOOST_AUTO_TEST_SUITE_END()  // Syntax
+BOOST_AUTO_TEST_SUITE_END() // Syntax
 
 //  vim: ft=cpp:ts=2:sw=2:expandtab
