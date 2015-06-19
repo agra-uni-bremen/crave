@@ -50,17 +50,28 @@ struct ConstraintManager {
 
     GetSupportSetVisitor gssv;
     n->visit(&gssv);
-
-    ConstraintPtr c(
-        boost::dynamic_pointer_cast<ForEach>(n) != 0
-            ? new UserVectorConstraint(c_id, n, name, gssv.getSupportVars(),
-                                       false, soft, cover)
-            : (boost::dynamic_pointer_cast<Unique>(n) != 0
-                   ? new UserVectorConstraint(c_id, n, name,
+  
+    ConstraintPtr c;
+    
+    if(boost::dynamic_pointer_cast<ForEach>(n) != 0)
+    {
+        ConstraintPtr tmp(new UserVectorConstraint(c_id, n, name, gssv.getSupportVars(),
+                                       false, soft, cover));
+        c.swap(tmp);
+    }
+    else if(boost::dynamic_pointer_cast<Unique>(n) != 0)
+    {
+        ConstraintPtr tmp(new UserVectorConstraint(c_id, n, name,
                                               gssv.getSupportVars(), true, soft,
-                                              cover)
-                   : new UserConstraint(c_id, n, name, gssv.getSupportVars(),
-                                        soft, cover)));
+                                              cover));
+        c.swap(tmp);
+    }
+    else
+    {
+        ConstraintPtr tmp(new UserConstraint(c_id, n, name, gssv.getSupportVars(),
+                                        soft, cover));
+        c.swap(tmp);
+    }
 
     assert(!c->isSoft() ||
            !c->isCover());  // soft cover constraint not defined/supported yet
