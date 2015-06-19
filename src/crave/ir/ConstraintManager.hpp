@@ -66,6 +66,12 @@ struct ConstraintManager {
                                               cover));
         c.swap(tmp);
     }
+    else if(gssv.getSupportVars().size() == 1)
+    {
+        ConstraintPtr tmp(new SingleVariableConstraint(c_id, n, name, gssv.getSupportVars(),
+                                        soft, cover));
+        c.swap(tmp);
+    }
     else
     {
         ConstraintPtr tmp(new UserConstraint(c_id, n, name, gssv.getSupportVars(),
