@@ -3,6 +3,7 @@
 #pragma once
 
 #include <glog/logging.h>
+#include <boost/make_shared.hpp>
 
 #include <string>
 #include <map>
@@ -55,9 +56,8 @@ struct ConstraintManager {
     
     if(boost::dynamic_pointer_cast<ForEach>(n) != 0)
     {
-        ConstraintPtr tmp(new UserVectorConstraint(c_id, n, name, gssv.getSupportVars(),
-                                       false, soft, cover));
-        c.swap(tmp);
+        c = boost::make_shared<UserVectorConstraint>(c_id, n, name, gssv.getSupportVars(),
+                                       false, soft, cover);
     }
     else if(boost::dynamic_pointer_cast<Unique>(n) != 0)
     {

@@ -4,6 +4,7 @@
 
 #include <string>
 #include <set>
+#include <boost/make_shared.hpp>
 
 #include "UserConstraintType.hpp"
 
@@ -12,6 +13,7 @@ namespace crave {
 struct UserVectorConstraint : UserConstraint {
   friend struct ConstraintManager;
   friend struct ConstraintPartitioner;
+  friend template boost::shared_ptr<UserVectorConstraint> boost::make_shared<UserVectorConstraint>();
 
  protected:
   UserVectorConstraint(unsigned const id, expression const expr,

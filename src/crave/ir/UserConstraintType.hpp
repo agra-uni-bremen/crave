@@ -7,6 +7,7 @@
 #include <string>
 #include <list>
 #include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 #include "Node.hpp"
 
@@ -16,6 +17,7 @@ namespace crave {
     struct UserConstraint {
         friend struct ConstraintManager;
         friend struct ConstraintPartitioner;
+        friend boost::shared_ptr<UserConstraint> boost::make_shared<UserConstraint>();
 
         typedef NodePtr expression;
 
