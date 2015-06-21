@@ -13,9 +13,8 @@ namespace crave {
 struct UserVectorConstraint : UserConstraint {
   friend struct ConstraintManager;
   friend struct ConstraintPartitioner;
-  friend template boost::shared_ptr<UserVectorConstraint> boost::make_shared<UserVectorConstraint>();
 
- protected:
+  //protected: // to make make_shared_posible
   UserVectorConstraint(unsigned const id, expression const expr,
                        std::string const& name, std::set<int> support_vars,
                        bool const unique, bool const soft = false,

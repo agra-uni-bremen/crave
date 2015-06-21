@@ -17,7 +17,6 @@ namespace crave {
     struct UserConstraint {
         friend struct ConstraintManager;
         friend struct ConstraintPartitioner;
-        friend boost::shared_ptr<UserConstraint> boost::make_shared<UserConstraint>();
 
         typedef NodePtr expression;
 
@@ -77,7 +76,7 @@ namespace crave {
         friend struct ConstraintPartitioner;
 
         typedef NodePtr expression;
-    protected:
+        // protected: to make make_shared possible
         SingleVariableConstraint(unsigned const id, expression const expr,
                 std::string const& name, std::set<int> support_vars,
                 bool const soft = false, bool const cover = false,
