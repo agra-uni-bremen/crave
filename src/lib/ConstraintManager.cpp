@@ -82,30 +82,27 @@ namespace crave {
     n->visit(&gssv);
 
     ConstraintPtr c;
+    
     if(boost::dynamic_pointer_cast<ForEach>(n) != 0)
     {
-        ConstraintPtr tmp(new UserVectorConstraint(c_id, n, name, gssv.getSupportVars(),
-                                       false, soft, cover));
-        c.swap(tmp);
+        c = boost::make_shared<UserVectorConstraint>(c_id, n, name, gssv.getSupportVars(),
+                                       false, soft, cover);
     }
     else if(boost::dynamic_pointer_cast<Unique>(n) != 0)
     {
-        ConstraintPtr tmp(new UserVectorConstraint(c_id, n, name,
+        c = boost::make_shared<UserVectorConstraint>(c_id, n, name,
                                               gssv.getSupportVars(), true, soft,
-                                              cover));
-        c.swap(tmp);
+                                              cover);
     }
     else if(gssv.getSupportVars().size() == 1)
     {
-        ConstraintPtr tmp(new SingleVariableConstraint(c_id, n, name, gssv.getSupportVars(),
-                                        soft, cover));
-        c.swap(tmp);
+        c = boost::make_shared<SingleVariableConstraint>(c_id, n, name, gssv.getSupportVars(),
+                                        soft, cover);
     }
     else
     {
-        ConstraintPtr tmp(new UserConstraint(c_id, n, name, gssv.getSupportVars(),
-                                        soft, cover));
-        c.swap(tmp);
+        c = boost::make_shared<SingleVariableConstraint>(c_id, n, name, gssv.getSupportVars(),
+                                        soft, cover);
     }
 
     assert(!c->isSoft() ||

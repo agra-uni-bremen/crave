@@ -49,42 +49,7 @@ struct ConstraintManager {
     FixWidthVisitor fwv;
     NodePtr n(fwv.fixWidth(*boost::proto::eval(e, *ctx)));
 
-    GetSupportSetVisitor gssv;
-    n->visit(&gssv);
-  
-    ConstraintPtr c;
-    
-    if(boost::dynamic_pointer_cast<ForEach>(n) != 0)
-    {
-        c = boost::make_shared<UserVectorConstraint>(c_id, n, name, gssv.getSupportVars(),
-                                       false, soft, cover);
-    }
-    else if(boost::dynamic_pointer_cast<Unique>(n) != 0)
-    {
-        c = boost::make_shared<UserVectorConstraint>(c_id, n, name,
-                                              gssv.getSupportVars(), true, soft,
-                                              cover);
-    }
-    else if(gssv.getSupportVars().size() == 1)
-    {
-        c = boost::make_shared<SingleVariableConstraint>(c_id, n, name, gssv.getSupportVars(),
-                                        soft, cover);
-    }
-    else
-    {
-        c = boost::make_shared<SingleVariableConstraint>(c_id, n, name, gssv.getSupportVars(),
-                                        soft, cover);
-    }
-
-    assert(!c->isSoft() ||
-           !c->isCover());  // soft cover constraint not defined/supported yet
-    assert(!c->isVectorConstraint() ||
-           !c->isCover());  // cover vector constraint not defined/supported yet
-
-    changed_ = true;
-    constraints_.push_back(c);
-
-    return constr_map_[name] = c;
+    return ConstraintManager::makeConstraint(name,c_id, n,ctx,soft,cover);
   }
 
   ConstraintPtr makeConstraint(std::string const& name, int c_id, NodePtr n,
