@@ -69,7 +69,7 @@ namespace crave {
             unsigned int varID = (*(c->support_vars_.begin()));
             if(cp->singleVariableConstraintMap_.count(varID))
             {
-                auto &value = cp->singleVariableConstraintMap_.at(varID);
+                ConstraintList& value = cp->singleVariableConstraintMap_.at(varID);
                 value.push_back(c);            
             }   
             else

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "stdint.h"
+
 #include <boost/proto/eval.hpp>
 
 #include "../frontend/bitsize_traits.hpp"
