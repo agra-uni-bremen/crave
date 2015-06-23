@@ -9,19 +9,6 @@ using namespace crave;
 
 BOOST_FIXTURE_TEST_SUITE(UserConstraint, Context_Fixture)
 
-BOOST_AUTO_TEST_CASE(constraint_SingleVariableConstraint) {
-    randv<unsigned> a;
-    ConstraintPartitioner cp;
-    ConstraintManager cm1;
-    Context ctx(&crave::variables);
-    cm1.makeConstraint(a() > 1, &ctx);
-    cp.reset();
-    cp.mergeConstraints(cm1);
-    cp.partition();
-    BOOST_CHECK_EQUAL(cp.getPartitions().size(), 1);
-    BOOST_CHECK_EQUAL(cp.getPartitions().at(0).singleVariableConstraintMap_.size(), 1);
-}
-
 BOOST_AUTO_TEST_CASE(constraint_partitioning) {
     randv<unsigned> a, b, c, d, e;
     ConstraintPartitioner cp;
@@ -65,6 +52,28 @@ BOOST_AUTO_TEST_CASE(constraint_expression_mixing) {
 
     BOOST_REQUIRE(evaluator.evaluate(e1 * e1));
     BOOST_CHECK_EQUAL(evaluator.result<unsigned>(), 100);
+}
+
+BOOST_AUTO_TEST_CASE(single_variable_constraint) {
+    randv<unsigned> a, b, c, d;
+    ConstraintPartitioner cp;
+    ConstraintManager cm;
+    Context ctx(&crave::variables);
+    cm.makeConstraint(a() > 1, &ctx);
+    cm.makeConstraint(a() < 2, &ctx);
+    cm.makeConstraint((1 < b()) || (b() < 10), &ctx);
+    cm.makeConstraint(c() + 5 > c() + 2 * c(), &ctx);
+    cm.makeConstraint(a() + b() + c() > 0, &ctx);
+    cm.makeConstraint(c() < d(), &ctx);
+    cp.reset();
+    cp.mergeConstraints(cm);
+    cp.partition();
+    BOOST_CHECK_EQUAL(cp.getPartitions().size(), 1);
+    ConstraintPartition const & part = cp.getPartitions().at(0);
+    BOOST_CHECK_EQUAL(part.singleVariableConstraintMap().size(), 3);
+    BOOST_CHECK_EQUAL(part.singleVariableConstraintMap().at(a().id()).size(), 2);
+    BOOST_CHECK_EQUAL(part.singleVariableConstraintMap().at(b().id()).size(), 1);
+    BOOST_CHECK_EQUAL(part.singleVariableConstraintMap().at(c().id()).size(), 1);
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Syntax

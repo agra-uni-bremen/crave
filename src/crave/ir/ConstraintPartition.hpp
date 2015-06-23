@@ -37,15 +37,15 @@ struct ConstraintPartition {
 
   bool containsVar(int id) const;
   
-  template <typename ostream>
-  friend ostream& operator<<(ostream& os, const ConstraintPartition& cp);
-  std::map<int, ConstraintList>  singleVariableConstraintMap_;
-
+  std::map<int, ConstraintList> const & singleVariableConstraintMap() const;
   
+  template <typename ostream>
+  friend ostream& operator<<(ostream& os, const ConstraintPartition& cp);  
 
  private:
   ConstraintList constraints_;
   std::set<int> support_vars_;
+  std::map<int, ConstraintList> singleVariableConstraintMap_;
 };
 
 template <typename ostream>

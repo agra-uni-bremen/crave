@@ -10,17 +10,16 @@
 
 namespace crave {
 
-struct UserVectorConstraint : UserConstraint {
+class UserVectorConstraint : public UserConstraint {
   friend struct ConstraintManager;
   friend struct ConstraintPartitioner;
 
-  //protected: // to make make_shared_posible
+ public:
   UserVectorConstraint(unsigned const id, expression const expr,
                        std::string const& name, std::set<int> support_vars,
                        bool const unique, bool const soft = false,
                        bool const cover = false, bool const enabled = true);
 
- public:
   bool isUnique();
   int getVectorId();
   bool isVectorConstraint();

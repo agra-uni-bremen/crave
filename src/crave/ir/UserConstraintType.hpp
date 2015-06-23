@@ -14,19 +14,18 @@
 namespace crave {
 
     
-    struct UserConstraint {
+    class UserConstraint {
         friend struct ConstraintManager;
         friend struct ConstraintPartitioner;
+        friend struct ConstraintPartition;
 
+      public:
         typedef NodePtr expression;
 
-    protected:
         UserConstraint(unsigned const id, expression const expr,
                 std::string const& name, std::set<int> support_vars,
                 bool const soft = false, bool const cover = false,
                 bool const enabled = true);
-
-    public:
 
         virtual ~UserConstraint() {
         }
@@ -69,21 +68,5 @@ namespace crave {
 
     typedef boost::shared_ptr<UserConstraint> ConstraintPtr;
     typedef std::list<ConstraintPtr> ConstraintList;
-    
-    struct SingleVariableConstraint : public UserConstraint
-    {
-        friend struct ConstraintManager;
-        friend struct ConstraintPartitioner;
-
-        typedef NodePtr expression;
-        // protected: to make make_shared possible
-        SingleVariableConstraint(unsigned const id, expression const expr,
-                std::string const& name, std::set<int> support_vars,
-                bool const soft = false, bool const cover = false,
-                bool const enabled = true) : UserConstraint(id,expr,name,support_vars,soft,cover,enabled)
-                {
-                    
-                }
-    };
-    
+        
 } // namespace crave

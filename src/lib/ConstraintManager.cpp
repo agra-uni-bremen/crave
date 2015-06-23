@@ -94,14 +94,9 @@ namespace crave {
                                               gssv.getSupportVars(), true, soft,
                                               cover);
     }
-    else if(gssv.getSupportVars().size() == 1)
-    {
-        c = boost::make_shared<SingleVariableConstraint>(c_id, n, name, gssv.getSupportVars(),
-                                        soft, cover);
-    }
     else
     {
-        c = boost::make_shared<SingleVariableConstraint>(c_id, n, name, gssv.getSupportVars(),
+        c = boost::make_shared<UserConstraint>(c_id, n, name, gssv.getSupportVars(),
                                         soft, cover);
     }
 
