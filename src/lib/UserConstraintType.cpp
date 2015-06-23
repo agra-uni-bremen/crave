@@ -2,67 +2,37 @@
 
 namespace crave {
 
-    UserConstraint::UserConstraint(unsigned const id, UserConstraint::expression const expr,
-            std::string const& name, std::set<int> support_vars,
-            bool const soft, bool const cover,
-            bool const enabled)
-    : id_(id),
-    expr_(expr),
-    name_(name),
-    support_vars_(support_vars),
-    soft_(soft),
-    cover_(cover),
-    enabled_(enabled) {
-    }
-    
-        template <typename ostream>
-        ostream& operator<<(ostream& os, const UserConstraint& constr) {
-            os << constr.name_ << " is a " << (constr.soft_ ? "soft" : "hard")
-                    << " constraint and " << (constr.enabled_ ? "enabled" : "disabled");
-            os << ", support vars =";
+UserConstraint::UserConstraint(unsigned const id, UserConstraint::expression const expr, std::string const& name,
+                               std::set<int> support_vars, bool const soft, bool const cover, bool const enabled)
+    : id_(id), expr_(expr), name_(name), support_vars_(support_vars), soft_(soft), cover_(cover), enabled_(enabled) {}
 
-            BOOST_FOREACH(int item, constr.support_vars_) {
-                os << " " << item;
-            }
-            return os;
-        }
-        
-        template std::ostream& operator<< <std::ostream>(std::ostream& os, const UserConstraint& constr);
-        
+template <typename ostream>
+ostream& operator<<(ostream& os, const UserConstraint& constr) {
+  os << constr.name_ << " is a " << (constr.soft_ ? "soft" : "hard") << " constraint and "
+     << (constr.enabled_ ? "enabled" : "disabled");
+  os << ", support vars =";
 
-    unsigned UserConstraint::id() const {
-        return id_;
-    }
+  BOOST_FOREACH(int item, constr.support_vars_) { os << " " << item; }
+  return os;
+}
 
-    UserConstraint::expression const& UserConstraint::expr() const {
-        return expr_;
-    }
+template std::ostream& operator<<<std::ostream>(std::ostream& os, const UserConstraint& constr);
 
-    std::string UserConstraint::name() const {
-        return name_;
-    }
+unsigned UserConstraint::id() const { return id_; }
 
-    bool UserConstraint::isSoft() const {
-        return soft_;
-    }
+UserConstraint::expression const& UserConstraint::expr() const { return expr_; }
 
-    bool UserConstraint::isCover() const {
-        return cover_;
-    }
+std::string UserConstraint::name() const { return name_; }
 
-    bool UserConstraint::isEnabled() const {
-        return enabled_;
-    }
+bool UserConstraint::isSoft() const { return soft_; }
 
-    void UserConstraint::enable() {
-        enabled_ = true;
-    }
+bool UserConstraint::isCover() const { return cover_; }
 
-    void UserConstraint::disable() {
-        enabled_ = false;
-    }
+bool UserConstraint::isEnabled() const { return enabled_; }
 
-    bool UserConstraint::isVectorConstraint() {
-        return false;
-    }
+void UserConstraint::enable() { enabled_ = true; }
+
+void UserConstraint::disable() { enabled_ = false; }
+
+bool UserConstraint::isVectorConstraint() { return false; }
 }

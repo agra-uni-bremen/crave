@@ -11,9 +11,7 @@ void EvalVisitor::visitNode(const Node&) {}
 
 void EvalVisitor::visitTerminal(const Terminal& t) {}
 
-void EvalVisitor::visitUnaryExpr(const UnaryExpression& u) {
-  u.child()->visit(this);
-}
+void EvalVisitor::visitUnaryExpr(const UnaryExpression& u) { u.child()->visit(this); }
 
 void EvalVisitor::visitUnaryOpr(const UnaryOperator&) {}
 
@@ -40,9 +38,7 @@ void EvalVisitor::visitVariableExpr(const VariableExpr& v) {
     exprStack_.push(std::make_pair(Constant(), false));
 }
 
-void EvalVisitor::visitConstant(const Constant& c) {
-  exprStack_.push(std::make_pair(c, true));
-}
+void EvalVisitor::visitConstant(const Constant& c) { exprStack_.push(std::make_pair(c, true)); }
 
 void EvalVisitor::visitVectorExpr(const VectorExpr& v) {
   eval_map::const_iterator ite(evalMap_->find(v.id()));
@@ -67,8 +63,7 @@ void EvalVisitor::visitNegOpr(const NegOpr& n) {
   stack_entry e;
   pop(e);
 
-  exprStack_.push(std::make_pair(
-      Constant(-e.first.value(), e.first.bitsize(), e.first.sign()), e.second));
+  exprStack_.push(std::make_pair(Constant(-e.first.value(), e.first.bitsize(), e.first.sign()), e.second));
 }
 
 void EvalVisitor::visitComplementOpr(const ComplementOpr& c) {
@@ -77,8 +72,7 @@ void EvalVisitor::visitComplementOpr(const ComplementOpr& c) {
   stack_entry e;
   pop(e);
 
-  exprStack_.push(std::make_pair(
-      Constant(~e.first.value(), e.first.bitsize(), e.first.sign()), e.second));
+  exprStack_.push(std::make_pair(Constant(~e.first.value(), e.first.bitsize(), e.first.sign()), e.second));
 }
 
 void EvalVisitor::visitInside(const Inside& i) {
@@ -89,8 +83,7 @@ void EvalVisitor::visitInside(const Inside& i) {
 
   bool result = false;
 
-  for (std::set<Constant>::iterator ite = i.collection().begin();
-       ite != i.collection().end(); ++ite)
+  for (std::set<Constant>::iterator ite = i.collection().begin(); ite != i.collection().end(); ++ite)
     if (*ite == e.first.value()) result = true;
 
   exprStack_.push(std::make_pair(Constant(result), e.second));
@@ -112,8 +105,7 @@ void EvalVisitor::visitAndOpr(const AndOpr& a) {
   evalBinExpr(a, lhs, rhs);
 
   exprStack_.push(std::make_pair(
-      Constant(lhs.first.value() & rhs.first.value(), lhs.first.bitsize(),
-               lhs.first.sign() || rhs.first.sign()),
+      Constant(lhs.first.value() & rhs.first.value(), lhs.first.bitsize(), lhs.first.sign() || rhs.first.sign()),
       lhs.second && rhs.second));
 }
 
@@ -122,8 +114,7 @@ void EvalVisitor::visitOrOpr(const OrOpr& o) {
   evalBinExpr(o, lhs, rhs);
 
   exprStack_.push(std::make_pair(
-      Constant(lhs.first.value() | rhs.first.value(), lhs.first.bitsize(),
-               lhs.first.sign() || rhs.first.sign()),
+      Constant(lhs.first.value() | rhs.first.value(), lhs.first.bitsize(), lhs.first.sign() || rhs.first.sign()),
       lhs.second && rhs.second));
 }
 
@@ -131,18 +122,14 @@ void EvalVisitor::visitLogicalAndOpr(const LogicalAndOpr& la) {
   stack_entry lhs, rhs;
   evalBinExpr(la, lhs, rhs);
 
-  exprStack_.push(
-      std::make_pair(Constant(lhs.first.value() && rhs.first.value()),
-                     lhs.second && rhs.second));
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() && rhs.first.value()), lhs.second && rhs.second));
 }
 
 void EvalVisitor::visitLogicalOrOpr(const LogicalOrOpr& lo) {
   stack_entry lhs, rhs;
   evalBinExpr(lo, lhs, rhs);
 
-  exprStack_.push(
-      std::make_pair(Constant(lhs.first.value() || rhs.first.value()),
-                     lhs.second && rhs.second));
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() || rhs.first.value()), lhs.second && rhs.second));
 }
 
 void EvalVisitor::visitXorOpr(const XorOpr& x) {
@@ -150,8 +137,7 @@ void EvalVisitor::visitXorOpr(const XorOpr& x) {
   evalBinExpr(x, lhs, rhs);
 
   exprStack_.push(std::make_pair(
-      Constant(lhs.first.value() ^ rhs.first.value(), lhs.first.bitsize(),
-               lhs.first.sign() || rhs.first.sign()),
+      Constant(lhs.first.value() ^ rhs.first.value(), lhs.first.bitsize(), lhs.first.sign() || rhs.first.sign()),
       lhs.second && rhs.second));
 }
 
@@ -173,54 +159,42 @@ void EvalVisitor::visitEqualOpr(const EqualOpr& eq) {
   stack_entry lhs, rhs;
   evalBinExpr(eq, lhs, rhs);
 
-  exprStack_.push(
-      std::make_pair(Constant(lhs.first.value() == rhs.first.value()),
-                     lhs.second && rhs.second));
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() == rhs.first.value()), lhs.second && rhs.second));
 }
 
 void EvalVisitor::visitNotEqualOpr(const NotEqualOpr& neq) {
   stack_entry lhs, rhs;
   evalBinExpr(neq, lhs, rhs);
 
-  exprStack_.push(
-      std::make_pair(Constant(lhs.first.value() != rhs.first.value()),
-                     lhs.second && rhs.second));
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() != rhs.first.value()), lhs.second && rhs.second));
 }
 
 void EvalVisitor::visitLessOpr(const LessOpr& l) {
   stack_entry lhs, rhs;
   evalBinExpr(l, lhs, rhs);
 
-  exprStack_.push(
-      std::make_pair(Constant(lhs.first.value() < rhs.first.value()),
-                     lhs.second && rhs.second));
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() < rhs.first.value()), lhs.second && rhs.second));
 }
 
 void EvalVisitor::visitLessEqualOpr(const LessEqualOpr& le) {
   stack_entry lhs, rhs;
   evalBinExpr(le, lhs, rhs);
 
-  exprStack_.push(
-      std::make_pair(Constant(lhs.first.value() <= rhs.first.value()),
-                     lhs.second && rhs.second));
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() <= rhs.first.value()), lhs.second && rhs.second));
 }
 
 void EvalVisitor::visitGreaterOpr(const GreaterOpr& g) {
   stack_entry lhs, rhs;
   evalBinExpr(g, lhs, rhs);
 
-  exprStack_.push(
-      std::make_pair(Constant(lhs.first.value() > rhs.first.value()),
-                     lhs.second && rhs.second));
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() > rhs.first.value()), lhs.second && rhs.second));
 }
 
 void EvalVisitor::visitGreaterEqualOpr(const GreaterEqualOpr& ge) {
   stack_entry lhs, rhs;
   evalBinExpr(ge, lhs, rhs);
 
-  exprStack_.push(
-      std::make_pair(Constant(lhs.first.value() >= rhs.first.value()),
-                     lhs.second && rhs.second));
+  exprStack_.push(std::make_pair(Constant(lhs.first.value() >= rhs.first.value()), lhs.second && rhs.second));
 }
 
 void EvalVisitor::visitPlusOpr(const PlusOpr& p) {
@@ -228,8 +202,7 @@ void EvalVisitor::visitPlusOpr(const PlusOpr& p) {
   evalBinExpr(p, lhs, rhs);
 
   exprStack_.push(std::make_pair(
-      Constant(lhs.first.value() + rhs.first.value(), lhs.first.bitsize(),
-               lhs.first.sign() || rhs.first.sign()),
+      Constant(lhs.first.value() + rhs.first.value(), lhs.first.bitsize(), lhs.first.sign() || rhs.first.sign()),
       lhs.second && rhs.second));
 }
 
@@ -238,8 +211,7 @@ void EvalVisitor::visitMinusOpr(const MinusOpr& m) {
   evalBinExpr(m, lhs, rhs);
 
   exprStack_.push(std::make_pair(
-      Constant(lhs.first.value() - rhs.first.value(), lhs.first.bitsize(),
-               lhs.first.sign() || rhs.first.sign()),
+      Constant(lhs.first.value() - rhs.first.value(), lhs.first.bitsize(), lhs.first.sign() || rhs.first.sign()),
       lhs.second && rhs.second));
 }
 
@@ -248,8 +220,7 @@ void EvalVisitor::visitMultipliesOpr(const MultipliesOpr& m) {
   evalBinExpr(m, lhs, rhs);
 
   exprStack_.push(std::make_pair(
-      Constant(lhs.first.value() * rhs.first.value(), lhs.first.bitsize(),
-               lhs.first.sign() || rhs.first.sign()),
+      Constant(lhs.first.value() * rhs.first.value(), lhs.first.bitsize(), lhs.first.sign() || rhs.first.sign()),
       lhs.second && rhs.second));
 }
 
@@ -267,12 +238,10 @@ void EvalVisitor::visitDevideOpr(const DevideOpr& d) {
     result = lhs.second && rhs.second;
 
     if (lhs.first.sign() || rhs.first.sign())
-      constant = Constant(static_cast<long long>(lhs.first.value()) /
-                              static_cast<long long>(rhs.first.value()),
+      constant = Constant(static_cast<long long>(lhs.first.value()) / static_cast<long long>(rhs.first.value()),
                           lhs.first.bitsize(), true);
     else
-      constant = Constant(lhs.first.value() / rhs.first.value(),
-                          lhs.first.bitsize(), false);
+      constant = Constant(lhs.first.value() / rhs.first.value(), lhs.first.bitsize(), false);
   }
   exprStack_.push(std::make_pair(constant, result));
 }
@@ -291,12 +260,10 @@ void EvalVisitor::visitModuloOpr(const ModuloOpr& m) {
     result = lhs.second && rhs.second;
 
     if (lhs.first.sign() || rhs.first.sign())
-      constant = Constant(static_cast<long long>(lhs.first.value()) %
-                              static_cast<long long>(rhs.first.value()),
+      constant = Constant(static_cast<long long>(lhs.first.value()) % static_cast<long long>(rhs.first.value()),
                           lhs.first.bitsize(), true);
     else
-      constant = Constant(lhs.first.value() % rhs.first.value(),
-                          lhs.first.bitsize(), false);
+      constant = Constant(lhs.first.value() % rhs.first.value(), lhs.first.bitsize(), false);
   }
   exprStack_.push(std::make_pair(constant, result));
 }
@@ -306,8 +273,7 @@ void EvalVisitor::visitShiftLeftOpr(const ShiftLeftOpr& shl) {
   evalBinExpr(shl, lhs, rhs);
 
   exprStack_.push(std::make_pair(
-      Constant(lhs.first.value() << rhs.first.value(), lhs.first.bitsize(),
-               lhs.first.sign() || rhs.first.sign()),
+      Constant(lhs.first.value() << rhs.first.value(), lhs.first.bitsize(), lhs.first.sign() || rhs.first.sign()),
       lhs.second && rhs.second));
 }
 
@@ -316,8 +282,7 @@ void EvalVisitor::visitShiftRightOpr(const ShiftRightOpr& shr) {
   evalBinExpr(shr, lhs, rhs);
 
   exprStack_.push(std::make_pair(
-      Constant(lhs.first.value() >> rhs.first.value(), lhs.first.bitsize(),
-               lhs.first.sign() || rhs.first.sign()),
+      Constant(lhs.first.value() >> rhs.first.value(), lhs.first.bitsize(), lhs.first.sign() || rhs.first.sign()),
       lhs.second && rhs.second));
 }
 
@@ -327,9 +292,7 @@ void EvalVisitor::visitVectorAccess(const VectorAccess& va) {
 void EvalVisitor::visitForEach(const ForEach& va) {
   throw std::runtime_error("ForEach is not allowed in EvalVisitor.");
 }
-void EvalVisitor::visitUnique(const Unique& va) {
-  throw std::runtime_error("Unique is not allowed in EvalVisitor.");
-}
+void EvalVisitor::visitUnique(const Unique& va) { throw std::runtime_error("Unique is not allowed in EvalVisitor."); }
 
 void EvalVisitor::visitIfThenElse(const IfThenElse& ite) {
   stack_entry a, b, c;

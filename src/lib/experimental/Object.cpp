@@ -13,9 +13,7 @@ static std::list<crv_object_name*> crv_name_stack;
 static std::list<crv_object*> crv_obj_stack;
 static std::unordered_map<std::string, crv_object*> crv_obj_map;
 
-crv_object_name::crv_object_name(const char* c) : name_(c), object_(0) {
-  crv_name_stack.push_back(this);
-}
+crv_object_name::crv_object_name(const char* c) : name_(c), object_(0) { crv_name_stack.push_back(this); }
 
 crv_object_name::~crv_object_name() {
   if (object_ == nullptr) return;
@@ -57,8 +55,7 @@ crv_object::~crv_object() {
 
 void crv_object::print_object_hierarchy(int lvl) {
   std::cout << std::string(2 * lvl, ' ');
-  std::cout << name() << " # " << fullname() << " @ " << this << ", parent @ "
-            << parent_ << std::endl;
+  std::cout << name() << " # " << fullname() << " @ " << this << ", parent @ " << parent_ << std::endl;
   for (auto obj : children_) obj->print_object_hierarchy(lvl + 1);
 }
 

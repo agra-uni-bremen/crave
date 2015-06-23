@@ -11,18 +11,15 @@
 #include <glog/logging.h>
 #include <string>
 
-#define DEFINE_SOLVER(inCrave, inMetaSMT)                      \
-  namespace crave {                                            \
-  template <>                                                  \
-  struct FactorySolver<inCrave> {                              \
-    typedef metaSMT::DirectSolver_Context<                     \
-        metaSMT::UnpackFuture_Context<inMetaSMT> > SolverType; \
-    static bool isDefined() { return true; }                   \
-    static metaSMTVisitor* getNewInstance() {                  \
-      return new metaSMTVisitorImpl<SolverType>();             \
-    }                                                          \
-  };                                                           \
-}  // namespace crave
+#define DEFINE_SOLVER(inCrave, inMetaSMT)                                                        \
+  namespace crave {                                                                              \
+  template <>                                                                                    \
+  struct FactorySolver<inCrave> {                                                                \
+    typedef metaSMT::DirectSolver_Context<metaSMT::UnpackFuture_Context<inMetaSMT> > SolverType; \
+    static bool isDefined() { return true; }                                                     \
+    static metaSMTVisitor* getNewInstance() { return new metaSMTVisitorImpl<SolverType>(); }     \
+  };                                                                                             \
+  }  // namespace crave
 
 #ifdef metaSMT_USE_Boolector
 #include <metaSMT/backend/Boolector.hpp>
@@ -46,8 +43,7 @@ DEFINE_SOLVER(crave::Z3, metaSMT::solver::Z3_Backend);
 
 #ifdef metaSMT_USE_CUDD
 #include <metaSMT/backend/CUDD_Distributed.hpp>
-DEFINE_SOLVER(crave::CUDD,
-              metaSMT::BitBlast<metaSMT::solver::CUDD_Distributed>);
+DEFINE_SOLVER(crave::CUDD, metaSMT::BitBlast<metaSMT::solver::CUDD_Distributed>);
 #endif
 
 #undef DEFINE_SOLVER
@@ -69,18 +65,18 @@ void FactoryMetaSMT::setSolverType(std::string const& type) {
     solver_type_ = CUDD;
 }
 
-#define TRY_GET_SOLVER(solver)                                             \
-  if (!FactorySolver<solver>::isDefined()) {                               \
-    solver_type_ = UNDEFINED_SOLVER;                                        \
-    LOG(INFO) << #solver                                                   \
-              << " has not been defined, another solver will be selected"; \
-    return getNewInstance();                                               \
-  } else  {                                                                 \
-    return FactorySolver<solver>::getNewInstance(); }
+#define TRY_GET_SOLVER(solver)                                                        \
+  if (!FactorySolver<solver>::isDefined()) {                                          \
+    solver_type_ = UNDEFINED_SOLVER;                                                  \
+    LOG(INFO) << #solver << " has not been defined, another solver will be selected"; \
+    return getNewInstance();                                                          \
+  } else {                                                                            \
+    return FactorySolver<solver>::getNewInstance();                                   \
+  }
 
 #define TRY_GET_SOLVER_WHEN_UNDEFINED(solver)                   \
   if (FactorySolver<solver>::isDefined()) {                     \
-    solver_type_ = solver;                                       \
+    solver_type_ = solver;                                      \
     LOG(INFO) << #solver << " has been automatically selected"; \
     return getNewInstance();                                    \
   }

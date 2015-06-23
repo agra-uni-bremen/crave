@@ -7,16 +7,14 @@
 
 namespace crave {
 
-void ReplaceVisitor::evalUnaryExpr(UnaryExpression const& unary_expr,
-                                   NodePtr& node) {
+void ReplaceVisitor::evalUnaryExpr(UnaryExpression const& unary_expr, NodePtr& node) {
   visitUnaryExpr(unary_expr);
   assert(aux_stack_.size() >= 1);
   node = aux_stack_.top();
   aux_stack_.pop();
 }
 
-void ReplaceVisitor::evalBinExpr(BinaryExpression const& bin_expr, NodePtr& lhs,
-                                 NodePtr& rhs) {
+void ReplaceVisitor::evalBinExpr(BinaryExpression const& bin_expr, NodePtr& lhs, NodePtr& rhs) {
   visitBinaryExpr(bin_expr);
   assert(aux_stack_.size() >= 2);
   rhs = aux_stack_.top();
@@ -25,8 +23,7 @@ void ReplaceVisitor::evalBinExpr(BinaryExpression const& bin_expr, NodePtr& lhs,
   aux_stack_.pop();
 }
 
-void ReplaceVisitor::evalTernExpr(TernaryExpression const& tern_expr,
-                                  NodePtr& a, NodePtr& b, NodePtr& c) {
+void ReplaceVisitor::evalTernExpr(TernaryExpression const& tern_expr, NodePtr& a, NodePtr& b, NodePtr& c) {
   visitTernaryExpr(tern_expr);
   assert(aux_stack_.size() >= 3);
   c = aux_stack_.top();
@@ -57,9 +54,7 @@ void ReplaceVisitor::evalTernSubscript(int& a, int& b, int& c) {
 
 void ReplaceVisitor::visitNode(Node const& n) {}
 void ReplaceVisitor::visitTerminal(Terminal const& t) {}
-void ReplaceVisitor::visitUnaryExpr(UnaryExpression const& e) {
-  e.child()->visit(this);
-}
+void ReplaceVisitor::visitUnaryExpr(UnaryExpression const& e) { e.child()->visit(this); }
 void ReplaceVisitor::visitUnaryOpr(UnaryOperator const&) {}
 void ReplaceVisitor::visitBinaryExpr(BinaryExpression const& e) {
   e.lhs()->visit(this);
