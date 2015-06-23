@@ -2,6 +2,8 @@
 
 namespace crave {
 
+bool VariableDefaultSolver::bypass_constraint_analysis = false;
+
 VariableDefaultSolver::VariableDefaultSolver(VariableContainer* vcon, const ConstraintPartition& cp)
     : VariableSolver(vcon, cp) {
   LOG(INFO) << "Create solver for partition " << constr_pttn_;
@@ -14,6 +16,11 @@ VariableDefaultSolver::VariableDefaultSolver(VariableContainer* vcon, const Cons
       solver_->makeAssertion(*c->expr());
     }
   }
+  if (!bypass_constraint_analysis)
+    analyseConstraints();
+}
+
+void VariableDefaultSolver::analyseConstraints() {
   analyseHards();
   if (contradictions_.empty()) {
     analyseSofts();

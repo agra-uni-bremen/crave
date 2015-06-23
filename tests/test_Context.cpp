@@ -145,6 +145,8 @@ BOOST_AUTO_TEST_CASE(alu) {
 }
 
 BOOST_AUTO_TEST_CASE(alu_enum) {
+  VariableDefaultSolver::bypass_constraint_analysis = true;
+
   Variable<unsigned> op;
   Variable<unsigned> a;
   Variable<unsigned> b;
@@ -166,6 +168,8 @@ BOOST_AUTO_TEST_CASE(alu_enum) {
     BOOST_REQUIRE_LE(count, 600);
   }
   BOOST_REQUIRE_EQUAL(count, 572);
+
+  VariableDefaultSolver::bypass_constraint_analysis = false;
 }
 
 BOOST_AUTO_TEST_CASE(pythagoras) {
@@ -226,6 +230,8 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_1) {
 }
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_2) {
+  VariableDefaultSolver::bypass_constraint_analysis = true;
+
   randv<signed char> a(NULL);
   Generator gen;
   gen(a() < 10);
@@ -239,6 +245,8 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_2) {
   }
 
   BOOST_CHECK_EQUAL(generated.size(), 138);
+
+  VariableDefaultSolver::bypass_constraint_analysis = false;
 }
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_3) {

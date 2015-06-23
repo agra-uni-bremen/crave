@@ -104,6 +104,8 @@ BOOST_AUTO_TEST_CASE(not_equal_t1) {
 }
 
 BOOST_AUTO_TEST_CASE(less) {
+  VariableDefaultSolver::bypass_constraint_analysis = true;
+
   Variable<unsigned> a;
 
   Generator gen;
@@ -118,9 +120,13 @@ BOOST_AUTO_TEST_CASE(less) {
   }
 
   BOOST_REQUIRE_EQUAL(generated.size(), 256);
+
+  VariableDefaultSolver::bypass_constraint_analysis = false;
 }
 
 BOOST_AUTO_TEST_CASE(less_equal) {
+  VariableDefaultSolver::bypass_constraint_analysis = true;
+
   Variable<unsigned> a;
 
   Generator gen;
@@ -135,9 +141,13 @@ BOOST_AUTO_TEST_CASE(less_equal) {
   }
 
   BOOST_REQUIRE_EQUAL(generated.size(), 257);
+
+  VariableDefaultSolver::bypass_constraint_analysis = false;  
 }
 
 BOOST_AUTO_TEST_CASE(greater) {
+  VariableDefaultSolver::bypass_constraint_analysis = true;
+
   Variable<unsigned> a;
 
   Generator gen;
@@ -152,9 +162,13 @@ BOOST_AUTO_TEST_CASE(greater) {
   }
 
   BOOST_REQUIRE_EQUAL(generated.size(), 256);
+
+  VariableDefaultSolver::bypass_constraint_analysis = false;  
 }
 
 BOOST_AUTO_TEST_CASE(greater_equal) {
+  VariableDefaultSolver::bypass_constraint_analysis = true;
+
   Variable<unsigned> a;
 
   Generator gen;
@@ -169,6 +183,8 @@ BOOST_AUTO_TEST_CASE(greater_equal) {
   }
 
   BOOST_REQUIRE_EQUAL(generated.size(), 257);
+
+  VariableDefaultSolver::bypass_constraint_analysis = false;
 }
 
 BOOST_AUTO_TEST_CASE(neg_t1) {
@@ -277,6 +293,8 @@ BOOST_AUTO_TEST_CASE(xor_t2) {
 }
 
 BOOST_AUTO_TEST_CASE(shiftleft) {
+  VariableDefaultSolver::bypass_constraint_analysis = true;
+  
   Variable<unsigned> a;
   Variable<unsigned> b;
   Variable<unsigned> c;
@@ -295,9 +313,13 @@ BOOST_AUTO_TEST_CASE(shiftleft) {
 
     gen(a != gen[a] || b != gen[b]);
   }
+
+  VariableDefaultSolver::bypass_constraint_analysis = false;
 }
 
 BOOST_AUTO_TEST_CASE(shiftright) {
+  VariableDefaultSolver::bypass_constraint_analysis = true;
+
   Variable<unsigned> a;
   Variable<unsigned> b;
   Variable<unsigned> c;
@@ -316,9 +338,13 @@ BOOST_AUTO_TEST_CASE(shiftright) {
 
     gen(a != gen[a] || b != gen[b]);
   }
+
+  VariableDefaultSolver::bypass_constraint_analysis = false;
 }
 
 BOOST_AUTO_TEST_CASE(plus_minus) {
+  VariableDefaultSolver::bypass_constraint_analysis = true;
+
   Variable<unsigned int> a;
   Variable<unsigned int> b;
   Variable<unsigned int> q;
@@ -337,6 +363,8 @@ BOOST_AUTO_TEST_CASE(plus_minus) {
     std::cout << "#" << cnt++ << ": result: a=" << gen[a] << ", b=" << gen[b] << ", q=" << gen[q] << ", r=" << gen[r]
               << "\n" << std::endl;
   }
+
+  VariableDefaultSolver::bypass_constraint_analysis = false;
 }
 
 BOOST_AUTO_TEST_CASE(mult_mod) {
@@ -365,6 +393,8 @@ BOOST_AUTO_TEST_CASE(mult_mod) {
 }
 
 BOOST_AUTO_TEST_CASE(divide) {
+  VariableDefaultSolver::bypass_constraint_analysis = true;
+
   Variable<unsigned char> a;
   Variable<unsigned char> b;
   Variable<unsigned char> q;
@@ -382,6 +412,8 @@ BOOST_AUTO_TEST_CASE(divide) {
     std::cout << "result: a=" << gen[a] << ", b=" << gen[b] << ", q=" << gen[q] << ", r=" << gen[r] << "\n"
               << std::endl;
   }
+
+  VariableDefaultSolver::bypass_constraint_analysis = false;
 }
 
 BOOST_AUTO_TEST_CASE(element_inside_set) {
