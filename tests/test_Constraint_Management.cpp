@@ -122,8 +122,9 @@ class Item1 : public rand_obj {
   randv<uint> a;
 };
 
-BOOST_AUTO_TEST_CASE(t2) { 
-  BOOST_CHECK_THROW(Item1 it, std::runtime_error); 
+BOOST_AUTO_TEST_CASE(t2) {
+  Item1* it;
+  BOOST_CHECK_THROW(it = new Item1, std::runtime_error);
 }
 
 class ItemPythagoras : public rand_obj {
