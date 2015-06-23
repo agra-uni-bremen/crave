@@ -28,7 +28,6 @@
 #include "visitor/GetSupportSetVisitor.hpp"
 #include "visitor/ToDotNodeVisitor.hpp"
 
-
 namespace crave {
 
 int new_constraint_id();

@@ -31,7 +31,7 @@ class rand_obj : public rand_obj_base {
 
   virtual bool next_cov();
 
-  virtual void gather_values(std::vector<int64_t> *ch);
+  virtual void gather_values(std::vector<int64_t>* ch);
 
   virtual void add_base_child(rand_base* rb);
 
@@ -51,7 +51,7 @@ class rand_obj : public rand_obj_base {
  protected:
   bool gen_base_children();
 
-  void gather_constraints(Generator *gen);
+  void gather_constraints(Generator* gen);
 
  public:
   Generator constraint;
@@ -67,18 +67,17 @@ class rand_obj : public rand_obj_base {
 
 #define INSERT(s, DATA, ELEM) DATA.insert(ELEM);
 
-#define CRAVE_ENUM(name, ...)                                         \
-  namespace crave {                                                   \
-  template <>                                                         \
-  struct randv<name> : randv<int> {                                   \
-    explicit randv(rand_obj* parent) : randv<int>(parent) {           \
-      if (parent == 0) {                                              \
-        throw std::runtime_error(                                     \
-            "randv<enum> must be owned by an instance of rand_obj."); \
-      }                                                               \
-      std::set<int> s;                                                \
-      BOOST_PP_SEQ_FOR_EACH(INSERT, s, __VA_ARGS__);                  \
-      parent->constraint(inside(var, s));                             \
-    }                                                                 \
-  };                                                                  \
-}  // namespace crave
+#define CRAVE_ENUM(name, ...)                                                              \
+  namespace crave {                                                                        \
+  template <>                                                                              \
+  struct randv<name> : randv<int> {                                                        \
+    explicit randv(rand_obj* parent) : randv<int>(parent) {                                \
+      if (parent == 0) {                                                                   \
+        throw std::runtime_error("randv<enum> must be owned by an instance of rand_obj."); \
+      }                                                                                    \
+      std::set<int> s;                                                                     \
+      BOOST_PP_SEQ_FOR_EACH(INSERT, s, __VA_ARGS__);                                       \
+      parent->constraint(inside(var, s));                                                  \
+    }                                                                                      \
+  };                                                                                       \
+  }  // namespace crave

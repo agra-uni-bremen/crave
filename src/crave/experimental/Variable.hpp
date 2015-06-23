@@ -26,8 +26,7 @@ template <typename T>
 class crv_variable_base : public crv_variable_base_ {
  public:
   operator T() const { return actual_value(); }
-  friend std::ostream& operator<<(std::ostream& os,
-                                  const crv_variable_base<T>& e) {
+  friend std::ostream& operator<<(std::ostream& os, const crv_variable_base<T>& e) {
     os << e.actual_value();
     return os;
   }
@@ -40,18 +39,12 @@ class crv_variable_base : public crv_variable_base_ {
   }
   void bind(crv_variable_base& other) { bound_var = &other; }
   void unbind() { bound_var = nullptr; }
-  expression bound_expr() {
-    return bound_var ? make_expression(var == bound_var->var)
-                     : value_to_expression(true);
-  }
+  expression bound_expr() { return bound_var ? make_expression(var == bound_var->var) : value_to_expression(true); }
 
  protected:
   crv_variable_base() : var(&value), value(), bound_var() {}
   crv_variable_base(const crv_variable_base& other)
-      : var(&value),
-        value(other.value),
-        bound_var(other.bound_var),
-        crv_variable_base_(other) {}
+      : var(&value), value(other.value), bound_var(other.bound_var), crv_variable_base_(other) {}
 
   T actual_value() const { return bound_var ? bound_var->value : value; }
 
@@ -60,18 +53,17 @@ class crv_variable_base : public crv_variable_base_ {
   crv_variable_base<T>* bound_var;
 };
 
-#define CRV_VARIABLE_COMMON_INTERFACE(Typename)                        \
- public:                                                               \
-  crv_variable(crv_object_name name = "var") {}                        \
-  crv_variable(const crv_variable& other)                              \
-      : crv_variable_base<Typename>(other) {}                          \
-  crv_variable<Typename>& operator=(const crv_variable<Typename>& i) { \
-    this->value = i.value;                                             \
-    return *this;                                                      \
-  }                                                                    \
-  crv_variable<Typename>& operator=(Typename i) {                      \
-    this->value = i;                                                   \
-    return *this;                                                      \
+#define CRV_VARIABLE_COMMON_INTERFACE(Typename)                                   \
+ public:                                                                          \
+  crv_variable(crv_object_name name = "var") {}                                   \
+  crv_variable(const crv_variable& other) : crv_variable_base<Typename>(other) {} \
+  crv_variable<Typename>& operator=(const crv_variable<Typename>& i) {            \
+    this->value = i.value;                                                        \
+    return *this;                                                                 \
+  }                                                                               \
+  crv_variable<Typename>& operator=(Typename i) {                                 \
+    this->value = i;                                                              \
+    return *this;                                                                 \
   }
 
 #define CRV_VARIABLE_ARITHMETIC_INTERFACE(Typename) \

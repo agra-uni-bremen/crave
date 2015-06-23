@@ -6,8 +6,7 @@ namespace crave {
 
 template <typename T>
 struct weighted_range {
-  weighted_range(T l, T r, unsigned w)
-      : left_(l), right_(r), weight_(w), accumWeight_(0) {}
+  weighted_range(T l, T r, unsigned w) : left_(l), right_(r), weight_(w), accumWeight_(0) {}
 
   bool operator<(const weighted_range<T>& other) const {
     if (left_ < other.left_) return true;

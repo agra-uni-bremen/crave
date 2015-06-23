@@ -17,7 +17,7 @@ typedef boost::shared_ptr<UserVectorConstraint> VectorConstraintPtr;
 
 struct ConstraintPartitioner {
   void reset();
-  
+
   void mergeConstraints(const ConstraintManager& mng);
 
   void partition();
@@ -27,7 +27,7 @@ struct ConstraintPartitioner {
   std::vector<VectorConstraintPtr>& getVectorConstraints();
 
  private:
-  void maximizePartition(ConstraintPartition *cp, ConstraintList *lc);
+  void maximizePartition(ConstraintPartition* cp, ConstraintList* lc);
 
  private:
   std::set<unsigned> constr_mngs_;
@@ -37,6 +37,5 @@ struct ConstraintPartitioner {
   std::vector<ConstraintPartition> partitions_;
   std::vector<VectorConstraintPtr> vec_constraints_;
 };
-
 
 }  // namespace crave

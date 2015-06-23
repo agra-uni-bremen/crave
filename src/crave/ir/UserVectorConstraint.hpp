@@ -15,10 +15,8 @@ class UserVectorConstraint : public UserConstraint {
   friend struct ConstraintPartitioner;
 
  public:
-  UserVectorConstraint(unsigned const id, expression const expr,
-                       std::string const& name, std::set<int> support_vars,
-                       bool const unique, bool const soft = false,
-                       bool const cover = false, bool const enabled = true);
+  UserVectorConstraint(unsigned const id, expression const expr, std::string const& name, std::set<int> support_vars,
+                       bool const unique, bool const soft = false, bool const cover = false, bool const enabled = true);
 
   bool isUnique();
   int getVectorId();

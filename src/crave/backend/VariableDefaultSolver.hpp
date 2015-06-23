@@ -12,8 +12,7 @@
 namespace crave {
 
 struct VariableDefaultSolver : VariableSolver {
-  VariableDefaultSolver(VariableContainer *vcon,
-                        const ConstraintPartition& cp);
+  VariableDefaultSolver(VariableContainer* vcon, const ConstraintPartition& cp);
 
   virtual bool solve();
 

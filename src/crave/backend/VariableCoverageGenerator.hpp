@@ -8,11 +8,11 @@
 
 namespace crave {
 
-    struct VariableCoverageGenerator : VariableGenerator {
-        explicit VariableCoverageGenerator(VariableContainer* vcon);
+struct VariableCoverageGenerator : VariableGenerator {
+  explicit VariableCoverageGenerator(VariableContainer* vcon);
 
-        virtual void reset(std::vector<ConstraintPartition>& partitions);
+  virtual void reset(std::vector<ConstraintPartition>& partitions);
 
-        virtual bool solve();
-    };
-} // namespace crave
+  virtual bool solve();
+};
+}  // namespace crave

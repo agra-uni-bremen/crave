@@ -17,8 +17,7 @@ class EvalVisitor : NodeVisitor {
  public:
   typedef std::map<int, Constant> eval_map;
 
-  explicit EvalVisitor(eval_map *m)
-      : NodeVisitor(), exprStack_(), evalMap_(m), result_() {}
+  explicit EvalVisitor(eval_map* m) : NodeVisitor(), exprStack_(), evalMap_(m), result_() {}
 
  private:
   virtual void visitNode(Node const&);
@@ -64,8 +63,7 @@ class EvalVisitor : NodeVisitor {
   void pop2(stack_entry&, stack_entry&);
   void pop3(stack_entry&, stack_entry&, stack_entry&);
   void evalBinExpr(BinaryExpression const&, stack_entry&, stack_entry&);
-  void evalTernExpr(TernaryExpression const&, stack_entry&, stack_entry&,
-                    stack_entry&);
+  void evalTernExpr(TernaryExpression const&, stack_entry&, stack_entry&, stack_entry&);
 
  public:
   Constant result() const { return result_; }
@@ -81,7 +79,7 @@ class EvalVisitor : NodeVisitor {
 
  private:
   std::stack<stack_entry> exprStack_;
-  eval_map *evalMap_;
+  eval_map* evalMap_;
 
   Constant result_;
 };
@@ -98,8 +96,7 @@ inline void EvalVisitor::pop2(stack_entry& fst, stack_entry& snd) {
   snd = exprStack_.top();
   exprStack_.pop();
 }
-inline void EvalVisitor::pop3(stack_entry& fst, stack_entry& snd,
-                              stack_entry& trd) {
+inline void EvalVisitor::pop3(stack_entry& fst, stack_entry& snd, stack_entry& trd) {
   assert(exprStack_.size() >= 3);
   fst = exprStack_.top();
   exprStack_.pop();
@@ -108,13 +105,11 @@ inline void EvalVisitor::pop3(stack_entry& fst, stack_entry& snd,
   trd = exprStack_.top();
   exprStack_.pop();
 }
-inline void EvalVisitor::evalBinExpr(BinaryExpression const& bin,
-                                     stack_entry& fst, stack_entry& snd) {
+inline void EvalVisitor::evalBinExpr(BinaryExpression const& bin, stack_entry& fst, stack_entry& snd) {
   visitBinaryExpr(bin);
   pop2(snd, fst);
 }
-inline void EvalVisitor::evalTernExpr(TernaryExpression const& tern,
-                                      stack_entry& fst, stack_entry& snd,
+inline void EvalVisitor::evalTernExpr(TernaryExpression const& tern, stack_entry& fst, stack_entry& snd,
                                       stack_entry& trd) {
   visitTernaryExpr(tern);
   pop3(trd, snd, fst);

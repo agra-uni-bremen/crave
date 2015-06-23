@@ -12,13 +12,10 @@ struct placeholder_tag {
   int id;
 };
 
-struct placeholder
-    : public Constraint<boost::proto::terminal<placeholder_tag>::type> {
+struct placeholder : public Constraint<boost::proto::terminal<placeholder_tag>::type> {
   typedef Constraint<boost::proto::terminal<placeholder_tag>::type> base_type;
 
-  placeholder()
-      : base_type(boost::proto::make_expr<boost::proto::tag::terminal>(
-            placeholder_tag(new_var_id()))) {}
+  placeholder() : base_type(boost::proto::make_expr<boost::proto::tag::terminal>(placeholder_tag(new_var_id()))) {}
 
   int id() const { return boost::proto::value(*this).id; }
 };

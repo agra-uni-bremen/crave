@@ -39,13 +39,11 @@ struct distribution : Node {
 
   T nextValue() const {
     if (ranges_.empty()) {
-      return boost::uniform_int<T>(std::numeric_limits<T>::min(),
-                                   std::numeric_limits<T>::max())(rng);
+      return boost::uniform_int<T>(std::numeric_limits<T>::min(), std::numeric_limits<T>::max())(rng);
     }
     weighted_range<T> selected = ranges_.back();
     if (ranges_.size() > 1) {
-      unsigned r =
-          boost::uniform_int<unsigned>(0, selected.accumWeight_ - 1)(rng);
+      unsigned r = boost::uniform_int<unsigned>(0, selected.accumWeight_ - 1)(rng);
       for (uint i = 0; i < ranges_.size(); i++)
         if (r < ranges_[i].accumWeight_) {
           selected = ranges_[i];

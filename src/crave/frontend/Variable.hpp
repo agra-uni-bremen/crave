@@ -5,7 +5,6 @@
 #include <boost/proto/core.hpp>
 #include "ConstraintType.hpp"
 
-
 // Variable
 namespace crave {
 
@@ -21,15 +20,10 @@ struct var_tag {
 };
 
 template <typename value_type_>
-struct Variable
-    : public Constraint<
-          typename boost::proto::terminal<var_tag<value_type_> >::type> {
-  typedef Constraint<
-      typename boost::proto::terminal<var_tag<value_type_> >::type> base_type;
+struct Variable : public Constraint<typename boost::proto::terminal<var_tag<value_type_> >::type> {
+  typedef Constraint<typename boost::proto::terminal<var_tag<value_type_> >::type> base_type;
 
-  Variable()
-      : base_type(boost::proto::make_expr<boost::proto::tag::terminal>(
-            var_tag<value_type_>(new_var_id()))) {}
+  Variable() : base_type(boost::proto::make_expr<boost::proto::tag::terminal>(var_tag<value_type_>(new_var_id()))) {}
 
   template <typename T>
   explicit Variable(T linkto)
@@ -41,13 +35,10 @@ struct Variable
 
   int id() const { return boost::proto::value(*this).id; }
 
-  typename boost::proto::result_of::make_expr<
-      boost::proto::tag::assign, Constraint_Domain,
-      Variable<value_type_> const&, value_type_ const&>::type const
+  typename boost::proto::result_of::make_expr<boost::proto::tag::assign, Constraint_Domain,
+                                              Variable<value_type_> const&, value_type_ const&>::type const
   operator=(value_type_ const& e) const {
-    return boost::proto::make_expr<boost::proto::tag::assign,
-                                   Constraint_Domain>(boost::cref(*this),
-                                                      boost::cref(e));
+    return boost::proto::make_expr<boost::proto::tag::assign, Constraint_Domain>(boost::cref(*this), boost::cref(e));
   }
 };
 }  // namespace crave

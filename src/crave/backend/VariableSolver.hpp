@@ -34,7 +34,7 @@ struct VariableSolver {
   std::vector<std::string> getInactiveSofts() const;
 
  protected:
-  VariableContainer *var_ctn_;
+  VariableContainer* var_ctn_;
   const ConstraintPartition& constr_pttn_;
   SolverPtr solver_;
 

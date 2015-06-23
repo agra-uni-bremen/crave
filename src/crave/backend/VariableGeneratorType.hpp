@@ -23,7 +23,7 @@ struct VariableGenerator {
   virtual bool solve();
 
   template <typename T>
-  bool read(const Variable<T> &var, T* value) const {
+  bool read(const Variable<T>& var, T* value) const {
     BOOST_FOREACH(VarSolverPtr vs, solvers_) {
       if (vs->read(var, value)) return true;
     }

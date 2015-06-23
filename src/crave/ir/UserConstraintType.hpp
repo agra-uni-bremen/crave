@@ -13,60 +13,54 @@
 
 namespace crave {
 
-    
-    class UserConstraint {
-        friend struct ConstraintManager;
-        friend struct ConstraintPartitioner;
-        friend struct ConstraintPartition;
+class UserConstraint {
+  friend struct ConstraintManager;
+  friend struct ConstraintPartitioner;
+  friend struct ConstraintPartition;
 
-      public:
-        typedef NodePtr expression;
+ public:
+  typedef NodePtr expression;
 
-        UserConstraint(unsigned const id, expression const expr,
-                std::string const& name, std::set<int> support_vars,
-                bool const soft = false, bool const cover = false,
-                bool const enabled = true);
+  UserConstraint(unsigned const id, expression const expr, std::string const& name, std::set<int> support_vars,
+                 bool const soft = false, bool const cover = false, bool const enabled = true);
 
-        virtual ~UserConstraint() {
-        }
+  virtual ~UserConstraint() {}
 
+  unsigned id() const;
 
+  expression const& expr() const;
 
-        unsigned id() const;
+  std::string name() const;
 
-        expression const& expr() const;
+  bool isSoft() const;
 
-        std::string name() const;
+  bool isCover() const;
 
-        bool isSoft() const;
+  bool isEnabled() const;
 
-        bool isCover() const;
+  void enable();
 
-        bool isEnabled() const;
+  void disable();
 
-        void enable();
+  virtual bool isVectorConstraint();
 
-        void disable();
+  template <typename ostream>
+  friend ostream& operator<<(ostream& os, const UserConstraint& constr);
 
-        virtual bool isVectorConstraint();
+ protected:
+  unsigned id_;
+  expression expr_;
+  std::string name_;
+  std::set<int> support_vars_;
+  bool soft_;
+  bool cover_;
+  bool enabled_;
+};
 
-        template <typename ostream>
-        friend ostream& operator<<(ostream& os, const UserConstraint& constr);
+template <typename ostream>
+ostream& operator<<(ostream& os, const UserConstraint& constr);
 
-    protected:
-        unsigned id_;
-        expression expr_;
-        std::string name_;
-        std::set<int> support_vars_;
-        bool soft_;
-        bool cover_;
-        bool enabled_;
-    };
+typedef boost::shared_ptr<UserConstraint> ConstraintPtr;
+typedef std::list<ConstraintPtr> ConstraintList;
 
-    template <typename ostream>
-    ostream& operator<<(ostream& os, const UserConstraint& constr);
-
-    typedef boost::shared_ptr<UserConstraint> ConstraintPtr;
-    typedef std::list<ConstraintPtr> ConstraintList;
-        
-} // namespace crave
+}  // namespace crave

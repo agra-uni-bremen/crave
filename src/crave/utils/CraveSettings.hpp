@@ -14,7 +14,7 @@ class CraveSetting : public Setting {
 
  private:
   virtual void load_(const ptree& tree);
-  
+
   virtual void save_(ptree* tree) const;
 
  public:
