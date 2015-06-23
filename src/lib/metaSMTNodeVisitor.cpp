@@ -81,8 +81,8 @@ void FactoryMetaSMT::setSolverType(std::string const& type) {
     return getNewInstance();                                    \
   }
 
-metaSMTVisitor* FactoryMetaSMT::getNewInstance() {
-  switch (solver_type_) {
+metaSMTVisitor* FactoryMetaSMT::getNewInstance(SolverTypes type) {
+  switch (type) {
     case BOOLECTOR:
       TRY_GET_SOLVER(BOOLECTOR);
     case CVC4:
@@ -95,8 +95,8 @@ metaSMTVisitor* FactoryMetaSMT::getNewInstance() {
       TRY_GET_SOLVER(CUDD);
     default:  // UNDEFINED_SOLVER
       TRY_GET_SOLVER_WHEN_UNDEFINED(BOOLECTOR);
-      TRY_GET_SOLVER_WHEN_UNDEFINED(CVC4);
       TRY_GET_SOLVER_WHEN_UNDEFINED(Z3);
+      TRY_GET_SOLVER_WHEN_UNDEFINED(CVC4);
       TRY_GET_SOLVER_WHEN_UNDEFINED(SWORD);
       TRY_GET_SOLVER_WHEN_UNDEFINED(CUDD);
       assert(false && "No solver has been defined.");

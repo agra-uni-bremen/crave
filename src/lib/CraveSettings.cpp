@@ -6,8 +6,8 @@ CraveSetting::CraveSetting(std::string const& filename)
     : Setting(filename), module_name_("crave"), backend_(), seed_(), BACKEND("backend"), SEED("seed") {}
 
 void CraveSetting::load_(const ptree& tree) {
-  backend_ = tree.get(module_name_ + "." + BACKEND, "Boolector");
-  seed_ = tree.get(module_name_ + "." + SEED, 42);
+  backend_ = tree.get(module_name_ + "." + BACKEND, "auto");
+  seed_ = tree.get(module_name_ + "." + SEED, 0);
 }
 
 void CraveSetting::save_(ptree* tree) const {
