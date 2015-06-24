@@ -279,8 +279,7 @@ namespace crave {
     void ComplexityEstimationVisitor::visitIfThenElse(const IfThenElse& ite) {
         stack_entry a, b, c;
         evalTernExpr(ite, a, b, c);
-
-        exprStack_.push(std::make_pair(new IfThenElse(a.first, b.first, c.first), a.second));
+        exprStack_.push(std::make_pair(new IfThenElse(a.first, b.first, c.first), a.second+b.second+c.second));
     }
 
     void ComplexityEstimationVisitor::visitBitslice(const Bitslice& b) {
