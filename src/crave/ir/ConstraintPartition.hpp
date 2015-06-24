@@ -39,6 +39,8 @@ struct ConstraintPartition {
 
   std::map<int, ConstraintList> const& singleVariableConstraintMap() const;
 
+  std::set<int> const& supportSet() const;
+
   template <typename ostream>
   friend ostream& operator<<(ostream& os, const ConstraintPartition& cp);
 
