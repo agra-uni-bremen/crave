@@ -15,7 +15,7 @@ namespace crave {
 
 VariableContainer variables;
 
-//  VariableContainer& variable_container() { return variables; }
+VariableContainer& variable_container() { return variables; }
 
 int new_var_id() {
   static int var_ID = 0;
