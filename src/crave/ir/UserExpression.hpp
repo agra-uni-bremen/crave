@@ -9,6 +9,8 @@ namespace crave {
 using boost::proto::tag::terminal;
 using boost::proto::result_of::make_expr;
 
+extern VariableContainer variables;
+
 struct expr_tag : public Constraint<boost::proto::terminal<NodePtr>::type> {
   typedef Constraint<boost::proto::terminal<NodePtr>::type> base_type;
   explicit expr_tag(NodePtr n) : base_type(boost::proto::make_expr<terminal>(n)) {}
@@ -18,7 +20,7 @@ typedef typename make_expr<terminal, Constraint_Domain, NodePtr>::type expressio
 
 template <typename Expr>
 expression make_expression(Expr e) {
-  static Context ctx(&crave::variables);
+  static Context ctx(&variables);
   return boost::proto::make_expr<terminal, Constraint_Domain>(boost::proto::eval(e, ctx));
 }
 

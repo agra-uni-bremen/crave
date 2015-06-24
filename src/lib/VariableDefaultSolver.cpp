@@ -53,8 +53,8 @@ bool VariableDefaultSolver::solve() {
       solver_->makeSuggestion(*pair.second->expr());
     }
   }
-  if (solver_->solve()) {
 
+  if (solver_->solve()) {
     BOOST_FOREACH(VariableContainer::WriteRefPair pair, var_ctn_->write_references) {
       if (constr_pttn_.containsVar(pair.first)) {
         solver_->read(*var_ctn_->variables[pair.first], *pair.second);

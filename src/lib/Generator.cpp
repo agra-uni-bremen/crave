@@ -4,7 +4,7 @@ namespace crave {
 
 Generator::Generator()
     : constr_mng_(),
-      var_ctn_(&crave::variables),
+      var_ctn_(&variables),
       ctx_(var_ctn_),
       var_gen_(var_ctn_),
       vec_gen_(var_gen_),

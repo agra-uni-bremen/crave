@@ -29,7 +29,7 @@ struct VariableSolver {
     return true;
   }
 
-  std::vector<std::vector<std::string> > getContradictions();
+  std::vector<std::vector<std::string> > getContradictions() const;
 
   std::vector<std::string> getInactiveSofts() const;
 
