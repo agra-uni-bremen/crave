@@ -42,23 +42,17 @@ void VariableDefaultSolver::analyseConstraints() {
 bool VariableDefaultSolver::solve() {
   if (!contradictions_.empty()) return false;
 
-  BOOST_FOREACH(VariableContainer::ReadRefPair pair, var_ctn_->read_references) {
-    if (constr_pttn_.containsVar(pair.first)) {
-      solver_->makeAssumption(*pair.second->expr());
-    }
+  BOOST_FOREACH(VariableContainer::ReadRefPair & pair, var_ctn_.read_references) {
+    solver_->makeAssumption(*pair.second->expr());
   }
 
-  BOOST_FOREACH(VariableContainer::ReadRefPair pair, var_ctn_->dist_references) {
-    if (constr_pttn_.containsVar(pair.first)) {
-      solver_->makeSuggestion(*pair.second->expr());
-    }
+  BOOST_FOREACH(VariableContainer::ReadRefPair & pair, var_ctn_.dist_references) {
+    solver_->makeSuggestion(*pair.second->expr());
   }
 
   if (solver_->solve()) {
-    BOOST_FOREACH(VariableContainer::WriteRefPair pair, var_ctn_->write_references) {
-      if (constr_pttn_.containsVar(pair.first)) {
-        solver_->read(*var_ctn_->variables[pair.first], *pair.second);
-      }
+    BOOST_FOREACH(VariableContainer::WriteRefPair & pair, var_ctn_.write_references) {
+      solver_->read(*var_ctn_.variables[pair.first], *pair.second);
     }
     return true;
   }

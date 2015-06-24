@@ -19,12 +19,10 @@ struct VariableSolver {
 
   template <typename T>
   bool read(Variable<T> const& var, T* value) {
-    if (var_ctn_->variables.find(var.id()) == var_ctn_->variables.end()) {
+    if (var_ctn_.variables.find(var.id()) == var_ctn_.variables.end())
       return false;
-    }
-    if (!constr_pttn_.containsVar(var.id())) return false;
     AssignResultImpl<T> result;
-    solver_->read(*var_ctn_->variables[var.id()], result);
+    solver_->read(*var_ctn_.variables[var.id()], result);
     *value = result.value();
     return true;
   }
@@ -34,7 +32,7 @@ struct VariableSolver {
   std::vector<std::string> getInactiveSofts() const;
 
  protected:
-  VariableContainer* var_ctn_;
+  VariableContainer var_ctn_;
   const ConstraintPartition& constr_pttn_;
   SolverPtr solver_;
 
