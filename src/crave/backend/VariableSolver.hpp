@@ -21,9 +21,8 @@ struct VariableSolver {
   bool read(Variable<T> const& var, T* value) {
     if (var_ctn_.variables.find(var.id()) == var_ctn_.variables.end())
       return false;
-    AssignResultImpl<T> result;
+    AssignResultToRef<T> result(value);
     solver_->read(*var_ctn_.variables[var.id()], result);
-    *value = result.value();
     return true;
   }
 

@@ -8,7 +8,7 @@
 #include <ostream>
 #include "Constraint.hpp"
 #include "Distribution.hpp"
-#include "AssignResultImpl.hpp"
+#include "AssignResultToRef.hpp"
 #include "RandBase.hpp"
 #include "RandvInterface.hpp"
 
@@ -51,11 +51,12 @@ class __rand_vec_base1 : public __rand_vec_base {
   virtual Variable<unsigned int> const& size_var() const { return sym_vec.size(); }
 
   virtual void set_values(const std::vector<std::string>& values) {
-    AssignResultImpl<T2> result;
+    T2 tmp;
+    AssignResultToRef<T2> result(&tmp);
     real_vec.clear();
     for (uint i = 0; i < values.size(); i++) {
       result.set_value(values[i]);
-      real_vec.push_back(result.value());
+      real_vec.push_back(tmp);
     }
   }
 

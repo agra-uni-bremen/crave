@@ -2,19 +2,18 @@
 #pragma once
 
 #include <string>
+#include <boost/function.hpp>
 #include "AssignResult.hpp"
+#include "bitsize_traits.hpp"
 
 namespace crave {
+
+extern boost::function0<bool> random_bit;
 
 template <typename T>
 struct AssignResultToRef : AssignResult {
  public:
   explicit AssignResultToRef(T* ref) : value_(ref) {}
-
- private:
-  typedef boost::optional<boost::function0<bool> > Random;
-
-  bool random_bit() const { return (*random_)(); }
 
  public:
   virtual T const& value() const { return *value_; }
@@ -31,7 +30,7 @@ struct AssignResultToRef : AssignResult {
           *value_ |= T(1);
           break;
         default:
-          if (random_ && random_bit())
+          if (random_bit && random_bit())
             *value_ |= T(1);
           else
             *value_ &= T(-2);
@@ -42,6 +41,5 @@ struct AssignResultToRef : AssignResult {
 
  protected:
   T* value_;
-  Random random_;
 };
 }  // namespace crave

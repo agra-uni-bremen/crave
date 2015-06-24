@@ -19,7 +19,7 @@
 
 #include "../frontend/bitsize_traits.hpp"
 #include "../frontend/Constraint.hpp"
-#include "../frontend/AssignResultImpl.hpp"
+#include "../frontend/AssignResultToRef.hpp"
 #include "VariableContainer.hpp"
 #include "Node.hpp"
 #include "ReferenceExpression.hpp"
