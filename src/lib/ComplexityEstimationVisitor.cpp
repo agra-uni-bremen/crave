@@ -188,56 +188,56 @@ namespace crave {
     void ComplexityEstimationVisitor::visitMultipliesOpr(const MultipliesOpr& m) {
         stack_entry lhs, rhs;
         evalBinExpr(m, lhs, rhs);
-        unsigned int bitsize = 0;
+        unsigned int complexity = 0;
         if (lhs.second > 0) {
             if (rhs.second > 0) {
-                bitsize = lhs.second * rhs.second;
+                complexity = lhs.second * rhs.second;
             } else {
-                bitsize = lhs.second;
+                complexity = lhs.second;
             }
         } else {
-            bitsize = rhs.second;
+            complexity = rhs.second;
         }
-        exprStack_.push(std::make_pair(new MultipliesOpr(lhs.first, rhs.first), bitsize));
+        exprStack_.push(std::make_pair(new MultipliesOpr(lhs.first, rhs.first), complexity));
     }
 
     void ComplexityEstimationVisitor::visitDevideOpr(const DevideOpr& d) {
         stack_entry lhs, rhs;
         evalBinExpr(d, lhs, rhs);
-        unsigned int bitsize = 0;
+        unsigned int complexity = 0;
         if (lhs.second > 0) {
             if (rhs.second > 0) {
-                bitsize = lhs.second * rhs.second;
+                complexity = lhs.second * rhs.second;
             } else {
-                bitsize = lhs.second;
+                complexity = lhs.second;
             }
         } else {
-            bitsize = rhs.second;
+            complexity = rhs.second;
         }
-        exprStack_.push(std::make_pair(new DevideOpr(lhs.first, rhs.first), bitsize));
+        exprStack_.push(std::make_pair(new DevideOpr(lhs.first, rhs.first), complexity));
     }
 
     void ComplexityEstimationVisitor::visitModuloOpr(const ModuloOpr& m) {
         stack_entry lhs, rhs;
         evalBinExpr(m, lhs, rhs);
 
-        unsigned int bitsize = 0;
+        unsigned int complexity = 0;
   if(lhs.second > 0)
   {
       if(rhs.second > 0)
       {
-          bitsize = lhs.second * rhs.second;
+          complexity = lhs.second * rhs.second;
       }
       else
       {
-          bitsize = lhs.second;
+          complexity = lhs.second;
       }
   }
   else
   {
-      bitsize = rhs.second;
+      complexity = rhs.second;
   } 
-        exprStack_.push(std::make_pair(new ModuloOpr(lhs.first, rhs.first), bitsize));
+        exprStack_.push(std::make_pair(new ModuloOpr(lhs.first, rhs.first), complexity));
     }
 
     void ComplexityEstimationVisitor::visitShiftLeftOpr(const ShiftLeftOpr& shl) {
