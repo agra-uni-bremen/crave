@@ -1,23 +1,23 @@
 #include "../crave/backend/VariableSolver.hpp"
 
 namespace crave {
-VariableSolver::VariableSolver(VariableContainer* vcon, const ConstraintPartition& cp)
+VariableSolver::VariableSolver(const VariableContainer& vcon, const ConstraintPartition& cp)
     : var_ctn_(), constr_pttn_(cp), solver_(FactoryMetaSMT::getNewInstance()) {
-  BOOST_FOREACH(VariableContainer::ReadRefPair & pair, vcon->read_references) {
+  BOOST_FOREACH(VariableContainer::ReadRefPair const& pair, vcon.read_references) {
     if (constr_pttn_.containsVar(pair.first))
       var_ctn_.read_references.push_back(pair);
   }
-  BOOST_FOREACH(VariableContainer::ReadRefPair & pair, vcon->dist_references) {
+  BOOST_FOREACH(VariableContainer::ReadRefPair const& pair, vcon.dist_references) {
     if (constr_pttn_.containsVar(pair.first))
       var_ctn_.dist_references.push_back(pair);
   }
-  BOOST_FOREACH(VariableContainer::WriteRefPair & pair, vcon->write_references) {
+  BOOST_FOREACH(VariableContainer::WriteRefPair const& pair, vcon.write_references) {
     if (constr_pttn_.containsVar(pair.first))
       var_ctn_.write_references.push_back(pair);
   }
   BOOST_FOREACH(unsigned id, constr_pttn_.supportSet()) {
-    assert(vcon->variables.find(id) != vcon->variables.end());
-    var_ctn_.variables[id] = vcon->variables[id];
+    assert(vcon.variables.find(id) != vcon.variables.end());
+    var_ctn_.variables[id] = vcon.variables.at(id);
   }
 }
 

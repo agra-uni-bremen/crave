@@ -14,7 +14,7 @@ namespace crave {
 struct VariableDefaultSolver : VariableSolver {
   static bool bypass_constraint_analysis;
 
-  VariableDefaultSolver(VariableContainer* vcon, const ConstraintPartition& cp);
+  VariableDefaultSolver(const VariableContainer& vcon, const ConstraintPartition& cp);
 
   virtual bool solve();
 

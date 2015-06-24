@@ -4,7 +4,7 @@ namespace crave {
 
 bool VariableDefaultSolver::bypass_constraint_analysis = false;
 
-VariableDefaultSolver::VariableDefaultSolver(VariableContainer* vcon, const ConstraintPartition& cp)
+VariableDefaultSolver::VariableDefaultSolver(const VariableContainer& vcon, const ConstraintPartition& cp)
     : VariableSolver(vcon, cp) {
   LOG(INFO) << "Create solver for partition " << constr_pttn_;
 

@@ -13,7 +13,7 @@ namespace crave {
 struct VariableSolver {
   friend struct VariableGenerator;
 
-  VariableSolver(VariableContainer* vcon, const ConstraintPartition& cp);
+  VariableSolver(const VariableContainer& vcon, const ConstraintPartition& cp);
 
   virtual bool solve() = 0;
 

@@ -10,7 +10,7 @@
 namespace crave {
 
 struct VariableCoverageSolver : VariableSolver {
-  VariableCoverageSolver(VariableContainer* vcon, const ConstraintPartition& cp);
+  VariableCoverageSolver(const VariableContainer& vcon, const ConstraintPartition& cp);
 
   virtual bool solve();
 

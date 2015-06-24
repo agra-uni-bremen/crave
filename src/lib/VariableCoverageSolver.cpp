@@ -2,7 +2,7 @@
 
 namespace crave {
 
-VariableCoverageSolver::VariableCoverageSolver(VariableContainer* vcon, const ConstraintPartition& cp)
+VariableCoverageSolver::VariableCoverageSolver(const VariableContainer& vcon, const ConstraintPartition& cp)
     : VariableSolver(vcon, cp) {
   LOG(INFO) << "Create coverage solver for partition " << constr_pttn_;
 
