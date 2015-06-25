@@ -4,6 +4,8 @@
 
 namespace crave {
 
+extern boost::function1<unsigned, unsigned> random_unsigned;
+
 bool VariableDefaultSolver::bypass_constraint_analysis = false;
 
 VariableDefaultSolver::VariableDefaultSolver(const VariableContainer& vcon, const ConstraintPartition& cp)

@@ -1,9 +1,7 @@
 // Copyright 2014 The CRAVE developers. All rights reserved.//
 
 #pragma once
-#include <boost/random/uniform_int.hpp>
-#include <boost/random/variate_generator.hpp>
-#include <boost/random/mersenne_twister.hpp>
+#include <boost/function.hpp>
 #include <boost/foreach.hpp>
 #include <metaSMT/frontend/QF_BV.hpp>
 #include <metaSMT/DirectSolver_Context.hpp>
@@ -25,10 +23,7 @@ namespace preds = metaSMT::logic;
 namespace qf_bv = metaSMT::logic::QF_BV;
 using metaSMT::evaluate;
 
-extern boost::mt19937 rng;
-struct RNG {
-  unsigned operator()(unsigned i) { return boost::uniform_int<>(0, i - 1)(rng); }
-} rng_;
+extern boost::function1<unsigned, unsigned> random_unsigned;
 
 template <typename SolverType>
 class metaSMTVisitorImpl : public metaSMTVisitor {
@@ -638,8 +633,8 @@ template <typename SolverType>
 bool metaSMTVisitorImpl<SolverType>::solve(bool ignoreSofts) {
   bool result = false;
 
-  std::random_shuffle(assumptions_.begin(), assumptions_.end(), rng_);
-  std::random_shuffle(suggestions_.begin(), suggestions_.end(), rng_);
+  std::random_shuffle(assumptions_.begin(), assumptions_.end(), crave::random_unsigned);
+  std::random_shuffle(suggestions_.begin(), suggestions_.end(), crave::random_unsigned);
 
   while (true) {
     BOOST_FOREACH(result_type const & item, assumptions_) {
@@ -663,7 +658,7 @@ bool metaSMTVisitorImpl<SolverType>::solve(bool ignoreSofts) {
 
     if (suggestions_.empty()) break;
     
-    unsigned select = rng_(suggestions_.size());
+    unsigned select = crave::random_unsigned(suggestions_.size());
     std::swap(suggestions_[select], suggestions_.back());
     suggestions_.pop_back();
   }
