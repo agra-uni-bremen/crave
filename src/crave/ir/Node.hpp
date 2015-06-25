@@ -6,6 +6,8 @@
 #include <ostream>
 #include <set>
 
+#include <stdint.h>
+
 #include "visitor/NodeVisitor.hpp"
 
 namespace crave {
@@ -80,18 +82,18 @@ class VariableExpr : public Terminal {
 class Constant : public Terminal {
  public:
   Constant() : Terminal(1, true), value_(false) {}
-  Constant(u_int64_t val, unsigned int bs, bool s) : Terminal(bs, s), value_(val) {}
+  Constant(uint64_t val, unsigned int bs, bool s) : Terminal(bs, s), value_(val) {}
   explicit Constant(bool b) : Terminal(1, true), value_(b) {}
   Constant(Constant const& c) : Terminal(c.bitsize(), c.sign()), value_(c.value()) {}
 
   void visit(NodeVisitor* v) const { v->visitConstant(*this); }
 
-  operator u_int64_t() const { return value_; }
+  operator uint64_t() const { return value_; }
 
-  u_int64_t value() const { return value_; }
+  uint64_t value() const { return value_; }
 
  private:
-  u_int64_t value_;
+  uint64_t value_;
 };
 
 class VectorExpr : public Terminal {
