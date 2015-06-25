@@ -24,5 +24,6 @@ struct VariableDefaultSolver : VariableSolver {
   void analyseSofts();
 
   std::map<int, SolverPtr> bdd_solvers_;
+  std::vector<VariableContainer::WriteRefPair> random_write_refs_;
 };
 }  // namespace crave
