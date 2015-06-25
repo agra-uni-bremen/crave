@@ -23,6 +23,8 @@ VariableDefaultSolver::VariableDefaultSolver(const VariableContainer& vcon, cons
   
   analyseConstraints();
 
+  if (!FactorySolver<CUDD>::isDefined()) return;
+
   LOG(INFO) << "Create BDD solvers for constraints involving single variable";
 
   std::set<int> vars_with_dist;
