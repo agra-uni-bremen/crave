@@ -43,7 +43,18 @@ DEFINE_SOLVER(crave::Z3, metaSMT::solver::Z3_Backend);
 
 #ifdef metaSMT_USE_CUDD
 #include <metaSMT/backend/CUDD_Distributed.hpp>
-DEFINE_SOLVER(crave::CUDD, metaSMT::BitBlast<metaSMT::solver::CUDD_Distributed>);
+namespace crave {
+  extern boost::mt19937 rng;
+}  
+namespace metaSMT {
+  namespace solver {
+class CUDD_Distributed_ : public CUDD_Distributed { 
+ public:
+  CUDD_Distributed_() { gen.seed(crave::rng()); }
+};
+  }
+}
+DEFINE_SOLVER(crave::CUDD, metaSMT::BitBlast<metaSMT::solver::CUDD_Distributed_>);
 #endif
 
 #undef DEFINE_SOLVER
