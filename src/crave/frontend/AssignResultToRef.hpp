@@ -2,9 +2,13 @@
 #pragma once
 
 #include <string>
+
 #include <boost/function.hpp>
+
 #include "AssignResult.hpp"
 #include "bitsize_traits.hpp"
+
+#include "../ir/Node.hpp"
 
 namespace crave {
 
@@ -16,9 +20,9 @@ struct AssignResultToRef : AssignResult {
   explicit AssignResultToRef(T* ref) : value_(ref) {}
 
  public:
-  virtual T const& value() const { return *value_; }
+  Constant value() const { return Constant(*value_, bitsize_traits<T>::value, crave::is_signed<T>::value); }
 
-  virtual void set_value(std::string const& str) {
+  void set_value(std::string const& str) {
     *value_ = ((crave::is_signed<T>::value && str[0] == '1') ? -1 : 0);
     for (std::string::const_iterator ite = str.begin(); ite != str.end(); ++ite) {
       *value_ <<= 1;
