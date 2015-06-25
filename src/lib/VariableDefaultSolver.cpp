@@ -1,5 +1,7 @@
 #include "../crave/backend/VariableDefaultSolver.hpp"
 
+#include <set>
+
 namespace crave {
 
 bool VariableDefaultSolver::bypass_constraint_analysis = false;
@@ -23,10 +25,20 @@ VariableDefaultSolver::VariableDefaultSolver(const VariableContainer& vcon, cons
 
   LOG(INFO) << "Create BDD solvers for constraints involving single variable";
 
+  std::set<int> vars_with_dist;
+  BOOST_FOREACH(VariableContainer::ReadRefPair & pair, var_ctn_.dist_references) {
+    assert(var_ctn_.dist_ref_to_var_map.find(pair.first) != var_ctn_.dist_ref_to_var_map.end());
+    vars_with_dist.insert(var_ctn_.dist_ref_to_var_map.at(pair.first));
+  }
+
   std::map<int, ConstraintList> const& svc_map = constr_pttn_.singleVariableConstraintMap();
   BOOST_FOREACH(VariableContainer::WriteRefPair & pair, var_ctn_.write_references) {
     int id = pair.first;
     if (svc_map.find(id) == svc_map.end()) continue;
+    if (vars_with_dist.find(id) != vars_with_dist.end()) {
+      LOG(INFO) << "  Skip var #" << id << " due to existing distribution constraints";      
+      continue;
+    }
     SolverPtr bdd_solver(FactoryMetaSMT::getNewInstance(CUDD));
     bdd_solvers_[id] = bdd_solver;
     BOOST_FOREACH(ConstraintPtr c, svc_map.at(id)) {
