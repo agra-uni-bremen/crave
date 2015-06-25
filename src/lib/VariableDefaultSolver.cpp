@@ -16,8 +16,24 @@ VariableDefaultSolver::VariableDefaultSolver(const VariableContainer& vcon, cons
       solver_->makeAssertion(*c->expr());
     }
   }
-  if (!bypass_constraint_analysis)
-    analyseConstraints();
+
+  if (bypass_constraint_analysis) return;
+  
+  analyseConstraints();
+
+  LOG(INFO) << "Create BDD solvers for constraints involving single variable";
+
+  std::map<int, ConstraintList> const& svc_map = constr_pttn_.singleVariableConstraintMap();
+  BOOST_FOREACH(VariableContainer::WriteRefPair & pair, var_ctn_.write_references) {
+    int id = pair.first;
+    if (svc_map.find(id) == svc_map.end()) continue;
+    SolverPtr bdd_solver(FactoryMetaSMT::getNewInstance(CUDD));
+    bdd_solvers_[id] = bdd_solver;
+    BOOST_FOREACH(ConstraintPtr c, svc_map.at(id)) {
+      bdd_solver->makeAssertion(*c->expr());
+    }
+    LOG(INFO) << "  BDD solver for var #" << id << " created";
+  }
 }
 
 void VariableDefaultSolver::analyseConstraints() {
@@ -41,6 +57,18 @@ void VariableDefaultSolver::analyseConstraints() {
 
 bool VariableDefaultSolver::solve() {
   if (!contradictions_.empty()) return false;
+
+  BOOST_FOREACH(VariableContainer::WriteRefPair & pair, var_ctn_.write_references) {
+    int id = pair.first;
+    if (bdd_solvers_.find(id) == bdd_solvers_.end()) continue;
+    SolverPtr bdd_solver = bdd_solvers_[id];
+    assert(bdd_solver->solve()); // otherwise, contradiction must have been found! 
+    bdd_solver->read(*var_ctn_.variables[id], *pair.second);
+    NodePtr value(new Constant(pair.second->value()));
+    NodePtr var = var_ctn_.variables[id];
+    NodePtr eq(new EqualOpr(var, value));
+    solver_->makeSuggestion(*eq);
+  }
 
   BOOST_FOREACH(VariableContainer::ReadRefPair & pair, var_ctn_.read_references) {
     solver_->makeAssumption(*pair.second->expr());

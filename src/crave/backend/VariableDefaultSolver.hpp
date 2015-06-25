@@ -22,5 +22,7 @@ struct VariableDefaultSolver : VariableSolver {
   void analyseConstraints();
   void analyseHards();
   void analyseSofts();
+
+  std::map<int, SolverPtr> bdd_solvers_;
 };
 }  // namespace crave
