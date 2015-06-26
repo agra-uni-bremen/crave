@@ -99,6 +99,11 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
   result_type operator()(boost::proto::tag::terminal t, WriteReference<value_type> const& ref) {
     return operator()(t, boost::proto::value(ref));
   }
+
+  template <typename value_type>
+  result_type operator()(boost::proto::tag::terminal t, Variable<value_type> const& var) {
+    return operator()(t, boost::proto::value(var));
+  }
 #endif
 
   template <typename Expr1, typename Expr2>
