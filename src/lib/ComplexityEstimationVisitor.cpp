@@ -42,7 +42,7 @@ namespace crave {
     }
 
     void ComplexityEstimationVisitor::visitConstant(const Constant& c) {
-        exprStack_.push(std::make_pair(new Constant(c), c.bitsize()));
+        exprStack_.push(std::make_pair(new Constant(c), 0));
     }
 
     void ComplexityEstimationVisitor::visitVectorExpr(const VectorExpr& v) {
