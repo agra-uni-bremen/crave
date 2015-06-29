@@ -70,17 +70,6 @@ class ToDotVisitor : public NodeVisitor {
   }
   visitBinaryExpr(o);
 }
- template <typename T> 
-  void unaryOperator(T const &o ,std::string name)
-{
-    if (putNode(&o)) {
-    visitNode(o);
-    out_ << " [label=\"";
-    visitUnaryOpr(o);
-    out_ << ": "+name+"\"]" << std::endl;
-  }
-  visitUnaryExpr(o);
-}
   
  private:
   std::ostream& out_;
