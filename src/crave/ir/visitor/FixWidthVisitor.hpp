@@ -65,85 +65,23 @@ class FixWidthVisitor : NodeVisitor {
   void evalBinExpr(BinaryExpression const&, stack_entry&, stack_entry&, bool);
   void evalTernExpr(TernaryExpression const&, stack_entry&, stack_entry&, stack_entry&);
 
-  template <typename T>
-  void visitSimpleTwoBinExpr(const T& object);
-
-  template <typename T>
-  void visitSimpleTwoBin2Expr(const T& object);
+  template <typename T, bool fixWidth = true>
+  void visitNumberResultBinExpr(const T& object);
+  template <typename T, bool fixWidth = true>
+  void visitNumberResultUnaryExpr(const T& object);
+  template <typename T, bool fixWidth = true>
+  void visitBooleanResultBinExpr(const T& object);
 
  public:
   result_type fixWidth(Node const& expr) {
     expr.visit(this);
     stack_entry entry;
     pop(entry);
-
     return entry.first;
   }
 
  private:
   std::stack<stack_entry> exprStack_;
 };
-
-inline void FixWidthVisitor::pop(stack_entry& fst) {
-  assert(exprStack_.size() >= 1);
-  fst = exprStack_.top();
-  exprStack_.pop();
-}
-
-inline void FixWidthVisitor::pop2(stack_entry& fst, stack_entry& snd) {
-  assert(exprStack_.size() >= 2);
-  fst = exprStack_.top();
-  exprStack_.pop();
-  snd = exprStack_.top();
-  exprStack_.pop();
-}
-
-inline void FixWidthVisitor::pop3(stack_entry& fst, stack_entry& snd, stack_entry& trd) {
-  assert(exprStack_.size() >= 3);
-  fst = exprStack_.top();
-  exprStack_.pop();
-  snd = exprStack_.top();
-  exprStack_.pop();
-  trd = exprStack_.top();
-  exprStack_.pop();
-}
-
-inline void FixWidthVisitor::evalBinExpr(BinaryExpression const& bin, stack_entry& fst, stack_entry& snd,
-                                         bool fixWidth = true) {
-  visitBinaryExpr(bin);
-  pop2(snd, fst);
-  if (!fixWidth) return;
-  if (fst.second < snd.second) {
-    unsigned int diff = snd.second - fst.second;
-    fst.first = result_type(new ExtendExpression(fst.first.get(), diff));
-    fst.second = snd.second;
-  } else if (fst.second > snd.second) {
-    unsigned int diff = fst.second - snd.second;
-    snd.first = result_type(new ExtendExpression(snd.first.get(), diff));
-    snd.second = fst.second;
-  }
-}
-
-inline void FixWidthVisitor::evalTernExpr(TernaryExpression const& tern, stack_entry& fst, stack_entry& snd,
-                                          stack_entry& trd) {
-  visitTernaryExpr(tern);
-  pop3(trd, snd, fst);
-}
-
-template <typename T>
-void FixWidthVisitor::visitSimpleTwoBinExpr(const T& object) {
-  stack_entry lhs, rhs;
-  evalBinExpr(object, lhs, rhs);
-
-  exprStack_.push(std::make_pair(new T(lhs.first, rhs.first), lhs.second));
-}
-
-template <typename T>
-void FixWidthVisitor::visitSimpleTwoBin2Expr(const T& object) {
-  stack_entry lhs, rhs;
-  evalBinExpr(object, lhs, rhs);
-
-  exprStack_.push(std::make_pair(new T(lhs.first, rhs.first), 1));
-}
 
 }  // end namespace crave
