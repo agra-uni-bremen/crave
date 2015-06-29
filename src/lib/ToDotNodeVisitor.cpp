@@ -86,17 +86,11 @@ void ToDotVisitor::visitVectorExpr(VectorExpr const &ve) {
   }
 }
 
-void ToDotVisitor::visitNotOpr(NotOpr const &o) {
-    unaryOperator(o,"not (!)");
-}
+void ToDotVisitor::visitNotOpr(NotOpr const &o) { unaryOperator(o, "not (!)"); }
 
-void ToDotVisitor::visitNegOpr(NegOpr const &o) {
-    unaryOperator(o,"neg (-)");
-}
+void ToDotVisitor::visitNegOpr(NegOpr const &o) { unaryOperator(o, "neg (-)"); }
 
-void ToDotVisitor::visitComplementOpr(ComplementOpr const &o) {
-  unaryOperator(o,"complement (~)");
-}
+void ToDotVisitor::visitComplementOpr(ComplementOpr const &o) { unaryOperator(o, "complement (~)"); }
 
 void ToDotVisitor::visitInside(Inside const &o) {
   if (putNode(&o)) {
@@ -116,77 +110,41 @@ void ToDotVisitor::visitExtendExpr(ExtendExpression const &e) {
   visitUnaryExpr(e);
 }
 
-void ToDotVisitor::visitLogicalAndOpr(LogicalAndOpr const &o) {
-  binaryOperator(o,"and (&&)");
-}
+void ToDotVisitor::visitLogicalAndOpr(LogicalAndOpr const &o) { binaryOperator(o, "and (&&)"); }
 
-void ToDotVisitor::visitLogicalOrOpr(LogicalOrOpr const &o) {
-  binaryOperator(o,"or (||)");
-}
+void ToDotVisitor::visitLogicalOrOpr(LogicalOrOpr const &o) { binaryOperator(o, "or (||)"); }
 
-void ToDotVisitor::visitAndOpr(AndOpr const &o) {
-    binaryOperator(o,"and (&)");
-}
+void ToDotVisitor::visitAndOpr(AndOpr const &o) { binaryOperator(o, "and (&)"); }
 
-void ToDotVisitor::visitOrOpr(OrOpr const &o) {
-    binaryOperator(o,"or (|)");
-}
+void ToDotVisitor::visitOrOpr(OrOpr const &o) { binaryOperator(o, "or (|)"); }
 
-void ToDotVisitor::visitXorOpr(XorOpr const &o) {
-    binaryOperator(o,"xor (^)");
-}
+void ToDotVisitor::visitXorOpr(XorOpr const &o) { binaryOperator(o, "xor (^)"); }
 
-void ToDotVisitor::visitEqualOpr(EqualOpr const &o) {
-    binaryOperator(o,"equal (==)");
-}
+void ToDotVisitor::visitEqualOpr(EqualOpr const &o) { binaryOperator(o, "equal (==)"); }
 
-void ToDotVisitor::visitNotEqualOpr(NotEqualOpr const &o) {
-    binaryOperator(o,"not_equal (!=)");
-}
+void ToDotVisitor::visitNotEqualOpr(NotEqualOpr const &o) { binaryOperator(o, "not_equal (!=)"); }
 
-void ToDotVisitor::visitLessOpr(LessOpr const &o) {
-    binaryOperator(o,"less (<)");
-}
+void ToDotVisitor::visitLessOpr(LessOpr const &o) { binaryOperator(o, "less (<)"); }
 
-void ToDotVisitor::visitLessEqualOpr(LessEqualOpr const &o) {
-    binaryOperator(o,"less_equal (<=)");
-}
+void ToDotVisitor::visitLessEqualOpr(LessEqualOpr const &o) { binaryOperator(o, "less_equal (<=)"); }
 
-void ToDotVisitor::visitGreaterOpr(GreaterOpr const &o) {
-    binaryOperator(o,"greater (>)");
-}
+void ToDotVisitor::visitGreaterOpr(GreaterOpr const &o) { binaryOperator(o, "greater (>)"); }
 
-void ToDotVisitor::visitGreaterEqualOpr(GreaterEqualOpr const &o) {
-    binaryOperator(o,"greater_equal (>=)");
-}
+void ToDotVisitor::visitGreaterEqualOpr(GreaterEqualOpr const &o) { binaryOperator(o, "greater_equal (>=)"); }
 
-void ToDotVisitor::visitPlusOpr(PlusOpr const &o) {
-    binaryOperator(o,"plus (+)");
-}
+void ToDotVisitor::visitPlusOpr(PlusOpr const &o) { binaryOperator(o, "plus (+)"); }
 
-void ToDotVisitor::visitMinusOpr(MinusOpr const &o) {
-    binaryOperator(o,"minus (-)");
-}
+void ToDotVisitor::visitMinusOpr(MinusOpr const &o) { binaryOperator(o, "minus (-)"); }
 
-void ToDotVisitor::visitMultipliesOpr(MultipliesOpr const &o) {
-    binaryOperator(o,"multiplies (*)");
-}
+void ToDotVisitor::visitMultipliesOpr(MultipliesOpr const &o) { binaryOperator(o, "multiplies (*)"); }
 
-void ToDotVisitor::visitDevideOpr(DevideOpr const &o) {
-    binaryOperator(o,"divide (/)");
-}
+void ToDotVisitor::visitDevideOpr(DevideOpr const &o) { binaryOperator(o, "divide (/)"); }
 
-void ToDotVisitor::visitModuloOpr(ModuloOpr const &o) {
-    binaryOperator(o,"modulo (%)");
-}
+void ToDotVisitor::visitModuloOpr(ModuloOpr const &o) { binaryOperator(o, "modulo (%)"); }
 
-void ToDotVisitor::visitShiftLeftOpr(ShiftLeftOpr const &o) {
-    binaryOperator(o,"shift_left (<<)");
-}
+void ToDotVisitor::visitShiftLeftOpr(ShiftLeftOpr const &o) { binaryOperator(o, "shift_left (<<)"); }
 
-void ToDotVisitor::visitShiftRightOpr(ShiftRightOpr const &o) {
-    binaryOperator(o,"shift_right (>>)");
-}
+void ToDotVisitor::visitShiftRightOpr(ShiftRightOpr const &o) { binaryOperator(o, "shift_right (>>)"); }
 
 void ToDotVisitor::visitVectorAccess(VectorAccess const &o) {
   if (putNode(&o)) {
@@ -212,10 +170,7 @@ void ToDotVisitor::visitForEach(ForEach const &fe) {
   visitBinaryExpr(fe);
 }
 
-void ToDotVisitor::visitUnique(Unique const &u) {
-    
-    unaryOperator(u,"unique");
-}
+void ToDotVisitor::visitUnique(Unique const &u) { unaryOperator(u, "unique"); }
 
 void ToDotVisitor::visitBitslice(Bitslice const &b) {
   if (putNode(&b)) {
@@ -224,7 +179,5 @@ void ToDotVisitor::visitBitslice(Bitslice const &b) {
   }
   visitUnaryExpr(b);
 }
-
-
 
 }  // namespace crave

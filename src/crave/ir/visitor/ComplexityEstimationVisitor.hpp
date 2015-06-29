@@ -64,7 +64,7 @@ class ComplexityEstimationVisitor : NodeVisitor {
   void visitSimpleTwoBinExpr(const T& object);
   template <typename T>
   void visitSimpleBinExpr(const T& object);
-  
+
   void pop(stack_entry&);
   void pop2(stack_entry&, stack_entry&);
   void pop3(stack_entry&, stack_entry&, stack_entry&);
