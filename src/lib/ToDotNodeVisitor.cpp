@@ -87,33 +87,15 @@ void ToDotVisitor::visitVectorExpr(VectorExpr const &ve) {
 }
 
 void ToDotVisitor::visitNotOpr(NotOpr const &o) {
-  if (putNode(&o)) {
-    visitNode(o);
-    out_ << " [label=\"";
-    visitUnaryOpr(o);
-    out_ << ": not (!)\"]" << std::endl;
-  }
-  visitUnaryExpr(o);
+    unaryOperator(o,"not (!)");
 }
 
 void ToDotVisitor::visitNegOpr(NegOpr const &o) {
-  if (putNode(&o)) {
-    visitNode(o);
-    out_ << " [label=\"";
-    visitUnaryOpr(o);
-    out_ << ": neg (-)\"]" << std::endl;
-  }
-  visitUnaryExpr(o);
+    unaryOperator(o,"neg (-)");
 }
 
 void ToDotVisitor::visitComplementOpr(ComplementOpr const &o) {
-  if (putNode(&o)) {
-    visitNode(o);
-    out_ << " [label=\"";
-    visitUnaryOpr(o);
-    out_ << ": complement (~)\"]" << std::endl;
-  }
-  visitUnaryExpr(o);
+  unaryOperator(o,"complement (~)");
 }
 
 void ToDotVisitor::visitInside(Inside const &o) {
@@ -231,11 +213,8 @@ void ToDotVisitor::visitForEach(ForEach const &fe) {
 }
 
 void ToDotVisitor::visitUnique(Unique const &u) {
-  if (putNode(&u)) {
-    visitNode(u);
-    out_ << " [label=\"unique \"]" << std::endl;
-  }
-  visitUnaryExpr(u);
+    
+    unaryOperator(u,"unique");
 }
 
 void ToDotVisitor::visitBitslice(Bitslice const &b) {
