@@ -4,6 +4,7 @@
 
 #include <ostream>
 #include <set>
+#include <string>
 
 #include "../Node.hpp"
 #include "NodeVisitor.hpp"
@@ -56,7 +57,20 @@ class ToDotVisitor : public NodeVisitor {
 
  private:
   bool putNode(Node const*);
+  void binaryOperator(std::string name);
 
+  template <typename T>
+  void binaryOperator(T const &o ,std::string name)
+{
+    if (putNode(&o)) {
+    visitNode(o);
+    out_ << " [label=\"";
+    visitBinaryOpr(o);
+    out_ << ": "+name+"\"]" << std::endl;
+  }
+  visitBinaryExpr(o);
+}
+  
  private:
   std::ostream& out_;
   std::set<Node const*> nodes_;
