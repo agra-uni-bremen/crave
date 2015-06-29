@@ -60,28 +60,26 @@ class ToDotVisitor : public NodeVisitor {
   void binaryOperator(std::string name);
 
   template <typename T>
-  void binaryOperator(T const &o ,std::string name)
-{
+  void binaryOperator(T const& o, std::string name) {
     if (putNode(&o)) {
-    visitNode(o);
-    out_ << " [label=\"";
-    visitBinaryOpr(o);
-    out_ << ": "+name+"\"]" << std::endl;
+      visitNode(o);
+      out_ << " [label=\"";
+      visitBinaryOpr(o);
+      out_ << ": " + name + "\"]" << std::endl;
+    }
+    visitBinaryExpr(o);
   }
-  visitBinaryExpr(o);
-}
- template <typename T> 
-  void unaryOperator(T const &o ,std::string name)
-{
+  template <typename T>
+  void unaryOperator(T const& o, std::string name) {
     if (putNode(&o)) {
-    visitNode(o);
-    out_ << " [label=\"";
-    visitUnaryOpr(o);
-    out_ << ": "+name+"\"]" << std::endl;
+      visitNode(o);
+      out_ << " [label=\"";
+      visitUnaryOpr(o);
+      out_ << ": " + name + "\"]" << std::endl;
+    }
+    visitUnaryExpr(o);
   }
-  visitUnaryExpr(o);
-}
-  
+
  private:
   std::ostream& out_;
   std::set<Node const*> nodes_;
