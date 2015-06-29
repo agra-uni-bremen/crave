@@ -61,23 +61,10 @@ class ComplexityEstimationVisitor : NodeVisitor {
   virtual void visitBitslice(Bitslice const&);
 
   template <typename T>
-  void visitSimpleTwoBinExpr(const T& object) {
-    stack_entry lhs, rhs;
-    evalBinExpr(object, lhs, rhs);
-
-    exprStack_.push(std::make_pair(new T(lhs.first, rhs.first), lhs.second + rhs.second));
-  }
-
+  void visitSimpleTwoBinExpr(const T& object);
   template <typename T>
-  void visitSimpleBinExpr(const T& object) {
-    visitUnaryExpr(object);
-
-    stack_entry e;
-    pop(e);
-
-    exprStack_.push(std::make_pair(new T(e.first), e.second));
-  }
-
+  void visitSimpleBinExpr(const T& object);
+  
   void pop(stack_entry&);
   void pop2(stack_entry&, stack_entry&);
   void pop3(stack_entry&, stack_entry&, stack_entry&);
@@ -96,40 +83,5 @@ class ComplexityEstimationVisitor : NodeVisitor {
  private:
   std::stack<stack_entry> exprStack_;
 };
-
-inline void ComplexityEstimationVisitor::pop(stack_entry& fst) {
-  assert(exprStack_.size() >= 1);
-  fst = exprStack_.top();
-  exprStack_.pop();
-}
-
-inline void ComplexityEstimationVisitor::pop2(stack_entry& fst, stack_entry& snd) {
-  assert(exprStack_.size() >= 2);
-  fst = exprStack_.top();
-  exprStack_.pop();
-  snd = exprStack_.top();
-  exprStack_.pop();
-}
-
-inline void ComplexityEstimationVisitor::pop3(stack_entry& fst, stack_entry& snd, stack_entry& trd) {
-  assert(exprStack_.size() >= 3);
-  fst = exprStack_.top();
-  exprStack_.pop();
-  snd = exprStack_.top();
-  exprStack_.pop();
-  trd = exprStack_.top();
-  exprStack_.pop();
-}
-
-inline void ComplexityEstimationVisitor::evalBinExpr(BinaryExpression const& bin, stack_entry& fst, stack_entry& snd) {
-  visitBinaryExpr(bin);
-  pop2(snd, fst);
-}
-
-inline void ComplexityEstimationVisitor::evalTernExpr(TernaryExpression const& tern, stack_entry& fst, stack_entry& snd,
-                                                      stack_entry& trd) {
-  visitTernaryExpr(tern);
-  pop3(trd, snd, fst);
-}
 
 }  // end namespace crave

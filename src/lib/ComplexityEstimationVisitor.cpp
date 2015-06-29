@@ -6,6 +6,42 @@
 
 namespace crave {
 
+void ComplexityEstimationVisitor::pop(stack_entry& fst) {
+  assert(exprStack_.size() >= 1);
+  fst = exprStack_.top();
+  exprStack_.pop();
+}
+
+void ComplexityEstimationVisitor::pop2(stack_entry& fst, stack_entry& snd) {
+  assert(exprStack_.size() >= 2);
+  fst = exprStack_.top();
+  exprStack_.pop();
+  snd = exprStack_.top();
+  exprStack_.pop();
+}
+
+void ComplexityEstimationVisitor::pop3(stack_entry& fst, stack_entry& snd, stack_entry& trd) {
+  assert(exprStack_.size() >= 3);
+  fst = exprStack_.top();
+  exprStack_.pop();
+  snd = exprStack_.top();
+  exprStack_.pop();
+  trd = exprStack_.top();
+  exprStack_.pop();
+}
+
+void ComplexityEstimationVisitor::evalBinExpr(BinaryExpression const& bin, stack_entry& fst, stack_entry& snd) {
+  visitBinaryExpr(bin);
+  pop2(snd, fst);
+}
+
+void ComplexityEstimationVisitor::evalTernExpr(TernaryExpression const& tern, stack_entry& fst, stack_entry& snd,
+                                                      stack_entry& trd) {
+  visitTernaryExpr(tern);
+  pop3(trd, snd, fst);
+}
+
+
     void ComplexityEstimationVisitor::visitNode(const Node&) {
     }
 
@@ -32,6 +68,25 @@ namespace crave {
         t.b()->visit(this);
         t.c()->visit(this);
     }
+
+  template <typename T>
+  void ComplexityEstimationVisitor::visitSimpleTwoBinExpr(const T& object) {
+    stack_entry lhs, rhs;
+    evalBinExpr(object, lhs, rhs);
+
+    exprStack_.push(std::make_pair(new T(lhs.first, rhs.first), lhs.second + rhs.second));
+  }
+
+  template <typename T>
+  void ComplexityEstimationVisitor::visitSimpleBinExpr(const T& object) {
+    visitUnaryExpr(object);
+
+    stack_entry e;
+    pop(e);
+
+    exprStack_.push(std::make_pair(new T(e.first), e.second));
+  }
+
 
     void ComplexityEstimationVisitor::visitPlaceholder(const Placeholder& pl) {
         exprStack_.push(std::make_pair(new Placeholder(pl), placeholder_bitsize()));
