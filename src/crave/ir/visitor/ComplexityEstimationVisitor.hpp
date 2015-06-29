@@ -61,9 +61,11 @@ class ComplexityEstimationVisitor : NodeVisitor {
   virtual void visitBitslice(Bitslice const&);
 
   template <typename T>
-  void visitSimpleTwoBinExpr(const T& object);
+  void visitSimpleUnaryExpr(const T& object);
   template <typename T>
   void visitSimpleBinExpr(const T& object);
+  template <typename T>
+  void visitComplexBinExpr(const T& object);
 
   void pop(stack_entry&);
   void pop2(stack_entry&, stack_entry&);
