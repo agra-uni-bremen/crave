@@ -57,7 +57,6 @@ class ToDotVisitor : public NodeVisitor {
 
  private:
   bool putNode(Node const*);
-  void binaryOperator(std::string name);
 
   template <typename T>
   void binaryOperator(T const& o, std::string name) {
