@@ -36,10 +36,9 @@ find_package ( Boost REQUIRED COMPONENTS system thread filesystem )
 find_package ( metaSMT REQUIRED )
 add_definitions( "${metaSMT_CXXFLAGS}" )
 
-find_package ( SystemC )
-
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-find_package( Glog )
+find_package ( SystemC )
+find_package ( Glog )
 
 include_directories( ${metaSMT_INCLUDE_DIR} )
 include_directories( ${Boost_INCLUDE_DIRS} )
