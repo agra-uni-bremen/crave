@@ -50,30 +50,15 @@ namespace crave {
     }
 
     void ComplexityEstimationVisitor::visitNotOpr(const NotOpr& n) {
-        visitUnaryExpr(n);
-
-        stack_entry e;
-        pop(e);
-
-        exprStack_.push(std::make_pair(new NotOpr(e.first), e.second));
+        visitSimpleBinExpr<NotOpr>(n);
     }
 
     void ComplexityEstimationVisitor::visitNegOpr(const NegOpr& n) {
-        visitUnaryExpr(n);
-
-        stack_entry e;
-        pop(e);
-
-        exprStack_.push(std::make_pair(new NegOpr(e.first), e.second));
+        visitSimpleBinExpr<NegOpr>(n);
     }
 
     void ComplexityEstimationVisitor::visitComplementOpr(const ComplementOpr& c) {
-        visitUnaryExpr(c);
-
-        stack_entry e;
-        pop(e);
-
-        exprStack_.push(std::make_pair(new ComplementOpr(e.first), e.second));
+        visitSimpleBinExpr<ComplementOpr>(c);
     }
 
     void ComplexityEstimationVisitor::visitInside(const Inside& i) {
@@ -95,94 +80,55 @@ namespace crave {
     }
 
     void ComplexityEstimationVisitor::visitAndOpr(const AndOpr& a) {
-        stack_entry lhs, rhs;
-        evalBinExpr(a, lhs, rhs);
-
-        exprStack_.push(std::make_pair(new AndOpr(lhs.first, rhs.first), lhs.second));
+        visitSimpleTwoBinExpr<AndOpr>(a);
     }
 
     void ComplexityEstimationVisitor::visitOrOpr(const OrOpr& o) {
-        stack_entry lhs, rhs;
-        evalBinExpr(o, lhs, rhs);
-
-        exprStack_.push(std::make_pair(new OrOpr(lhs.first, rhs.first), lhs.second+rhs.second));
+        visitSimpleTwoBinExpr<OrOpr>(o);
     }
 
     void ComplexityEstimationVisitor::visitLogicalAndOpr(const LogicalAndOpr& la) {
-        stack_entry lhs, rhs;
-        evalBinExpr(la, lhs, rhs);
-
-        exprStack_.push(std::make_pair(new LogicalAndOpr(lhs.first, rhs.first), lhs.second+rhs.second));
+        visitSimpleTwoBinExpr<LogicalAndOpr>(la);
     }
 
     void ComplexityEstimationVisitor::visitLogicalOrOpr(const LogicalOrOpr& lo) {
-        stack_entry lhs, rhs;
-        evalBinExpr(lo, lhs, rhs);
-
-        exprStack_.push(std::make_pair(new LogicalOrOpr(lhs.first, rhs.first), lhs.second+rhs.second));
+        visitSimpleTwoBinExpr<LogicalOrOpr>(lo);
     }
 
     void ComplexityEstimationVisitor::visitXorOpr(const XorOpr& x) {
-        stack_entry lhs, rhs;
-        evalBinExpr(x, lhs, rhs);
-
-        exprStack_.push(std::make_pair(new XorOpr(lhs.first, rhs.first), lhs.second+rhs.second));
+        visitSimpleTwoBinExpr<XorOpr>(x);
     }
 
     void ComplexityEstimationVisitor::visitEqualOpr(const EqualOpr& eq) {
-        stack_entry lhs, rhs;
-        evalBinExpr(eq, lhs, rhs);
-
-        exprStack_.push(std::make_pair(new EqualOpr(lhs.first, rhs.first), lhs.second+rhs.second));
+        visitSimpleTwoBinExpr<EqualOpr>(eq);
     }
 
     void ComplexityEstimationVisitor::visitNotEqualOpr(const NotEqualOpr& neq) {
-        stack_entry lhs, rhs;
-        evalBinExpr(neq, lhs, rhs);
-
-        exprStack_.push(std::make_pair(new NotEqualOpr(lhs.first, rhs.first), lhs.second+rhs.second));
+        visitSimpleTwoBinExpr<NotEqualOpr>(neq);
     }
 
     void ComplexityEstimationVisitor::visitLessOpr(const LessOpr& l) {
-        stack_entry lhs, rhs;
-        evalBinExpr(l, lhs, rhs);
-
-        exprStack_.push(std::make_pair(new LessOpr(lhs.first, rhs.first), lhs.second+rhs.second));
+        visitSimpleTwoBinExpr<LessOpr>(l);
     }
 
     void ComplexityEstimationVisitor::visitLessEqualOpr(const LessEqualOpr& le) {
-        stack_entry lhs, rhs;
-        evalBinExpr(le, lhs, rhs);
-
-        exprStack_.push(std::make_pair(new LessEqualOpr(lhs.first, rhs.first), lhs.second+rhs.second));
+        visitSimpleTwoBinExpr<LessEqualOpr>(le);
     }
 
     void ComplexityEstimationVisitor::visitGreaterOpr(const GreaterOpr& g) {
-        stack_entry lhs, rhs;
-        evalBinExpr(g, lhs, rhs);
-
-        exprStack_.push(std::make_pair(new GreaterOpr(lhs.first, rhs.first), lhs.second+rhs.second));
+        visitSimpleTwoBinExpr<GreaterOpr>(g);
     }
 
     void ComplexityEstimationVisitor::visitGreaterEqualOpr(const GreaterEqualOpr& ge) {
-        stack_entry lhs, rhs;
-        evalBinExpr(ge, lhs, rhs);
-
-        exprStack_.push(std::make_pair(new GreaterEqualOpr(lhs.first, rhs.first), lhs.second+rhs.second));
+        visitSimpleTwoBinExpr<GreaterEqualOpr>(ge);
     }
 
     void ComplexityEstimationVisitor::visitPlusOpr(const PlusOpr& p) {
-        stack_entry lhs, rhs;
-        evalBinExpr(p, lhs, rhs);
-
-        exprStack_.push(std::make_pair(new PlusOpr(lhs.first, rhs.first), lhs.second+rhs.second));
+        visitSimpleTwoBinExpr<PlusOpr>(p);
     }
 
     void ComplexityEstimationVisitor::visitMinusOpr(const MinusOpr& m) {
-        stack_entry lhs, rhs;
-        evalBinExpr(m, lhs, rhs);
-
-        exprStack_.push(std::make_pair(new MinusOpr(lhs.first, rhs.first), lhs.second+rhs.second));
+        visitSimpleTwoBinExpr<MinusOpr>(m);
     }
 
     void ComplexityEstimationVisitor::visitMultipliesOpr(const MultipliesOpr& m) {
@@ -222,64 +168,42 @@ namespace crave {
         evalBinExpr(m, lhs, rhs);
 
         unsigned int complexity = 0;
-  if(lhs.second > 0)
-  {
-      if(rhs.second > 0)
-      {
-          complexity = lhs.second * rhs.second;
-      }
-      else
-      {
-          complexity = lhs.second;
-      }
-  }
-  else
-  {
-      complexity = rhs.second;
-  } 
+        if (lhs.second > 0) {
+            if (rhs.second > 0) {
+                complexity = lhs.second * rhs.second;
+            } else {
+                complexity = lhs.second;
+            }
+        } else {
+            complexity = rhs.second;
+        }
         exprStack_.push(std::make_pair(new ModuloOpr(lhs.first, rhs.first), complexity));
     }
 
     void ComplexityEstimationVisitor::visitShiftLeftOpr(const ShiftLeftOpr& shl) {
-        stack_entry lhs, rhs;
-        evalBinExpr(shl, lhs, rhs);
-
-        exprStack_.push(std::make_pair(new ShiftLeftOpr(lhs.first, rhs.first), lhs.second+rhs.second));
+        visitSimpleTwoBinExpr<ShiftLeftOpr>(shl);
     }
 
     void ComplexityEstimationVisitor::visitShiftRightOpr(const ShiftRightOpr& shr) {
-        stack_entry lhs, rhs;
-        evalBinExpr(shr, lhs, rhs);
-
-        exprStack_.push(std::make_pair(new ShiftRightOpr(lhs.first, rhs.first), lhs.second+rhs.second));
+        visitSimpleTwoBinExpr<ShiftRightOpr>(shr);
     }
 
     void ComplexityEstimationVisitor::visitVectorAccess(const VectorAccess& va) {
-        stack_entry lhs, rhs;
-        evalBinExpr(va, lhs, rhs);
-        exprStack_.push(std::make_pair(new VectorAccess(lhs.first, rhs.first), rhs.second+lhs.second));
+        visitSimpleTwoBinExpr<VectorAccess>(va);
     }
 
     void ComplexityEstimationVisitor::visitForEach(const ForEach& fe) {
-        stack_entry lhs, rhs;
-        evalBinExpr(fe, lhs, rhs);
-
-        exprStack_.push(std::make_pair(new ForEach(lhs.first, rhs.first), lhs.second+rhs.second));
+        visitSimpleTwoBinExpr<ForEach>(fe);
     }
 
     void ComplexityEstimationVisitor::visitUnique(const Unique& u) {
-        visitUnaryExpr(u);
-
-        stack_entry e;
-        pop(e);
-
-        exprStack_.push(std::make_pair(new Unique(e.first), e.second));
+        visitSimpleBinExpr<Unique>(u);
     }
 
     void ComplexityEstimationVisitor::visitIfThenElse(const IfThenElse& ite) {
         stack_entry a, b, c;
         evalTernExpr(ite, a, b, c);
-        exprStack_.push(std::make_pair(new IfThenElse(a.first, b.first, c.first), a.second+b.second+c.second));
+        exprStack_.push(std::make_pair(new IfThenElse(a.first, b.first, c.first), a.second + b.second + c.second));
     }
 
     void ComplexityEstimationVisitor::visitBitslice(const Bitslice& b) {
