@@ -65,11 +65,11 @@ class FixWidthVisitor : NodeVisitor {
   void evalBinExpr(BinaryExpression const&, stack_entry&, stack_entry&, bool);
   void evalTernExpr(TernaryExpression const&, stack_entry&, stack_entry&, stack_entry&);
 
-  template <typename T, bool fixWidth = true>
+  template <typename T>
   void visitNumberResultBinExpr(const T& object);
-  template <typename T, bool fixWidth = true>
+  template <typename T>
   void visitNumberResultUnaryExpr(const T& object);
-  template <typename T, bool fixWidth = true>
+  template <typename T>
   void visitBooleanResultBinExpr(const T& object);
 
  public:

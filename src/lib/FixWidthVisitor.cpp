@@ -73,14 +73,14 @@ void FixWidthVisitor::visitTernaryExpr(const TernaryExpression& t) {
   t.c()->visit(this);
 }
 
-template <typename T, bool fixWidth>
+template <typename T>
 void FixWidthVisitor::visitNumberResultBinExpr(const T& object) {
   stack_entry lhs, rhs;
-  evalBinExpr(object, lhs, rhs, fixWidth);
+  evalBinExpr(object, lhs, rhs);
   exprStack_.push(std::make_pair(new T(lhs.first, rhs.first), lhs.second));
 }
 
-template <typename T, bool fixWidth>
+template <typename T>
 void FixWidthVisitor::visitNumberResultUnaryExpr(const T& object) {
   visitUnaryExpr(object);
   stack_entry e;
@@ -88,10 +88,10 @@ void FixWidthVisitor::visitNumberResultUnaryExpr(const T& object) {
   exprStack_.push(std::make_pair(new T(e.first), e.second));
 }
 
-template <typename T, bool fixWidth>
+template <typename T>
 void FixWidthVisitor::visitBooleanResultBinExpr(const T& object) {
   stack_entry lhs, rhs;
-  evalBinExpr(object, lhs, rhs, fixWidth);
+  evalBinExpr(object, lhs, rhs);
   exprStack_.push(std::make_pair(new T(lhs.first, rhs.first), 1));
 }
 
@@ -171,9 +171,17 @@ void FixWidthVisitor::visitShiftLeftOpr(const ShiftLeftOpr& shl) { visitNumberRe
 
 void FixWidthVisitor::visitShiftRightOpr(const ShiftRightOpr& shr) { visitNumberResultBinExpr(shr); }
 
-void FixWidthVisitor::visitVectorAccess(const VectorAccess& va) { visitNumberResultBinExpr<VectorAccess, false>(va); }
+void FixWidthVisitor::visitVectorAccess(const VectorAccess& va) { 
+  stack_entry lhs, rhs;
+  evalBinExpr(va, lhs, rhs, false);
+  exprStack_.push(std::make_pair(new VectorAccess(lhs.first, rhs.first), lhs.second));
+}
 
-void FixWidthVisitor::visitForEach(const ForEach& fe) { visitBooleanResultBinExpr<ForEach, false>(fe); }
+void FixWidthVisitor::visitForEach(const ForEach& fe) { 
+  stack_entry lhs, rhs;
+  evalBinExpr(fe, lhs, rhs, false);
+  exprStack_.push(std::make_pair(new ForEach(lhs.first, rhs.first), 1));
+}
 
 void FixWidthVisitor::visitUnique(const Unique& u) { visitNumberResultUnaryExpr(u); }
 
