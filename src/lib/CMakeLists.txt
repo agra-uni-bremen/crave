@@ -31,6 +31,7 @@ SET(CRAVE_LIB_SRC
   Operators.cpp
   Distribution.cpp
   RandomBase.cpp
+  VariableGeneratorMT.cpp
 )
 
 if (CRAVE_ENABLE_EXPERIMENTAL)
