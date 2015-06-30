@@ -2,6 +2,7 @@
 #define	VARIABLEGENERATORMT_HPP
 
 #include "VariableGeneratorType.hpp"
+#include <boost/thread/mutex.hpp>
 
 namespace crave {
 
@@ -11,11 +12,13 @@ namespace crave {
         virtual ~VariableGeneratorMT();
 
         virtual void reset(std::vector<ConstraintPartition>& partitions);
-
         virtual bool solve();
-        
     private:
-        bool solve(VarSolverPtr vs);
+        void createNewSolver(ConstraintPartition & partition);
+        void solve(VarSolverPtr vs);
+        bool solveReturn;
+        boost::mutex result_mutex;
+        boost::mutex solvers_mutex;
 
     };
 }
