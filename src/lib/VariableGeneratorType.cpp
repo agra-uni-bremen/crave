@@ -1,7 +1,7 @@
 #include "../crave/backend/VariableGeneratorType.hpp"
 
 namespace crave {
-VariableGenerator::VariableGenerator(VariableContainer* vcon) : var_ctn_(vcon), solvers_() {}
+VariableGenerator::VariableGenerator(const VariableContainer& vcon) : var_ctn_(vcon), solvers_() {}
 
 void VariableGenerator::reset(std::vector<ConstraintPartition>& partitions) {
   solvers_.clear();

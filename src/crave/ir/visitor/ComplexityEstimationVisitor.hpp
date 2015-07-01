@@ -12,12 +12,12 @@
 
 namespace crave {
 
-class FixWidthVisitor : NodeVisitor {
+class ComplexityEstimationVisitor : NodeVisitor {
   typedef boost::intrusive_ptr<Node> result_type;
-  typedef std::pair<result_type, int> stack_entry;
+  typedef std::pair<result_type, unsigned int> stack_entry;
 
  public:
-  FixWidthVisitor() : NodeVisitor(), exprStack_() {}
+  ComplexityEstimationVisitor() : NodeVisitor(), exprStack_() {}
 
  private:
   virtual void visitNode(Node const&);
@@ -59,25 +59,27 @@ class FixWidthVisitor : NodeVisitor {
   virtual void visitForEach(ForEach const&);
   virtual void visitUnique(Unique const&);
   virtual void visitBitslice(Bitslice const&);
+
+  template <typename T>
+  void visitSimpleUnaryExpr(const T& object);
+  template <typename T>
+  void visitSimpleBinExpr(const T& object);
+  template <typename T>
+  void visitComplexBinExpr(const T& object);
+
   void pop(stack_entry&);
   void pop2(stack_entry&, stack_entry&);
   void pop3(stack_entry&, stack_entry&, stack_entry&);
-  void evalBinExpr(BinaryExpression const&, stack_entry&, stack_entry&, bool);
+  void evalBinExpr(BinaryExpression const&, stack_entry&, stack_entry&);
   void evalTernExpr(TernaryExpression const&, stack_entry&, stack_entry&, stack_entry&);
 
-  template <typename T>
-  void visitNumberResultBinExpr(const T& object);
-  template <typename T>
-  void visitNumberResultUnaryExpr(const T& object);
-  template <typename T>
-  void visitBooleanResultBinExpr(const T& object);
-
  public:
-  result_type fixWidth(Node const& expr) {
+  unsigned int getComplexityEstimation(Node const& expr) {
     expr.visit(this);
     stack_entry entry;
     pop(entry);
-    return entry.first;
+
+    return entry.second;
   }
 
  private:

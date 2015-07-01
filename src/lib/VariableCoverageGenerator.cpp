@@ -3,7 +3,7 @@
 
 namespace crave {
 
-VariableCoverageGenerator::VariableCoverageGenerator(VariableContainer* vcon) : VariableGenerator(vcon) {}
+VariableCoverageGenerator::VariableCoverageGenerator(const VariableContainer& vcon) : VariableGenerator(vcon) {}
 
 void VariableCoverageGenerator::reset(std::vector<ConstraintPartition>& partitions) {
   solvers_.clear();

@@ -635,7 +635,7 @@ BOOST_AUTO_TEST_CASE(bitslice_t) {
   Generator gen;
   gen(bitslice(10, 3, x()) == 0xFF);
   BOOST_REQUIRE(gen.next());
-  BOOST_REQUIRE(x == (0xFF << 3));
+  BOOST_REQUIRE_EQUAL((x >> 3) & 0xFF, 0xFF);
 
   BOOST_CHECK_THROW(gen(bitslice(3, 10, x()) == 0xFF), std::runtime_error);
   BOOST_CHECK_THROW(gen(bitslice(16, 3, x()) == 0xFF), std::runtime_error);
