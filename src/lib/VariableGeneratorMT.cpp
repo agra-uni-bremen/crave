@@ -7,13 +7,8 @@ namespace crave {
 VariableGeneratorMT::VariableGeneratorMT(VariableContainer const& vcon) : VariableGenerator(vcon){
 }
 
-
-VariableGeneratorMT::~VariableGeneratorMT() {
-}
-
 void VariableGeneratorMT::createNewSolver(ConstraintPartition & partition,unsigned int index)
 {
-    //VarSolverPtr vs(new VariableDefaultSolver(var_ctn_, partition));
     var_solv_array[index] = boost::make_shared<VariableDefaultSolver>(var_ctn_,partition);
 }
 
@@ -36,25 +31,27 @@ void VariableGeneratorMT::reset(std::vector<ConstraintPartition>& partitions) {
   delete []var_solv_array;
 }
 
-void VariableGeneratorMT::solve(VarSolverPtr vs)
+void VariableGeneratorMT::solve(VarSolverPtr vs, unsigned int index)
 {
-    if(solveReturn)
-    {
-        bool result = vs->solve();
-        boost::mutex::scoped_lock scoped_lock(this->result_mutex);
-        this->solveReturn &= result;
-    }
+    result_array[index] = vs->solve();
 }
 
 bool VariableGeneratorMT::solve() {
-  this->solveReturn = true; 
+  result_array = new bool[this->solvers_.size()];
   boost::thread_group threads;
-  BOOST_FOREACH(VarSolverPtr vs, this->solvers_) {
-    boost::thread *thread(new boost::thread(boost::bind(&VariableGeneratorMT::solve,this, vs)));
+  for(unsigned int i=0;i<this->solvers_.size();i++)
+  {
+    boost::thread *thread(new boost::thread(boost::bind(&VariableGeneratorMT::solve,this, this->solvers_.at(i),i)));
     threads.add_thread(thread);
   }
   threads.join_all();
-  return this->solveReturn;
+  bool result = true;
+  for(unsigned int i=0;i<this->solvers_.size();i++)
+  {
+      result &= result_array[i];
+  }
+  delete [] result_array;
+  return result;
 }
 
 }
