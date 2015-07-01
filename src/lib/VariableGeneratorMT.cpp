@@ -11,28 +11,29 @@ VariableGeneratorMT::VariableGeneratorMT(VariableContainer const& vcon) : Variab
 VariableGeneratorMT::~VariableGeneratorMT() {
 }
 
-void VariableGeneratorMT::createNewSolver(ConstraintPartition & partition)
+void VariableGeneratorMT::createNewSolver(ConstraintPartition & partition,unsigned int index)
 {
-    VarSolverPtr vs(new VariableDefaultSolver(var_ctn_, partition));
-    boost::mutex::scoped_lock scoped_lock(this->solvers_mutex);
-    solvers_.push_back(vs);
+    //VarSolverPtr vs(new VariableDefaultSolver(var_ctn_, partition));
+    var_solv_array[index] = boost::make_shared<VariableDefaultSolver>(var_ctn_,partition);
 }
 
 
 void VariableGeneratorMT::reset(std::vector<ConstraintPartition>& partitions) {
-  boost::mutex::scoped_lock scoped_lock(this->solvers_mutex);
-  solvers_.clear();
-  scoped_lock.unlock();
+  var_solv_array = new VarSolverPtr[partitions.size()];
   
-  std::vector<boost::shared_ptr<boost::thread> > threads;
-  BOOST_FOREACH(ConstraintPartition & partition, partitions) { 
-    boost::shared_ptr<boost::thread> thread(new boost::thread(boost::bind(&VariableGeneratorMT::createNewSolver,this, boost::ref(partition))));   
-    threads.push_back(thread);
-  }
-  BOOST_FOREACH(boost::shared_ptr<boost::thread> thread, threads)
+  boost::thread_group threads;
+      for(int i=0;i<partitions.size();i++)
+      {
+          boost::thread *thread(new boost::thread(boost::bind(&VariableGeneratorMT::createNewSolver,this, boost::ref(partitions.at(i)),i)));  
+          threads.add_thread(thread);
+      }
+  threads.join_all();
+  solvers_.clear();
+  for(int i=0;i<partitions.size();i++)
   {
-      thread->join();
+      solvers_.push_back(var_solv_array[i]);
   }
+  delete []var_solv_array;
 }
 
 void VariableGeneratorMT::solve(VarSolverPtr vs)
@@ -47,15 +48,12 @@ void VariableGeneratorMT::solve(VarSolverPtr vs)
 
 bool VariableGeneratorMT::solve() {
   this->solveReturn = true; 
-  std::vector<boost::shared_ptr<boost::thread> > threads;
+  boost::thread_group threads;
   BOOST_FOREACH(VarSolverPtr vs, this->solvers_) {
-    boost::shared_ptr<boost::thread> thread(new boost::thread(boost::bind(&VariableGeneratorMT::solve,this, vs)));
-    threads.push_back(thread);
+    boost::thread *thread(new boost::thread(boost::bind(&VariableGeneratorMT::solve,this, vs)));
+    threads.add_thread(thread);
   }
-  BOOST_FOREACH(boost::shared_ptr<boost::thread> thread, threads)
-  {
-      thread->join();
-  }
+  threads.join_all();
   return this->solveReturn;
 }
 

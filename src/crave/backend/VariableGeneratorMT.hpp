@@ -14,11 +14,11 @@ namespace crave {
         virtual void reset(std::vector<ConstraintPartition>& partitions);
         virtual bool solve();
     private:
-        void createNewSolver(ConstraintPartition & partition);
+        void createNewSolver(ConstraintPartition & partition,unsigned int index);
         void solve(VarSolverPtr vs);
         bool solveReturn;
+        boost::shared_ptr<VariableSolver>* var_solv_array;
         boost::mutex result_mutex;
-        boost::mutex solvers_mutex;
 
     };
 }
