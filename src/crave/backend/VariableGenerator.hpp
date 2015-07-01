@@ -6,5 +6,6 @@
 #include "VariableDefaultSolver.hpp"
 #include "VariableCoverageSolver.hpp"
 #include "VariableGeneratorType.hpp"
+#include "VariableGeneratorMT.hpp"
 #include "VariableCoverageGenerator.hpp"
 #include "FactoryMetaSMT.hpp"

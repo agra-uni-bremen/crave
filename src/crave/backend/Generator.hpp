@@ -116,7 +116,7 @@ struct Generator {
   Context ctx_;
 
   // solvers
-  VariableGenerator var_gen_;
+  VariableGeneratorMT var_gen_;
   VectorGenerator vec_gen_;
 
   VariableCoverageGenerator var_cov_gen_;
