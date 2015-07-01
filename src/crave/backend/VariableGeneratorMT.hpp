@@ -8,7 +8,7 @@ namespace crave {
 
     class VariableGeneratorMT : public VariableGenerator {
     public:
-        explicit VariableGeneratorMT(VariableContainer* vcon);
+        explicit VariableGeneratorMT(VariableContainer const& vcon);
         virtual ~VariableGeneratorMT();
 
         virtual void reset(std::vector<ConstraintPartition>& partitions);
