@@ -32,6 +32,7 @@ SET(CRAVE_LIB_SRC
   Distribution.cpp
   RandomBase.cpp
   VariableGeneratorMT.cpp
+  ComplexityEstimationVisitor.cpp
 )
 
 if (CRAVE_ENABLE_EXPERIMENTAL)

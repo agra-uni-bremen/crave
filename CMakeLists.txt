@@ -28,6 +28,7 @@ SET( CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING
   "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel Profiling."
   FORCE )
 
+set(Boost_NO_BOOST_CMAKE true)
 set(Boost_NO_SYSTEM_PATHS true)
 set(Boost_ADDITIONAL_VERSIONS "1.50.0")
 find_package ( Boost REQUIRED COMPONENTS system thread filesystem )
@@ -35,10 +36,9 @@ find_package ( Boost REQUIRED COMPONENTS system thread filesystem )
 find_package ( metaSMT REQUIRED )
 add_definitions( "${metaSMT_CXXFLAGS}" )
 
-find_package ( SystemC )
-
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-find_package( Glog )
+find_package ( SystemC )
+find_package ( Glog )
 
 include_directories( ${metaSMT_INCLUDE_DIR} )
 include_directories( ${Boost_INCLUDE_DIRS} )

@@ -21,9 +21,9 @@ struct Generator {
       : constr_mng_(),
         var_ctn_(&variables),
         ctx_(var_ctn_),
-        var_gen_(var_ctn_),
+        var_gen_(*var_ctn_),
         vec_gen_(var_gen_),
-        var_cov_gen_(var_ctn_),
+        var_cov_gen_(*var_ctn_),
         vec_cov_gen_(var_cov_gen_),
         covered_(false) {
     (*this)(expr);
@@ -116,7 +116,7 @@ struct Generator {
   Context ctx_;
 
   // solvers
-  VariableGenerator var_gen_;
+  VariableGeneratorMT var_gen_;
   VectorGenerator vec_gen_;
 
   VariableCoverageGenerator var_cov_gen_;

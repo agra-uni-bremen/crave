@@ -1,9 +1,7 @@
 // Copyright 2014 The CRAVE developers. All rights reserved.//
 
 #pragma once
-#include <boost/random/uniform_int.hpp>
-#include <boost/random/variate_generator.hpp>
-#include <boost/random/mersenne_twister.hpp>
+#include <boost/function.hpp>
 #include <boost/foreach.hpp>
 #include <metaSMT/frontend/QF_BV.hpp>
 #include <metaSMT/DirectSolver_Context.hpp>
@@ -25,10 +23,7 @@ namespace preds = metaSMT::logic;
 namespace qf_bv = metaSMT::logic::QF_BV;
 using metaSMT::evaluate;
 
-extern boost::mt19937 rng;
-struct RNG {
-  unsigned operator()(unsigned i) { return boost::uniform_int<>(0, i - 1)(rng); }
-} rng_;
+extern boost::function1<unsigned, unsigned> random_unsigned;
 
 template <typename SolverType>
 class metaSMTVisitorImpl : public metaSMTVisitor {
@@ -638,23 +633,20 @@ template <typename SolverType>
 bool metaSMTVisitorImpl<SolverType>::solve(bool ignoreSofts) {
   bool result = false;
 
-  std::random_shuffle(assumptions_.begin(), assumptions_.end(), rng_);
-  std::random_shuffle(suggestions_.begin(), suggestions_.end(), rng_);
+  std::random_shuffle(assumptions_.begin(), assumptions_.end(), crave::random_unsigned);
+  std::random_shuffle(suggestions_.begin(), suggestions_.end(), crave::random_unsigned);
 
-  for (int k = suggestions_.size(); k >= 0; --k) {
-    for (typename std::vector<result_type>::const_iterator ite = assumptions_.begin(); ite != assumptions_.end();
-         ++ite) {
-      metaSMT::assumption(solver_, *ite);
+  while (true) {
+    BOOST_FOREACH(result_type const & item, assumptions_) {
+      metaSMT::assumption(solver_, item);
     }
 
-    //    if (k > 0)
-    //      metaSMT::assumption(solver_, metaSMT::cardinality_eq(solver_,
-    // suggestions_, k));
-
-    for (int i = 0; i < k; i++) metaSMT::assumption(solver_, suggestions_[i]);
+    BOOST_FOREACH(result_type const & item, suggestions_) {
+      metaSMT::assumption(solver_, item);
+    }
 
     if (!ignoreSofts) {
-      BOOST_FOREACH(typename std::vector<result_type>::value_type const & item, softs_) {
+      BOOST_FOREACH(result_type const & item, softs_) {
         metaSMT::assumption(solver_, preds::equal(item, preds::True));
       }
     }
@@ -663,6 +655,12 @@ bool metaSMTVisitorImpl<SolverType>::solve(bool ignoreSofts) {
       result = true;
       break;
     }
+
+    if (suggestions_.empty()) break;
+    
+    unsigned select = crave::random_unsigned(suggestions_.size());
+    std::swap(suggestions_[select], suggestions_.back());
+    suggestions_.pop_back();
   }
 
   assumptions_.clear();

@@ -22,6 +22,7 @@ struct VariableContainer {
   std::vector<ReadRefPair> read_references;
   std::vector<WriteRefPair> write_references;
   std::vector<ReadRefPair> dist_references;
+  std::map<int, int> dist_ref_to_var_map;
 };
 
 VariableContainer& variable_container();

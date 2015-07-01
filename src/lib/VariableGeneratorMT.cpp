@@ -1,9 +1,10 @@
 #include "../crave/backend/VariableGeneratorMT.hpp"
+#include "../crave/backend/VariableDefaultSolver.hpp"
 #include <boost/thread/thread.hpp>
 #include <boost/shared_ptr.hpp>
 
 namespace crave {
-VariableGeneratorMT::VariableGeneratorMT(VariableContainer* vcon) : VariableGenerator(vcon){
+VariableGeneratorMT::VariableGeneratorMT(VariableContainer const& vcon) : VariableGenerator(vcon){
 }
 
 

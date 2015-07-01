@@ -43,6 +43,12 @@ struct random_bit_gen {
 
 boost::function0<bool> random_bit = random_bit_gen();
 
+struct RNG {
+  unsigned operator()(unsigned i) { return boost::uniform_int<>(0, i - 1)(rng); }
+};
+
+boost::function1<unsigned, unsigned> random_unsigned = RNG();
+
 // if called with zero seed -> use default seed std::time(0)
 void set_global_seed(unsigned int s) { 
   if (s) rng.seed(s); 

@@ -6,7 +6,6 @@
 #include <sysc/datatypes/int/sc_uint.h>
 #include <sysc/datatypes/bit/sc_bv.h>
 #include <vector>
-#include "../ir/ReferenceExpression.hpp"
 #include "bitsize_traits.hpp"
 #include "Distribution.hpp"
 #include "RandomBase.hpp"
@@ -46,6 +45,11 @@ struct sc_dt_width<SCDT<N> > : boost::mpl::int_<N> {};
 template <typename T>
 struct bitsize_traits<T, typename boost::enable_if<is_sysc_dt<T> >::type> : sc_dt_width<T> {};
 
+template <typename T>
+struct to_uint64<T, typename boost::enable_if<is_sysc_dt<T> >::type> {
+  uint64_t operator()(T const & value) { return value.to_uint64(); }
+};
+
 #define RANDV_SCDT_PRIM_INTERFACE(Typename)                                                       \
  public:                                                                                          \
   void gather_values(std::vector<int64_t>* ch) { ch->insert(ch->end(), this->value.to_int64()); } \
@@ -64,23 +68,6 @@ struct bitsize_traits<T, typename boost::enable_if<is_sysc_dt<T> >::type> : sc_d
     this->value = (T)i;                                                                           \
     return *this;                                                                                 \
   }
-
-#define RANDV_SCDT_REF_EXPR(Typename)                                                                                 \
-  template <int N>                                                                                                    \
-  struct ReferenceExpressionImpl<randv<Typename<N> > > : public ReferenceExpression {                                 \
-   public:                                                                                                            \
-    ReferenceExpressionImpl(randv<Typename<N> > const& value, ReferenceExpression::result_type expr)                  \
-        : value_(value), expr_(expr) {}                                                                               \
-    virtual ~ReferenceExpressionImpl() {}                                                                             \
-    virtual ReferenceExpression::result_type expr() const {                                                           \
-      return new EqualOpr(expr_,                                                                                      \
-                          new Constant(((Typename<N>)value_).to_uint64(), N, crave::is_signed<Typename<N> >::value)); \
-    }                                                                                                                 \
-                                                                                                                      \
-   private:                                                                                                           \
-    randv<Typename<N> > const& value_;                                                                                \
-    ReferenceExpression::result_type expr_;                                                                           \
-  };
 
 #define RANDV_SCDT_BINARY_OPERATOR(Typename, BinOp)                                 \
   template <int N, typename T>                                                      \
@@ -124,7 +111,6 @@ class randv<sc_dt::sc_bv<N> > : public randv_base<sc_dt::sc_bv<N> > {
 };
 RANDV_SCDT_BINARY_OPERATOR(sc_dt::sc_bv, == );
 RANDV_SCDT_BINARY_OPERATOR(sc_dt::sc_bv, != );
-RANDV_SCDT_REF_EXPR(sc_dt::sc_bv);
 
 template <int N>
 class randv<sc_dt::sc_int<N> > : public randv_base<sc_dt::sc_int<N> > {
@@ -136,7 +122,6 @@ class randv<sc_dt::sc_int<N> > : public randv_base<sc_dt::sc_int<N> > {
 };
 RANDV_SCDT_VALUE_OPERATORS(sc_dt::sc_int);
 RANDV_SCDT_COMPARISON_OPERATORS(sc_dt::sc_int);
-RANDV_SCDT_REF_EXPR(sc_dt::sc_int);
 
 template <int N>
 class randv<sc_dt::sc_uint<N> > : public randv_base<sc_dt::sc_uint<N> > {
@@ -148,7 +133,6 @@ class randv<sc_dt::sc_uint<N> > : public randv_base<sc_dt::sc_uint<N> > {
 };
 RANDV_SCDT_VALUE_OPERATORS(sc_dt::sc_uint);
 RANDV_SCDT_COMPARISON_OPERATORS(sc_dt::sc_uint);
-RANDV_SCDT_REF_EXPR(sc_dt::sc_uint);
 
 }  // namespace crave
 

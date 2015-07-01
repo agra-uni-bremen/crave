@@ -263,9 +263,13 @@ struct Item1 : public rand_obj {
 };
 
 BOOST_AUTO_TEST_CASE(binary_search_test) {
+  VariableDefaultSolver::bypass_constraint_analysis = true;
+
   Item1 it;
   it.next();
   BOOST_REQUIRE_EQUAL(it.x, 5);
+
+  VariableDefaultSolver::bypass_constraint_analysis = false;
 }
 
 struct Item2 : public rand_obj {

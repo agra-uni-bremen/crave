@@ -19,7 +19,7 @@
 
 #include "../frontend/bitsize_traits.hpp"
 #include "../frontend/Constraint.hpp"
-#include "../frontend/AssignResultImpl.hpp"
+#include "../frontend/AssignResultToRef.hpp"
 #include "VariableContainer.hpp"
 #include "Node.hpp"
 #include "ReferenceExpression.hpp"
@@ -40,7 +40,8 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
         vector_variables_(vars->vector_variables),
         read_references_(vars->read_references),
         write_references_(vars->write_references),
-        dist_references_(vars->dist_references) {}
+        dist_references_(vars->dist_references),
+        dist_ref_to_var_map(vars->dist_ref_to_var_map) {}
 
   result_type new_var(unsigned id, unsigned width, bool sign) {
     return (variables_[id] = new VariableExpr(id, width, sign));
@@ -97,6 +98,11 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
   template <typename value_type>
   result_type operator()(boost::proto::tag::terminal t, WriteReference<value_type> const& ref) {
     return operator()(t, boost::proto::value(ref));
+  }
+
+  template <typename value_type>
+  result_type operator()(boost::proto::tag::terminal t, Variable<value_type> const& var) {
+    return operator()(t, boost::proto::value(var));
   }
 #endif
 
@@ -272,6 +278,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
 
     result_type val_equal_tmp(new EqualOpr(boost::proto::eval(var_term, *this), tmp_var));
     result_type tmp_inside(new Inside(tmp_var, constants));
+    dist_ref_to_var_map[id] = var_term.id();
     return new LogicalAndOpr(val_equal_tmp, tmp_inside);
   }
 
@@ -302,6 +309,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
       }
 
       result_type var_equal_tmp(new EqualOpr(boost::proto::eval(var_term, *this), tmp_var));
+      dist_ref_to_var_map[id] = var_term.id();
       return dist.ranges().size() > 0 ? new LogicalAndOpr(var_equal_tmp, in_ranges) : var_equal_tmp;
     } else {
       throw std::runtime_error("Distribution and variable type not compatible");
@@ -347,6 +355,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
   std::vector<ReadRefPair>& read_references_;
   std::vector<WriteRefPair>& write_references_;
   std::vector<ReadRefPair>& dist_references_;
+  std::map<int, int>& dist_ref_to_var_map; 
 };
 // Context
 
