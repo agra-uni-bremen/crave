@@ -1,4 +1,5 @@
 #include "../crave/backend/VariableGeneratorType.hpp"
+#include "../crave/backend/VariableDefaultSolver.hpp"
 
 namespace crave {
 VariableGenerator::VariableGenerator(const VariableContainer& vcon) : var_ctn_(vcon), solvers_() {}

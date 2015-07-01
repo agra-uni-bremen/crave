@@ -5,9 +5,8 @@
 #include <boost/foreach.hpp>
 #include <string>
 #include <vector>
-#include <boost/thread/mutex.hpp>
 
-#include "VariableDefaultSolver.hpp"
+#include "VariableSolver.hpp"
 
 namespace crave {
 
@@ -38,6 +37,5 @@ struct VariableGenerator {
  protected:
   const VariableContainer& var_ctn_;
   std::vector<VarSolverPtr> solvers_;
-  boost::mutex mutex;
 };
 }  // namespace crave
