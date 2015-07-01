@@ -6,7 +6,7 @@
 
 namespace crave {
 
-    ccdlass VariableGeneratorMT : public VariableGenerator {
+    class VariableGeneratorMT : public VariableGenerator {
     public:
         explicit VariableGeneratorMT(VariableContainer* vcon);
         virtual ~VariableGeneratorMT();
