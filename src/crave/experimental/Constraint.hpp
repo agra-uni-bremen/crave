@@ -31,8 +31,21 @@ class crv_constraint : public crv_object {
 
   std::string kind() override { return "crv_constraint"; }
 
+  void activate()
+  {
+      active_ = true;
+  }
+  
+  void deactivate()
+  {
+      active_ = false;
+  }
+  
+  bool active(){return active_;}
+  
  private:
   expression_list list_;
+  bool active_;
 };
 
 }  // end namespace crave
