@@ -31,19 +31,20 @@ class crv_constraint : public crv_object {
 
   std::string kind() override { return "crv_constraint"; }
 
-  void activate()
-  {
+  void activate() {
       active_ = true;
+      request_rebuild();
   }
   
-  void deactivate()
-  {
+  void deactivate() {
       active_ = false;
+      request_rebuild();
   }
   
   bool active(){return active_;}
   
  private:
+  
   expression_list list_;
   bool active_;
 };

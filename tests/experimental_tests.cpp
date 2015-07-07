@@ -57,7 +57,6 @@ class Item : public crv_sequence_item {
 BOOST_AUTO_TEST_CASE(t1) {
   Item it;
 
-  
   BOOST_REQUIRE(!it.randomize());
   BOOST_REQUIRE(it.sum->active());
   BOOST_REQUIRE(it.product->active());

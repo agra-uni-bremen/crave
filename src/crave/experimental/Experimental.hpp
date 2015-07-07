@@ -52,6 +52,12 @@ class crv_sequence_item : public crv_object {
   }
 
  protected:
+     
+     virtual void request_rebuild()
+     {
+         built_ = false;
+     }
+     
   Generator gen_;
   bool built_;
 };
