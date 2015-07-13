@@ -38,10 +38,31 @@ class crv_sequence_item : public crv_object {
       for (crv_object* obj : children_) {
         if (obj->kind() == "crv_constraint") {
           crv_constraint* cstr = (crv_constraint*)obj;
-          gen_(cstr->single_expr());
+          gen_(cstr->name(),cstr->single_expr());
+          if(!cstr->active())
+          {
+              gen_.disableConstraint(cstr->name());
+          }
         }
       }
       built_ = true;
+    }
+    if (rebuild_) {
+        LOG(INFO) << "Rebuild!" << std::endl;
+      for (crv_object* obj : children_) {
+        if (obj->kind() == "crv_constraint") {
+          crv_constraint* cstr = (crv_constraint*)obj;
+          if(cstr->active())
+          {
+            gen_.enableConstraint(cstr->name());
+          }
+          else
+          {
+              gen_.disableConstraint(cstr->name());
+          }
+        }
+      }
+      rebuild_ = true;
     }
     return gen_.nextCov();
   }
@@ -55,11 +76,15 @@ class crv_sequence_item : public crv_object {
      
      virtual void request_rebuild()
      {
-         built_ = false;
+         rebuild_ = true;
+         
+         LOG(INFO) << this->name() << ":" << "request_rebuild" << std::endl;
+         LOG(INFO) << this->name() << ":"  << "set rebuild_ to true" << std::endl;
      }
      
   Generator gen_;
   bool built_;
+  bool rebuild_;
 };
 
 }  // end namespace crave

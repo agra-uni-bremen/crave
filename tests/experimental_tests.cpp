@@ -54,7 +54,6 @@ BOOST_AUTO_TEST_CASE(t1) {
   BOOST_REQUIRE(it.product.active());
   BOOST_REQUIRE(it.x.active());
 
-  
   it.sum.deactivate();
   BOOST_REQUIRE(it.randomize());
   BOOST_REQUIRE(!it.sum.active());

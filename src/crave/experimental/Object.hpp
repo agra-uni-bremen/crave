@@ -6,6 +6,7 @@
 #include <list>
 #include <string>
 #include <unordered_map>
+#include <glog/logging.h>
 
 namespace crave {
 
@@ -44,6 +45,7 @@ class crv_object {
   void remove_child(crv_object*);
  virtual void request_rebuild()
   {
+     LOG(INFO) << this->name() << ":" << "request_rebuild" << std::endl;
       if(parent_ != nullptr)
       {
           parent_->request_rebuild();
