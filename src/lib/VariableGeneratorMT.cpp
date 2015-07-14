@@ -30,6 +30,7 @@ bool VariableGeneratorMT::solve() {
   result_ = true;
   boost::thread_group threads;
   for (unsigned i = 0; i < solvers_.size(); i++) {
+    if (!result_) break;
     boost::thread* thread(new boost::thread(boost::bind(&VariableGeneratorMT::solve, this, solvers_.at(i))));
     threads.add_thread(thread);
   }
