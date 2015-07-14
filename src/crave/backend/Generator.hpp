@@ -32,6 +32,12 @@ struct Generator {
   {
       delete var_gen_;
   }
+  
+  void enable_multithreading()
+  {
+      delete var_gen_;
+      var_gen_ = new VariableGeneratorMT(*var_ctn_);
+  }
 
   template <typename Expr>
   Generator& operator()(Expr expr) {
