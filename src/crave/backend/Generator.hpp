@@ -21,11 +21,16 @@ struct Generator {
       : constr_mng_(),
         var_ctn_(&variables),
         ctx_(var_ctn_),
-        var_gen_(*var_ctn_),
+        var_gen_(new VariableGenerator(*var_ctn_)),
         var_cov_gen_(*var_ctn_),
         vec_gen_(),
         covered_(false) {
     (*this)(expr);
+  }
+  
+  ~Generator()
+  {
+      delete var_gen_;
   }
 
   template <typename Expr>
@@ -97,7 +102,7 @@ struct Generator {
   template <typename T>
   T operator[](Variable<T> const& var) {
     T result;
-    if (!var_gen_.read(var, &result)) {
+    if (!var_gen_->read(var, &result)) {
       throw std::runtime_error("Invalid variable read request.");
     }
     return result;
@@ -115,7 +120,7 @@ struct Generator {
   Context ctx_;
 
   // variable solvers
-  VariableGenerator var_gen_;
+  VariableGenerator *var_gen_;
   VariableCoverageGenerator var_cov_gen_;
   
   // vector solver

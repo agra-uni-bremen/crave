@@ -6,7 +6,7 @@ Generator::Generator()
     : constr_mng_(),
       var_ctn_(&variables),
       ctx_(var_ctn_),
-      var_gen_(*var_ctn_),
+      var_gen_(new VariableGenerator(*var_ctn_)),
       var_cov_gen_(*var_ctn_),
       vec_gen_(),
       covered_(false) {}
@@ -39,7 +39,7 @@ void Generator::rebuild(bool selfInclude) {
   constr_pttn_.partition();
   // currently, every hard/soft/cover constraint is considered for
   // partitioning, this is suboptimal.
-  var_gen_.reset(constr_pttn_.getPartitions());
+  var_gen_->reset(constr_pttn_.getPartitions());
   vec_gen_.reset(constr_pttn_.getVectorConstraints());
   var_cov_gen_.reset(constr_pttn_.getPartitions());
 }
@@ -49,7 +49,7 @@ bool Generator::next() {
     reset();
     rebuild(true);
   }
-  return var_gen_.solve() && vec_gen_.solve(var_gen_);
+  return var_gen_->solve() && vec_gen_.solve(*var_gen_);
 }
 
 bool Generator::nextCov() {
@@ -80,7 +80,7 @@ std::ostream& Generator::printDotGraph(std::ostream& os, bool root) {
   return os;
 }
 
-std::vector<std::vector<std::string> > Generator::analyseContradiction() { return var_gen_.analyseContradiction(); }
+std::vector<std::vector<std::string> > Generator::analyseContradiction() { return var_gen_->analyseContradiction(); }
 
-std::vector<std::string> Generator::getInactiveSofts() { return var_gen_.getInactiveSofts(); }
+std::vector<std::string> Generator::getInactiveSofts() { return var_gen_->getInactiveSofts(); }
 }
