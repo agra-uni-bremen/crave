@@ -17,15 +17,13 @@ struct VectorSolver {
   typedef boost::intrusive_ptr<VariableExpr> VariablePtr;
   typedef std::vector<VariablePtr> VectorElements;
 
-  VectorSolver(int vector_id, const VariableGenerator& var_gen);
+  explicit VectorSolver(int vector_id);
 
   void addConstraint(VectorConstraintPtr vc);
-
-  bool solve();
+  bool solve(const VariableGenerator& var_gen);
 
  private:
   void resetSolver(unsigned int const size);
-
   void buildSolver(unsigned int const size);
 
  private:
@@ -33,8 +31,6 @@ struct VectorSolver {
   int vector_id_;
   SolverPtr solver_;
   VectorElements vec_elements_;
-
-  const VariableGenerator& var_gen_;
 };
 
 /*
@@ -43,10 +39,8 @@ struct VectorSolver {
 struct VectorGenerator {
   typedef std::map<int, VectorSolver> VectorSolverMap;
 
-  explicit VectorGenerator(const VariableGenerator& var_gen);
-
-  bool solve();
-
+  VectorGenerator();
+  bool solve(const VariableGenerator& var_gen);
   void reset(const std::vector<VectorConstraintPtr>& v);
 
  private:
@@ -54,7 +48,6 @@ struct VectorGenerator {
 
  private:
   VectorSolverMap vector_solvers_;
-  const VariableGenerator& var_gen_;
 };
 
 }  // namespace crave

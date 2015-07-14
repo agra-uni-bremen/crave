@@ -22,9 +22,8 @@ struct Generator {
         var_ctn_(&variables),
         ctx_(var_ctn_),
         var_gen_(*var_ctn_),
-        vec_gen_(var_gen_),
         var_cov_gen_(*var_ctn_),
-        vec_cov_gen_(var_cov_gen_),
+        vec_gen_(),
         covered_(false) {
     (*this)(expr);
   }
@@ -115,12 +114,12 @@ struct Generator {
   // context
   Context ctx_;
 
-  // solvers
+  // variable solvers
   VariableGenerator var_gen_;
-  VectorGenerator vec_gen_;
-
   VariableCoverageGenerator var_cov_gen_;
-  VectorGenerator vec_cov_gen_;
+  
+  // vector solver
+  VectorGenerator vec_gen_;
 
   // coverage
   bool covered_;

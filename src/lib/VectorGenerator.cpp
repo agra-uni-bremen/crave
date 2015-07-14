@@ -1,20 +1,19 @@
 #include "../crave/backend/VectorGenerator.hpp"
 
 namespace crave {
-VectorSolver::VectorSolver(int vector_id, const VariableGenerator& var_gen)
+VectorSolver::VectorSolver(int vector_id)
     : constraints_(),
       vector_id_(vector_id),
       solver_(FactoryMetaSMT::getNewInstance()),
-      vec_elements_(),
-      var_gen_(var_gen) {}
+      vec_elements_() {}
 
 void VectorSolver::addConstraint(VectorConstraintPtr vc) { constraints_.push_back(vc); }
 
-bool VectorSolver::solve() {
+bool VectorSolver::solve(const VariableGenerator& var_gen) {
   __rand_vec_base* vector = vectorBaseMap[vector_id_];
 
   unsigned int size = default_rand_vec_size();
-  if (!var_gen_.read(vector->size_var(), &size)) {
+  if (!var_gen.read(vector->size_var(), &size)) {
     LOG(INFO) << "Use default size for vector " << vector_id_;
   }
   resetSolver(size);
@@ -67,11 +66,11 @@ void VectorSolver::buildSolver(unsigned int const size) {
   }
 }
 
-VectorGenerator::VectorGenerator(const VariableGenerator& var_gen) : vector_solvers_(), var_gen_(var_gen) {}
+VectorGenerator::VectorGenerator() : vector_solvers_() {}
 
-bool VectorGenerator::solve() {
+bool VectorGenerator::solve(const VariableGenerator& var_gen) {
   BOOST_FOREACH(VectorSolverMap::value_type & c_pair, vector_solvers_) {
-    if (!c_pair.second.solve()) return false;
+    if (!c_pair.second.solve(var_gen)) return false;
   }
   return true;
 }
@@ -87,7 +86,7 @@ void VectorGenerator::addConstraint(VectorConstraintPtr vc) {
   if (ite != vector_solvers_.end() && !(vector_solvers_.key_comp()(v_id, ite->first))) {
     ite->second.addConstraint(vc);
   } else {
-    VectorSolver vs(v_id, var_gen_);
+    VectorSolver vs(v_id);
     vs.addConstraint(vc);
     vector_solvers_.insert(std::make_pair(v_id, vs));
   }

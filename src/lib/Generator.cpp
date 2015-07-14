@@ -7,9 +7,8 @@ Generator::Generator()
       var_ctn_(&variables),
       ctx_(var_ctn_),
       var_gen_(*var_ctn_),
-      vec_gen_(var_gen_),
       var_cov_gen_(*var_ctn_),
-      vec_cov_gen_(var_cov_gen_),
+      vec_gen_(),
       covered_(false) {}
 
 bool Generator::enableConstraint(std::string const& name) { return constr_mng_.enableConstraint(name); }
@@ -43,7 +42,6 @@ void Generator::rebuild(bool selfInclude) {
   var_gen_.reset(constr_pttn_.getPartitions());
   vec_gen_.reset(constr_pttn_.getVectorConstraints());
   var_cov_gen_.reset(constr_pttn_.getPartitions());
-  vec_cov_gen_.reset(constr_pttn_.getVectorConstraints());
 }
 
 bool Generator::next() {
@@ -51,7 +49,7 @@ bool Generator::next() {
     reset();
     rebuild(true);
   }
-  return var_gen_.solve() && vec_gen_.solve();
+  return var_gen_.solve() && vec_gen_.solve(var_gen_);
 }
 
 bool Generator::nextCov() {
@@ -60,7 +58,7 @@ bool Generator::nextCov() {
     rebuild(true);
   }
   if (!covered_) {
-    if (var_cov_gen_.solve() && vec_cov_gen_.solve())
+    if (var_cov_gen_.solve() && vec_gen_.solve(var_cov_gen_))
       return true;
     else
       covered_ = true;
@@ -73,7 +71,6 @@ bool Generator::isCovered() { return covered_; }
 void Generator::resetCoverage() {
   covered_ = false;
   var_cov_gen_.reset(constr_pttn_.getPartitions());
-  vec_cov_gen_.reset(constr_pttn_.getVectorConstraints());
 }
 
 std::ostream& Generator::printDotGraph(std::ostream& os, bool root) {
