@@ -12,6 +12,7 @@
 #include "../backend/Generator.hpp"
 
 #include <vector>
+#include <memory>
 
 #define CRV_VARIABLE(type, name) \
   crave::crv_variable<type> name { #name }
@@ -35,24 +36,31 @@ class crv_sequence_item : public crv_object {
 
   bool randomize() override {
     if (!built_) {
+      if (!gen_) gen_ = std::make_shared<Generator>();
       for (crv_object* obj : children_) {
         if (obj->kind() == "crv_constraint") {
           crv_constraint* cstr = (crv_constraint*)obj;
-          gen_(cstr->single_expr());
+          if (cstr->active()) (*gen_)(cstr->fullname(), cstr->single_expr());
         }
       }
       built_ = true;
     }
-    return gen_.nextCov();
+    return gen_->nextCov();
   }
 
   void goal(crv_covergroup& group) {
-    for (auto e : group.bound_var_expr_list()) gen_(e);
-    for (auto e : group.uncovered_as_list()) gen_.cover(e);
+    for (auto e : group.bound_var_expr_list()) (*gen_)(e);
+    for (auto e : group.uncovered_as_list()) gen_->cover(e);
   }
 
  protected:
-  Generator gen_;
+  void request_rebuild() override {
+    built_ = false;
+    gen_.reset();
+    crv_object::request_rebuild();
+  }
+
+  std::shared_ptr<Generator> gen_;
   bool built_;
 };
 

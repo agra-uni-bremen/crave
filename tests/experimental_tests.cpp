@@ -8,3 +8,4 @@ struct Context_Fixture {
 
 #include "test_CoverageSampling.cpp"
 #include "test_ObjectHierarchy.cpp"
+#include "test_ExperimentalConstraintManagement.cpp"

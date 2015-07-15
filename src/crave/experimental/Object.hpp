@@ -43,6 +43,12 @@ class crv_object {
 
   void remove_child(crv_object*);
 
+  virtual void request_rebuild() {
+    if (parent_ != nullptr) {
+      parent_->request_rebuild();
+    }
+  }
+
   std::string name_;
   crv_object* parent_;
   std::list<crv_object*> children_;
