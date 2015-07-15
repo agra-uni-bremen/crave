@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE(less_equal) {
 
   BOOST_REQUIRE_EQUAL(generated.size(), 257);
 
-  VariableDefaultSolver::bypass_constraint_analysis = false;  
+  VariableDefaultSolver::bypass_constraint_analysis = false;
 }
 
 BOOST_AUTO_TEST_CASE(greater) {
@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE(greater) {
 
   BOOST_REQUIRE_EQUAL(generated.size(), 256);
 
-  VariableDefaultSolver::bypass_constraint_analysis = false;  
+  VariableDefaultSolver::bypass_constraint_analysis = false;
 }
 
 BOOST_AUTO_TEST_CASE(greater_equal) {
@@ -294,7 +294,7 @@ BOOST_AUTO_TEST_CASE(xor_t2) {
 
 BOOST_AUTO_TEST_CASE(shiftleft) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
-  
+
   Variable<unsigned> a;
   Variable<unsigned> b;
   Variable<unsigned> c;

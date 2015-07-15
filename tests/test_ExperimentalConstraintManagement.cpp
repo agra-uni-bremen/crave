@@ -106,9 +106,9 @@ BOOST_AUTO_TEST_CASE(test2) {
   BOOST_REQUIRE(it.randomize());
   std::cout << it << std::endl;
   BOOST_REQUIRE(it.c == 3 && it.d == 3);
-  
+
   it.item.x.activate();
-  
+
   BOOST_REQUIRE(!it.randomize());
   BOOST_REQUIRE(!it.item.randomize());
 }
