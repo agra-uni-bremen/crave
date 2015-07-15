@@ -16,9 +16,9 @@ namespace crave {
 
 class crv_constraint : public crv_object {
  public:
-  crv_constraint(crv_object_name): active_(true) {}
+  crv_constraint(crv_object_name) : active_(true) {}
 
-  crv_constraint(crv_object_name, expression_list list) : list_(list),active_(true) {}
+  crv_constraint(crv_object_name, expression_list list) : list_(list), active_(true) {}
 
   template <typename Expr>
   void operator()(Expr expr) {
@@ -32,19 +32,22 @@ class crv_constraint : public crv_object {
   std::string kind() override { return "crv_constraint"; }
 
   void activate() {
+    if (!active_) {
       active_ = true;
       request_rebuild();
+    }
   }
-  
+
   void deactivate() {
+    if (active_) {
       active_ = false;
       request_rebuild();
+    }
   }
-  
-  bool active(){return active_;}
-  
+
+  bool active() { return active_; }
+
  private:
-  
   expression_list list_;
   bool active_;
 };
