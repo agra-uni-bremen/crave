@@ -12,6 +12,7 @@
 #include "../backend/Generator.hpp"
 
 #include <vector>
+#include <memory>
 
 #define CRV_VARIABLE(type, name) \
   crave::crv_variable<type> name { #name }
@@ -35,56 +36,32 @@ class crv_sequence_item : public crv_object {
 
   bool randomize() override {
     if (!built_) {
+      if (!gen_) gen_ = std::make_shared<Generator>();
       for (crv_object* obj : children_) {
         if (obj->kind() == "crv_constraint") {
           crv_constraint* cstr = (crv_constraint*)obj;
-          gen_(cstr->name(),cstr->single_expr());
-          if(!cstr->active())
-          {
-              gen_.disableConstraint(cstr->name());
-          }
+          if (cstr->active()) (*gen_)(cstr->fullname(), cstr->single_expr());
         }
       }
       built_ = true;
     }
-    if (rebuild_) {
-        LOG(INFO) << "Rebuild!" << std::endl;
-      for (crv_object* obj : children_) {
-        if (obj->kind() == "crv_constraint") {
-          crv_constraint* cstr = (crv_constraint*)obj;
-          if(cstr->active())
-          {
-            gen_.enableConstraint(cstr->name());
-          }
-          else
-          {
-              gen_.disableConstraint(cstr->name());
-          }
-        }
-      }
-      rebuild_ = true;
-    }
-    return gen_.nextCov();
+    return gen_->nextCov();
   }
 
   void goal(crv_covergroup& group) {
-    for (auto e : group.bound_var_expr_list()) gen_(e);
-    for (auto e : group.uncovered_as_list()) gen_.cover(e);
+    for (auto e : group.bound_var_expr_list()) (*gen_)(e);
+    for (auto e : group.uncovered_as_list()) gen_->cover(e);
   }
 
  protected:
-     
-     virtual void request_rebuild()
-     {
-         rebuild_ = true;
-         
-         LOG(INFO) << this->name() << ":" << "request_rebuild" << std::endl;
-         LOG(INFO) << this->name() << ":"  << "set rebuild_ to true" << std::endl;
-     }
-     
-  Generator gen_;
+  void request_rebuild() override {
+    built_ = false;
+    gen_.reset();
+    crv_object::request_rebuild();
+  }
+
+  std::shared_ptr<Generator> gen_;
   bool built_;
-  bool rebuild_;
 };
 
 }  // end namespace crave
