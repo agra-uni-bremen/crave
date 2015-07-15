@@ -36,13 +36,8 @@ class crv_sequence_item : public crv_object {
 
   bool randomize() override {
     if (!built_) {
-      if (!gen_) gen_ = std::make_shared<Generator>();
-      for (crv_object* obj : children_) {
-        if (obj->kind() == "crv_constraint") {
-          crv_constraint* cstr = (crv_constraint*)obj;
-          if (cstr->active()) (*gen_)(cstr->fullname(), cstr->single_expr());
-        }
-      }
+      gen_ = std::make_shared<Generator>();
+      recursive_build(*gen_);
       built_ = true;
     }
     return gen_->nextCov();
@@ -58,6 +53,19 @@ class crv_sequence_item : public crv_object {
     built_ = false;
     gen_.reset();
     crv_object::request_rebuild();
+  }
+
+  void recursive_build(Generator& gen) {
+    for (crv_object* obj : children_) {
+      if (obj->kind() == "crv_constraint") {
+        crv_constraint* cstr = (crv_constraint*)obj;
+        if (cstr->active()) gen(cstr->fullname(), cstr->single_expr());
+      }
+      else if (obj->kind() == "crv_sequence_item") {
+        crv_sequence_item* item = (crv_sequence_item*)obj;
+        item->recursive_build(gen);
+      }
+    }
   }
 
   std::shared_ptr<Generator> gen_;
