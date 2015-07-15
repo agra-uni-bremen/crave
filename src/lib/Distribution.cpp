@@ -10,7 +10,7 @@ distribution<bool> distribution<bool>::create(const double prob) {
 
 bool distribution<bool>::nextValue() const {
   boost::uniform_01<> dist;
-  return dist(rng) <= prob_;
+  return dist(*rng.get()) <= prob_;
 }
 
 std::vector<weighted_range<bool> >& distribution<bool>::ranges() {

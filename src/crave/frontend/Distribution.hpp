@@ -7,10 +7,11 @@
 #include <vector>
 #include "../ir/Node.hpp"
 #include "WeightedRange.hpp"
+#include "../mt19937Manager.hpp"
 
 namespace crave {
 
-extern boost::mt19937 rng;
+extern mt19937Manager rng;
 
 template <typename T>
 struct distribution : Node {
@@ -39,18 +40,18 @@ struct distribution : Node {
 
   T nextValue() const {
     if (ranges_.empty()) {
-      return boost::uniform_int<T>(std::numeric_limits<T>::min(), std::numeric_limits<T>::max())(rng);
+      return boost::uniform_int<T>(std::numeric_limits<T>::min(), std::numeric_limits<T>::max())(*rng.get());
     }
     weighted_range<T> selected = ranges_.back();
     if (ranges_.size() > 1) {
-      unsigned r = boost::uniform_int<unsigned>(0, selected.accumWeight_ - 1)(rng);
+      unsigned r = boost::uniform_int<unsigned>(0, selected.accumWeight_ - 1)(*rng.get());
       for (uint i = 0; i < ranges_.size(); i++)
         if (r < ranges_[i].accumWeight_) {
           selected = ranges_[i];
           break;
         }
     }
-    return boost::uniform_int<T>(selected.left_, selected.right_)(rng);
+    return boost::uniform_int<T>(selected.left_, selected.right_)(*rng.get());
   }
 
  private:

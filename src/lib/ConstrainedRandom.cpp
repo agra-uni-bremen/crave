@@ -10,6 +10,7 @@
 #include "../crave/ConstrainedRandom.hpp"
 #include "../crave/utils/Settings.hpp"
 #include "../crave/ir/VariableContainer.hpp"
+#include "../crave/mt19937Manager.hpp"
 
 namespace crave {
 
@@ -31,12 +32,13 @@ unsigned int default_rand_vec_size() { return 5; }
 
 unsigned int placeholder_bitsize() { return 32; }
 
-boost::mt19937 rng(std::time(0));
+mt19937Manager rng(std::time(0));
+//boost::mt19937 rng(std::time(0));
 
 struct random_bit_gen {
   random_bit_gen() : rnd(0, 1) {}
 
-  bool operator()() { return rnd(rng); }
+  bool operator()() { return rnd(*rng.get()); }
 
   boost::uniform_int<unsigned short> rnd;
 };
@@ -44,14 +46,14 @@ struct random_bit_gen {
 boost::function0<bool> random_bit = random_bit_gen();
 
 struct RNG {
-  unsigned operator()(unsigned i) { return boost::uniform_int<>(0, i - 1)(rng); }
+  unsigned operator()(unsigned i) { return boost::uniform_int<>(0, i - 1)(*rng.get()); }
 };
 
 boost::function1<unsigned, unsigned> random_unsigned = RNG();
 
 // if called with zero seed -> use default seed std::time(0)
 void set_global_seed(unsigned int s) {
-  if (s) rng.seed(s);
+  if (s) rng.set_global_seed(s);
 }
 
 void set_solver_backend(std::string const& type) { FactoryMetaSMT::setSolverType(type); }

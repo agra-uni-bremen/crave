@@ -44,13 +44,13 @@ DEFINE_SOLVER(crave::Z3, metaSMT::solver::Z3_Backend);
 #ifdef metaSMT_USE_CUDD
 #include <metaSMT/backend/CUDD_Distributed.hpp>
 namespace crave {
-extern boost::mt19937 rng;
+extern mt19937Manager rng;
 }
 namespace metaSMT {
 namespace solver {
 class CUDD_Distributed_ : public CUDD_Distributed {
  public:
-  CUDD_Distributed_() { gen.seed(crave::rng()); }
+  CUDD_Distributed_() { gen.seed((*rng.get())()); }
 };
 }
 }
