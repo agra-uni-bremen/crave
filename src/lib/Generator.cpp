@@ -11,6 +11,15 @@ Generator::Generator()
       vec_gen_(),
       covered_(false) {}
 
+Generator::~Generator() { delete var_gen_; }
+  
+void Generator::enable_multithreading() {
+  delete var_gen_;
+  var_gen_ = new VariableGeneratorMT(*var_ctn_);
+  reset();
+  rebuild(true);
+}
+
 bool Generator::enableConstraint(std::string const& name) { return constr_mng_.enableConstraint(name); }
 
 bool Generator::disableConstraint(std::string const& name) { return constr_mng_.disableConstraint(name); }

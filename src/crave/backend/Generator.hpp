@@ -17,27 +17,11 @@ struct Generator {
   Generator();
 
   template <typename Expr>
-  explicit Generator(Expr expr)
-      : constr_mng_(),
-        var_ctn_(&variables),
-        ctx_(var_ctn_),
-        var_gen_(new VariableGenerator(*var_ctn_)),
-        var_cov_gen_(*var_ctn_),
-        vec_gen_(),
-        covered_(false) {
-    (*this)(expr);
-  }
+  explicit Generator(Expr expr) : Generator() { (*this)(expr); }
   
-  ~Generator()
-  {
-      delete var_gen_;
-  }
+  ~Generator();
   
-  void enable_multithreading()
-  {
-      delete var_gen_;
-      var_gen_ = new VariableGeneratorMT(*var_ctn_);
-  }
+  void enable_multithreading();
 
   template <typename Expr>
   Generator& operator()(Expr expr) {
