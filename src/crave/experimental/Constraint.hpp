@@ -29,7 +29,7 @@ class crv_constraint : public crv_object {
 
   void operator=(expression_list list) { list_ = list; }
 
-  std::string kind() override { return "crv_constraint"; }
+  std::string kind() override final { return "crv_constraint"; }
 
   void activate() {
     if (!active_) {

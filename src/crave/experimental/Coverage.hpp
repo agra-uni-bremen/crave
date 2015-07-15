@@ -42,7 +42,7 @@ class crv_coverpoint : public crv_object {
  public:
   crv_coverpoint(crv_object_name) : bins_() {}
 
-  std::string kind() override { return "crv_coverpoint"; }
+  std::string kind() override final { return "crv_coverpoint"; }
 
   std::vector<crv_bin>& bins() { return bins_; }
 
