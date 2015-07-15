@@ -13,7 +13,7 @@ struct AssignResult {
   virtual ~AssignResult() {}
 
   virtual void set_value(std::string const& result) = 0;
-  
+
   virtual Constant value() const = 0;
 };
 } /* namespace crave */

@@ -116,7 +116,7 @@ void ComplexityEstimationVisitor::visitNegOpr(const NegOpr& n) { visitSimpleUnar
 
 void ComplexityEstimationVisitor::visitComplementOpr(const ComplementOpr& c) { visitSimpleUnaryExpr(c); }
 
-void ComplexityEstimationVisitor::visitInside(const Inside& i) { 
+void ComplexityEstimationVisitor::visitInside(const Inside& i) {
   visitUnaryExpr(i);
   stack_entry e;
   pop(e);

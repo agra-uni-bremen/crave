@@ -47,7 +47,7 @@ struct bitsize_traits<T, typename boost::enable_if<is_sysc_dt<T> >::type> : sc_d
 
 template <typename T>
 struct to_uint64<T, typename boost::enable_if<is_sysc_dt<T> >::type> {
-  uint64_t operator()(T const & value) { return value.to_uint64(); }
+  uint64_t operator()(T const& value) { return value.to_uint64(); }
 };
 
 #define RANDV_SCDT_PRIM_INTERFACE(Typename)                                                       \

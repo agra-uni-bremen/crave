@@ -13,7 +13,7 @@ namespace crave {
 
 template <typename T, typename Enable = void>
 struct to_uint64 {
-  uint64_t operator()(T const & value) { return value; }
+  uint64_t operator()(T const& value) { return value; }
 };
 
 template <typename T>

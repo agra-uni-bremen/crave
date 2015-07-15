@@ -20,8 +20,8 @@ struct AssignResultToRef : AssignResult {
   explicit AssignResultToRef(T* ref) : value_(ref) {}
 
  public:
-  Constant value() const { 
-    return Constant(crave::to_uint64<T>()(*value_), bitsize_traits<T>::value, crave::is_signed<T>::value); 
+  Constant value() const {
+    return Constant(crave::to_uint64<T>()(*value_), bitsize_traits<T>::value, crave::is_signed<T>::value);
   }
 
   void set_value(std::string const& str) {

@@ -17,10 +17,13 @@ struct Generator {
   Generator();
 
   template <typename Expr>
-  explicit Generator(Expr expr) : Generator() { (*this)(expr); }
-  
+  explicit Generator(Expr expr)
+      : Generator() {
+    (*this)(expr);
+  }
+
   ~Generator();
-  
+
   void enable_multithreading();
 
   template <typename Expr>
@@ -110,9 +113,9 @@ struct Generator {
   Context ctx_;
 
   // variable solvers
-  VariableGenerator *var_gen_;
+  VariableGenerator* var_gen_;
   VariableCoverageGenerator var_cov_gen_;
-  
+
   // vector solver
   VectorGenerator vec_gen_;
 

@@ -12,7 +12,7 @@ Generator::Generator()
       covered_(false) {}
 
 Generator::~Generator() { delete var_gen_; }
-  
+
 void Generator::enable_multithreading() {
   delete var_gen_;
   var_gen_ = new VariableGeneratorMT(*var_ctn_);

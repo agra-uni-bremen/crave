@@ -50,8 +50,8 @@ struct RNG {
 boost::function1<unsigned, unsigned> random_unsigned = RNG();
 
 // if called with zero seed -> use default seed std::time(0)
-void set_global_seed(unsigned int s) { 
-  if (s) rng.seed(s); 
+void set_global_seed(unsigned int s) {
+  if (s) rng.seed(s);
 }
 
 void set_solver_backend(std::string const& type) { FactoryMetaSMT::setSolverType(type); }

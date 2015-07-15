@@ -2,10 +2,7 @@
 
 namespace crave {
 VectorSolver::VectorSolver(int vector_id)
-    : constraints_(),
-      vector_id_(vector_id),
-      solver_(FactoryMetaSMT::getNewInstance()),
-      vec_elements_() {}
+    : constraints_(), vector_id_(vector_id), solver_(FactoryMetaSMT::getNewInstance()), vec_elements_() {}
 
 void VectorSolver::addConstraint(VectorConstraintPtr vc) { constraints_.push_back(vc); }
 

@@ -355,7 +355,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
   std::vector<ReadRefPair>& read_references_;
   std::vector<WriteRefPair>& write_references_;
   std::vector<ReadRefPair>& dist_references_;
-  std::map<int, int>& dist_ref_to_var_map; 
+  std::map<int, int>& dist_ref_to_var_map;
 };
 // Context
 

@@ -637,18 +637,12 @@ bool metaSMTVisitorImpl<SolverType>::solve(bool ignoreSofts) {
   std::random_shuffle(suggestions_.begin(), suggestions_.end(), crave::random_unsigned);
 
   while (true) {
-    BOOST_FOREACH(result_type const & item, assumptions_) {
-      metaSMT::assumption(solver_, item);
-    }
+    BOOST_FOREACH(result_type const & item, assumptions_) { metaSMT::assumption(solver_, item); }
 
-    BOOST_FOREACH(result_type const & item, suggestions_) {
-      metaSMT::assumption(solver_, item);
-    }
+    BOOST_FOREACH(result_type const & item, suggestions_) { metaSMT::assumption(solver_, item); }
 
     if (!ignoreSofts) {
-      BOOST_FOREACH(result_type const & item, softs_) {
-        metaSMT::assumption(solver_, preds::equal(item, preds::True));
-      }
+      BOOST_FOREACH(result_type const & item, softs_) { metaSMT::assumption(solver_, preds::equal(item, preds::True)); }
     }
 
     if (metaSMT::solve(solver_)) {
@@ -657,7 +651,7 @@ bool metaSMTVisitorImpl<SolverType>::solve(bool ignoreSofts) {
     }
 
     if (suggestions_.empty()) break;
-    
+
     unsigned select = crave::random_unsigned(suggestions_.size());
     std::swap(suggestions_[select], suggestions_.back());
     suggestions_.pop_back();

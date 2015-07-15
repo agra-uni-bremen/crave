@@ -171,13 +171,13 @@ void FixWidthVisitor::visitShiftLeftOpr(const ShiftLeftOpr& shl) { visitNumberRe
 
 void FixWidthVisitor::visitShiftRightOpr(const ShiftRightOpr& shr) { visitNumberResultBinExpr(shr); }
 
-void FixWidthVisitor::visitVectorAccess(const VectorAccess& va) { 
+void FixWidthVisitor::visitVectorAccess(const VectorAccess& va) {
   stack_entry lhs, rhs;
   evalBinExpr(va, lhs, rhs, false);
   exprStack_.push(std::make_pair(new VectorAccess(lhs.first, rhs.first), lhs.second));
 }
 
-void FixWidthVisitor::visitForEach(const ForEach& fe) { 
+void FixWidthVisitor::visitForEach(const ForEach& fe) {
   stack_entry lhs, rhs;
   evalBinExpr(fe, lhs, rhs, false);
   exprStack_.push(std::make_pair(new ForEach(lhs.first, rhs.first), 1));

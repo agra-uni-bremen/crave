@@ -19,8 +19,7 @@ struct VariableSolver {
 
   template <typename T>
   bool read(Variable<T> const& var, T* value) {
-    if (var_ctn_.variables.find(var.id()) == var_ctn_.variables.end())
-      return false;
+    if (var_ctn_.variables.find(var.id()) == var_ctn_.variables.end()) return false;
     AssignResultToRef<T> result(value);
     solver_->read(*var_ctn_.variables[var.id()], result);
     return true;
