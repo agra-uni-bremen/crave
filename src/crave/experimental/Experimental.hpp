@@ -60,8 +60,7 @@ class crv_sequence_item : public crv_object {
       if (obj->kind() == "crv_constraint") {
         crv_constraint* cstr = (crv_constraint*)obj;
         if (cstr->active()) gen(cstr->fullname(), cstr->single_expr());
-      }
-      else if (obj->kind() == "crv_sequence_item") {
+      } else if (obj->kind() == "crv_sequence_item") {
         crv_sequence_item* item = (crv_sequence_item*)obj;
         item->recursive_build(gen);
       }

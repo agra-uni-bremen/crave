@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include <boost/bind.hpp>
-
 #include <vector>
 #include <string>
 #include <set>
+
+#include <boost/preprocessor.hpp>                                                          \
 
 #include "backend/Generator.hpp"
 #include "frontend/RandomBase.hpp"

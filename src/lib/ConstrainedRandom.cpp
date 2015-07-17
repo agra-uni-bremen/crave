@@ -33,7 +33,6 @@ unsigned int default_rand_vec_size() { return 5; }
 unsigned int placeholder_bitsize() { return 32; }
 
 mt19937Manager rng(std::time(0));
-//boost::mt19937 rng(std::time(0));
 
 struct random_bit_gen {
   random_bit_gen() : rnd(0, 1) {}
