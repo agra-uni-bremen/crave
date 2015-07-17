@@ -29,7 +29,7 @@ ELSE(SystemC_LIBRARIES AND SystemC_INCLUDE_DIRS)
       $ENV{SYSTEMC_HOME}/lib-linux64
       $ENV{SYSTEMC_HOME}/lib-macos
     NAMES
-      systemc
+      libsystemc.a
   )
 
 SET(SystemC_INCLUDE_DIRS ${SystemC_INCLUDE_DIR})
