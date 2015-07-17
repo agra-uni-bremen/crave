@@ -1,6 +1,7 @@
 // Copyright 2014 The CRAVE developers. All rights reserved.//
 #include "../crave/RandomSeedManager.hpp"
 #include <boost/foreach.hpp>
+#include <boost/functional/hash.hpp>
 
 RandomSeedManager::RandomSeedManager(unsigned int seed) : seed_(seed), default_rng_(seed) {}
 
@@ -13,17 +14,6 @@ void RandomSeedManager::set_global_seed(unsigned int s) {
   default_rng_.seed(s);
 }
 
-unsigned int RandomSeedManager::charToUIntSeed(const char* name)
-{
-    unsigned int value = 42; 
-    unsigned int length = strlen(name);
-    for(int i=0;i<length;i++)
-    {
-        value -= name[i];
-    }
-    return value;
-}
-
 #ifndef WITH_SYSTEMC
 
 boost::mt19937* RandomSeedManager::get() { return &default_rng_; }
@@ -34,13 +24,12 @@ boost::mt19937* RandomSeedManager::get() { return &default_rng_; }
 boost::mt19937* RandomSeedManager::get() {
   sc_core::sc_process_b* process = sc_core::sc_get_current_process_b();
   if (!process) return &default_rng_;
-  unsigned int processId = process->proc_id;
-  if (randomMap_.count(processId)) {  // constains
-    return randomMap_.at(processId);
+  if (randomMap_.count(process->proc_id)) {  // constains
+    return randomMap_.at(process->proc_id);
   }
-  unsigned int seed = charToUIntSeed(process->name());
-  boost::mt19937* rnd = new boost::mt19937(seed_ + 19937 * seed);
-  randomMap_.insert(std::make_pair(processId, rnd));
+  static boost::hash<std::string> string_hash;
+  boost::mt19937* rnd = new boost::mt19937(seed_ + 19937 * string_hash(process->name()));
+  randomMap_.insert(std::make_pair(process->proc_id, rnd));
   return rnd;
 }
 
