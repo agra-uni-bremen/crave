@@ -3,12 +3,13 @@
 #include <map>
 #include <boost/random.hpp>
 
-class mt19937Manager {
+class RandomSeedManager {
  public:
-  mt19937Manager(unsigned int seed);
-  virtual ~mt19937Manager();
+  RandomSeedManager(unsigned int seed);
+  virtual ~RandomSeedManager();
   void set_global_seed(unsigned int s);
   boost::mt19937* get();
+  unsigned int charToUIntSeed(const char* name);
 
  private:
   typedef std::map<unsigned int, boost::mt19937*> random_map_t;

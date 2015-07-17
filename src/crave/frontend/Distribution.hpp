@@ -7,11 +7,11 @@
 #include <vector>
 #include "../ir/Node.hpp"
 #include "WeightedRange.hpp"
-#include "../mt19937Manager.hpp"
+#include "../RandomSeedManager.hpp"
 
 namespace crave {
 
-extern mt19937Manager rng;
+extern RandomSeedManager rng;
 
 template <typename T>
 struct distribution : Node {

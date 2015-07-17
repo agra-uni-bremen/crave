@@ -10,7 +10,7 @@
 #include "../crave/ConstrainedRandom.hpp"
 #include "../crave/utils/Settings.hpp"
 #include "../crave/ir/VariableContainer.hpp"
-#include "../crave/mt19937Manager.hpp"
+#include "../crave/RandomSeedManager.hpp"
 
 namespace crave {
 
@@ -32,7 +32,7 @@ unsigned int default_rand_vec_size() { return 5; }
 
 unsigned int placeholder_bitsize() { return 32; }
 
-mt19937Manager rng(std::time(0));
+RandomSeedManager rng(std::time(0));
 
 struct random_bit_gen {
   random_bit_gen() : rnd(0, 1) {}

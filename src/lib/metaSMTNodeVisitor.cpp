@@ -43,9 +43,9 @@ DEFINE_SOLVER(crave::Z3, metaSMT::solver::Z3_Backend);
 
 #ifdef metaSMT_USE_CUDD
 #include <metaSMT/backend/CUDD_Distributed.hpp>
-#include "../crave/mt19937Manager.hpp"
+#include "../crave/RandomSeedManager.hpp"
 namespace crave {
-extern mt19937Manager rng;
+extern RandomSeedManager rng;
 }
 namespace metaSMT {
 namespace solver {

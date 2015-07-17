@@ -33,7 +33,7 @@ SET(CRAVE_LIB_SRC
   RandomBase.cpp
   VariableGeneratorMT.cpp
   ComplexityEstimationVisitor.cpp
-  mt19937Manager.cpp
+  RandomSeedManager.cpp
 )
 
 if (CRAVE_ENABLE_EXPERIMENTAL)
