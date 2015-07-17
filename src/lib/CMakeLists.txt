@@ -48,12 +48,18 @@ add_library (crave STATIC
   ${CRAVE_LIB_SRC}
 )
 
-target_link_libraries (crave
+SET(LINK_LIBRARIES
   metaSMT
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_THREAD_LIBRARY}
   ${Boost_FILESYSTEM_LIBRARY}
 )
+
+if(SystemC_FOUND)
+  LIST(APPEND LINK_LIBRARIES ${SystemC_LIBRARY})
+endif(SystemC_FOUND)
+
+target_link_libraries (crave ${LINK_LIBRARIES})
 
 install(TARGETS crave
   EXPORT crave

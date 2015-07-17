@@ -44,6 +44,11 @@ include_directories( ${metaSMT_INCLUDE_DIR} )
 include_directories( ${Boost_INCLUDE_DIRS} )
 include_directories( ${GLOG_INCLUDE_DIRS} )
 
+if(SystemC_FOUND)
+  find_package(Threads REQUIRED)
+  include_directories(${SystemC_INCLUDE_DIR})
+endif(SystemC_FOUND)
+
 add_subdirectory(src)
 
 enable_testing ()
