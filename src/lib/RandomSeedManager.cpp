@@ -19,7 +19,7 @@ unsigned int RandomSeedManager::charToUIntSeed(const char* name)
     unsigned int length = strlen(name);
     for(int i=0;i<length;i++)
     {
-        value -= name[i];
+        value -= (i^name[i]);
     }
     return value;
 }
