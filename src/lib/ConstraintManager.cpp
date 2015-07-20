@@ -90,7 +90,7 @@ ConstraintPtr ConstraintManager::makeConstraint(std::string const& name, int c_i
   if (!c->isVectorConstraint()) {
     ComplexityEstimationVisitor cev;
     c->complexity_ = cev.getComplexityEstimation(*n);
-  }    
+  }
 
   changed_ = true;
   constraints_.push_back(c);

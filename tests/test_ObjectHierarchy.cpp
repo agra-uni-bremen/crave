@@ -32,10 +32,7 @@ struct random_object3 : crv_object {
   random_object1* obj1;
 
   random_object3(crv_object_name);
-  ~random_object3()
-  {
-      delete obj1;
-  }
+  ~random_object3() { delete obj1; }
 };
 
 random_object3::random_object3(crv_object_name) {

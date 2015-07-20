@@ -34,4 +34,3 @@ boost::mt19937* RandomSeedManager::get() {
 }
 
 #endif
-

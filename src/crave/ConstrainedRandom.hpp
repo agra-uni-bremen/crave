@@ -6,7 +6,7 @@
 #include <string>
 #include <set>
 
-#include <boost/preprocessor.hpp>                                                          \
+#include <boost/preprocessor.hpp>
 
 #include "backend/Generator.hpp"
 #include "frontend/RandomBase.hpp"
