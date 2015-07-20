@@ -44,6 +44,8 @@ class UserConstraint {
 
   virtual bool isVectorConstraint();
 
+  unsigned complexity() const;
+
   template <typename ostream>
   friend ostream& operator<<(ostream& os, const UserConstraint& constr);
 
@@ -55,6 +57,7 @@ class UserConstraint {
   bool soft_;
   bool cover_;
   bool enabled_;
+  unsigned complexity_;
 };
 
 template <typename ostream>

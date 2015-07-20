@@ -1,4 +1,7 @@
 #include "../crave/ir/ConstraintManager.hpp"
+#include "../crave/ir/visitor/GetSupportSetVisitor.hpp"
+#include "../crave/ir/visitor/ToDotNodeVisitor.hpp"
+#include "../crave/ir/visitor/ComplexityEstimationVisitor.hpp"
 
 namespace crave {
 
@@ -83,6 +86,11 @@ ConstraintPtr ConstraintManager::makeConstraint(std::string const& name, int c_i
 
   assert(!c->isSoft() || !c->isCover());              // soft cover constraint not defined/supported yet
   assert(!c->isVectorConstraint() || !c->isCover());  // cover vector constraint not defined/supported yet
+
+  if (!c->isVectorConstraint()) {
+    ComplexityEstimationVisitor cev;
+    c->complexity_ = cev.getComplexityEstimation(*n);
+  }    
 
   changed_ = true;
   constraints_.push_back(c);

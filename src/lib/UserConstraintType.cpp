@@ -4,7 +4,14 @@ namespace crave {
 
 UserConstraint::UserConstraint(unsigned const id, UserConstraint::expression const expr, std::string const& name,
                                std::set<int> support_vars, bool const soft, bool const cover, bool const enabled)
-    : id_(id), expr_(expr), name_(name), support_vars_(support_vars), soft_(soft), cover_(cover), enabled_(enabled) {}
+    : id_(id),
+      expr_(expr),
+      name_(name),
+      support_vars_(support_vars),
+      soft_(soft),
+      cover_(cover),
+      enabled_(enabled),
+      complexity_(0) {}
 
 template <typename ostream>
 ostream& operator<<(ostream& os, const UserConstraint& constr) {
@@ -35,4 +42,6 @@ void UserConstraint::enable() { enabled_ = true; }
 void UserConstraint::disable() { enabled_ = false; }
 
 bool UserConstraint::isVectorConstraint() { return false; }
+
+unsigned UserConstraint::complexity() const { return complexity_; }
 }

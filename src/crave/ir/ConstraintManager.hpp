@@ -11,8 +11,6 @@
 #include "UserVectorConstraint.hpp"
 #include "Context.hpp"
 #include "visitor/FixWidthVisitor.hpp"
-#include "visitor/GetSupportSetVisitor.hpp"
-#include "visitor/ToDotNodeVisitor.hpp"
 
 namespace crave {
 

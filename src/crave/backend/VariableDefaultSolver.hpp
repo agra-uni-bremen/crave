@@ -13,6 +13,7 @@ namespace crave {
 
 struct VariableDefaultSolver : VariableSolver {
   static bool bypass_constraint_analysis;
+  static unsigned complexity_limit_for_bdd;
 
   VariableDefaultSolver(const VariableContainer& vcon, const ConstraintPartition& cp);
 

@@ -8,6 +8,8 @@ extern boost::function1<unsigned, unsigned> random_unsigned;
 
 bool VariableDefaultSolver::bypass_constraint_analysis = false;
 
+unsigned VariableDefaultSolver::complexity_limit_for_bdd = 400;
+
 VariableDefaultSolver::VariableDefaultSolver(const VariableContainer& vcon, const ConstraintPartition& cp)
     : VariableSolver(vcon, cp) {
   LOG(INFO) << "Create solver for partition " << constr_pttn_;
@@ -43,7 +45,9 @@ VariableDefaultSolver::VariableDefaultSolver(const VariableContainer& vcon, cons
       }
       SolverPtr bdd_solver(FactoryMetaSMT::getNewInstance(CUDD));
       bdd_solvers_[id] = bdd_solver;
-      BOOST_FOREACH(ConstraintPtr c, svc_map.at(id)) { bdd_solver->makeAssertion(*c->expr()); }
+      BOOST_FOREACH(ConstraintPtr c, svc_map.at(id)) {
+        if (c->complexity() > 0 && c->complexity() < complexity_limit_for_bdd) bdd_solver->makeAssertion(*c->expr());
+      }
       vars_with_dist.insert(id);
       LOG(INFO) << "  BDD solver for var #" << id << " created";
     }
