@@ -14,15 +14,28 @@ extern VariableContainer variables;
 
 struct Generator {
  public:
-  Generator();
+  Generator()
+    : constr_mng_(),
+      var_ctn_(&variables),
+      ctx_(var_ctn_),
+      var_gen_(new VariableGenerator(*var_ctn_)),
+      var_cov_gen_(*var_ctn_),
+      vec_gen_(),
+      covered_(false) {}
 
   template <typename Expr>
   explicit Generator(Expr expr)
-      : Generator() {
+    : constr_mng_(),
+      var_ctn_(&variables),
+      ctx_(var_ctn_),
+      var_gen_(new VariableGenerator(*var_ctn_)),
+      var_cov_gen_(*var_ctn_),
+      vec_gen_(),
+      covered_(false) {
     (*this)(expr);
   }
 
-  ~Generator();
+  ~Generator() { delete var_gen_; }
 
   void enable_multithreading();
 

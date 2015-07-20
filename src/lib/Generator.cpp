@@ -2,17 +2,6 @@
 
 namespace crave {
 
-Generator::Generator()
-    : constr_mng_(),
-      var_ctn_(&variables),
-      ctx_(var_ctn_),
-      var_gen_(new VariableGenerator(*var_ctn_)),
-      var_cov_gen_(*var_ctn_),
-      vec_gen_(),
-      covered_(false) {}
-
-Generator::~Generator() { delete var_gen_; }
-
 void Generator::enable_multithreading() {
   delete var_gen_;
   var_gen_ = new VariableGeneratorMT(*var_ctn_);
