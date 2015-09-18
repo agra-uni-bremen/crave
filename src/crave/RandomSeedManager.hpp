@@ -22,13 +22,13 @@ class RandomSeedManager {
   
   RandomSeedManager& operator=(const RandomSeedManager& rhs)
   {
-      if(&rhs == this)
+      if(&rhs != this)
       {
-        return *this;
+        this->default_rng_ = rhs.default_rng_;
+        this->randomMap_ = rhs.randomMap_;
+        this->seed_ = rhs.seed_;
       }
-      this->default_rng_ = rhs.default_rng_;
-      this->randomMap_ = rhs.randomMap_;
-      this->seed_ = rhs.seed_;
+      return *this;
   }
 
  private:
