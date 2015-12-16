@@ -53,10 +53,13 @@ class crv_variable_base : public crv_variable_base_ {
   crv_variable_base<T>* bound_var;
 };
 
-#define CRV_VARIABLE_COMMON_INTERFACE(Typename)                                   \
+#define CRV_VARIABLE_COMMON_CONSTRUCTORS(Typename)                                \
  public:                                                                          \
   crv_variable(crv_object_name name = "var") {}                                   \
   crv_variable(const crv_variable& other) : crv_variable_base<Typename>(other) {} \
+
+#define CRV_VARIABLE_ASSIGNMENT_INTERFACE(Typename)                               \
+ public:                                                                          \
   crv_variable<Typename>& operator=(const crv_variable<Typename>& i) {            \
     this->value = i.value;                                                        \
     return *this;                                                                 \
@@ -139,7 +142,8 @@ class crv_variable_base : public crv_variable_base_ {
 
 template <>
 class crv_variable<bool> : public crv_variable_base<bool> {
-  CRV_VARIABLE_COMMON_INTERFACE(bool);
+  CRV_VARIABLE_COMMON_CONSTRUCTORS(bool);
+  CRV_VARIABLE_ASSIGNMENT_INTERFACE(bool);
   CRV_VARIABLE_PRIM_INTERFACE(bool);
   CRV_VARIABLE_BITWISE_INTERFACE(bool);
 };
@@ -148,7 +152,8 @@ class crv_variable<bool> : public crv_variable_base<bool> {
 #define CRV_VARIABLE_INTEGER_TYPE(typename)                           \
   template <>                                                         \
   class crv_variable<typename> : public crv_variable_base<typename> { \
-    CRV_VARIABLE_COMMON_INTERFACE(typename);                          \
+    CRV_VARIABLE_COMMON_CONSTRUCTORS(typename);                       \
+    CRV_VARIABLE_ASSIGNMENT_INTERFACE(typename);                      \
     CRV_VARIABLE_PRIM_INTERFACE(typename);                            \
     CRV_VARIABLE_ARITHMETIC_INTERFACE(typename);                      \
     CRV_VARIABLE_BITWISE_INTERFACE(typename);                         \
