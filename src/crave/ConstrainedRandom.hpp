@@ -65,7 +65,7 @@ class rand_obj : public rand_obj_base {
 
 }  // end namespace crave
 
-#define INSERT(s, DATA, ELEM) DATA.insert(ELEM);
+#define __CRAVE_INSERT(s, DATA, ELEM) DATA.insert(ELEM);
 
 #define CRAVE_ENUM(name, ...)                                                              \
   namespace crave {                                                                        \
@@ -76,7 +76,7 @@ class rand_obj : public rand_obj_base {
         throw std::runtime_error("randv<enum> must be owned by an instance of rand_obj."); \
       }                                                                                    \
       std::set<int> s;                                                                     \
-      BOOST_PP_SEQ_FOR_EACH(INSERT, s, __VA_ARGS__);                                       \
+      BOOST_PP_SEQ_FOR_EACH(__CRAVE_INSERT, s, __VA_ARGS__);                               \
       parent->constraint(inside(var, s));                                                  \
     }                                                                                      \
   };                                                                                       \
