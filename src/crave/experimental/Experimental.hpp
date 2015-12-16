@@ -72,3 +72,34 @@ class crv_sequence_item : public crv_object {
 };
 
 }  // end namespace crave
+
+#define __CRAVE_EXPERIMENTAL_INSERT(s, DATA, ELEM) DATA.insert(ELEM);
+
+#define CRAVE_EXPERIMENTAL_ENUM(name, ...)                                     \
+  namespace crave {                                                            \
+  template <>                                                                  \
+  class crv_variable<name> : public crv_variable_base<int> {                   \
+   public:                                                                     \
+    crv_variable(const crv_variable& other) : crv_variable_base<int>(other) {} \
+    crv_variable<name>& operator=(const crv_variable<name>& i) {               \
+      this->value = i.value;                                                   \
+      return *this;                                                            \
+    }                                                                          \
+    crv_variable<name>& operator=(name i) {                                    \
+      this->value = i;                                                         \
+      return *this;                                                            \
+    }                                                                          \
+    crv_variable(crv_object_name name = "var") {                               \
+      std::set<int> s;                                                         \
+      BOOST_PP_SEQ_FOR_EACH(__CRAVE_EXPERIMENTAL_INSERT, s, __VA_ARGS__);      \
+      enum_internal = {inside(var, s)};                                        \
+      if (!parent_) {                                                          \
+        throw std::runtime_error("crv_variable<enum> cannot be orphaned");     \
+      }                                                                        \
+      parent_->children_.push_back(&enum_internal);                            \
+    }                                                                          \
+                                                                               \
+   private:                                                                    \
+    crv_constraint enum_internal{"enum_internal"};                             \
+  };                                                                           \
+  }  // namespace crave

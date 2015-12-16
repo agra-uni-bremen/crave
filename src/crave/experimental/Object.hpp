@@ -22,6 +22,9 @@ struct crv_object_name {
 };
 
 class crv_object {
+  template <typename T>
+  friend class crv_variable;
+
  public:
   crv_object();
   ~crv_object();
