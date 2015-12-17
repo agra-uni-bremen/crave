@@ -14,7 +14,7 @@
 #include <vector>
 #include <memory>
 
-#include "better-enums/enum.h"
+#include "better-enums/enum.hpp"
 
 #define CRV_VARIABLE(type, name) \
   crave::crv_variable<type> name { #name }
