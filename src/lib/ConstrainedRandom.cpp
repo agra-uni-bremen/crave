@@ -147,7 +147,10 @@ void rand_obj::gather_values(std::vector<int64_t>* ch) {
   }
 }
 
-void rand_obj::add_base_child(rand_base* rb) { baseChildren_.push_back(rb); }
+void rand_obj::add_base_child(rand_base* rb) { 
+  baseChildren_.push_back(rb); 
+  if (rb->kind() == "rand_vec") request_rebuild();
+}
 
 void rand_obj::request_rebuild() {
   rebuild_ = true;
@@ -174,8 +177,10 @@ bool rand_obj::disable_constraint(std::string name) {
 bool rand_obj::is_constraint_enabled(std::string name) { return constraint.isConstraintEnabled(name); }
 
 bool rand_obj::gen_base_children() {
-  for (uint i = 0; i < baseChildren_.size(); i++)
+  for (uint i = 0; i < baseChildren_.size(); i++) {
+    if (baseChildren_[i]->kind() == "rand_vec") continue; // rand_vec to be generated later
     if (!baseChildren_[i]->next()) return false;
+  }
   for (uint i = 0; i < objChildren_.size(); i++)
     if (!objChildren_[i]->gen_base_children()) return false;
   return true;
@@ -185,6 +190,11 @@ void rand_obj::gather_constraints(Generator* gen) {
   for (uint i = 0; i < objChildren_.size(); i++) {
     objChildren_[i]->gather_constraints(gen);
   }
+  for (uint i = 0; i < baseChildren_.size(); i++) 
+    if (baseChildren_[i]->kind() == "rand_vec") {
+      __rand_vec_base* rvb = dynamic_cast<__rand_vec_base*>(baseChildren_[i]);
+      gen->addVecId(rvb->id()); 
+    }
   gen->merge(constraint);
 }
 

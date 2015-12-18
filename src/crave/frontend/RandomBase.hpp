@@ -23,6 +23,8 @@ class __rand_vec_base {
   virtual ~__rand_vec_base() {}
   virtual void set_values(const std::vector<std::string>&) = 0;
   virtual Variable<unsigned int> const& size_var() const = 0;
+  virtual int id() const = 0;
+  virtual void gen_values(unsigned num) = 0;
 };
 
 extern std::map<int, __rand_vec_base*> vectorBaseMap;
@@ -60,6 +62,17 @@ class __rand_vec_base1 : public __rand_vec_base {
     }
   }
 
+  virtual void gen_values(unsigned num) {
+    static randv<T1> r(NULL);
+    this->clear();
+    for (uint i = 0; i < num; i++) {
+      r.next();
+      this->push_back(r);
+    }
+  }
+
+  virtual int id() const { return sym_vec.id(); }
+
  protected:
   Vector<T1> sym_vec;
   std::vector<T2> real_vec;
@@ -79,12 +92,7 @@ class rand_vec : public __rand_vec<T>, public rand_base {
   }
 
   virtual bool next() {
-    static randv<T> r(NULL);
-    this->clear();
-    for (uint i = 0; i < default_rand_vec_size(); i++) {
-      r.next();
-      this->push_back(r);
-    }
+    __rand_vec<T>::gen_values(default_rand_vec_size());
     return true;
   }
 

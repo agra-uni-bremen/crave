@@ -114,6 +114,8 @@ struct Generator {
     return result;
   }
 
+  void addVecId(int id) { to_be_generated_vec_ids_.insert(id); }
+
  private:
   // constraints
   ConstraintManager constr_mng_;
@@ -121,6 +123,7 @@ struct Generator {
 
   // variables
   VariableContainer* var_ctn_;
+  std::set<int> to_be_generated_vec_ids_;
 
   // context
   Context ctx_;

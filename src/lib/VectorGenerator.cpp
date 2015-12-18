@@ -65,9 +65,19 @@ void VectorSolver::buildSolver(unsigned int const size) {
 
 VectorGenerator::VectorGenerator() : vector_solvers_() {}
 
-bool VectorGenerator::solve(const VariableGenerator& var_gen) {
+bool VectorGenerator::solve(const VariableGenerator& var_gen, const std::set<int>& vec_ids) {
   BOOST_FOREACH(VectorSolverMap::value_type & c_pair, vector_solvers_) {
     if (!c_pair.second.solve(var_gen)) return false;
+  }
+  BOOST_FOREACH(int id, vec_ids) {
+    if (vector_solvers_.find(id) != vector_solvers_.end()) continue;
+    // unconstrained vector
+    __rand_vec_base* vector = vectorBaseMap[id];
+    unsigned int size = default_rand_vec_size();
+    if (!var_gen.read(vector->size_var(), &size)) {
+      LOG(INFO) << "Use default size for vector " << id;
+    }
+    vector->gen_values(size);
   }
   return true;
 }

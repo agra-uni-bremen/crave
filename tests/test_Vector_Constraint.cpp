@@ -295,7 +295,7 @@ struct Item6 : public rand_obj {
 BOOST_AUTO_TEST_CASE(only_size_constrained_vect_test) {
   Item6 it;
   it.next();
-  BOOST_REQUIRE(it.v.size() == default_rand_vec_size() + 7);
+  BOOST_REQUIRE_EQUAL(it.v.size(), default_rand_vec_size() + 7);
 }
 
 BOOST_AUTO_TEST_SUITE_END()  // Context

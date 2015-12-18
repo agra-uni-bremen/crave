@@ -40,7 +40,7 @@ struct VectorGenerator {
   typedef std::map<int, VectorSolver> VectorSolverMap;
 
   VectorGenerator();
-  bool solve(const VariableGenerator& var_gen);
+  bool solve(const VariableGenerator& var_gen, const std::set<int>& vec_ids);
   void reset(const std::vector<VectorConstraintPtr>& v);
 
  private:
