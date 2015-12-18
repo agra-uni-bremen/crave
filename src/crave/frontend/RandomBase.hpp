@@ -90,7 +90,7 @@ class rand_vec : public __rand_vec<T>, public rand_base {
 
   virtual void gather_values(std::vector<int64_t>* ch) { ch->push_back(this->size()); }
   
-  virtual const char* kind() const { return "rand_vec"; }
+  virtual std::string kind() const { return "rand_vec"; }
 };
 
 }  // namespace crave
