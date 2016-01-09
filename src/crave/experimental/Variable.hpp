@@ -31,10 +31,11 @@ class crv_variable_base : public crv_variable_base_ {
     return os;
   }
   WriteReference<T> const& operator()() const { return var; }
+  ReadReference<T> const& prev() const { return ref; }
   unsigned id() override { return var.id(); }
   Constant constant_expr() override {
-    unsigned width = bitsize_traits<T>::value;
-    bool sign = crave::is_signed<T>::value;
+    constexpr unsigned width = bitsize_traits<T>::value;
+    constexpr bool sign = crave::is_signed<T>::value;
     return Constant(actual_value(), width, sign);
   }
   void bind(crv_variable_base& other) { bound_var = &other; }
@@ -42,13 +43,14 @@ class crv_variable_base : public crv_variable_base_ {
   expression bound_expr() { return bound_var ? make_expression(var == bound_var->var) : value_to_expression(true); }
 
  protected:
-  crv_variable_base() : var(&value), value(), bound_var() {}
+  crv_variable_base() : var(&value), ref(value), value(), bound_var() {}
   crv_variable_base(const crv_variable_base& other)
-      : var(&value), value(other.value), bound_var(other.bound_var), crv_variable_base_(other) {}
+      : var(&value), ref(value), value(other.value), bound_var(other.bound_var), crv_variable_base_(other) {}
 
   T actual_value() const { return bound_var ? bound_var->value : value; }
 
   WriteReference<T> var;
+  ReadReference<T> ref;
   T value;
   crv_variable_base<T>* bound_var;
 };
