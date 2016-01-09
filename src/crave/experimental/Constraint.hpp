@@ -25,7 +25,7 @@ class crv_constraint : public crv_object {
     list_.add_expr(expr);
   }
 
-  expression single_expr() { return list_.single_expr(); }
+  expression_list const& expr_list() const { return list_; }
 
   void operator=(expression_list list) { list_ = list; }
 

@@ -26,12 +26,6 @@ class expression_list {
     exprs_.push_back(make_expression(expr));
   }
 
-  expression single_expr() {
-    expression result = value_to_expression(true);
-    for (auto e : exprs_) result = make_expression(result && e);
-    return result;
-  }
-
   container_type::iterator begin() { return exprs_.begin(); }
   container_type::iterator end() { return exprs_.end(); }
   container_type::const_iterator begin() const { return exprs_.begin(); }

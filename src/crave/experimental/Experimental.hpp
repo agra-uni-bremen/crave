@@ -5,6 +5,7 @@
 #include "Object.hpp"
 #include "Variable.hpp"
 #include "Array.hpp"
+#include "Vector.hpp"
 #include "Expression.hpp"
 #include "Constraint.hpp"
 #include "Coverage.hpp"
@@ -61,7 +62,10 @@ class crv_sequence_item : public crv_object {
     for (crv_object* obj : children_) {
       if (obj->kind() == "crv_constraint") {
         crv_constraint* cstr = (crv_constraint*)obj;
-        if (cstr->active()) gen(cstr->fullname(), cstr->single_expr());
+        if (!cstr->active()) continue;
+        unsigned cnt = 0;
+        for (auto e : cstr->expr_list()) 
+          gen(cstr->fullname() + "#" + std::to_string(cnt++), e);
       } else if (obj->kind() == "crv_sequence_item") {
         crv_sequence_item* item = (crv_sequence_item*)obj;
         item->recursive_build(gen);
