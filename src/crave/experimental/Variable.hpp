@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <vector>
-
 #include "Object.hpp"
 
 #include "../frontend/Constraint.hpp"
@@ -12,14 +10,23 @@
 
 namespace crave {
 
-template <typename T>
-class crv_variable;
-
 struct crv_variable_base_ : public crv_object {
   virtual Constant constant_expr() = 0;
   virtual expression bound_expr() = 0;
   virtual unsigned id() = 0;
   std::string kind() override final { return "crv_variable"; }
+};
+
+template <typename T, typename Enable = void>
+struct to_constant_expr { };
+
+template <typename T>
+struct to_constant_expr<T, typename std::enable_if<std::is_integral<T>::value>::type> {
+  Constant operator()(T value) { 
+    constexpr unsigned width = bitsize_traits<T>::value;
+    constexpr bool sign = crave::is_signed<T>::value;
+    return Constant(value, width, sign);
+  }
 };
 
 template <typename T>
@@ -33,14 +40,10 @@ class crv_variable_base : public crv_variable_base_ {
   WriteReference<T> const& operator()() const { return var; }
   ReadReference<T> const& prev() const { return ref; }
   unsigned id() override { return var.id(); }
-  Constant constant_expr() override {
-    constexpr unsigned width = bitsize_traits<T>::value;
-    constexpr bool sign = crave::is_signed<T>::value;
-    return Constant(actual_value(), width, sign);
-  }
   void bind(crv_variable_base& other) { bound_var = &other; }
   void unbind() { bound_var = nullptr; }
   expression bound_expr() { return bound_var ? make_expression(var == bound_var->var) : value_to_expression(true); }
+  Constant constant_expr() override { return to_constant_expr<T>()(actual_value()); }
 
  protected:
   crv_variable_base() : var(&value), ref(value), value(), bound_var() {}
@@ -52,7 +55,7 @@ class crv_variable_base : public crv_variable_base_ {
   WriteReference<T> var;
   ReadReference<T> ref;
   T value;
-  crv_variable_base<T>* bound_var;
+  crv_variable_base* bound_var;
 };
 
 #define CRV_VARIABLE_COMMON_CONSTRUCTORS(Typename)                                \
@@ -113,6 +116,7 @@ class crv_variable_base : public crv_variable_base_ {
   }
 
 #define CRV_VARIABLE_BITWISE_INTERFACE(Typename)    \
+ public:                                            \
   crv_variable<Typename>& operator&=(Typename i) {  \
     this->value &= i;                               \
     return *this;                                   \
@@ -134,43 +138,22 @@ class crv_variable_base : public crv_variable_base_ {
     return *this;                                   \
   }
 
-#define CRV_VARIABLE_PRIM_INTERFACE(Typename) \
- public:                                      \
-  bool randomize() override {                 \
-    static distribution<Typename> dist;       \
-    value = dist.nextValue();                 \
-    return true;                              \
+template <typename T, typename Enable = void> 
+class crv_variable { };
+
+template <typename T>
+class crv_variable<T, typename std::enable_if<std::is_integral<T>::value>::type> : public crv_variable_base<T> {
+  CRV_VARIABLE_COMMON_CONSTRUCTORS(T);
+  CRV_VARIABLE_ASSIGNMENT_INTERFACE(T);                      
+  CRV_VARIABLE_ARITHMETIC_INTERFACE(T);                      
+  CRV_VARIABLE_BITWISE_INTERFACE(T);
+
+ public:                                            \
+  bool randomize() override {
+    static distribution<T> dist;
+    this->value = dist.nextValue();  
+    return true;
   }
-
-template <>
-class crv_variable<bool> : public crv_variable_base<bool> {
-  CRV_VARIABLE_COMMON_CONSTRUCTORS(bool);
-  CRV_VARIABLE_ASSIGNMENT_INTERFACE(bool);
-  CRV_VARIABLE_PRIM_INTERFACE(bool);
-  CRV_VARIABLE_BITWISE_INTERFACE(bool);
 };
-
-// for all C/C++ built-in integer types
-#define CRV_VARIABLE_INTEGER_TYPE(typename)                           \
-  template <>                                                         \
-  class crv_variable<typename> : public crv_variable_base<typename> { \
-    CRV_VARIABLE_COMMON_CONSTRUCTORS(typename);                       \
-    CRV_VARIABLE_ASSIGNMENT_INTERFACE(typename);                      \
-    CRV_VARIABLE_PRIM_INTERFACE(typename);                            \
-    CRV_VARIABLE_ARITHMETIC_INTERFACE(typename);                      \
-    CRV_VARIABLE_BITWISE_INTERFACE(typename);                         \
-  };
-
-CRV_VARIABLE_INTEGER_TYPE(int);
-CRV_VARIABLE_INTEGER_TYPE(unsigned int);
-CRV_VARIABLE_INTEGER_TYPE(char);
-CRV_VARIABLE_INTEGER_TYPE(signed char);
-CRV_VARIABLE_INTEGER_TYPE(unsigned char);
-CRV_VARIABLE_INTEGER_TYPE(short);
-CRV_VARIABLE_INTEGER_TYPE(unsigned short);
-CRV_VARIABLE_INTEGER_TYPE(long);
-CRV_VARIABLE_INTEGER_TYPE(unsigned long);
-CRV_VARIABLE_INTEGER_TYPE(long long);
-CRV_VARIABLE_INTEGER_TYPE(unsigned long long);
 
 }  // namespace crave

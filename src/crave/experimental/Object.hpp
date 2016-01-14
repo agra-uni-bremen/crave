@@ -22,7 +22,7 @@ struct crv_object_name {
 };
 
 class crv_object {
-  template <typename T>
+  template <typename T, typename Enable>
   friend class crv_variable;
 
  public:
