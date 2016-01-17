@@ -46,6 +46,16 @@ class crv_sequence_item : public crv_object {
     return gen_->nextCov();
   }
 
+  template <typename... Exprs>
+  bool randomize_with(Exprs... exprs) {
+    // TODO Generator caching
+    rand_with_gen_ = std::make_shared<Generator>();
+    recursive_build(*rand_with_gen_);
+    expression_list list(exprs...);
+    for (auto e : list) (*rand_with_gen_)(e);
+    return rand_with_gen_->next();
+  }
+
   void goal(crv_covergroup& group) {
     for (auto e : group.bound_var_expr_list()) (*gen_)(e);
     for (auto e : group.uncovered_as_list()) gen_->cover(e);
@@ -74,6 +84,7 @@ class crv_sequence_item : public crv_object {
   }
 
   std::shared_ptr<Generator> gen_;
+  std::shared_ptr<Generator> rand_with_gen_;
   bool built_;
 };
 
