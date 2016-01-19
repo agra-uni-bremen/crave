@@ -14,6 +14,8 @@ struct AssignResult {
 
   virtual void set_value(std::string const& result) = 0;
 
-  virtual Constant value() const = 0;
+  virtual Constant to_constant(std::string const& result) const = 0;
+
+  virtual Constant value_as_constant() const = 0;
 };
 } /* namespace crave */

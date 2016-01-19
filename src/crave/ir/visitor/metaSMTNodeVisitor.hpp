@@ -29,6 +29,7 @@ class metaSMTVisitor : public NodeVisitor {
   virtual std::vector<std::vector<unsigned int> > analyseContradiction(std::map<unsigned int, NodePtr> const&) = 0;
   virtual bool solve(bool ignoreSofts = true) = 0;
   virtual bool read(Node const&, AssignResult&) = 0;
+  virtual bool read(Node const&, std::string&) = 0;
   virtual bool readVector(const std::vector<VariablePtr>& vec, __rand_vec_base* rand_vec) = 0;
 };
 

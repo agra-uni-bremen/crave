@@ -27,24 +27,33 @@ struct AssignResultToRef : AssignResult {
   explicit AssignResultToRef(T* ref) : value_(ref) {}
 
  public:
-  Constant value() const { return to_constant_expr<T>()(*value_); }
+  Constant value_as_constant() const { return to_constant_expr<T>()(*value_); }
 
-  void set_value(std::string const& str) {
-    *value_ = ((crave::is_signed<T>::value && str[0] == '1') ? -1 : 0);
+  Constant to_constant(std::string const& str) const { 
+    T v;
+    set_value(str, &v);
+    return to_constant_expr<T>()(v);
+  }
+
+  void set_value(std::string const& str) { set_value(str, value_); }
+
+ private:
+  void set_value(std::string const& str, T* val) const {
+    *val = ((crave::is_signed<T>::value && str[0] == '1') ? -1 : 0);
     for (std::string::const_iterator ite = str.begin(); ite != str.end(); ++ite) {
-      *value_ <<= 1;
+      *val <<= 1;
       switch (*ite) {
         case '0':
-          *value_ &= T(-2);
+          *val &= T(-2);
           break;
         case '1':
-          *value_ |= T(1);
+          *val |= T(1);
           break;
         default:
           if (random_bit && random_bit())
-            *value_ |= T(1);
+            *val |= T(1);
           else
-            *value_ &= T(-2);
+            *val &= T(-2);
           break;
       }
     }
