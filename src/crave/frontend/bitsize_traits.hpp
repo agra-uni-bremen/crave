@@ -11,11 +11,6 @@
 
 namespace crave {
 
-template <typename T, typename Enable = void>
-struct to_uint64 {
-  uint64_t operator()(T const& value) { return value; }
-};
-
 template <typename T>
 class randv;
 template <typename T>
@@ -108,6 +103,9 @@ struct is_signed<crave::read_ref_tag<T> > : public crave::is_signed<T> {};
 
 template <typename T>
 struct is_signed<crave::vector_tag<T> > : public crave::is_signed<T> {};
+
+template <typename T, typename Enable = void>
+struct to_constant_expr { };
 
 }  // namespace crave
 

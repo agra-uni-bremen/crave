@@ -17,18 +17,6 @@ struct crv_variable_base_ : public crv_object {
   std::string kind() override final { return "crv_variable"; }
 };
 
-template <typename T, typename Enable = void>
-struct to_constant_expr { };
-
-template <typename T>
-struct to_constant_expr<T, typename std::enable_if<std::is_integral<T>::value>::type> {
-  Constant operator()(T value) { 
-    constexpr unsigned width = bitsize_traits<T>::value;
-    constexpr bool sign = crave::is_signed<T>::value;
-    return Constant(value, width, sign);
-  }
-};
-
 template <typename T>
 class crv_variable_base : public crv_variable_base_ {
  public:

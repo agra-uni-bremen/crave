@@ -2,49 +2,18 @@
 
 #pragma once
 
-#include <sysc/datatypes/int/sc_int.h>
-#include <sysc/datatypes/int/sc_uint.h>
-#include <sysc/datatypes/bit/sc_bv.h>
 #include <vector>
-#include "bitsize_traits.hpp"
+#include "bitsize_traits_sysc.hpp"
 #include "Distribution.hpp"
 #include "RandomBase.hpp"
 
 namespace crave {
 
-template <int N>
-struct is_signed<sc_dt::sc_bv<N> > : boost::mpl::false_ {};
-
-template <int N>
-struct is_signed<sc_dt::sc_int<N> > : boost::mpl::true_ {};
-
-template <int N>
-struct is_signed<sc_dt::sc_uint<N> > : boost::mpl::false_ {};
-
-template <typename T, int N = 0>
-struct is_sysc_dt : boost::mpl::false_ {};
-
-template <int N>
-struct is_sysc_dt<sc_dt::sc_bv<N> > : boost::mpl::true_ {};
-
-template <int N>
-struct is_sysc_dt<sc_dt::sc_int<N> > : boost::mpl::true_ {};
-
-template <int N>
-struct is_sysc_dt<sc_dt::sc_uint<N> > : boost::mpl::true_ {};
-
-template <class SCDT>
-struct sc_dt_width {};
-
-template <template <int> class SCDT, int N>
-struct sc_dt_width<SCDT<N> > : boost::mpl::int_<N> {};
-
 template <typename T>
-struct bitsize_traits<T, typename boost::enable_if<is_sysc_dt<T> >::type> : sc_dt_width<T> {};
-
-template <typename T>
-struct to_uint64<T, typename boost::enable_if<is_sysc_dt<T> >::type> {
-  uint64_t operator()(T const& value) { return value.to_uint64(); }
+struct to_constant_expr<T, typename boost::enable_if<is_sysc_dt<T> >::type> {
+  Constant operator()(T value) { 
+    return Constant(value.to_uint64(), bitsize_traits<T>::value, crave::is_signed<T>::value);
+  }
 };
 
 #define RANDV_SCDT_PRIM_INTERFACE(Typename)                                                       \
@@ -133,4 +102,3 @@ RANDV_SCDT_COMPARISON_OPERATORS(sc_dt::sc_uint);
 
 }  // namespace crave
 
-//  vim: ft=cpp:ts=2:sw=2:expandtab

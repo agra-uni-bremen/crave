@@ -15,14 +15,19 @@ namespace crave {
 extern boost::function0<bool> random_bit;
 
 template <typename T>
+struct to_constant_expr<T, typename boost::enable_if<boost::is_integral<T> >::type> {
+  Constant operator()(T value) { 
+    return Constant(value, bitsize_traits<T>::value, crave::is_signed<T>::value);
+  }
+};
+
+template <typename T>
 struct AssignResultToRef : AssignResult {
  public:
   explicit AssignResultToRef(T* ref) : value_(ref) {}
 
  public:
-  Constant value() const {
-    return Constant(crave::to_uint64<T>()(*value_), bitsize_traits<T>::value, crave::is_signed<T>::value);
-  }
+  Constant value() const { return to_constant_expr<T>()(*value_); }
 
   void set_value(std::string const& str) {
     *value_ = ((crave::is_signed<T>::value && str[0] == '1') ? -1 : 0);
