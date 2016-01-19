@@ -152,22 +152,30 @@ BOOST_AUTO_TEST_CASE(alu_enum) {
   Variable<unsigned> b;
 
   Generator gen;
-  gen(a < 16u)
-  (b < 16u)(op < 4u)             // 4 opcodes
-      (op != 0u || a + b < 16u)  // no add overflow
+  gen(a < 8u)
+  (b < 8u)(op < 4u)             // 4 opcodes
+      (op != 0u || a + b < 8u)  // no add overflow
       (op != 1u || a > b)        // no sub underflow
-      (op != 2u || a * b < 16u)  // no m overflow
+      (op != 2u || a * b < 8u)  // no m overflow
       (op != 3u || b != 0u)      // div valid
       ;
 
-  unsigned count = 0;
+  int count = 0;
+  for (int a = 0; a < 8; a++)
+    for (int b = 0; b < 8; b++) {
+      if (a + b < 8) count++; // op == 0
+      if (a > b) count++; // op == 1
+      if (a * b < 8) count++; // op == 2
+      if (b != 0) count++; // op == 3;
+    }
+
   while (gen.next()) {
-    ++count;
+    --count;
     gen(op != gen[op] || a != gen[a] || b != gen[b]);
 
-    BOOST_REQUIRE_LE(count, 600);
+    BOOST_REQUIRE_GE(count, 0);
   }
-  BOOST_REQUIRE_EQUAL(count, 572);
+  BOOST_REQUIRE_EQUAL(count, 0);
 
   VariableDefaultSolver::bypass_constraint_analysis = false;
 }
