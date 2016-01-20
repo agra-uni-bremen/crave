@@ -25,7 +25,7 @@ class crv_variable<T, typename std::enable_if<is_sysc_dt<T>::value>::type> : pub
 
  public:                                  
   bool randomize() override {             
-    static distribution<int64_t> dist;    
+    static distribution<uint64_t> dist;
     this->value = dist.nextValue();       
     return true;                          
   }

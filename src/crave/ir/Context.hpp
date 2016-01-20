@@ -282,20 +282,20 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
     return new LogicalAndOpr(val_equal_tmp, tmp_inside);
   }
 
-  template <typename Integer, typename DistInt> // DistInt is used for better error message
+  template <typename Integer, typename DistInt>
   result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_dist>::type const& tag,
                          WriteReference<Integer> const& var_term, distribution_tag<DistInt> const& dist_expr) {
-    distribution<Integer> const& dist = boost::proto::value(dist_expr);
-    unsigned width = bitsize_traits<Integer>::value;
-    bool sign = crave::is_signed<Integer>::value;
+    distribution<DistInt> const& dist = boost::proto::value(dist_expr);
+    unsigned width = bitsize_traits<DistInt>::value;
+    bool sign = crave::is_signed<DistInt>::value;
 
     unsigned id = new_var_id();
     result_type tmp_var = new_var(id, width, sign);
-    boost::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<Integer>(dist, tmp_var));
+    boost::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<DistInt>(dist, tmp_var));
     dist_references_.push_back(std::make_pair(id, ref_expr));
 
     result_type in_ranges;
-    BOOST_FOREACH(weighted_range<Integer> const & r, dist.ranges()) {
+    BOOST_FOREACH(weighted_range<DistInt> const & r, dist.ranges()) {
       result_type left(new Constant(r.left_, width, sign));
       result_type right(new Constant(r.right_, width, sign));
       result_type left_cond(new LessEqualOpr(left, tmp_var));
