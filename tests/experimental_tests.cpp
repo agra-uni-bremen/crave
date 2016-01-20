@@ -12,3 +12,4 @@ struct Context_Fixture {
 #include "test_ExperimentalConstraintManagement.cpp"
 #include "test_ExperimentalOperators.cpp"
 #include "test_ExperimentalUserConstraint.cpp"
+#include "test_ExperimentalContext.cpp"
