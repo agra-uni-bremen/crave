@@ -20,9 +20,9 @@ class crv_constraint : public crv_object {
 
   crv_constraint(crv_object_name, expression_list list) : list_(list), active_(true) {}
 
-  template <typename Expr>
-  void operator()(Expr expr) {
-    list_.add_expr(expr);
+  crv_constraint& operator &= (expression_list list) {
+    list_.join(list);
+    return *this;
   }
 
   expression_list const& expr_list() const { return list_; }

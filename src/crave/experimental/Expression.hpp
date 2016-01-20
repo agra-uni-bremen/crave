@@ -21,6 +21,8 @@ class expression_list {
 
   void operator=(expression_list const& list) { exprs_ = list.exprs_; }
 
+  void join(expression_list const& list) { exprs_.insert(end(), list.begin(), list.end()); }
+
   template <typename Expr>
   void add_expr(Expr expr) {
     exprs_.push_back(make_expression(expr));
