@@ -10,6 +10,14 @@
 
 namespace crave {
 
+template<typename T>
+distribution_tag<T> make_distribution(weighted_range<T> const& range) { return distribution<T>::create(range); }
+
+template<typename T, typename... Args>
+distribution_tag<T> make_distribution(weighted_range<T> const& range, Args... args) {
+  return make_distribution(args...)(range);
+}
+
 struct crv_variable_base_ : public crv_object {
   virtual Constant constant_expr() = 0;
   virtual expression bound_expr() = 0;
