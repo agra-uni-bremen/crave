@@ -5,7 +5,7 @@
 #include <boost/random.hpp>
 #include <limits>
 #include <vector>
-#include "../ir/Node.hpp"
+#include "ConstraintType.hpp"
 #include "WeightedRange.hpp"
 #include "../RandomSeedManager.hpp"
 
@@ -14,29 +14,30 @@ namespace crave {
 extern RandomSeedManager rng;
 
 template <typename T>
-struct distribution : Node {
+struct distribution_tag;
+
+template <typename T>
+struct distribution {
   distribution() : ranges_() {}
+
+  distribution(const weighted_range<T>& range) { addRange(range); }
 
   distribution& operator()(const weighted_range<T>& range) {
     addRange(range);
     return *this;
   }
 
-  static distribution create(const weighted_range<T>& range) {
-    distribution dist;
-    dist(range);
-    return dist;
+  static distribution_tag<T> create(const weighted_range<T>& range) {
+    return distribution_tag<T>(distribution(range));
   }
 
-  static distribution simple_range(T left, T right) {
-    distribution dist;
-    dist(range<T>(left, right));
-    return dist;
+  static distribution_tag<T> simple_range(T left, T right) {
+    return distribution_tag<T>(distribution(range<T>(left, right)));
   }
 
   void reset() { ranges_.clear(); }
 
-  std::vector<weighted_range<T> >& ranges() { return ranges_; }
+  std::vector<weighted_range<T> > const& ranges() const { return ranges_; }
 
   T nextValue() const {
     if (ranges_.empty()) {
@@ -54,7 +55,7 @@ struct distribution : Node {
     return boost::uniform_int<T>(selected.left_, selected.right_)(*rng.get());
   }
 
- private:
+ protected:
   void addRange(weighted_range<T> wr) {
     for (uint i = 0; i < ranges_.size(); i++)
       if (ranges_[i].overlap(wr)) {
@@ -68,22 +69,33 @@ struct distribution : Node {
     ranges_.push_back(wr);
   }
 
- private:
+ protected:
   std::vector<weighted_range<T> > ranges_;
 };
 
 template <>
-struct distribution<bool> : Node {
+struct distribution<bool> {
   explicit distribution(const double prob = 0.5);
 
-  static distribution create(const double prob);
+  static distribution_tag<bool> create(const double prob);
 
   bool nextValue() const;
 
-  std::vector<weighted_range<bool> >& ranges();
+  std::vector<weighted_range<bool> > const& ranges() const;
 
  private:
   double prob_;
+};
+
+template <typename T>
+struct distribution_tag : public Constraint<typename boost::proto::terminal<distribution<T> >::type> {
+  typedef Constraint<typename boost::proto::terminal<distribution<T> >::type> base_type;
+  explicit distribution_tag(distribution<T> d) : base_type(boost::proto::make_expr<boost::proto::tag::terminal>(d)) {}
+
+  distribution_tag& operator()(const weighted_range<T>& range) {
+    boost::proto::value(*this)(range);
+    return *this;
+  }
 };
 
 }  // namespace crave

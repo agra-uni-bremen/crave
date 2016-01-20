@@ -3,9 +3,8 @@
 namespace crave {
 distribution<bool>::distribution(const double prob) : prob_(prob) {}
 
-distribution<bool> distribution<bool>::create(const double prob) {
-  distribution<bool> dist(prob);
-  return dist;
+distribution_tag<bool> distribution<bool>::create(const double prob) {
+  return distribution_tag<bool>(distribution<bool>(prob));
 }
 
 bool distribution<bool>::nextValue() const {
@@ -13,7 +12,7 @@ bool distribution<bool>::nextValue() const {
   return dist(*rng.get()) <= prob_;
 }
 
-std::vector<weighted_range<bool> >& distribution<bool>::ranges() {
+std::vector<weighted_range<bool> > const& distribution<bool>::ranges() const {
   static std::vector<weighted_range<bool> > v;
   return v;
 }

@@ -282,43 +282,32 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
     return new LogicalAndOpr(val_equal_tmp, tmp_inside);
   }
 
-  template <typename Integer, typename Expr>
+  template <typename Integer, typename DistInt> // DistInt is used for better error message
   result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_dist>::type const& tag,
-                         WriteReference<Integer> const& var_term, Expr const& dist_expr) {
-    result_type node = boost::proto::eval(dist_expr, *this);
-    if (boost::dynamic_pointer_cast<distribution<Integer> >(node) != 0) {
-      distribution<Integer>& dist = *(boost::dynamic_pointer_cast<distribution<Integer> >(node));
+                         WriteReference<Integer> const& var_term, distribution_tag<DistInt> const& dist_expr) {
+    distribution<Integer> const& dist = boost::proto::value(dist_expr);
+    unsigned width = bitsize_traits<Integer>::value;
+    bool sign = crave::is_signed<Integer>::value;
 
-      unsigned width = bitsize_traits<Integer>::value;
-      bool sign = crave::is_signed<Integer>::value;
+    unsigned id = new_var_id();
+    result_type tmp_var = new_var(id, width, sign);
+    boost::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<Integer>(dist, tmp_var));
+    dist_references_.push_back(std::make_pair(id, ref_expr));
 
-      unsigned id = new_var_id();
-      result_type tmp_var = new_var(id, width, sign);
-      boost::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<Integer>(dist, tmp_var));
-      dist_references_.push_back(std::make_pair(id, ref_expr));
-
-      result_type in_ranges;
-      BOOST_FOREACH(weighted_range<Integer> const & r, dist.ranges()) {
-        result_type left(new Constant(r.left_, width, sign));
-        result_type right(new Constant(r.right_, width, sign));
-        result_type left_cond(new LessEqualOpr(left, tmp_var));
-        result_type right_cond(new LessEqualOpr(tmp_var, right));
-        result_type in_range(new LogicalAndOpr(left_cond, right_cond));
-        result_type tmp(in_ranges != 0 ? new LogicalOrOpr(in_ranges, in_range) : in_range);
-        in_ranges = tmp;
-      }
-
-      result_type var_equal_tmp(new EqualOpr(boost::proto::eval(var_term, *this), tmp_var));
-      dist_ref_to_var_map[id] = var_term.id();
-      return dist.ranges().size() > 0 ? new LogicalAndOpr(var_equal_tmp, in_ranges) : var_equal_tmp;
-    } else {
-      throw std::runtime_error("Distribution and variable type not compatible");
+    result_type in_ranges;
+    BOOST_FOREACH(weighted_range<Integer> const & r, dist.ranges()) {
+      result_type left(new Constant(r.left_, width, sign));
+      result_type right(new Constant(r.right_, width, sign));
+      result_type left_cond(new LessEqualOpr(left, tmp_var));
+      result_type right_cond(new LessEqualOpr(tmp_var, right));
+      result_type in_range(new LogicalAndOpr(left_cond, right_cond));
+      result_type tmp(in_ranges != 0 ? new LogicalOrOpr(in_ranges, in_range) : in_range);
+      in_ranges = tmp;
     }
-  }
 
-  template <typename Integer>
-  result_type operator()(boost::proto::tag::terminal, distribution<Integer> const& dist) {
-    return new distribution<Integer>(dist);
+    result_type var_equal_tmp(new EqualOpr(boost::proto::eval(var_term, *this), tmp_var));
+    dist_ref_to_var_map[id] = var_term.id();
+    return dist.ranges().size() > 0 ? new LogicalAndOpr(var_equal_tmp, in_ranges) : var_equal_tmp;
   }
 
   template <typename Expr1, typename Expr2>
