@@ -71,11 +71,16 @@ class crv_sequence_item : public crv_object {
   void recursive_build(Generator& gen) {
     for (crv_object* obj : children_) {
       if (obj->kind() == "crv_constraint") {
-        crv_constraint* cstr = (crv_constraint*)obj;
+        crv_constraint_base* cstr = (crv_constraint_base*)obj;
         if (!cstr->active()) continue;
         unsigned cnt = 0;
-        for (auto e : cstr->expr_list()) 
-          gen(cstr->fullname() + "#" + std::to_string(cnt++), e);
+        if (!cstr->soft()) {
+          for (auto e : cstr->expr_list()) 
+            gen(cstr->fullname() + "#" + std::to_string(cnt++), e);
+        } else {
+          for (auto e : cstr->expr_list())
+            gen.soft(cstr->fullname() + "#" + std::to_string(cnt++), e);
+        }            
       } else if (obj->kind() == "crv_sequence_item") {
         crv_sequence_item* item = (crv_sequence_item*)obj;
         item->recursive_build(gen);
