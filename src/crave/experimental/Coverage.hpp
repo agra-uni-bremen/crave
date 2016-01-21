@@ -42,7 +42,7 @@ class crv_coverpoint : public crv_object {
  public:
   crv_coverpoint(crv_object_name = "covpt") : bins_() {}
 
-  std::string kind() override final { return "crv_coverpoint"; }
+  std::string obj_kind() override final { return "crv_coverpoint"; }
 
   std::vector<crv_bin>& bins() { return bins_; }
 
@@ -76,7 +76,7 @@ class crv_covergroup : public crv_object {
  public:
   crv_covergroup() : points_(), vars_(), built_(false), eval_() {}
 
-  std::string kind() override { return "crv_covergroup"; }
+  std::string obj_kind() override { return "crv_covergroup"; }
 
   void sample() {
     if (!built_) build();
@@ -89,7 +89,7 @@ class crv_covergroup : public crv_object {
   void report() {
     if (!built_) build();
     for (crv_coverpoint* cp : points_) {
-      std::cout << cp->kind() << " " << cp->name() << std::endl;
+      std::cout << cp->obj_kind() << " " << cp->name() << std::endl;
       int c = 0;
       for (crv_bin& cb : cp->bins()) {
         std::cout << "  crv_bin " << c++ << ": " << cb.hit_count() << " " << cb.hit_minimum() << " "
@@ -125,11 +125,11 @@ class crv_covergroup : public crv_object {
   void build() {
     built_ = true;
     for (crv_object* obj : children_) {
-      if (obj->kind() == "crv_variable") {
+      if (obj->obj_kind() == "crv_variable") {
         crv_variable_base_* v = (crv_variable_base_*)obj;
         vars_.push_back(v);
       }
-      if (obj->kind() == "crv_coverpoint") {
+      if (obj->obj_kind() == "crv_coverpoint") {
         crv_coverpoint* cp = (crv_coverpoint*)obj;
         points_.push_back(cp);
       }

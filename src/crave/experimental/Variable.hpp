@@ -22,7 +22,7 @@ struct crv_variable_base_ : public crv_object {
   virtual Constant constant_expr() = 0;
   virtual expression bound_expr() = 0;
   virtual unsigned id() = 0;
-  std::string kind() override final { return "crv_variable"; }
+  std::string obj_kind() override final { return "crv_variable"; }
 };
 
 template <typename T>

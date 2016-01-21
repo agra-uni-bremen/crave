@@ -17,7 +17,7 @@ class crv_vector : public __rand_vec<T>, public crv_object {
  public:
   crv_vector(crv_object_name = "vec") : __rand_vec<T>() { }
 
-  std::string kind() override { return "crv_vector"; }
+  std::string obj_kind() override { return "crv_vector"; }
 
   bool randomize() override {
     __rand_vec<T>::gen_values(default_rand_vec_size());

@@ -25,7 +25,7 @@ struct Node {
   const char* name() const { return m_name; }
   void rename(const char* name) { m_name = name; }
 
-  virtual const char* kind() const = 0;
+  virtual const char* obj_kind() const = 0;
   virtual void accept(NodeVisitor&) = 0;
 
  protected:
@@ -35,7 +35,7 @@ struct Node {
 struct Terminal : Node {
   Terminal(const char* name) : Node(name) {}
 
-  virtual const char* kind() const { return "Terminal"; }
+  virtual const char* obj_kind() const { return "Terminal"; }
   virtual void accept(NodeVisitor& v);
 };
 
@@ -45,12 +45,12 @@ struct NonTerminal : Node {
 };
 
 struct Selector : NonTerminal {
-  virtual const char* kind() const { return "Selector"; }
+  virtual const char* obj_kind() const { return "Selector"; }
   virtual void accept(NodeVisitor& v);
 };
 
 struct Sequence : NonTerminal {
-  virtual const char* kind() const { return "Sequence"; }
+  virtual const char* obj_kind() const { return "Sequence"; }
   virtual void accept(NodeVisitor& v);
 };
 };

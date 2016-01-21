@@ -20,7 +20,7 @@ class crv_array : public crv_object {
     }
   }
 
-  std::string kind() override { return "crv_array"; }
+  std::string obj_kind() override { return "crv_array"; }
 
   expression sum() {
     expression result = value_to_expression(0);

@@ -23,7 +23,7 @@ class crv_sequence_item : public crv_object {
  public:
   crv_sequence_item() : gen_(), built_(false) {}
 
-  std::string kind() override final { return "crv_sequence_item"; }
+  std::string obj_kind() override final { return "crv_sequence_item"; }
 
   bool randomize() override {
     if (!built_) {
@@ -58,7 +58,7 @@ class crv_sequence_item : public crv_object {
 
   void recursive_build(Generator& gen) {
     for (crv_object* obj : children_) {
-      if (obj->kind() == "crv_constraint") {
+      if (obj->obj_kind() == "crv_constraint") {
         crv_constraint_base* cstr = (crv_constraint_base*)obj;
         if (!cstr->active()) continue;
         unsigned cnt = 0;
@@ -69,7 +69,7 @@ class crv_sequence_item : public crv_object {
           for (auto e : cstr->expr_list())
             gen.soft(cstr->fullname() + "#" + std::to_string(cnt++), e);
         }            
-      } else if (obj->kind() == "crv_sequence_item") {
+      } else if (obj->obj_kind() == "crv_sequence_item") {
         crv_sequence_item* item = (crv_sequence_item*)obj;
         item->recursive_build(gen);
       }

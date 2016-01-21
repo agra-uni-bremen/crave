@@ -29,7 +29,7 @@ class crv_object {
   crv_object();
   ~crv_object();
 
-  virtual std::string kind() { return "crv_object"; }
+  virtual std::string obj_kind() { return "crv_object"; }
   virtual bool randomize() { return false; }
 
   std::string name() { return name_; }
