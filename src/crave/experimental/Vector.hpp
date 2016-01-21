@@ -15,7 +15,7 @@ namespace crave {
 template <typename T>
 class crv_vector : public __rand_vec<T>, public crv_object {
  public:
-  crv_vector(crv_object_name) : __rand_vec<T>() { }
+  crv_vector(crv_object_name = "vec") : __rand_vec<T>() { }
 
   std::string kind() override { return "crv_vector"; }
 

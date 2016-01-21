@@ -40,7 +40,7 @@ class crv_bin {
 
 class crv_coverpoint : public crv_object {
  public:
-  crv_coverpoint(crv_object_name) : bins_() {}
+  crv_coverpoint(crv_object_name = "covpt") : bins_() {}
 
   std::string kind() override final { return "crv_coverpoint"; }
 
