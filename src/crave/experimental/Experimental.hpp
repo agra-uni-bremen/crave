@@ -17,18 +17,6 @@
 
 #include "better-enums/enum.hpp"
 
-#define CRV_VARIABLE(type, name) \
-  crave::crv_variable<type> name { #name }
-
-#define CRV_ARRAY(type, size, name) \
-  crave::crv_array<type, size> name { #name }
-
-#define CRV_CONSTRAINT(name, ...) \
-  crave::crv_constraint name { #name, __VA_ARGS__ }
-
-#define CRV_COVERPOINT(name, ...) \
-  crave::crv_coverpoint name { #name }
-
 namespace crave {
 
 class crv_sequence_item : public crv_object {
