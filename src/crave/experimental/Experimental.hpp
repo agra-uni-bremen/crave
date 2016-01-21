@@ -81,6 +81,13 @@ class crv_sequence_item : public crv_object {
   bool built_;
 };
 
+template <typename... Exprs> 
+bool solve(Exprs... exprs) {
+  Generator gen;
+  for (auto e : expression_list(exprs...)) gen(e);
+  return gen.next();
+}
+
 }  // end namespace crave
 
 #define __CRAVE_EXPERIMENTAL_INSERT(s, DATA, ELEM) DATA.insert(ELEM);
