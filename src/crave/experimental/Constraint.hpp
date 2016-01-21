@@ -12,12 +12,11 @@
 namespace crave {
 
 class crv_constraint_base : public crv_object {
- public:
+ protected:
   crv_constraint_base() : active_(true) {}
 
-  crv_constraint_base(expression_list list) : list_(list), active_(true) {}
-
-  expression_list const& expr_list() const { return list_; }
+ public:
+  virtual expression_list const& expr_list() const = 0;
 
   std::string kind() override final { return "crv_constraint"; }
 
@@ -40,7 +39,6 @@ class crv_constraint_base : public crv_object {
   virtual bool soft() const = 0;
 
  protected:
-  expression_list list_;
   bool active_;
 };
 
@@ -49,18 +47,40 @@ enum ConstraintType { hard, soft };
 template<ConstraintType type>
 class crv_constraint_ : public crv_constraint_base {
  public:
-  crv_constraint_(crv_object_name) {}
+  crv_constraint_(crv_object_name = (type == ConstraintType::hard ? "hard_cstr" : "soft_cstr")) {}
 
-  crv_constraint_(crv_object_name, expression_list list) : crv_constraint_base(list) {}
+  template <typename... Exprs>
+  crv_constraint_(Exprs... exprs) 
+      :  crv_constraint_() {
+    list_ = expression_list(exprs...);
+  }
 
-  crv_constraint_base& operator &= (expression_list list) {
-    list_.join(list);
+  template <typename... Exprs>
+  explicit crv_constraint_(crv_object_name name, Exprs... exprs) 
+      : crv_constraint_(name) {
+    list_ = expression_list(exprs...);    
+  }
+
+  template <typename... Exprs>
+  explicit crv_constraint_(const char* name, Exprs... exprs) 
+      : crv_constraint_(crv_object_name(name), exprs...) {} 
+
+  crv_constraint_& operator = (crv_constraint_ const & c) {
+    list_ = c.list_;
     return *this;
   }
 
-  void operator=(expression_list list) { list_ = list; }
+  crv_constraint_& operator &= (crv_constraint_ const & c) {
+    list_.join(c.list_);
+    return *this;
+  }
 
   bool soft() const override { return type == ConstraintType::soft; }
+
+  expression_list const& expr_list() const override { return list_; }
+
+ protected:
+  expression_list list_; 
 };
 
 typedef crv_constraint_<ConstraintType::hard> crv_constraint;
