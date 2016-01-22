@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(randv_test) {
 
   BOOST_REQUIRE_EQUAL(count, 4);
 }
-/*
+//todo
 BOOST_AUTO_TEST_CASE(randv_var_ref_mixed_test) {
   Generator gen;
   crv_variable<int> a;
@@ -123,13 +123,12 @@ BOOST_AUTO_TEST_CASE(randv_var_ref_mixed_test) {
   while (gen.next()) {
     ++count;
     std::cout << "result: a = " << a << ", b = " << gen[b] << std::endl;
-    gen(a() != a || b != gen[b]);
+    //gen(a() != a || b != gen[b]); //compile failure
 
     BOOST_REQUIRE_LE(count, 10);
   }
   BOOST_REQUIRE_EQUAL(count, 4);
 }
-*/
 
 //todo
 BOOST_AUTO_TEST_CASE(alu) {
@@ -235,7 +234,8 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_1) {
 
   BOOST_CHECK(a + b >= 120);
 }
-/*
+
+//todo
 BOOST_AUTO_TEST_CASE(mixed_bv_width_2) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
 
@@ -246,7 +246,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_2) {
   std::set<signed char> generated;
   for (int iterations = 0; gen.next(); ++iterations) {
     generated.insert(a);
-    gen(a() != a);
+    //gen(a() != a); //compile failure
 
     BOOST_REQUIRE_LT(iterations, 150);
   }
@@ -255,8 +255,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_2) {
 
   VariableDefaultSolver::bypass_constraint_analysis = false;
 }
-*/
-/*
+//todo
 BOOST_AUTO_TEST_CASE(mixed_bv_width_3) {
   crv_variable<short> a;
   Generator gen;
@@ -266,14 +265,14 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_3) {
   std::set<short> generated;
   for (unsigned iterations = 0; gen.next(); ++iterations) {
     generated.insert(a);
-    gen(a() != a);
+    //gen(a() != a); //compile failure
 
     BOOST_REQUIRE_LT(iterations, 20);
   }
 
   BOOST_CHECK_EQUAL(generated.size(), 19);
-}*/
-/*
+}
+//todo
 BOOST_AUTO_TEST_CASE(mixed_bv_width_4) {
   crv_variable<int> a;
   Generator gen;
@@ -283,14 +282,14 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_4) {
   std::set<int> generated;
   for (unsigned iterations = 0; gen.next(); ++iterations) {
     generated.insert(a);
-    gen(a() != a);
+   //gen(a() != a); //compile failure
 
     BOOST_REQUIRE_LT(iterations, 20);
   }
 
   BOOST_CHECK_EQUAL(generated.size(), 19);
-}*/
-/*
+}
+//todo
 BOOST_AUTO_TEST_CASE(mixed_bv_width_5) {
   crv_variable<short> a;
   crv_variable<signed char> b;
@@ -302,7 +301,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_5) {
   int cnt = 0;
   while (gen.next()) {
     cnt++;
-    gen((a() != a) || (b() != b));
+    //gen((a() != a) || (b() != b)); //compile failure
 
     BOOST_REQUIRE_LT(cnt, 300);
   }
@@ -313,8 +312,8 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_5) {
       if ((-2 <= i + j) && (i + j <= 2)) cnt1++;
 
   BOOST_CHECK_EQUAL(cnt, cnt1);
-}*/
-/*
+}
+//todo
 BOOST_AUTO_TEST_CASE(mixed_bv_width_6) {
   crv_variable<short> a;
   crv_variable<signed char> b;
@@ -332,7 +331,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_6) {
   while (gen.next()) {
     cnt1++;
     BOOST_REQUIRE_EQUAL(a * b % 6, 0);
-    gen(a() != a || b() != b);
+    //gen(a() != a || b() != b); //compile failure
   }
 
   BOOST_REQUIRE_EQUAL(cnt, cnt1);
@@ -393,7 +392,7 @@ BOOST_AUTO_TEST_CASE(dist_of_boolean75) {
 
   BOOST_REQUIRE_LT(counter, 575);
   BOOST_REQUIRE_GT(counter, 425);
-}*/
+}
 
 BOOST_AUTO_TEST_SUITE_END()  // Context
 
