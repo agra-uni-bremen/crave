@@ -25,7 +25,8 @@ struct crv_variable_base_ : public crv_object {
   std::string obj_kind() override final { return "crv_variable"; }
 };
 
-struct prev_ { } prev;
+struct prev_ { };
+extern prev_ prev;
 
 template <typename T>
 class crv_variable_base : public crv_variable_base_ {
