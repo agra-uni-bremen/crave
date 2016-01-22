@@ -90,25 +90,28 @@ BOOST_AUTO_TEST_CASE(soft_constraint_t) {
 
   BOOST_REQUIRE(gen.next());
 }
-/*
+
+struct randv_test_s : public crv_sequence_item {
+  crv_variable<unsigned int> a{"c"};
+  crv_variable<unsigned int> b{"d"};
+};
+//todo
 BOOST_AUTO_TEST_CASE(randv_test) {
   Generator gen;
-  crv_variable<int> a;
-  crv_variable<int> b;
-  std::cout << "init: a = " << a << ", b = " << b << std::endl;
-  gen(4 <= a() && a() <= 6)
-  (9 <= a() + b() && a() + b() <= 11)(b() % 2 == 0);
+  randv_test_s item;
+  std::cout << "init: a = " << item.a << ", b = " << item.b << std::endl;
+  gen(4 <= item.a() && item.a() <= 6)
+  (9 <= item.a() + item.b() && item.a() + item.b() <= 11)(item.b() % 2 == 0);
   int count = 0;
   while (gen.next()) {
     ++count;
-    std::cout << "result: a = " << a << ", b = " << b << std::endl;
-    gen(a() != a || b() != b);
-
+    std::cout << "result: a = " << item.a << ", b = " << item.b << std::endl;
+    //gen(item.a() != item.a || item.b() != item.b); //compile failure
     BOOST_REQUIRE_LE(count, 10);
   }
 
   BOOST_REQUIRE_EQUAL(count, 4);
-}*/
+}
 /*
 BOOST_AUTO_TEST_CASE(randv_var_ref_mixed_test) {
   Generator gen;
