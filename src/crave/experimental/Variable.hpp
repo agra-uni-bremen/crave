@@ -25,6 +25,9 @@ struct crv_variable_base_ : public crv_object {
   std::string obj_kind() override final { return "crv_variable"; }
 };
 
+struct prev_ { };
+extern prev_ prev;
+
 template <typename T>
 class crv_variable_base : public crv_variable_base_ {
  public:
@@ -34,7 +37,13 @@ class crv_variable_base : public crv_variable_base_ {
     return os;
   }
   WriteReference<T> const& operator()() const { return var; }
-  ReadReference<T> const& prev() const { return ref; }
+  
+  template <class Q>
+  ReadReference<T> const& operator()(Q const&) const {
+    static_assert(std::is_same<Q, prev_>::value, "only prev is supported");
+    return ref; 
+  }
+
   unsigned id() override { return var.id(); }
   void bind(crv_variable_base& other) { bound_var = &other; }
   void unbind() { bound_var = nullptr; }

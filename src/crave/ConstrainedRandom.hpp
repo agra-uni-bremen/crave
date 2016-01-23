@@ -23,6 +23,8 @@ void set_config_file_name(std::string const&);
 void init();
 void init(std::string const&);
 
+extern placeholder _i;
+
 class rand_obj : public rand_obj_base {
  public:
   explicit rand_obj(rand_obj* parent = 0);

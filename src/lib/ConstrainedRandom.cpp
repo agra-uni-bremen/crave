@@ -30,7 +30,9 @@ int new_constraint_id() {
 
 unsigned int default_rand_vec_size() { return 5; }
 
-unsigned int placeholder_bitsize() { return 32; }
+unsigned int placeholder_bitsize() { return bitsize_traits<placeholder_tag>::value; }
+
+placeholder _i;
 
 RandomSeedManager rng(std::time(0));
 
