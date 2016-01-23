@@ -5,6 +5,7 @@
 #include "Object.hpp"
 #include "Variable.hpp"
 #include "Array.hpp"
+#include "Vector.hpp"
 #include "Expression.hpp"
 #include "Constraint.hpp"
 #include "Coverage.hpp"
@@ -16,25 +17,13 @@
 
 #include "better-enums/enum.hpp"
 
-#define CRV_VARIABLE(type, name) \
-  crave::crv_variable<type> name { #name }
-
-#define CRV_ARRAY(type, size, name) \
-  crave::crv_array<type, size> name { #name }
-
-#define CRV_CONSTRAINT(name, ...) \
-  crave::crv_constraint name { #name, __VA_ARGS__ }
-
-#define CRV_COVERPOINT(name, ...) \
-  crave::crv_coverpoint name { #name }
-
 namespace crave {
 
 class crv_sequence_item : public crv_object {
  public:
   crv_sequence_item() : gen_(), built_(false) {}
 
-  std::string kind() override final { return "crv_sequence_item"; }
+  std::string obj_kind() override final { return "crv_sequence_item"; }
 
   bool randomize() override {
     if (!built_) {
@@ -43,6 +32,16 @@ class crv_sequence_item : public crv_object {
       built_ = true;
     }
     return gen_->nextCov();
+  }
+
+  template <typename... Exprs>
+  bool randomize_with(Exprs... exprs) {
+    // TODO Generator caching
+    rand_with_gen_ = std::make_shared<Generator>();
+    recursive_build(*rand_with_gen_);
+    expression_list list(exprs...);
+    for (auto e : list) (*rand_with_gen_)(e);
+    return rand_with_gen_->next();
   }
 
   void goal(crv_covergroup& group) {
@@ -59,10 +58,18 @@ class crv_sequence_item : public crv_object {
 
   void recursive_build(Generator& gen) {
     for (crv_object* obj : children_) {
-      if (obj->kind() == "crv_constraint") {
-        crv_constraint* cstr = (crv_constraint*)obj;
-        if (cstr->active()) gen(cstr->fullname(), cstr->single_expr());
-      } else if (obj->kind() == "crv_sequence_item") {
+      if (obj->obj_kind() == "crv_constraint") {
+        crv_constraint_base* cstr = (crv_constraint_base*)obj;
+        if (!cstr->active()) continue;
+        unsigned cnt = 0;
+        if (!cstr->soft()) {
+          for (auto e : cstr->expr_list()) 
+            gen(cstr->fullname() + "#" + std::to_string(cnt++), e);
+        } else {
+          for (auto e : cstr->expr_list())
+            gen.soft(cstr->fullname() + "#" + std::to_string(cnt++), e);
+        }            
+      } else if (obj->obj_kind() == "crv_sequence_item") {
         crv_sequence_item* item = (crv_sequence_item*)obj;
         item->recursive_build(gen);
       }
@@ -70,8 +77,16 @@ class crv_sequence_item : public crv_object {
   }
 
   std::shared_ptr<Generator> gen_;
+  std::shared_ptr<Generator> rand_with_gen_;
   bool built_;
 };
+
+template <typename... Exprs> 
+bool solve(Exprs... exprs) {
+  Generator gen;
+  for (auto e : expression_list(exprs...)) gen(e);
+  return gen.next();
+}
 
 }  // end namespace crave
 

@@ -28,8 +28,9 @@ crv_object::crv_object() {
   crv_object_name* top = crv_name_stack.back();
   top->object_ = this;
   parent_ = !crv_obj_stack.empty() ? crv_obj_stack.back() : root();
-  parent_->children_.push_back(this);
+  parent_->children_.push_back(this);  
   name_ = top->name_;
+  orig_name_ = name_;
   // check name conflict
   auto& name_map = parent_->local_name_map_;
   if (name_map.find(name_) != name_map.end()) {
@@ -61,7 +62,7 @@ void crv_object::print_object_hierarchy(int lvl) {
 
 void crv_object::remove_child(crv_object* child) {
   children_.remove(child);
-  if (--local_name_map_[child->name_] == 0) local_name_map_.erase(child->name_);
+  if (--local_name_map_[child->orig_name_] == 0) local_name_map_.erase(child->name_);
 }
 
 crv_object* crv_object::root() {

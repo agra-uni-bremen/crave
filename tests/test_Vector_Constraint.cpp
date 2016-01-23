@@ -65,7 +65,7 @@ struct Item2 : public rand_obj {
 BOOST_AUTO_TEST_CASE(default_size_test) {
   Item2 it;
   it.next();
-  BOOST_REQUIRE(5 <= it.v.size() && it.v.size() <= 10);
+  BOOST_REQUIRE(it.v.size() == default_rand_vec_size());
   for (uint i = 0; i < it.v.size(); i++) {
     std::cout << it.v[i] << " ";
     BOOST_REQUIRE(100 <= it.v[i] && it.v[i] <= 200);
@@ -285,6 +285,17 @@ BOOST_AUTO_TEST_CASE(bool_rand_vec) {
   BOOST_REQUIRE(gen.next());
   BOOST_REQUIRE(a.size() == 10);
   for (uint i = 1; i < a.size(); i++) BOOST_REQUIRE(a[i] != a[i - 1]);
+}
+
+struct Item6 : public rand_obj {
+  Item6() : v(this) { constraint(v().size() == default_rand_vec_size() + 7); }
+  rand_vec<unsigned int> v;
+};
+
+BOOST_AUTO_TEST_CASE(only_size_constrained_vect_test) {
+  Item6 it;
+  it.next();
+  BOOST_REQUIRE_EQUAL(it.v.size(), default_rand_vec_size() + 7);
 }
 
 BOOST_AUTO_TEST_SUITE_END()  // Context

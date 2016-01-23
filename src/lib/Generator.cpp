@@ -29,6 +29,7 @@ void Generator::merge(const Generator& other) { constr_pttn_.mergeConstraints(ot
 void Generator::reset() {
   constr_mng_.resetChanged();
   constr_pttn_.reset();
+  to_be_generated_vec_ids_.clear();
   resetCoverage();
 }
 
@@ -47,7 +48,7 @@ bool Generator::next() {
     reset();
     rebuild(true);
   }
-  return var_gen_->solve() && vec_gen_.solve(*var_gen_);
+  return var_gen_->solve() && vec_gen_.solve(*var_gen_, to_be_generated_vec_ids_);
 }
 
 bool Generator::nextCov() {
@@ -56,7 +57,7 @@ bool Generator::nextCov() {
     rebuild(true);
   }
   if (!covered_) {
-    if (var_cov_gen_.solve() && vec_gen_.solve(var_cov_gen_))
+    if (var_cov_gen_.solve() && vec_gen_.solve(var_cov_gen_, to_be_generated_vec_ids_))
       return true;
     else
       covered_ = true;

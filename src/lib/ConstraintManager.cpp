@@ -3,6 +3,10 @@
 #include "../crave/ir/visitor/ToDotNodeVisitor.hpp"
 #include "../crave/ir/visitor/ComplexityEstimationVisitor.hpp"
 
+#include <boost/make_shared.hpp>
+
+#include <glog/logging.h>
+
 namespace crave {
 
 template <typename ostream>

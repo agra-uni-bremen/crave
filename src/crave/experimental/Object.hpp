@@ -22,14 +22,14 @@ struct crv_object_name {
 };
 
 class crv_object {
-  template <typename T>
+  template <typename T, typename Enable>
   friend class crv_variable;
 
  public:
   crv_object();
   ~crv_object();
 
-  virtual std::string kind() { return "crv_object"; }
+  virtual std::string obj_kind() { return "crv_object"; }
   virtual bool randomize() { return false; }
 
   std::string name() { return name_; }
@@ -42,7 +42,7 @@ class crv_object {
 
  protected:
   crv_object(const crv_object& other)
-      : name_(other.name_), parent_(other.parent_), children_(other.children_), fullname_(other.fullname_) {}
+      : name_(other.name_), orig_name_(other.orig_name_), parent_(other.parent_), children_(other.children_), fullname_(other.fullname_) {}
 
   void remove_child(crv_object*);
 
@@ -53,13 +53,14 @@ class crv_object {
   }
 
   std::string name_;
+  std::string orig_name_;
   crv_object* parent_;
   std::list<crv_object*> children_;
   std::string fullname_;
   std::unordered_map<std::string, unsigned> local_name_map_;
 
  private:
-  crv_object(int) : name_("root"), parent_(0), children_(), fullname_("root") {}
+  crv_object(int) : name_("root"), orig_name_(name_), parent_(0), children_(), fullname_(name_) {}
 };
 
 };  // namespace crave

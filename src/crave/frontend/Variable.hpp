@@ -25,12 +25,6 @@ struct Variable : public Constraint<typename boost::proto::terminal<var_tag<valu
 
   Variable() : base_type(boost::proto::make_expr<boost::proto::tag::terminal>(var_tag<value_type_>(new_var_id()))) {}
 
-  template <typename T>
-  explicit Variable(T linkto)
-      : Variable() {
-    linkto.addVariable(*this);
-  }
-
   typedef value_type_ value_type;
 
   int id() const { return boost::proto::value(*this).id; }

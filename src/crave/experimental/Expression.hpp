@@ -21,15 +21,11 @@ class expression_list {
 
   void operator=(expression_list const& list) { exprs_ = list.exprs_; }
 
+  void join(expression_list const& list) { exprs_.insert(end(), list.begin(), list.end()); }
+
   template <typename Expr>
   void add_expr(Expr expr) {
     exprs_.push_back(make_expression(expr));
-  }
-
-  expression single_expr() {
-    expression result = value_to_expression(true);
-    for (auto e : exprs_) result = make_expression(result && e);
-    return result;
   }
 
   container_type::iterator begin() { return exprs_.begin(); }

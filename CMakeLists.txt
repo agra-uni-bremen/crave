@@ -1,5 +1,5 @@
 project ( crave )
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 2.8.9)
 
 set(${PROJECT_NAME}_CONFIG_DIR "share/${PROJECT_NAME}" CACHE PATH 
   "where to install CMake and Make Config files")
@@ -78,7 +78,7 @@ string(REPLACE ";" " " ${PROJECT_NAME}_MLIBS "${${PROJECT_NAME}_LIBS}")
 string(REPLACE ";" " -I" ${PROJECT_NAME}_MINCLUDE "${${PROJECT_NAME}_INCLUDE}")
 set(${PROJECT_NAME}_RPATH "")
 foreach(LIBPATH ${${PROJECT_NAME}_LIBS})
-  get_filename_component(LIBDIR ${LIBPATH} DIRECTORY)
+  get_filename_component(LIBDIR ${LIBPATH} PATH)
   LIST(APPEND ${PROJECT_NAME}_RPATH -Wl,-rpath=${LIBDIR})
 endforeach()  
 string(REPLACE ";" " " ${PROJECT_NAME}_RPATH "${${PROJECT_NAME}_RPATH}")

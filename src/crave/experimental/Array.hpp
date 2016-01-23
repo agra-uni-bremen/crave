@@ -13,14 +13,14 @@ namespace crave {
 template <typename T, unsigned N>
 class crv_array : public crv_object {
  public:
-  crv_array(crv_object_name) : arr_() {
+  crv_array(crv_object_name = "arr") : arr_() {
     for (unsigned i = 0; i < N; i++) {
       std::string s = std::string("element[") + std::to_string(i) + "]";
       arr_.emplace_back(new crv_variable<T>{s.c_str()});
     }
   }
 
-  std::string kind() override { return "crv_array"; }
+  std::string obj_kind() override { return "crv_array"; }
 
   expression sum() {
     expression result = value_to_expression(0);

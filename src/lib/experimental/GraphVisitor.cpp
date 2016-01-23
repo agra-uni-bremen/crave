@@ -11,7 +11,7 @@ namespace crave {
 namespace graph {
 
 void PrintVisitor::printNode(Node& n) {
-  std::cout << std::string(depth, ' ') << n.kind() << " " << (n.name() ? n.name() : "") << std::endl;
+  std::cout << std::string(depth, ' ') << n.obj_kind() << " " << (n.name() ? n.name() : "") << std::endl;
 }
 
 void PrintVisitor::visitTerminal(Terminal& t) { ++depth, printNode(t), --depth; }
@@ -46,7 +46,7 @@ void UpdateVisitor::visitNonTerminal(NonTerminal& nt) {
       tmp = m_named_nodes[n->name()];
     }
     tmp->accept(*this);
-    if (!tmp->name() && tmp->kind() == nt.kind()) {
+    if (!tmp->name() && tmp->obj_kind() == nt.obj_kind()) {
       // unfold unnamed child of same kind
       NonTerminal& nt_child = static_cast<NonTerminal&>(*tmp);
       updated_children.insert(updated_children.end(), nt_child.children.begin(), nt_child.children.end());

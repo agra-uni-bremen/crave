@@ -4,32 +4,21 @@
 
 #include "Object.hpp"
 #include "Expression.hpp"
-#include "../ir/UserExpression.hpp"
 
 #include <glog/logging.h>
 
 #include <string>
-#include <vector>
-#include <memory>
 
 namespace crave {
 
-class crv_constraint : public crv_object {
+class crv_constraint_base : public crv_object {
+ protected:
+  crv_constraint_base() : active_(true) {}
+
  public:
-  crv_constraint(crv_object_name) : active_(true) {}
+  virtual expression_list const& expr_list() const = 0;
 
-  crv_constraint(crv_object_name, expression_list list) : list_(list), active_(true) {}
-
-  template <typename Expr>
-  void operator()(Expr expr) {
-    list_.add_expr(expr);
-  }
-
-  expression single_expr() { return list_.single_expr(); }
-
-  void operator=(expression_list list) { list_ = list; }
-
-  std::string kind() override final { return "crv_constraint"; }
+  std::string obj_kind() override final { return "crv_constraint"; }
 
   void activate() {
     if (!active_) {
@@ -45,11 +34,56 @@ class crv_constraint : public crv_object {
     }
   }
 
-  bool active() { return active_; }
+  bool active() const { return active_; }
 
- private:
-  expression_list list_;
+  virtual bool soft() const = 0;
+
+ protected:
   bool active_;
 };
+
+enum ConstraintType { hard, soft };
+
+template<ConstraintType type>
+class crv_constraint_ : public crv_constraint_base {
+ public:
+  crv_constraint_(crv_object_name = (type == ConstraintType::hard ? "hard_cstr" : "soft_cstr")) {}
+
+  template <typename... Exprs>
+  crv_constraint_(Exprs... exprs) 
+      :  crv_constraint_() {
+    list_ = expression_list(exprs...);
+  }
+
+  template <typename... Exprs>
+  explicit crv_constraint_(crv_object_name name, Exprs... exprs) 
+      : crv_constraint_(name) {
+    list_ = expression_list(exprs...);    
+  }
+
+  template <typename... Exprs>
+  explicit crv_constraint_(const char* name, Exprs... exprs) 
+      : crv_constraint_(crv_object_name(name), exprs...) {} 
+
+  crv_constraint_& operator = (crv_constraint_ const & c) {
+    list_ = c.list_;
+    return *this;
+  }
+
+  crv_constraint_& operator &= (crv_constraint_ const & c) {
+    list_.join(c.list_);
+    return *this;
+  }
+
+  bool soft() const override { return type == ConstraintType::soft; }
+
+  expression_list const& expr_list() const override { return list_; }
+
+ protected:
+  expression_list list_; 
+};
+
+typedef crv_constraint_<ConstraintType::hard> crv_constraint;
+typedef crv_constraint_<ConstraintType::soft> crv_soft_constraint;
 
 }  // end namespace crave

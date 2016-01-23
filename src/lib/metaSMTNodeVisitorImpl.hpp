@@ -79,6 +79,7 @@ class metaSMTVisitorImpl : public metaSMTVisitor {
   virtual std::vector<std::vector<unsigned int> > analyseContradiction(std::map<unsigned int, NodePtr> const &);
   virtual bool solve(bool ignoreSofts);
   virtual bool read(Node const &var, AssignResult &);
+  virtual bool read(Node const &var, std::string &);
   virtual bool readVector(const std::vector<VariablePtr> &vec, __rand_vec_base *rand_vec);
 
  private:  // typedefs
@@ -665,17 +666,27 @@ bool metaSMTVisitorImpl<SolverType>::solve(bool ignoreSofts) {
 
 template <typename SolverType>
 bool metaSMTVisitorImpl<SolverType>::read(Node const &v, AssignResult &assign) {
+  std::string res;
+  if (read(v, res)) {
+    assign.set_value(res);
+    return true;
+  }
+  else
+    return false;
+}
+
+template <typename SolverType>
+bool metaSMTVisitorImpl<SolverType>::read(Node const &v, std::string &str) {
   // assert(static_cast<VariableExpr const *>(&var) != 0);
   VariableExpr const &var = *static_cast<VariableExpr const *>(&v);
   typename result_map::const_iterator ite(terminals_.find(var.id()));
   if (ite == terminals_.end()) return false;
-
   result_type var_expr = ite->second;
-  std::string res = metaSMT::read_value(solver_, var_expr);
-  assign.set_value(res);
-
+  std::string tmp = metaSMT::read_value(solver_, var_expr);
+  str = tmp;
   return true;
 }
+
 
 template <typename SolverType>
 bool metaSMTVisitorImpl<SolverType>::readVector(const std::vector<VariablePtr> &vec, __rand_vec_base *rand_vec) {

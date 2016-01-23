@@ -2,9 +2,6 @@
 
 #pragma once
 
-#include <glog/logging.h>
-#include <boost/make_shared.hpp>
-
 #include <string>
 #include <map>
 #include "UserConstraintType.hpp"
@@ -36,16 +33,8 @@ struct ConstraintManager {
   template <typename Expr>
   ConstraintPtr makeConstraint(std::string const& name, int c_id, Expr e, Context* ctx, bool const soft = false,
                                bool const cover = false) {
-    LOG(INFO) << "New " << (soft ? "soft " : "") << (cover ? "cover " : "") << "constraint " << name << " in set "
-              << id_;
-
-    if (constr_map_.find(name) != constr_map_.end()) {
-      throw std::runtime_error("Constraint already exists.");
-    }
-
     FixWidthVisitor fwv;
     NodePtr n(fwv.fixWidth(*boost::proto::eval(e, *ctx)));
-
     return ConstraintManager::makeConstraint(name, c_id, n, ctx, soft, cover);
   }
 
