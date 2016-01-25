@@ -1,8 +1,16 @@
 #include "../crave/utils/SettingsType.hpp"
+#include <boost/version.hpp>
 
 namespace crave {
 
 typedef boost::property_tree::ptree ptree;
+
+#if (BOOST_VERSION >= 105600)
+typedef boost::property_tree::xml_writer_settings<std::string> xml_writer_settings;
+#else
+typedef boost::property_tree::xml_writer_settings<char> xml_writer_settings;
+#endif
+
 Setting::Setting(std::string const& filename) : filename_(filename) {}
 
 void Setting::load() {
@@ -13,9 +21,7 @@ void Setting::load() {
 void Setting::save() const {
   ptree tree = read_setting_file_();
   save_(&tree);
-
-  boost::property_tree::xml_writer_settings<char> settings('\t', 1);
-  write_xml(filename_, tree, std::locale(), settings);
+  write_xml(filename_, tree, std::locale(), xml_writer_settings('\t', 1));
 }
 
 ptree Setting::read_setting_file_() const {

@@ -2,9 +2,10 @@
 
 #pragma once
 
+#include <boost/make_shared.hpp>
+
 #include <string>
 #include <set>
-#include <boost/make_shared.hpp>
 
 #include "UserConstraintType.hpp"
 
