@@ -279,10 +279,9 @@ BOOST_AUTO_TEST_CASE(binary_search_test) {
 
   VariableDefaultSolver::bypass_constraint_analysis = false;
 }
-/*
- * TODO
+
 struct Item2 : public crv_sequence_item {
-  Item2() : i() {
+  Item2(crv_object_name) {
     constraint={
     address() % 4 == 0,
     address() <= 1000u,
@@ -291,14 +290,13 @@ struct Item2 : public crv_sequence_item {
     foreach(data(), data()[i - 1] <= data()[i]),
   }
 
-  placeholder i;
   crv_variable<unsigned> address;
   crv_vector<int> data;
   crv_constraint constraint{"constraint"};
 };
 
 BOOST_AUTO_TEST_CASE(item_with_vector) {
-  Item2 it;
+  Item2 it("it");
   for (int i = 0; i < 20; i++) {
     BOOST_REQUIRE(it.randomize());
     BOOST_REQUIRE_EQUAL(it.data.size(), 4);
@@ -312,7 +310,7 @@ BOOST_AUTO_TEST_CASE(item_with_vector) {
       if (i > 0) BOOST_REQUIRE_LE(it.data[i - 1], it.data[i]);
     }
   }
-}*/
+}
 //TODO
 class Constraint_base : public Generator {
  public:

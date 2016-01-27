@@ -298,7 +298,7 @@ BOOST_AUTO_TEST_CASE(element_inside_set_t1) {
     BOOST_REQUIRE(item.s.find(item.a) != item.s.end());
 
     unsigned first = item.a;
-    item.con1(item.a() != first);
+    item.con1={item.a() != first};
 
     BOOST_REQUIRE(item.randomize());
     BOOST_REQUIRE(item.s.find(item.a) != item.s.end());
@@ -306,7 +306,7 @@ BOOST_AUTO_TEST_CASE(element_inside_set_t1) {
     unsigned second = item.a;
     ;
     BOOST_REQUIRE_NE(first, second);
-    item.con1(item.a() != second);
+    item.con1={item.a() != second};
 
     BOOST_REQUIRE(item.randomize());
     BOOST_REQUIRE(item.s.find(item.a) != item.s.end());
@@ -315,7 +315,7 @@ BOOST_AUTO_TEST_CASE(element_inside_set_t1) {
     ;
     BOOST_REQUIRE_NE(third, second);
     BOOST_REQUIRE_NE(first, third);
-    item.con1(item.a() != third);
+    item.con1={item.a() != third};
 
     BOOST_REQUIRE(item.randomize());
 }
@@ -339,14 +339,14 @@ BOOST_AUTO_TEST_CASE(element_inside_vec_t1) {
     BOOST_REQUIRE(find(item.v.begin(), item.v.end(), item.x) != item.v.end());
 
     unsigned first = item.x;
-    item.con1(item.x() != first);
+    item.con1={item.x() != first};
 
     BOOST_REQUIRE(item.randomize());
     BOOST_REQUIRE(find(item.v.begin(), item.v.end(), item.x) != item.v.end());
 
     unsigned second = item.x;
     BOOST_REQUIRE_NE(first, second);
-    item.con1(item.x() != second);
+    item.con1={item.x() != second};
 
     BOOST_REQUIRE(item.randomize());
     BOOST_REQUIRE(find(item.v.begin(), item.v.end(), item.x) != item.v.end());
@@ -354,7 +354,7 @@ BOOST_AUTO_TEST_CASE(element_inside_vec_t1) {
     unsigned third = item.x;
     BOOST_REQUIRE_NE(third, second);
     BOOST_REQUIRE_NE(first, third);
-    item.con1(item.x() != third);
+    item.con1={item.x() != third};
     BOOST_REQUIRE(!item.randomize());
 }
 
@@ -374,24 +374,24 @@ struct element_inside_array_s1 : crv_sequence_item {
 BOOST_AUTO_TEST_CASE(element_inside_array_t) {
     element_inside_array_s1 item("item");
     Generator gen;
-    item.con1(inside(item.x(), item.a));
+    item.con1={inside(item.x(), item.a)};
 
     BOOST_REQUIRE(item.randomize());
 
     unsigned first = item.x;
-    item.con1(item.x() != first);
+    item.con1={item.x() != first};
 
     BOOST_REQUIRE(item.randomize());
 
     unsigned second = item.x;
     BOOST_REQUIRE_NE(first, second);
-    item.con1(item.x() != second);
+    item.con1={item.x() != second};
 
     BOOST_REQUIRE(item.randomize());
     unsigned third = item.x;
     BOOST_REQUIRE_NE(third, second);
     BOOST_REQUIRE_NE(first, third);
-    item.con1(item.x() != third);
+    item.con1={item.x() != third};
 
     BOOST_REQUIRE(!item.randomize());
 }
@@ -416,14 +416,14 @@ BOOST_AUTO_TEST_CASE(element_inside_list_t1) {
     BOOST_REQUIRE(find(item.l.begin(), item.l.end(), item.x) != item.l.end());
 
     unsigned first = item.x;
-    item.con1(item.x() != first);
+    item.con1={item.x() != first};
 
     BOOST_REQUIRE(item.randomize());
     BOOST_REQUIRE(find(item.l.begin(), item.l.end(), item.x) != item.l.end());
 
     unsigned second = item.x;
     BOOST_REQUIRE_NE(first, second);
-    item.con1(item.x() != second);
+    item.con1={item.x() != second};
 
     BOOST_REQUIRE(item.randomize());
     BOOST_REQUIRE(find(item.l.begin(), item.l.end(), item.x) != item.l.end());
@@ -431,7 +431,7 @@ BOOST_AUTO_TEST_CASE(element_inside_list_t1) {
     unsigned third = item.x;
     BOOST_REQUIRE_NE(third, second);
     BOOST_REQUIRE_NE(first, third);
-    item.con1(item.x() != third);
+    item.con1={item.x() != third};
 
     BOOST_REQUIRE(!item.randomize());
 }
@@ -546,8 +546,8 @@ BOOST_AUTO_TEST_CASE(bitslice_t) {
   BOOST_REQUIRE(item.randomize());
   BOOST_REQUIRE_EQUAL((item.x >> 3) & 0xFF, 0xFF);
 
-  BOOST_CHECK_THROW(item.con1(bitslice(3, 10, item.x()) == 0xFF), std::runtime_error);
-  BOOST_CHECK_THROW(item.con1(bitslice(16, 3, item.x()) == 0xFF), std::runtime_error);
+  BOOST_CHECK_THROW(item.con1={bitslice(3, 10, item.x()) == 0xFF}, std::runtime_error);
+  BOOST_CHECK_THROW(item.con1={bitslice(16, 3, item.x()) == 0xFF}, std::runtime_error);
 }
 
 //TODO
@@ -658,7 +658,7 @@ BOOST_AUTO_TEST_CASE(mult_mod_t1) {
 
   BOOST_REQUIRE_EQUAL(cnt, cnt1);
 }*/
-
+/*
 BOOST_AUTO_TEST_CASE(divide) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
 
@@ -681,5 +681,5 @@ BOOST_AUTO_TEST_CASE(divide) {
   }
 
   VariableDefaultSolver::bypass_constraint_analysis = false;
-}
+}*/
 BOOST_AUTO_TEST_SUITE_END()
