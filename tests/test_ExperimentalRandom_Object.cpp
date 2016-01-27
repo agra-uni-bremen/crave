@@ -5,8 +5,6 @@
 #include <set>
 #include <iostream>
 
-/*TODO ALL*/
-// using namespace std;
 using boost::format;
 using namespace crave;
 
@@ -52,8 +50,7 @@ BOOST_AUTO_TEST_CASE(t_rand_enum) {
     BOOST_REQUIRE(obj.color == obj.x);
   }
 }
-/*
- * TODO
+/* TODO
 BOOST_AUTO_TEST_CASE(t_rand_enum_standalone) {
   crv_variable<color_enum>* color;
   BOOST_CHECK_THROW(color = new crv_variable<color_enum>(), std::runtime_error);
@@ -282,14 +279,15 @@ BOOST_AUTO_TEST_CASE(binary_search_test) {
 
 struct Item2 : public crv_sequence_item {
   Item2(crv_object_name) {
-    constraint={
+   constraint={
     address() % 4 == 0,
     address() <= 1000u,
     data().size() == 4,
-    foreach(data(), -50 <= data()[i] && data()[i] <= 50),
-    foreach(data(), data()[i - 1] <= data()[i]),
-  }
-
+    foreach(data(), -50 <= data()[_i] && data()[_i] <= 50),
+    foreach(data(), data()[_i - 1] <= data()[_i]),
+  };
+ }
+    
   crv_variable<unsigned> address;
   crv_vector<int> data;
   crv_constraint constraint{"constraint"};

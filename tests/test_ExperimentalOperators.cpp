@@ -304,15 +304,14 @@ BOOST_AUTO_TEST_CASE(element_inside_set_t1) {
     BOOST_REQUIRE(item.s.find(item.a) != item.s.end());
 
     unsigned second = item.a;
-    ;
     BOOST_REQUIRE_NE(first, second);
+    
     item.con1={item.a() != second};
 
     BOOST_REQUIRE(item.randomize());
     BOOST_REQUIRE(item.s.find(item.a) != item.s.end());
 
     unsigned third = item.a;
-    ;
     BOOST_REQUIRE_NE(third, second);
     BOOST_REQUIRE_NE(first, third);
     item.con1={item.a() != third};

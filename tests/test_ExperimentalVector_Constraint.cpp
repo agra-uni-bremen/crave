@@ -9,7 +9,7 @@ using boost::format;
 using namespace crave;
 
 template <typename T>
-bool check_unique(rand_vec<T>& v) {
+bool check_unique(crv_vector<T>& v) {
   for (uint i = 0; i < v.size(); i++)
     for (uint j = 0; j < i; j++)
       if (v[i] == v[j]) return false;
@@ -19,14 +19,13 @@ bool check_unique(rand_vec<T>& v) {
 BOOST_FIXTURE_TEST_SUITE(Vector_Constraint_t, Context_Fixture)
 
 struct Item : public crv_sequence_item {
-  Item(crv_object_name) : i_() {
-    constraint(30 <= v().size() && v().size() <= 50);
-    constraint(foreach(v(), v()[i_] == v()[i_ - 1] + v()[i_ - 2]));
-    constraint(foreach(v(), if_then(i_ <= 1, v()[i_] == i_)));
+  Item(crv_object_name){
+    constraint={30 <= v().size() && v().size() <= 50,
+    foreach(v(), v()[_i] == v()[_i - 1] + v()[_i - 2]),
+    foreach(v(), if_then(_i <= 1, v()[_i] == _i))};
   }
 
-  placeholder i_;
-  rand_vec<unsigned int> v;
+  crv_vector<unsigned int> v;
   crv_constraint constraint{"constraint"};
 };
 
@@ -44,7 +43,7 @@ struct Item1 : public crv_sequence_item {
   Item1(crv_object_name) {}
 
   __rand_vec<unsigned int> u;
-  rand_vec<unsigned int> v;
+  crv_vector<unsigned int> v;
 };
 
 BOOST_AUTO_TEST_CASE(free_vector_test) {
@@ -57,10 +56,9 @@ BOOST_AUTO_TEST_CASE(free_vector_test) {
 }
 
 struct Item2 : public crv_sequence_item {
-  Item2(crv_object_name) : idx() { constraint(foreach(v(), 100 <= v()[idx] && v()[idx] <= 200)); }
+  Item2(crv_object_name){ constraint={foreach(v(), 100 <= v()[_i] && v()[_i] <= 200)}; }
 
-  placeholder idx;
-  rand_vec<unsigned int> v;
+  crv_vector<unsigned int> v;
    crv_constraint constraint{"constraint"};
 };
 
@@ -76,15 +74,14 @@ BOOST_AUTO_TEST_CASE(default_size_test) {
 }
 
 struct Item3 : public crv_sequence_item {
-  Item3(crv_object_name) : i() {
-    constraint(v().size() == 100);
-    constraint(foreach(v(), v()[i] < 100));
-    constraint(foreach(v(), v()[i] >= 0));
-    constraint(unique(v()));
+  Item3(crv_object_name) {
+    constraint={(v().size() == 100),
+    (foreach(v(), v()[_i] < 100)),
+    (foreach(v(), v()[_i] >= 0)),
+    (unique(v()))};
   }
 
-  placeholder i;
-  rand_vec<int> v;
+  crv_vector<int> v;
    crv_constraint constraint{"constraint"};
 };
 
@@ -99,11 +96,10 @@ BOOST_AUTO_TEST_CASE(unique_test_1) {
 }
 
 BOOST_AUTO_TEST_CASE(unique_test_2) {
-  rand_vec<unsigned int> v(NULL);
-  placeholder idx;
+  crv_vector<unsigned int> v;
   Generator gen;
   gen(v().size() == 7);
-  gen(foreach(v(), v()[idx] < 6));
+  gen(foreach(v(), v()[_i] < 6));
 
   gen("unique", unique(v()));
   BOOST_REQUIRE(!gen.next());
@@ -119,24 +115,22 @@ BOOST_AUTO_TEST_CASE(unique_test_2) {
 }
 
 BOOST_AUTO_TEST_CASE(soft_unique_test) {
-  rand_vec<unsigned int> v(NULL);
-  placeholder idx;
+  crv_vector<unsigned int> v(NULL);
   Generator gen;
   gen(v().size() == 7);
-  gen(foreach(v(), v()[idx] < 6));
+  gen(foreach(v(), v()[_i] < 6));
   gen.soft(unique(v()));
   BOOST_REQUIRE(gen.next());
 }
 
 struct Item4 : public crv_sequence_item {
-  Item4(crv_object_name) : _i() {
-    constraint(v().size() == 10);
-    c1(foreach(v(), v()[_i] <= 100));
-    c2(foreach(v(), v()[_i] > 100));
+  Item4(crv_object_name) {
+    constraint={(v().size() == 10)};
+    c1={(foreach(v(), v()[_i] <= 100))};
+    c2={(foreach(v(), v()[_i] > 100))};
   }
 
-  placeholder _i;
-  rand_vec<unsigned int> v;
+  crv_vector<unsigned int> v;
   crv_constraint constraint{"constraint"};
   crv_constraint c1{"c1"};
   crv_constraint c2{"c2"};
@@ -160,15 +154,14 @@ BOOST_AUTO_TEST_CASE(constraint_management_test) {
 }
 
 struct Item5 : public crv_sequence_item {
-  Item5(crv_object_name) : x() {
-    constraint(v().size() == 50);
-    constraint(foreach(v(), if_then(x < 25, v()[x] == x)));
-    constraint(foreach(v(), if_then(x == 25, v()[x] == 0)));
-    constraint(foreach(v(), if_then(x > 25, v()[x] + x == 200)));
+  Item5(crv_object_name) {
+    constraint={(v().size() == 50),
+    (foreach(v(), if_then(_i < 25, v()[_i] == _i))),
+    (foreach(v(), if_then(_i == 25, v()[_i] == 0))),
+    (foreach(v(), if_then(_i > 25, v()[_i] + _i == 200)))};
   }
 
-  placeholder x;
-  rand_vec<unsigned int> v;
+  crv_vector<unsigned int> v;
    crv_constraint constraint{"constraint"};
 };
 /*
@@ -188,21 +181,20 @@ BOOST_AUTO_TEST_CASE(index_constraint_test) {
 }*/
 
 BOOST_AUTO_TEST_CASE(soft_vec_constraint) {
-  rand_vec<unsigned int> v(NULL);
-  placeholder i;
+  crv_vector<unsigned int> v;
 
   Generator gen;
   gen(v().size() == 10);
-  gen(foreach(v(), v()[i] >= v()[i - 1]));
-  gen.soft(foreach(v(), v()[i] < v()[i - 1]));
+  gen(foreach(v(), v()[_i] >= v()[_i - 1]));
+  gen.soft(foreach(v(), v()[_i] < v()[_i - 1]));
   BOOST_REQUIRE(gen.next());
 
   Generator gen1;
   gen1(v().size() == 4);
-  gen1(foreach(v(), v()[i] >= v()[i - 1]));
-  gen1(foreach(v(), v()[i] <= 1000));
-  gen1.soft(foreach(v(), v()[i] <= v()[i - 1]));
-  gen1.soft(foreach(v(), if_then(i == 0, v()[i] % 13 == 3)));
+  gen1(foreach(v(), v()[_i] >= v()[_i - 1]));
+  gen1(foreach(v(), v()[_i] <= 1000));
+  gen1.soft(foreach(v(), v()[_i] <= v()[_i - 1]));
+  gen1.soft(foreach(v(), if_then(_i == 0, v()[_i] % 13 == 3)));
   BOOST_REQUIRE(gen1.next());
   for (int j = 0; j < 10; j++) {
     BOOST_REQUIRE_EQUAL(v.size(), 4);
@@ -216,11 +208,10 @@ BOOST_AUTO_TEST_CASE(soft_vec_constraint) {
 }
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_1) {
-  rand_vec<signed char> a(NULL);
-  placeholder idx;
+  crv_vector<signed char> a;
   Generator gen;
   gen(a().size() == 28);
-  gen(foreach(a(), a()[idx] < (short)-100));
+  gen(foreach(a(), a()[_i] < (short)-100));
   gen(unique(a()));
 
   BOOST_REQUIRE(gen.next());
@@ -233,12 +224,11 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_1) {
 }
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_2) {
-  rand_vec<short> a(NULL);
-  placeholder p;
+  crv_vector<short> a;
   Generator gen;
   gen(a().size() == 19);
-  gen(foreach(a(), a()[p] < 10));
-  gen(foreach(a(), a()[p] > -10));
+  gen(foreach(a(), a()[_i] < 10));
+  gen(foreach(a(), a()[_i] > -10));
   gen(unique(a()));
 
   BOOST_REQUIRE(gen.next());
@@ -247,8 +237,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_2) {
 }
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_3) {
-  rand_vec<int> a(NULL);
-  placeholder _i;
+  crv_vector<int> a;
   Generator gen;
   gen(a().size() == 19);
   gen(foreach(a(), a()[_i] < (signed char)10));
@@ -261,8 +250,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_3) {
 }
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_4) {
-  rand_vec<short> a(NULL);
-  placeholder _i;
+  crv_vector<short> a;
   Generator gen;
   gen(a().size() == 10);
   gen(foreach(a(), -3 <= a()[_i] && a()[_i] <= 3));
@@ -282,8 +270,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_4) {
 }
 
 BOOST_AUTO_TEST_CASE(bool_rand_vec) {
-  rand_vec<bool> a(NULL);
-  placeholder _i;
+  crv_vector<bool> a;
   Generator gen;
   gen(a().size() == 10);
   gen(foreach(a(), a()[_i] != a()[_i - 1]));
