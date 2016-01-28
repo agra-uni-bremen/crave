@@ -9,20 +9,15 @@ using namespace crave;
 BOOST_FIXTURE_TEST_SUITE(ConstraintManagement, Context_Fixture)
 
 struct Item : public crv_sequence_item {
-  crv_variable<unsigned int> a{"a"};
-  crv_variable<unsigned int> b{"b"};
+  crv_variable<unsigned int> a;
+  crv_variable<unsigned int> b;
 
-  crv_constraint sum{"sum",a() + b() == 4};
-  crv_constraint product{"product",a() * b() == 4};
-  crv_constraint range{"range",a() < 10, b() < 10};
-  crv_constraint x{"x",a() != 2};
+  crv_constraint sum{a() + b() == 4};
+  crv_constraint product{a() * b() == 4};
+  crv_constraint range{a() < 10, b() < 10};
+  crv_constraint x{a() != 2};
 
-  Item(crv_object_name) {/*
-    sum = {a() + b() == 4};
-    product = {a() * b() == 4};
-    range = {a() < 10, b() < 10};
-    x = {a() != 2};*/
-  }
+  Item(crv_object_name) {}
   friend ostream& operator<<(ostream& os, const Item& it) {
     os << it.a << " " << it.b;
     return os;
