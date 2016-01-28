@@ -19,14 +19,12 @@ bool check_unique(crv_vector<T>& v) {
 BOOST_FIXTURE_TEST_SUITE(Vector_Constraint_t, Context_Fixture)
 
 struct Item : public crv_sequence_item {
-  Item(crv_object_name){
-    constraint={30 <= v().size() && v().size() <= 50,
-    foreach(v(), v()[_i] == v()[_i - 1] + v()[_i - 2]),
-    foreach(v(), if_then(_i <= 1, v()[_i] == _i))};
-  }
+  Item(crv_object_name){ }
 
   crv_vector<unsigned int> v;
-  crv_constraint constraint;
+  crv_constraint constraint={30 <= v().size() && v().size() <= 50,
+    foreach(v(), v()[_i] == v()[_i - 1] + v()[_i - 2]),
+    foreach(v(), if_then(_i <= 1, v()[_i] == _i))};
 };
 
 BOOST_AUTO_TEST_CASE(fibo_test) {
@@ -56,10 +54,10 @@ BOOST_AUTO_TEST_CASE(free_vector_test) {
 }
 
 struct Item2 : public crv_sequence_item {
-  Item2(crv_object_name){ constraint={foreach(v(), 100 <= v()[_i] && v()[_i] <= 200)}; }
+  Item2(crv_object_name){ }
 
   crv_vector<unsigned int> v;
-   crv_constraint constraint;
+   crv_constraint constraint={foreach(v(), 100 <= v()[_i] && v()[_i] <= 200)};
 };
 
 BOOST_AUTO_TEST_CASE(default_size_test) {
@@ -74,15 +72,13 @@ BOOST_AUTO_TEST_CASE(default_size_test) {
 }
 
 struct Item3 : public crv_sequence_item {
-  Item3(crv_object_name) {
-    constraint={(v().size() == 100),
+  Item3(crv_object_name) { }
+
+  crv_vector<int> v;
+   crv_constraint constraint={(v().size() == 100),
     (foreach(v(), v()[_i] < 100)),
     (foreach(v(), v()[_i] >= 0)),
     (unique(v()))};
-  }
-
-  crv_vector<int> v;
-   crv_constraint constraint;
 };
 
 BOOST_AUTO_TEST_CASE(unique_test_1) {
@@ -124,16 +120,12 @@ BOOST_AUTO_TEST_CASE(soft_unique_test) {
 }
 
 struct Item4 : public crv_sequence_item {
-  Item4(crv_object_name) {
-    constraint={(v().size() == 10)};
-    c1={(foreach(v(), v()[_i] <= 100))};
-    c2={(foreach(v(), v()[_i] > 100))};
-  }
+  Item4(crv_object_name) { }
 
   crv_vector<unsigned int> v;
-  crv_constraint constraint;
-  crv_constraint c1;
-  crv_constraint c2;
+  crv_constraint constraint={(v().size() == 10)};
+  crv_constraint c1={(foreach(v(), v()[_i] <= 100))};
+  crv_constraint c2={(foreach(v(), v()[_i] > 100))};
 };
 
 BOOST_AUTO_TEST_CASE(constraint_management_test) {
@@ -154,15 +146,13 @@ BOOST_AUTO_TEST_CASE(constraint_management_test) {
 }
 
 struct Item5 : public crv_sequence_item {
-  Item5(crv_object_name) {
-    constraint={(v().size() == 50),
+  Item5(crv_object_name) { }
+
+  crv_vector<unsigned int> v;
+   crv_constraint constraint={(v().size() == 50),
     (foreach(v(), if_then(_i < 25, v()[_i] == _i))),
     (foreach(v(), if_then(_i == 25, v()[_i] == 0))),
     (foreach(v(), if_then(_i > 25, v()[_i] + _i == 200)))};
-  }
-
-  crv_vector<unsigned int> v;
-   crv_constraint constraint;
 };
 
 BOOST_AUTO_TEST_CASE(index_constraint_test) {

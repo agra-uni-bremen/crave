@@ -10,8 +10,8 @@ using namespace crave;
 BOOST_FIXTURE_TEST_SUITE(CoverageSampling, Context_Fixture)
 
 struct my_covergroup : public crv_covergroup {
-  crv_variable<unsigned> a{"a"};
-  crv_variable<unsigned> b{"b"};
+  crv_variable<unsigned> a;
+  crv_variable<unsigned> b;
 
   crv_coverpoint cp1{"coverpoint1"};
   crv_coverpoint cp2{"coverpoint2"};

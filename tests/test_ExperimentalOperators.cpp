@@ -149,11 +149,9 @@ struct neg_s2 : crv_sequence_item {
     crv_variable<int> b;
     crv_variable<int> c;
     crv_variable<int> d;
-    crv_constraint con1;
+    crv_constraint con1= {dist(a(), distribution<bool>::create(0.5)), b() == 1337 && c() == 42, if_then_else(a(), d() == -b(), d() == -c())};
 
-    neg_s2(crv_object_name) {
-        con1 = {dist(a(), distribution<bool>::create(0.5)), b() == 1337 && c() == 42, if_then_else(a(), d() == -b(), d() == -c())};
-    }
+    neg_s2(crv_object_name) { }
 };
 
 BOOST_AUTO_TEST_CASE(neg_t2) {
@@ -170,11 +168,9 @@ BOOST_AUTO_TEST_CASE(neg_t2) {
 struct comp_s1 : crv_sequence_item {
     crv_variable<unsigned> a;
     crv_variable<unsigned> b;
-    crv_constraint con1;
+    crv_constraint con1= {a() == 0, b() == ~a()};
 
-    comp_s1(crv_object_name) {
-        con1 = {a() == 0, b() == ~a()};
-    }
+    comp_s1(crv_object_name) { }
 };
 
 BOOST_AUTO_TEST_CASE(complement_t1) {
@@ -188,11 +184,9 @@ struct bitwise_and_s1 : crv_sequence_item {
     crv_variable<unsigned> a;
     crv_variable<unsigned> b;
     crv_variable<unsigned> c;
-    crv_constraint con1;
+    crv_constraint con1= {a() == 42, b() == 1337, c() == (a() & b())};
 
-    bitwise_and_s1(crv_object_name) {
-        con1 = {a() == 42, b() == 1337, c() == (a() & b())};
-    }
+    bitwise_and_s1(crv_object_name) { }
 };
 
 BOOST_AUTO_TEST_CASE(bitwise_and_t1) {
@@ -220,12 +214,10 @@ struct xor_s1 : crv_sequence_item {
     crv_variable<bool> a;
     crv_variable<bool> b;
     crv_variable<unsigned> c;
-    crv_constraint con1;
-    crv_constraint con2;
+    crv_constraint con1={a() == false, b() == false, c() == (a() ^ b())};
+    crv_constraint con2={a() == false, b() == true, c() == (a() ^ b())};
 
     xor_s1(crv_object_name) {
-        con1 = {a() == false, b() == false, c() == (a() ^ b())};
-        con2 = {a() == false, b() == true, c() == (a() ^ b())};
         con2.deactivate();
     }
 };
@@ -298,14 +290,13 @@ BOOST_AUTO_TEST_CASE(element_inside_set_t1) {
 
 struct element_inside_vec_s1 : crv_sequence_item {
     crv_variable<unsigned> x;
-    crv_constraint con1;
+    crv_constraint con1= {inside(x(), v)};
     std::vector<unsigned> v;
 
     element_inside_vec_s1(crv_object_name) {
         v.push_back(1);
         v.push_back(7);
         v.push_back(9);
-        con1 = {inside(x(), v)};
     }
 };
 
@@ -336,14 +327,13 @@ BOOST_AUTO_TEST_CASE(element_inside_vec_t1) {
 
 struct element_inside_array_s1 : crv_sequence_item {
     crv_variable<unsigned> x;
-    crv_constraint con1;
+    crv_constraint con1= {inside(x(), a)};
     unsigned a[3];
 
     element_inside_array_s1(crv_object_name) {
         a[0] = 1;
         a[1] = 7;
         a[2] = 9;
-        con1 = {inside(x(), a)};
     }
 };
 
@@ -374,14 +364,13 @@ BOOST_AUTO_TEST_CASE(element_inside_array_t) {
 
 struct element_inside_list_s1 : crv_sequence_item {
     crv_variable<unsigned> x;
-    crv_constraint con1;
+    crv_constraint con1={inside(x(), l)};
     std::list<unsigned> l;
 
     element_inside_list_s1(crv_object_name) {
         l.push_back(1);
         l.push_back(7);
         l.push_back(9);
-        con1 = {inside(x(), l)};
     }
 };
 
@@ -414,12 +403,10 @@ BOOST_AUTO_TEST_CASE(element_inside_list_t1) {
 
 struct element_not_inside_s1 : crv_sequence_item {
     crv_variable<unsigned> x;
-    crv_constraint con1;
+    crv_constraint con1= {inside(x(), s)};
     std::set<unsigned> s;
 
-    element_not_inside_s1(crv_object_name) {
-        con1 = {inside(x(), s)};
-    }
+    element_not_inside_s1(crv_object_name) { }
 };
 
 BOOST_AUTO_TEST_CASE(element_not_inside_t1) {
@@ -429,12 +416,10 @@ BOOST_AUTO_TEST_CASE(element_not_inside_t1) {
 
 struct element_not_inside_s2 : crv_sequence_item {
     crv_variable<unsigned> x;
-    crv_constraint con1;
+    crv_constraint con1= {inside(x(), s)};
     std::vector<unsigned> s;
 
-    element_not_inside_s2(crv_object_name) {
-        con1 = {inside(x(), s)};
-    }
+    element_not_inside_s2(crv_object_name) { }
 };
 
 BOOST_AUTO_TEST_CASE(element_not_inside_t2) {
@@ -444,12 +429,10 @@ BOOST_AUTO_TEST_CASE(element_not_inside_t2) {
 
 struct element_not_inside_s3 : crv_sequence_item {
     crv_variable<unsigned> x;
-    crv_constraint con1;
+    crv_constraint con1={inside(x(), s)};
     std::list<unsigned> s;
 
-    element_not_inside_s3(crv_object_name) {
-        con1 = {inside(x(), s)};
-    }
+    element_not_inside_s3(crv_object_name) { }
 };
 
 BOOST_AUTO_TEST_CASE(element_not_inside_t3) {
@@ -460,11 +443,9 @@ BOOST_AUTO_TEST_CASE(element_not_inside_t3) {
 struct if_then_else_s1 : crv_sequence_item {
     unsigned a;
     crv_variable<unsigned> b;
-    crv_constraint con1;
+    crv_constraint con1= {if_then_else(reference(a)<5, b()> 0 && b() <= 50, b() > 50 && b() <= 100)};
 
-    if_then_else_s1(crv_object_name) {
-        con1 = {if_then_else(reference(a)<5, b()> 0 && b() <= 50, b() > 50 && b() <= 100)};
-    }
+    if_then_else_s1(crv_object_name) { }
 };
 
 BOOST_AUTO_TEST_CASE(if_then_else_t1) {
@@ -485,11 +466,9 @@ BOOST_AUTO_TEST_CASE(if_then_else_t1) {
 struct if_then_s1 : crv_sequence_item {
     unsigned a;
     crv_variable<unsigned> b;
-    crv_constraint con1;
+    crv_constraint con1= {if_then(reference(a)<5, b()> 0 && b() <= 100),if_then(reference(a) >= 5, b() > 100 && b() <= 1000)};
 
-    if_then_s1(crv_object_name) {
-        con1 = {if_then(reference(a)<5, b()> 0 && b() <= 100),if_then(reference(a) >= 5, b() > 100 && b() <= 1000)};
-    }
+    if_then_s1(crv_object_name) { }
 };
 
 BOOST_AUTO_TEST_CASE(if_then_t1) {
@@ -510,11 +489,9 @@ BOOST_AUTO_TEST_CASE(if_then_t1) {
 
 struct bitslice_s1 : crv_sequence_item {
     crv_variable<short> x;
-    crv_constraint con1;
+    crv_constraint con1 = {bitslice(10, 3, x()) == 0xFF};
 
-    bitslice_s1(crv_object_name) {
-        con1 = {bitslice(10, 3, x()) == 0xFF};
-    }
+    bitslice_s1(crv_object_name) { }
 };
 
 BOOST_AUTO_TEST_CASE(bitslice_t) {
@@ -607,11 +584,9 @@ BOOST_AUTO_TEST_CASE(plus_minus) {
 struct mult_mod_s1 : crv_sequence_item {
     crv_variable<int> a;
     crv_variable<int> b;
-    crv_constraint con1;
+    crv_constraint con1 = {-3 <= a() && a() <= 3,-3 <= b() && b() <= 3,a() * b() % 6 == 0};
 
-    mult_mod_s1(crv_object_name) {
-        con1 = {-3 <= a() && a() <= 3,-3 <= b() && b() <= 3,a() * b() % 6 == 0};
-    }
+    mult_mod_s1(crv_object_name) { }
 };
 
 BOOST_AUTO_TEST_CASE(mult_mod_t1) {

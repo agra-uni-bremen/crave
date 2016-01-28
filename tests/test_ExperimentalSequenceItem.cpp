@@ -33,12 +33,11 @@ BOOST_FIXTURE_TEST_SUITE(SequenceItem_t, Context_Fixture)
 
 class my_rand_obj : public crv_sequence_item {
  public:
-  crv_constraint constraint;
+  crv_constraint constraint={color() == x()};
   crv_variable<color_enum> color;
   crv_variable<int> x;
 
-  my_rand_obj(crv_object_name){
-      constraint={color() == x()};}
+  my_rand_obj(crv_object_name){ }
 };
 
 BOOST_AUTO_TEST_CASE(t_rand_enum) {
@@ -59,19 +58,17 @@ BOOST_AUTO_TEST_CASE(t_rand_enum_standalone) {
 
 class tall_rand_enum_obj : public crv_sequence_item {
  public:
-  crv_constraint constraint;
+  crv_constraint constraint={player() == football_enum::GK && player() != football_enum::CF};
   crv_variable<football_enum> player;
 
-  tall_rand_enum_obj(crv_object_name) {
-    constraint={player() == football_enum::GK && player() != football_enum::CF};
-  }
+  tall_rand_enum_obj(crv_object_name) { }
 };
 
 class tall_rand_enum_obj_gt : public crv_sequence_item {
  public:
   crv_variable<football_enum> player;
-  crv_constraint constraint;
-  tall_rand_enum_obj_gt(crv_object_name) { constraint={player() > football_enum::AM};}
+  crv_constraint constraint={player() > football_enum::AM};
+  tall_rand_enum_obj_gt(crv_object_name) { }
 };
 
 BOOST_AUTO_TEST_CASE(enum_no_overflow) {
@@ -93,10 +90,10 @@ BOOST_AUTO_TEST_CASE(enum_gt) {
 
 class item : public crv_sequence_item {
  public:
-  item(crv_object_name){ constraint={a() + b() == c()}; }
+  item(crv_object_name){ }
 
  public:
-  crv_constraint constraint;
+  crv_constraint constraint={a() + b() == c()};
   crv_variable<int> a;
   crv_variable<int> b;
   crv_variable<int> c;
@@ -104,16 +101,14 @@ class item : public crv_sequence_item {
 
 class item1 : public item {
  public:
-  crv_constraint constraint;
-  item1(crv_object_name name) : item(name){
-    constraint={10 <= a() && a() <= 20,a() + b() + c() <= 200};
-  }
+  crv_constraint constraint={10 <= a() && a() <= 20,a() + b() + c() <= 200};
+  item1(crv_object_name name) : item(name){ }
 };
 
 class item2 : public item1 {
  public:
-     crv_constraint constraint;
-  item2(crv_object_name name) : item1(name){ constraint={a() + b() + c() == 100}; }
+     crv_constraint constraint={a() + b() + c() == 100};
+  item2(crv_object_name name) : item1(name){ }
   crv_variable<int> d;
 };
 
@@ -144,17 +139,14 @@ BOOST_AUTO_TEST_CASE(t4) {
 
 class obj : public crv_sequence_item {
  public:
-  obj(crv_object_name){
-    constraint={dist(a(), distribution<int>::simple_range(-20, -10)),
+  obj(crv_object_name){ }
+  crv_constraint constraint={dist(a(), distribution<int>::simple_range(-20, -10)),
     dist(b(), distribution<unsigned int>::simple_range(10, 20)),
     dist(c(), distribution<short>::simple_range(-20, -10)),
     dist(d(), distribution<unsigned short>::simple_range(10, 20))};
-    e_con={dist(e(), distribution<char>::simple_range('a', 'z'))};
-    f_con={dist(f(), distribution<unsigned char>::simple_range('A', 'Z'))};
-  }
-  crv_constraint constraint;
-  crv_constraint e_con;
-  crv_constraint f_con;
+ 
+  crv_constraint e_con={dist(e(), distribution<char>::simple_range('a', 'z'))};
+  crv_constraint f_con={dist(f(), distribution<unsigned char>::simple_range('A', 'Z'))};
   crv_variable<int> a;
   crv_variable<unsigned int> b;
   crv_variable<short> c;
@@ -170,26 +162,23 @@ class obj : public crv_sequence_item {
 
 class obj1 : public obj {
  public:
-  crv_constraint constraint;
+  crv_constraint constraint={
+      dist(e(), distribution<char>::simple_range('A', 'Z')), 
+      dist(f(), distribution<unsigned char>::simple_range('a', 'z'))};
+  
   obj1(crv_object_name name) : obj(name){
     e_con.deactivate();
     f_con.deactivate();
-    constraint={
-      dist(e(), distribution<char>::simple_range('A', 'Z')), 
-      dist(f(), distribution<unsigned char>::simple_range('a', 'z'))
-    };
   }
 };
 
 class obj2 : public obj1 {
  public:
-   crv_constraint constraint;
-   obj2(crv_object_name name) : l("l") , obj1(name) {
-   constraint={dist(g(), distribution<long>::simple_range(-20, -10)),
+   crv_constraint constraint={dist(g(), distribution<long>::simple_range(-20, -10)),
    dist(h(), distribution<unsigned long>::simple_range(10, 20)),
    dist(i(), distribution<long long>::simple_range(-20, -10)),
    dist(j(), distribution<unsigned long long>::simple_range(10, 20))};
-  }
+   obj2(crv_object_name name) : l("l") , obj1(name) { }
   crv_variable<long> g;
   crv_variable<unsigned long> h;
   crv_variable<long long> i;
@@ -245,10 +234,7 @@ BOOST_AUTO_TEST_CASE(t5) {
 struct Item1 : public crv_sequence_item {
   
   
-  Item1(crv_object_name) : pivot(0) {
-    c1={x() * x() >= 24};
-    c2={x() <= reference(pivot)};
-  }
+  Item1(crv_object_name) : pivot(0) { }
 
   bool next() {
     int lower = 0;
@@ -264,8 +250,8 @@ struct Item1 : public crv_sequence_item {
     x = upper;
     return true;
   }
-  crv_constraint c1;
-  crv_constraint c2;
+  crv_constraint c1={x() * x() >= 24};
+  crv_constraint c2={x() <= reference(pivot)};
   crv_variable<unsigned> x;
   int pivot;
 };
@@ -281,19 +267,17 @@ BOOST_AUTO_TEST_CASE(binary_search_test) {
 }
 
 struct Item2 : public crv_sequence_item {
-  Item2(crv_object_name) {
-   constraint={
+  Item2(crv_object_name) { }
+    
+  crv_variable<unsigned> address;
+  crv_vector<int> data;
+  crv_constraint constraint={
     address() % 4 == 0,
     address() <= 1000u,
     data().size() == 4,
     foreach(data(), -50 <= data()[_i] && data()[_i] <= 50),
     foreach(data(), data()[_i - 1] <= data()[_i]),
   };
- }
-    
-  crv_variable<unsigned> address;
-  crv_vector<int> data;
-  crv_constraint constraint{"constraint"};
 };
 
 BOOST_AUTO_TEST_CASE(item_with_vector) {
