@@ -15,7 +15,7 @@ using boost::format;
 BOOST_FIXTURE_TEST_SUITE(Distribution_t, Context_Fixture)
 
 BOOST_AUTO_TEST_CASE(crv_variable_dist_t1) {
-  crv_variable<int> v{"v"};
+  crv_variable<int> v;
   Generator gen;
   gen(dist(v(), distribution<int>::create(range<int>(0, 5))(range<int>(50, 65))(range<int>(100, 125))));
 
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(crv_variable_dist_t1) {
 }
 
 BOOST_AUTO_TEST_CASE(crv_variable_dist_t2) {
-  crv_variable<int> v{"v"};
+  crv_variable<int> v;
   Generator gen;
   BOOST_CHECK_THROW(
       gen(dist(v(), distribution<int>::create(range<int>(0, 10))(range<int>(50, 75))(range<int>(30, 51)))),
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(crv_variable_dist_t2) {
 }
 
 BOOST_AUTO_TEST_CASE(crv_variable_dist_t3) {
-  crv_variable<char> v{"v"};
+  crv_variable<char> v;
   Generator gen;
   gen(dist(v(), distribution<char>::create(weighted_range<char>(1, 5, 50))(weighted_range<char>(10, 20, 20))(
                     weighted_range<char>(-50, -50, 30))));
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(crv_variable_dist_t3) {
 }
 
 BOOST_AUTO_TEST_CASE(crv_variable_dist_t4) {
-  crv_variable<int> v{"v"};
+  crv_variable<int> v;
   Generator gen;
   gen("x", dist(v(), distribution<int>::create(range<int>(0, 10))(range<int>(50, 75))(range<int>(100, 200))));
   gen("y", dist(v(), distribution<int>::simple_range(5000, 6000)));

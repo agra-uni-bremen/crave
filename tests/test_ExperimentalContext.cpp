@@ -92,8 +92,8 @@ BOOST_AUTO_TEST_CASE(soft_constraint_t) {
 }
 
 struct randv_test_s : public crv_sequence_item {
-  crv_variable<unsigned int> a{"c"};
-  crv_variable<unsigned int> b{"d"};
+  crv_variable<unsigned int> a;
+  crv_variable<unsigned int> b;
   
   randv_test_s(crv_object_name) {}
 };

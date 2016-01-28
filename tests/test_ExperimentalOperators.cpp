@@ -202,14 +202,12 @@ BOOST_AUTO_TEST_CASE(bitwise_and_t1) {
 }
 
 struct bitwise_or_s1 : crv_sequence_item {
-    crv_variable<unsigned> a{"a"};
-    crv_variable<unsigned> b{"b"};
-    crv_variable<unsigned> c{"c"};
-    crv_constraint con1{"bitwise"};
+    crv_variable<unsigned> a;
+    crv_variable<unsigned> b;
+    crv_variable<unsigned> c;
+    crv_constraint con1= {a() == 42, b() == 1337, c() == (a() | b())};
 
-    bitwise_or_s1(crv_object_name) {
-        con1 = {a() == 42, b() == 1337, c() == (a() | b())};
-    }
+    bitwise_or_s1(crv_object_name) {}
 };
 
 BOOST_AUTO_TEST_CASE(bitwise_or_t1) {
@@ -245,14 +243,12 @@ BOOST_AUTO_TEST_CASE(xor_t1) {
 }
 
 struct xor_s2 : crv_sequence_item {
-    crv_variable<unsigned> a{"a"};
-    crv_variable<unsigned> b{"b"};
-    crv_variable<unsigned> c{"c"};
-    crv_constraint con1{"xor"};
+    crv_variable<unsigned> a;
+    crv_variable<unsigned> b;
+    crv_variable<unsigned> c;
+    crv_constraint con1 = {a() == 65535, b() == 4080, c() == (a() ^ b())};
 
-    xor_s2(crv_object_name) {
-        con1 = {a() == 65535, b() == 4080, c() == (a() ^ b())};
-    }
+    xor_s2(crv_object_name) { }
 };
 
 BOOST_AUTO_TEST_CASE(xor_t2) {
