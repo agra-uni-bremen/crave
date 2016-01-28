@@ -161,4 +161,7 @@ class crv_variable<T, typename std::enable_if<std::is_integral<T>::value>::type>
   }
 };
 
+template <typename T>
+struct bitsize_traits<crv_variable<T>> : public bitsize_traits<T> {};
+
 }  // namespace crave

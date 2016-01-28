@@ -167,7 +167,6 @@ struct Item5 : public crv_sequence_item {
 
 BOOST_AUTO_TEST_CASE(index_constraint_test) {
   Item5 it{"item"};
-  //it.constraint.printDotGraph(std::cout); compile failure
   it.randomize();
   BOOST_REQUIRE(it.v.size() == 50);
   for (uint i = 0; i < it.v.size(); i++) {

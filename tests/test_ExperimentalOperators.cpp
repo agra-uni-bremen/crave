@@ -636,8 +636,7 @@ struct mult_mod_s1 : crv_sequence_item {
         con1 = {-3 <= a() && a() <= 3,-3 <= b() && b() <= 3,a() * b() % 6 == 0};
     }
 };
-/*
- * compile error
+
 BOOST_AUTO_TEST_CASE(mult_mod_t1) {
   mult_mod_s1 item("item");
 
@@ -657,7 +656,7 @@ BOOST_AUTO_TEST_CASE(mult_mod_t1) {
   }
 
   BOOST_REQUIRE_EQUAL(cnt, cnt1);
-}*/
+}
 
 BOOST_AUTO_TEST_CASE(divide) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
