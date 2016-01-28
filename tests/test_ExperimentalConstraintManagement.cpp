@@ -1,8 +1,8 @@
 #include <boost/test/unit_test.hpp>
 
-#include "../src/crave/experimental/Variable.hpp"
-#include "../src/crave/experimental/Coverage.hpp"
-#include "../src/crave/experimental/Constraint.hpp"
+#include <crave/experimental/Variable.hpp>
+#include <crave/experimental/Coverage.hpp>
+#include <crave/experimental/Constraint.hpp>
 
 using namespace crave;
 

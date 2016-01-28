@@ -4,6 +4,9 @@
 
 #include <string>
 #include <map>
+
+#include <boost/lexical_cast.hpp>
+
 #include "UserConstraintType.hpp"
 #include "UserVectorConstraint.hpp"
 #include "Context.hpp"
