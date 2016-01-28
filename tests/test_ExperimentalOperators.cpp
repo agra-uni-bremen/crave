@@ -316,7 +316,7 @@ BOOST_AUTO_TEST_CASE(element_inside_set_t1) {
     BOOST_REQUIRE_NE(first, third);
     item.con1&={item.a() != third};
 
-    BOOST_REQUIRE(item.randomize());
+    BOOST_REQUIRE(!item.randomize());
 }
 
 struct element_inside_vec_s1 : crv_sequence_item {

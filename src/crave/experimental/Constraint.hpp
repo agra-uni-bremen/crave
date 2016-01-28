@@ -67,11 +67,13 @@ class crv_constraint_ : public crv_constraint_base {
 
   crv_constraint_& operator = (crv_constraint_ const & c) {
     list_ = c.list_;
+    request_rebuild();
     return *this;
   }
 
   crv_constraint_& operator &= (crv_constraint_ const & c) {
     list_.join(c.list_);
+    request_rebuild();
     return *this;
   }
 
