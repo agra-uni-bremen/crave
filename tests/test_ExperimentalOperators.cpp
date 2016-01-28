@@ -9,12 +9,10 @@ using namespace crave;
 BOOST_FIXTURE_TEST_SUITE(Ex_Operators_t, Context_Fixture)
 
 struct logical_not_s1 : crv_sequence_item {
-    crv_variable<unsigned int> a{"a"};
-    crv_constraint con{"not"};
+    logical_not_s1(crv_object_name) {}
 
-    logical_not_s1(crv_object_name) {
-        con = {!(a() != 0)};
-    }
+    crv_variable<unsigned> a;
+    crv_constraint con { !(a() != 0) };
 };
 
 BOOST_AUTO_TEST_CASE(logical_not_t1) {
@@ -25,13 +23,11 @@ BOOST_AUTO_TEST_CASE(logical_not_t1) {
 }
 
 struct logical_not_s2 : crv_sequence_item {
-    crv_variable<unsigned int> a{"a"};
-    crv_variable<unsigned int> b{"b"};
-    crv_constraint con{"not"};
+    logical_not_s2(crv_object_name) {}
 
-    logical_not_s2(crv_object_name) {
-        con = {if_then_else(!(a() % 2 == 0), b() > 0 && b() <= 50, b() > 50 && b() <= 100)};
-    }
+    crv_variable<unsigned> a;
+    crv_variable<unsigned> b;
+    crv_constraint con { if_then_else(!(a() % 2 == 0), b() > 0 && b() <= 50, b() > 50 && b() <= 100) };
 };
 
 BOOST_AUTO_TEST_CASE(logical_not_t2) {
@@ -49,17 +45,13 @@ BOOST_AUTO_TEST_CASE(logical_not_t2) {
 }
 
 struct logical_and_s1 : crv_sequence_item {
-    crv_variable<bool> a{"a"};
-    crv_variable<bool> b{"b"};
-    crv_variable<bool> c{"b"};
-    crv_constraint con1{"and"};
-    crv_constraint con2{"and"};
+    crv_variable<bool> a;
+    crv_variable<bool> b;
+    crv_variable<bool> c;
+    crv_constraint con1 {a() == true, b() == true};
+    crv_constraint con2 {c() == (a() && b())};
 
-    logical_and_s1(crv_object_name) {
-        con1 = {a() == true, b() == true};
-        con2 = {c() == (a() && b())};
-        con2.deactivate();
-    }
+    logical_and_s1(crv_object_name) { con2.deactivate(); }
 };
 
 BOOST_AUTO_TEST_CASE(logical_and_t1) {
@@ -79,17 +71,13 @@ BOOST_AUTO_TEST_CASE(logical_and_t1) {
 }
 
 struct logical_or_s1 : crv_sequence_item {
-    crv_variable<bool> a{"a"};
-    crv_variable<bool> b{"b"};
-    crv_variable<bool> c{"b"};
-    crv_constraint con1{"or"};
-    crv_constraint con2{"or"};
+    crv_variable<bool> a;
+    crv_variable<bool> b;
+    crv_variable<bool> c;
+    crv_constraint con1 {a() == false, b() == false};
+    crv_constraint con2 {c() == (a() || b())};
 
-    logical_or_s1(crv_object_name) {
-        con1 = {a() == false, b() == false};
-        con2 = {c() == (a() || b())};
-        con2.deactivate();
-    }
+    logical_or_s1(crv_object_name) { con2.deactivate(); }
 };
 
 BOOST_AUTO_TEST_CASE(logical_or_t1) {
@@ -111,30 +99,26 @@ BOOST_AUTO_TEST_CASE(logical_or_t1) {
 }
 
 struct logical_equal_s1 : crv_sequence_item {
-    crv_variable<unsigned int> a{"a"};
-    crv_variable<unsigned int> b{"b"};
-    crv_constraint con1{"equal"};
+    crv_variable<unsigned> a;
+    crv_variable<unsigned> b;
+    crv_constraint con {a() == 65535, a() == b()};
 
-    logical_equal_s1(crv_object_name) {
-        con1 = {a() == 65535, a() == b()};
-    }
+    logical_equal_s1(crv_object_name) {}
 };
 
 BOOST_AUTO_TEST_CASE(equal_t1) {
     logical_equal_s1 item("equal");
-    BOOST_REQUIRE(item.con1.active());
+    BOOST_REQUIRE(item.con.active());
     BOOST_REQUIRE(item.randomize());
     BOOST_CHECK_EQUAL(item.a, item.b);
 }
 
 struct not_equal_s1 : crv_sequence_item {
-    crv_variable<unsigned int> a{"a"};
-    crv_variable<unsigned int> b{"b"};
-    crv_constraint con1{"not_equal"};
+    crv_variable<unsigned> a;
+    crv_variable<unsigned> b;
+    crv_constraint con {a() < 65535, a() != b()};
 
-    not_equal_s1(crv_object_name) {
-        con1 = {a() < 65535, a() != b()};
-    }
+    not_equal_s1(crv_object_name) {}
 };
 
 BOOST_AUTO_TEST_CASE(not_equal_t1) {
@@ -146,13 +130,11 @@ BOOST_AUTO_TEST_CASE(not_equal_t1) {
 }
 
 struct neg_s1 : crv_sequence_item {
-    crv_variable<unsigned int> a{"a"};
-    crv_variable<unsigned int> b{"b"};
-    crv_constraint con1{"neg"};
+    crv_variable<unsigned> a;
+    crv_variable<unsigned> b;
+    crv_constraint con {a() == -1337, b() == -a()};
 
-    neg_s1(crv_object_name) {
-        con1 = {a() == -1337, b() == -a()};
-    }
+    neg_s1(crv_object_name) {}
 };
 
 BOOST_AUTO_TEST_CASE(neg_t1) {
@@ -186,8 +168,8 @@ BOOST_AUTO_TEST_CASE(neg_t2) {
 }
 
 struct comp_s1 : crv_sequence_item {
-    crv_variable<unsigned int> a{"a"};
-    crv_variable<unsigned int> b{"b"};
+    crv_variable<unsigned> a{"a"};
+    crv_variable<unsigned> b{"b"};
     crv_constraint con1{"neg"};
 
     comp_s1(crv_object_name) {
@@ -203,9 +185,9 @@ BOOST_AUTO_TEST_CASE(complement_t1) {
 }
 
 struct bitwise_and_s1 : crv_sequence_item {
-    crv_variable<unsigned int> a{"a"};
-    crv_variable<unsigned int> b{"b"};
-    crv_variable<unsigned int> c{"c"};
+    crv_variable<unsigned> a{"a"};
+    crv_variable<unsigned> b{"b"};
+    crv_variable<unsigned> c{"c"};
     crv_constraint con1{"bitwise"};
 
     bitwise_and_s1(crv_object_name) {
@@ -220,9 +202,9 @@ BOOST_AUTO_TEST_CASE(bitwise_and_t1) {
 }
 
 struct bitwise_or_s1 : crv_sequence_item {
-    crv_variable<unsigned int> a{"a"};
-    crv_variable<unsigned int> b{"b"};
-    crv_variable<unsigned int> c{"c"};
+    crv_variable<unsigned> a{"a"};
+    crv_variable<unsigned> b{"b"};
+    crv_variable<unsigned> c{"c"};
     crv_constraint con1{"bitwise"};
 
     bitwise_or_s1(crv_object_name) {
@@ -239,7 +221,7 @@ BOOST_AUTO_TEST_CASE(bitwise_or_t1) {
 struct xor_s1 : crv_sequence_item {
     crv_variable<bool> a{"a"};
     crv_variable<bool> b{"b"};
-    crv_variable<unsigned int> c{"c"};
+    crv_variable<unsigned> c{"c"};
     crv_constraint con1{"xor"};
     crv_constraint con2{"xor"};
 
@@ -263,9 +245,9 @@ BOOST_AUTO_TEST_CASE(xor_t1) {
 }
 
 struct xor_s2 : crv_sequence_item {
-    crv_variable<unsigned int> a{"a"};
-    crv_variable<unsigned int> b{"b"};
-    crv_variable<unsigned int> c{"c"};
+    crv_variable<unsigned> a{"a"};
+    crv_variable<unsigned> b{"b"};
+    crv_variable<unsigned> c{"c"};
     crv_constraint con1{"xor"};
 
     xor_s2(crv_object_name) {
@@ -280,7 +262,7 @@ BOOST_AUTO_TEST_CASE(xor_t2) {
 }
 
 struct element_inside_set_s1 : crv_sequence_item {
-    crv_variable<unsigned int> a{"a"};
+    crv_variable<unsigned> a{"a"};
     crv_constraint con1{"inside"};
     std::set<unsigned> s;
 
@@ -320,7 +302,7 @@ BOOST_AUTO_TEST_CASE(element_inside_set_t1) {
 }
 
 struct element_inside_vec_s1 : crv_sequence_item {
-    crv_variable<unsigned int> x{"x"};
+    crv_variable<unsigned> x{"x"};
     crv_constraint con1{"inside"};
     std::vector<unsigned> v;
 
@@ -358,7 +340,7 @@ BOOST_AUTO_TEST_CASE(element_inside_vec_t1) {
 }
 
 struct element_inside_array_s1 : crv_sequence_item {
-    crv_variable<unsigned int> x{"x"};
+    crv_variable<unsigned> x{"x"};
     crv_constraint con1{"inside"};
     unsigned a[3];
 
@@ -396,7 +378,7 @@ BOOST_AUTO_TEST_CASE(element_inside_array_t) {
 }
 
 struct element_inside_list_s1 : crv_sequence_item {
-    crv_variable<unsigned int> x{"x"};
+    crv_variable<unsigned> x{"x"};
     crv_constraint con1{"inside"};
     std::list<unsigned> l;
 
@@ -436,7 +418,7 @@ BOOST_AUTO_TEST_CASE(element_inside_list_t1) {
 }
 
 struct element_not_inside_s1 : crv_sequence_item {
-    crv_variable<unsigned int> x{"x"};
+    crv_variable<unsigned> x{"x"};
     crv_constraint con1{"inside"};
     std::set<unsigned> s;
 
@@ -451,7 +433,7 @@ BOOST_AUTO_TEST_CASE(element_not_inside_t1) {
 }
 
 struct element_not_inside_s2 : crv_sequence_item {
-    crv_variable<unsigned int> x{"x"};
+    crv_variable<unsigned> x{"x"};
     crv_constraint con1{"inside"};
     std::vector<unsigned> s;
 
@@ -466,7 +448,7 @@ BOOST_AUTO_TEST_CASE(element_not_inside_t2) {
 }
 
 struct element_not_inside_s3 : crv_sequence_item {
-    crv_variable<unsigned int> x{"x"};
+    crv_variable<unsigned> x{"x"};
     crv_constraint con1{"inside"};
     std::list<unsigned> s;
 
@@ -481,8 +463,8 @@ BOOST_AUTO_TEST_CASE(element_not_inside_t3) {
 }
 
 struct if_then_else_s1 : crv_sequence_item {
-    unsigned int a;
-    crv_variable<unsigned int> b{"b"};
+    unsigned a;
+    crv_variable<unsigned> b{"b"};
     crv_constraint con1{"if_then_else"};
 
     if_then_else_s1(crv_object_name) {
@@ -506,8 +488,8 @@ BOOST_AUTO_TEST_CASE(if_then_else_t1) {
 }
 
 struct if_then_s1 : crv_sequence_item {
-    unsigned int a;
-    crv_variable<unsigned int> b{"b"};
+    unsigned a;
+    crv_variable<unsigned> b{"b"};
     crv_constraint con1{"if_then_else"};
 
     if_then_s1(crv_object_name) {
@@ -605,16 +587,16 @@ BOOST_AUTO_TEST_CASE(shiftright) {
 BOOST_AUTO_TEST_CASE(plus_minus) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
 
-  Variable<unsigned int> a;
-  Variable<unsigned int> b;
-  Variable<unsigned int> q;
-  Variable<unsigned int> r;
+  Variable<unsigned> a;
+  Variable<unsigned> b;
+  Variable<unsigned> q;
+  Variable<unsigned> r;
 
   Generator gen;
   gen(b != 0u)
   (b < a)(q == a + b)(r == a - b);
 
-  unsigned int cnt = 0u;
+  unsigned cnt = 0u;
   while (gen.next() && cnt < 300) {
     BOOST_REQUIRE_EQUAL(gen[a] + gen[b], gen[q]);
     BOOST_REQUIRE_EQUAL(gen[a] - gen[b], gen[r]);
