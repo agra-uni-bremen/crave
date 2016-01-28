@@ -33,7 +33,7 @@ BOOST_FIXTURE_TEST_SUITE(SequenceItem_t, Context_Fixture)
 
 class my_rand_obj : public crv_sequence_item {
  public:
-  crv_constraint constraint{"constraint"};
+  crv_constraint constraint;
   crv_variable<color_enum> color;
   crv_variable<int> x;
 
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(t_rand_enum_standalone) {
 
 class tall_rand_enum_obj : public crv_sequence_item {
  public:
-  crv_constraint constraint{"constraint"};
+  crv_constraint constraint;
   crv_variable<football_enum> player;
 
   tall_rand_enum_obj(crv_object_name) {
@@ -70,7 +70,7 @@ class tall_rand_enum_obj : public crv_sequence_item {
 class tall_rand_enum_obj_gt : public crv_sequence_item {
  public:
   crv_variable<football_enum> player;
-  crv_constraint constraint{"constraint"};
+  crv_constraint constraint;
   tall_rand_enum_obj_gt(crv_object_name) { constraint={player() > football_enum::AM};}
 };
 
@@ -96,7 +96,7 @@ class item : public crv_sequence_item {
   item(crv_object_name){ constraint={a() + b() == c()}; }
 
  public:
-  crv_constraint constraint{"constraint"};
+  crv_constraint constraint;
   crv_variable<int> a;
   crv_variable<int> b;
   crv_variable<int> c;
@@ -104,7 +104,7 @@ class item : public crv_sequence_item {
 
 class item1 : public item {
  public:
-  crv_constraint constraint{"constraint"};
+  crv_constraint constraint;
   item1(crv_object_name name) : item(name){
     constraint={10 <= a() && a() <= 20,a() + b() + c() <= 200};
   }
@@ -112,7 +112,7 @@ class item1 : public item {
 
 class item2 : public item1 {
  public:
-     crv_constraint constraint{"constraint"};
+     crv_constraint constraint;
   item2(crv_object_name name) : item1(name){ constraint={a() + b() + c() == 100}; }
   crv_variable<int> d;
 };
@@ -152,9 +152,9 @@ class obj : public crv_sequence_item {
     e_con={dist(e(), distribution<char>::simple_range('a', 'z'))};
     f_con={dist(f(), distribution<unsigned char>::simple_range('A', 'Z'))};
   }
-  crv_constraint constraint{"constraint"};
-  crv_constraint e_con{"e"};
-  crv_constraint f_con{"f"};
+  crv_constraint constraint;
+  crv_constraint e_con;
+  crv_constraint f_con;
   crv_variable<int> a;
   crv_variable<unsigned int> b;
   crv_variable<short> c;
@@ -170,7 +170,7 @@ class obj : public crv_sequence_item {
 
 class obj1 : public obj {
  public:
-  crv_constraint constraint{"constraint"};
+  crv_constraint constraint;
   obj1(crv_object_name name) : obj(name){
     e_con.deactivate();
     f_con.deactivate();
@@ -183,7 +183,7 @@ class obj1 : public obj {
 
 class obj2 : public obj1 {
  public:
-   crv_constraint constraint{"constraint"};
+   crv_constraint constraint;
    obj2(crv_object_name name) : l("l") , obj1(name) {
    constraint={dist(g(), distribution<long>::simple_range(-20, -10)),
    dist(h(), distribution<unsigned long>::simple_range(10, 20)),
@@ -264,8 +264,8 @@ struct Item1 : public crv_sequence_item {
     x = upper;
     return true;
   }
-  crv_constraint c1{"c1"};
-  crv_constraint c2{"c2"};
+  crv_constraint c1;
+  crv_constraint c2;
   crv_variable<unsigned> x;
   int pivot;
 };

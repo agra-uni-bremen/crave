@@ -145,11 +145,11 @@ BOOST_AUTO_TEST_CASE(neg_t1) {
 }
 
 struct neg_s2 : crv_sequence_item {
-    crv_variable<bool> a{"a"};
-    crv_variable<int> b{"b"};
-    crv_variable<int> c{"c"};
-    crv_variable<int> d{"d"};
-    crv_constraint con1{"neg"};
+    crv_variable<bool> a;
+    crv_variable<int> b;
+    crv_variable<int> c;
+    crv_variable<int> d;
+    crv_constraint con1;
 
     neg_s2(crv_object_name) {
         con1 = {dist(a(), distribution<bool>::create(0.5)), b() == 1337 && c() == 42, if_then_else(a(), d() == -b(), d() == -c())};
@@ -168,9 +168,9 @@ BOOST_AUTO_TEST_CASE(neg_t2) {
 }
 
 struct comp_s1 : crv_sequence_item {
-    crv_variable<unsigned> a{"a"};
-    crv_variable<unsigned> b{"b"};
-    crv_constraint con1{"neg"};
+    crv_variable<unsigned> a;
+    crv_variable<unsigned> b;
+    crv_constraint con1;
 
     comp_s1(crv_object_name) {
         con1 = {a() == 0, b() == ~a()};
@@ -185,10 +185,10 @@ BOOST_AUTO_TEST_CASE(complement_t1) {
 }
 
 struct bitwise_and_s1 : crv_sequence_item {
-    crv_variable<unsigned> a{"a"};
-    crv_variable<unsigned> b{"b"};
-    crv_variable<unsigned> c{"c"};
-    crv_constraint con1{"bitwise"};
+    crv_variable<unsigned> a;
+    crv_variable<unsigned> b;
+    crv_variable<unsigned> c;
+    crv_constraint con1;
 
     bitwise_and_s1(crv_object_name) {
         con1 = {a() == 42, b() == 1337, c() == (a() & b())};
@@ -219,11 +219,11 @@ BOOST_AUTO_TEST_CASE(bitwise_or_t1) {
 }
 
 struct xor_s1 : crv_sequence_item {
-    crv_variable<bool> a{"a"};
-    crv_variable<bool> b{"b"};
-    crv_variable<unsigned> c{"c"};
-    crv_constraint con1{"xor"};
-    crv_constraint con2{"xor"};
+    crv_variable<bool> a;
+    crv_variable<bool> b;
+    crv_variable<unsigned> c;
+    crv_constraint con1;
+    crv_constraint con2;
 
     xor_s1(crv_object_name) {
         con1 = {a() == false, b() == false, c() == (a() ^ b())};
@@ -262,15 +262,14 @@ BOOST_AUTO_TEST_CASE(xor_t2) {
 }
 
 struct element_inside_set_s1 : crv_sequence_item {
-    crv_variable<unsigned> a{"a"};
-    crv_constraint con1{"inside"};
+    crv_variable<unsigned> a;
+    crv_constraint con1={inside(a(), s)};
     std::set<unsigned> s;
 
     element_inside_set_s1(crv_object_name) {
         s.insert(1);
         s.insert(7);
         s.insert(9);
-        con1 = {inside(a(), s)};
     }
 };
 
@@ -302,8 +301,8 @@ BOOST_AUTO_TEST_CASE(element_inside_set_t1) {
 }
 
 struct element_inside_vec_s1 : crv_sequence_item {
-    crv_variable<unsigned> x{"x"};
-    crv_constraint con1{"inside"};
+    crv_variable<unsigned> x;
+    crv_constraint con1;
     std::vector<unsigned> v;
 
     element_inside_vec_s1(crv_object_name) {
@@ -340,8 +339,8 @@ BOOST_AUTO_TEST_CASE(element_inside_vec_t1) {
 }
 
 struct element_inside_array_s1 : crv_sequence_item {
-    crv_variable<unsigned> x{"x"};
-    crv_constraint con1{"inside"};
+    crv_variable<unsigned> x;
+    crv_constraint con1;
     unsigned a[3];
 
     element_inside_array_s1(crv_object_name) {
@@ -378,8 +377,8 @@ BOOST_AUTO_TEST_CASE(element_inside_array_t) {
 }
 
 struct element_inside_list_s1 : crv_sequence_item {
-    crv_variable<unsigned> x{"x"};
-    crv_constraint con1{"inside"};
+    crv_variable<unsigned> x;
+    crv_constraint con1;
     std::list<unsigned> l;
 
     element_inside_list_s1(crv_object_name) {
@@ -418,8 +417,8 @@ BOOST_AUTO_TEST_CASE(element_inside_list_t1) {
 }
 
 struct element_not_inside_s1 : crv_sequence_item {
-    crv_variable<unsigned> x{"x"};
-    crv_constraint con1{"inside"};
+    crv_variable<unsigned> x;
+    crv_constraint con1;
     std::set<unsigned> s;
 
     element_not_inside_s1(crv_object_name) {
@@ -433,8 +432,8 @@ BOOST_AUTO_TEST_CASE(element_not_inside_t1) {
 }
 
 struct element_not_inside_s2 : crv_sequence_item {
-    crv_variable<unsigned> x{"x"};
-    crv_constraint con1{"inside"};
+    crv_variable<unsigned> x;
+    crv_constraint con1;
     std::vector<unsigned> s;
 
     element_not_inside_s2(crv_object_name) {
@@ -448,8 +447,8 @@ BOOST_AUTO_TEST_CASE(element_not_inside_t2) {
 }
 
 struct element_not_inside_s3 : crv_sequence_item {
-    crv_variable<unsigned> x{"x"};
-    crv_constraint con1{"inside"};
+    crv_variable<unsigned> x;
+    crv_constraint con1;
     std::list<unsigned> s;
 
     element_not_inside_s3(crv_object_name) {
@@ -464,8 +463,8 @@ BOOST_AUTO_TEST_CASE(element_not_inside_t3) {
 
 struct if_then_else_s1 : crv_sequence_item {
     unsigned a;
-    crv_variable<unsigned> b{"b"};
-    crv_constraint con1{"if_then_else"};
+    crv_variable<unsigned> b;
+    crv_constraint con1;
 
     if_then_else_s1(crv_object_name) {
         con1 = {if_then_else(reference(a)<5, b()> 0 && b() <= 50, b() > 50 && b() <= 100)};
@@ -489,8 +488,8 @@ BOOST_AUTO_TEST_CASE(if_then_else_t1) {
 
 struct if_then_s1 : crv_sequence_item {
     unsigned a;
-    crv_variable<unsigned> b{"b"};
-    crv_constraint con1{"if_then_else"};
+    crv_variable<unsigned> b;
+    crv_constraint con1;
 
     if_then_s1(crv_object_name) {
         con1 = {if_then(reference(a)<5, b()> 0 && b() <= 100),if_then(reference(a) >= 5, b() > 100 && b() <= 1000)};
@@ -514,8 +513,8 @@ BOOST_AUTO_TEST_CASE(if_then_t1) {
 }
 
 struct bitslice_s1 : crv_sequence_item {
-    crv_variable<short> x{"x"};
-    crv_constraint con1{"bitslice"};
+    crv_variable<short> x;
+    crv_constraint con1;
 
     bitslice_s1(crv_object_name) {
         con1 = {bitslice(10, 3, x()) == 0xFF};
@@ -610,9 +609,9 @@ BOOST_AUTO_TEST_CASE(plus_minus) {
 }
 
 struct mult_mod_s1 : crv_sequence_item {
-    crv_variable<int> a{"a"};
-    crv_variable<int> b{"b"};
-    crv_constraint con1{"mult_mod"};
+    crv_variable<int> a;
+    crv_variable<int> b;
+    crv_constraint con1;
 
     mult_mod_s1(crv_object_name) {
         con1 = {-3 <= a() && a() <= 3,-3 <= b() && b() <= 3,a() * b() % 6 == 0};

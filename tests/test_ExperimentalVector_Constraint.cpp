@@ -26,7 +26,7 @@ struct Item : public crv_sequence_item {
   }
 
   crv_vector<unsigned int> v;
-  crv_constraint constraint{"constraint"};
+  crv_constraint constraint;
 };
 
 BOOST_AUTO_TEST_CASE(fibo_test) {
@@ -59,7 +59,7 @@ struct Item2 : public crv_sequence_item {
   Item2(crv_object_name){ constraint={foreach(v(), 100 <= v()[_i] && v()[_i] <= 200)}; }
 
   crv_vector<unsigned int> v;
-   crv_constraint constraint{"constraint"};
+   crv_constraint constraint;
 };
 
 BOOST_AUTO_TEST_CASE(default_size_test) {
@@ -82,7 +82,7 @@ struct Item3 : public crv_sequence_item {
   }
 
   crv_vector<int> v;
-   crv_constraint constraint{"constraint"};
+   crv_constraint constraint;
 };
 
 BOOST_AUTO_TEST_CASE(unique_test_1) {
@@ -131,9 +131,9 @@ struct Item4 : public crv_sequence_item {
   }
 
   crv_vector<unsigned int> v;
-  crv_constraint constraint{"constraint"};
-  crv_constraint c1{"c1"};
-  crv_constraint c2{"c2"};
+  crv_constraint constraint;
+  crv_constraint c1;
+  crv_constraint c2;
 };
 
 BOOST_AUTO_TEST_CASE(constraint_management_test) {
@@ -162,7 +162,7 @@ struct Item5 : public crv_sequence_item {
   }
 
   crv_vector<unsigned int> v;
-   crv_constraint constraint{"constraint"};
+   crv_constraint constraint;
 };
 
 BOOST_AUTO_TEST_CASE(index_constraint_test) {

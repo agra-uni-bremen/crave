@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(single_variable_constraint) {
 struct TestObject : public crv_sequence_item {
 
   crv_variable<unsigned> v1r1, v1r2, v1r3;
-  crv_constraint tree{"tree"};
+  crv_constraint tree;
   TestObject(crv_object_name) { tree = {((v1r1() * v1r2()) + (v1r3() - 4)) == 10};}
 };
 BOOST_AUTO_TEST_CASE(ComplexityEstimationVisitorTest) {
