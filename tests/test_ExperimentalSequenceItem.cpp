@@ -29,7 +29,7 @@ CRAVE_BETTER_ENUM(football_enum,
   CF    // Centre Striker
 );
 
-BOOST_FIXTURE_TEST_SUITE(Random_Object_t, Context_Fixture)
+BOOST_FIXTURE_TEST_SUITE(SequenceItem_t, Context_Fixture)
 
 class my_rand_obj : public crv_sequence_item {
  public:
@@ -308,48 +308,6 @@ BOOST_AUTO_TEST_CASE(item_with_vector) {
       if (i > 0) BOOST_REQUIRE_LE(it.data[i - 1], it.data[i]);
     }
   }
-}
-//TODO
-class Constraint_base : public Generator {
- public:
-  Constraint_base() : Generator(), constraint(*this) {}
-
- protected:
-  Generator& constraint;
-};
-//TODO
-class Constraint1 : public Constraint_base {
- public:
-  Variable<unsigned> x;
-
-  Constraint1() : Constraint_base() { constraint(x < 10); }
-};
-//TODO
-class Constraint2 : public Constraint1 {
- public:
-  Constraint2() : Constraint1() { constraint(x > 6); }
-};
-//TODO
-BOOST_AUTO_TEST_CASE(t1) {
-  Constraint2 c2;
-
-  c2();
-  unsigned r = c2[c2.x];
-  BOOST_REQUIRE_LT(r, 10);
-  BOOST_REQUIRE_GT(r, 6);
-
-  c2(c2.x != r)();
-  r = c2[c2.x];
-  BOOST_REQUIRE_LT(r, 10);
-  BOOST_REQUIRE_GT(r, 6);
-
-  c2(c2.x != r)();
-  r = c2[c2.x];
-  BOOST_REQUIRE_LT(r, 10);
-  BOOST_REQUIRE_GT(r, 6);
-
-  c2(c2.x != r);
-  BOOST_REQUIRE(!c2.next());
 }
 
 BOOST_AUTO_TEST_SUITE_END()  // Context
