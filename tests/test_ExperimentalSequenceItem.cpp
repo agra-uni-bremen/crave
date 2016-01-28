@@ -150,7 +150,7 @@ class obj : public crv_sequence_item {
     dist(c(), distribution<short>::simple_range(-20, -10)),
     dist(d(), distribution<unsigned short>::simple_range(10, 20))};
     e_con={dist(e(), distribution<char>::simple_range('a', 'z'))};
-    e_con={dist(f(), distribution<unsigned char>::simple_range('A', 'Z'))};
+    f_con={dist(f(), distribution<unsigned char>::simple_range('A', 'Z'))};
   }
   crv_constraint constraint{"constraint"};
   crv_constraint e_con{"e"};
@@ -174,8 +174,10 @@ class obj1 : public obj {
   obj1(crv_object_name name) : obj(name){
     e_con.deactivate();
     f_con.deactivate();
-    constraint={dist(e(), distribution<char>::simple_range('A', 'Z'))};
-    constraint={dist(f(), distribution<unsigned char>::simple_range('a', 'z'))};
+    constraint={
+      dist(e(), distribution<char>::simple_range('A', 'Z')), 
+      dist(f(), distribution<unsigned char>::simple_range('a', 'z'))
+    };
   }
 };
 

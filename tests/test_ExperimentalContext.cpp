@@ -94,12 +94,14 @@ BOOST_AUTO_TEST_CASE(soft_constraint_t) {
 struct randv_test_s : public crv_sequence_item {
   crv_variable<unsigned int> a{"c"};
   crv_variable<unsigned int> b{"d"};
+  
+  randv_test_s(crv_object_name) {}
 };
 
 //todo
 BOOST_AUTO_TEST_CASE(randv_test) {
   Generator gen;
-  randv_test_s item;
+  randv_test_s item("item");
   std::cout << "init: a = " << item.a << ", b = " << item.b << std::endl;
   gen(4 <= item.a() && item.a() <= 6)
   (9 <= item.a() + item.b() && item.a() + item.b() <= 11)(item.b() % 2 == 0);

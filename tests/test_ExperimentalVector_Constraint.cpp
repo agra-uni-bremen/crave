@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE(unique_test_2) {
 }
 
 BOOST_AUTO_TEST_CASE(soft_unique_test) {
-  crv_vector<unsigned int> v(NULL);
+  crv_vector<unsigned int> v;
   Generator gen;
   gen(v().size() == 7);
   gen(foreach(v(), v()[_i] < 6));
