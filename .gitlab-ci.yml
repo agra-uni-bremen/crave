@@ -5,7 +5,7 @@ build:
   - make -j
   - make test -j
   tags:
-    linux
+  - linux
   cache:
     paths:
     - deps/
