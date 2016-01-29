@@ -1,0 +1,11 @@
+build:
+  script: 
+  - ./show_linux_distribution.sh
+  - git submodule update --init
+  - make -j
+  - make test -j
+  cache:
+    paths:
+    - deps/
+
+  
