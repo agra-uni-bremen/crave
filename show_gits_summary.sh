@@ -23,7 +23,6 @@ echo $I version 1.0, 2016-01-23
 echo
 
 getGitInfo .
-getGitInfo crave
 getGitInfo examples
 getGitInfo dependencies
 getGitInfo metaSMT
