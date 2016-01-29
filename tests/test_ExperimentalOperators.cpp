@@ -251,14 +251,10 @@ BOOST_AUTO_TEST_CASE(xor_t2) {
 
 struct element_inside_set_s1 : crv_sequence_item {
     crv_variable<unsigned> a;
-    crv_constraint con1={inside(a(), s)};
-    std::set<unsigned> s;
+    std::set<unsigned> s { 1, 7, 9 };
+    crv_constraint con1 { inside(a(), s) };
 
-    element_inside_set_s1(crv_object_name) {
-        s.insert(1);
-        s.insert(7);
-        s.insert(9);
-    }
+    element_inside_set_s1(crv_object_name) {}
 };
 
 BOOST_AUTO_TEST_CASE(element_inside_set_t1) {
@@ -267,7 +263,7 @@ BOOST_AUTO_TEST_CASE(element_inside_set_t1) {
     BOOST_REQUIRE(item.s.find(item.a) != item.s.end());
 
     unsigned first = item.a;
-    item.con1&={item.a() != first};
+    item.con1 &= {item.a() != first};
 
     BOOST_REQUIRE(item.randomize());
     BOOST_REQUIRE(item.s.find(item.a) != item.s.end());
@@ -275,7 +271,7 @@ BOOST_AUTO_TEST_CASE(element_inside_set_t1) {
     unsigned second = item.a;
     BOOST_REQUIRE_NE(first, second);
     
-    item.con1&={item.a() != second};
+    item.con1 &= {item.a() != second};
 
     BOOST_REQUIRE(item.randomize());
     BOOST_REQUIRE(item.s.find(item.a) != item.s.end());
@@ -283,21 +279,17 @@ BOOST_AUTO_TEST_CASE(element_inside_set_t1) {
     unsigned third = item.a;
     BOOST_REQUIRE_NE(third, second);
     BOOST_REQUIRE_NE(first, third);
-    item.con1&={item.a() != third};
+    item.con1 &= {item.a() != third};
 
     BOOST_REQUIRE(!item.randomize());
 }
 
 struct element_inside_vec_s1 : crv_sequence_item {
     crv_variable<unsigned> x;
+    std::vector<unsigned> v { 1, 7, 9 };
     crv_constraint con1= {inside(x(), v)};
-    std::vector<unsigned> v;
 
-    element_inside_vec_s1(crv_object_name) {
-        v.push_back(1);
-        v.push_back(7);
-        v.push_back(9);
-    }
+    element_inside_vec_s1(crv_object_name) {}
 };
 
 BOOST_AUTO_TEST_CASE(element_inside_vec_t1) {
@@ -306,14 +298,14 @@ BOOST_AUTO_TEST_CASE(element_inside_vec_t1) {
     BOOST_REQUIRE(find(item.v.begin(), item.v.end(), item.x) != item.v.end());
 
     unsigned first = item.x;
-    item.con1&={item.x() != first};
+    item.con1 &= {item.x() != first};
 
     BOOST_REQUIRE(item.randomize());
     BOOST_REQUIRE(find(item.v.begin(), item.v.end(), item.x) != item.v.end());
 
     unsigned second = item.x;
     BOOST_REQUIRE_NE(first, second);
-    item.con1&={item.x() != second};
+    item.con1 &= {item.x() != second};
 
     BOOST_REQUIRE(item.randomize());
     BOOST_REQUIRE(find(item.v.begin(), item.v.end(), item.x) != item.v.end());
@@ -321,57 +313,46 @@ BOOST_AUTO_TEST_CASE(element_inside_vec_t1) {
     unsigned third = item.x;
     BOOST_REQUIRE_NE(third, second);
     BOOST_REQUIRE_NE(first, third);
-    item.con1&={item.x() != third};
+    item.con1 &= {item.x() != third};
     BOOST_REQUIRE(!item.randomize());
 }
 
 struct element_inside_array_s1 : crv_sequence_item {
     crv_variable<unsigned> x;
-    crv_constraint con1= {inside(x(), a)};
-    unsigned a[3];
+    unsigned a[3] { 1, 7, 9 };
+    crv_constraint con1 { inside(x(), a) };
 
-    element_inside_array_s1(crv_object_name) {
-        a[0] = 1;
-        a[1] = 7;
-        a[2] = 9;
-    }
+    element_inside_array_s1(crv_object_name) {}
 };
 
 BOOST_AUTO_TEST_CASE(element_inside_array_t) {
     element_inside_array_s1 item("item");
-    Generator gen;
-    item.con1&={inside(item.x(), item.a)};
-
     BOOST_REQUIRE(item.randomize());
 
     unsigned first = item.x;
-    item.con1&={item.x() != first};
+    item.con1 &= {item.x() != first};
 
     BOOST_REQUIRE(item.randomize());
 
     unsigned second = item.x;
     BOOST_REQUIRE_NE(first, second);
-    item.con1&={item.x() != second};
+    item.con1 &= {item.x() != second};
 
     BOOST_REQUIRE(item.randomize());
     unsigned third = item.x;
     BOOST_REQUIRE_NE(third, second);
     BOOST_REQUIRE_NE(first, third);
-    item.con1&={item.x() != third};
+    item.con1 &= {item.x() != third};
 
     BOOST_REQUIRE(!item.randomize());
 }
 
 struct element_inside_list_s1 : crv_sequence_item {
     crv_variable<unsigned> x;
-    crv_constraint con1={inside(x(), l)};
-    std::list<unsigned> l;
+    std::list<unsigned> l { 1, 7, 9 };
+    crv_constraint con1 { inside(x(), l) };
 
-    element_inside_list_s1(crv_object_name) {
-        l.push_back(1);
-        l.push_back(7);
-        l.push_back(9);
-    }
+    element_inside_list_s1(crv_object_name) {}
 };
 
 BOOST_AUTO_TEST_CASE(element_inside_list_t1) {
@@ -381,14 +362,14 @@ BOOST_AUTO_TEST_CASE(element_inside_list_t1) {
     BOOST_REQUIRE(find(item.l.begin(), item.l.end(), item.x) != item.l.end());
 
     unsigned first = item.x;
-    item.con1&={item.x() != first};
+    item.con1 &= {item.x() != first};
 
     BOOST_REQUIRE(item.randomize());
     BOOST_REQUIRE(find(item.l.begin(), item.l.end(), item.x) != item.l.end());
 
     unsigned second = item.x;
     BOOST_REQUIRE_NE(first, second);
-    item.con1&={item.x() != second};
+    item.con1 &= {item.x() != second};
 
     BOOST_REQUIRE(item.randomize());
     BOOST_REQUIRE(find(item.l.begin(), item.l.end(), item.x) != item.l.end());
@@ -396,15 +377,15 @@ BOOST_AUTO_TEST_CASE(element_inside_list_t1) {
     unsigned third = item.x;
     BOOST_REQUIRE_NE(third, second);
     BOOST_REQUIRE_NE(first, third);
-    item.con1&={item.x() != third};
+    item.con1 &= {item.x() != third};
 
     BOOST_REQUIRE(!item.randomize());
 }
 
 struct element_not_inside_s1 : crv_sequence_item {
     crv_variable<unsigned> x;
-    crv_constraint con1= {inside(x(), s)};
     std::set<unsigned> s;
+    crv_constraint con1 { inside(x(), s) };
 
     element_not_inside_s1(crv_object_name) { }
 };
@@ -416,8 +397,8 @@ BOOST_AUTO_TEST_CASE(element_not_inside_t1) {
 
 struct element_not_inside_s2 : crv_sequence_item {
     crv_variable<unsigned> x;
-    crv_constraint con1= {inside(x(), s)};
     std::vector<unsigned> s;
+    crv_constraint con1 {inside(x(), s)};
 
     element_not_inside_s2(crv_object_name) { }
 };
@@ -429,8 +410,8 @@ BOOST_AUTO_TEST_CASE(element_not_inside_t2) {
 
 struct element_not_inside_s3 : crv_sequence_item {
     crv_variable<unsigned> x;
-    crv_constraint con1={inside(x(), s)};
     std::list<unsigned> s;
+    crv_constraint con1 { inside(x(), s) };
 
     element_not_inside_s3(crv_object_name) { }
 };
@@ -443,7 +424,7 @@ BOOST_AUTO_TEST_CASE(element_not_inside_t3) {
 struct if_then_else_s1 : crv_sequence_item {
     unsigned a;
     crv_variable<unsigned> b;
-    crv_constraint con1= {if_then_else(reference(a)<5, b()> 0 && b() <= 50, b() > 50 && b() <= 100)};
+    crv_constraint con1 { if_then_else(reference(a)<5, b()> 0 && b() <= 50, b() > 50 && b() <= 100) };
 
     if_then_else_s1(crv_object_name) { }
 };
@@ -466,7 +447,7 @@ BOOST_AUTO_TEST_CASE(if_then_else_t1) {
 struct if_then_s1 : crv_sequence_item {
     unsigned a;
     crv_variable<unsigned> b;
-    crv_constraint con1= {if_then(reference(a)<5, b()> 0 && b() <= 100),if_then(reference(a) >= 5, b() > 100 && b() <= 1000)};
+    crv_constraint con1 { if_then(reference(a)<5, b()> 0 && b() <= 100),if_then(reference(a) >= 5, b() > 100 && b() <= 1000) };
 
     if_then_s1(crv_object_name) { }
 };
@@ -489,7 +470,7 @@ BOOST_AUTO_TEST_CASE(if_then_t1) {
 
 struct bitslice_s1 : crv_sequence_item {
     crv_variable<short> x;
-    crv_constraint con1 = {bitslice(10, 3, x()) == 0xFF};
+    crv_constraint con1 { bitslice(10, 3, x()) == 0xFF };
 
     bitslice_s1(crv_object_name) { }
 };
