@@ -1,0 +1,6 @@
+[submodule "dependencies"]
+	path = dependencies
+	url = https://github.com/agra-uni-bremen/dependencies.git
+[submodule "metaSMT"]
+	path = metaSMT
+	url = https://github.com/agra-uni-bremen/metaSMT.git

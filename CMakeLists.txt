@@ -1,4 +1,4 @@
-project ( crave )
+project(crave)
 cmake_minimum_required(VERSION 2.8.9)
 
 set(${PROJECT_NAME}_CONFIG_DIR "share/${PROJECT_NAME}" CACHE PATH 
@@ -28,30 +28,80 @@ SET( CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING
   "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel Profiling."
   FORCE )
 
+############################################################
+##                CRAVE settings                          ##
+############################################################
+
+option(CRAVE_ENABLE_EXPERIMENTAL "enable experimental extensions of CRAVE" on)
+
+if (CRAVE_ENABLE_EXPERIMENTAL)
+  add_definitions(-std=c++11)
+endif()
+
+option(CRAVE_ENABLE_COVERAGE "enable code coverage for CRAVE tests" off)  
+
+if (CRAVE_ENABLE_COVERAGE)
+  add_definitions(--coverage)
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage") 
+endif()
+
+if (metaSMT_USE_Boolector)
+  add_definitions(-DmetaSMT_USE_Boolector)
+endif()
+if (metaSMT_USE_CVC4)
+  add_definitions(-DmetaSMT_USE_CVC4)
+endif()
+if (metaSMT_USE_Z3)
+  add_definitions(-DmetaSMT_USE_Z3)
+endif()
+if (metaSMT_USE_SWORD)
+  add_definitions(-DmetaSMT_USE_SWORD)
+endif()
+if (metaSMT_USE_CUDD)
+  add_definitions(-DmetaSMT_USE_CUDD)
+endif()
+
+if (WITH_SYSTEMC)
+  add_definitions(-DWITH_SYSTEMC)
+endif()
+
+### packages
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
 set(Boost_NO_BOOST_CMAKE true)
 set(Boost_NO_SYSTEM_PATHS true)
 set(Boost_ADDITIONAL_VERSIONS "1.50.0")
-find_package ( Boost REQUIRED COMPONENTS system thread filesystem )
+find_package(Boost REQUIRED COMPONENTS system thread filesystem)
 
-find_package ( metaSMT REQUIRED )
-add_definitions( "${metaSMT_CXXFLAGS}" )
+find_package(Glog REQUIRED)
 
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-find_package ( SystemC )
-find_package ( Glog )
+if (WITH_SYSTEMC)
+  find_package(SystemC REQUIRED)
+  find_package(Threads REQUIRED)
+else()
+  find_package(SystemC)
+endif()
 
-include_directories( ${metaSMT_INCLUDE_DIR} )
-include_directories( ${Boost_INCLUDE_DIRS} )
-include_directories( ${GLOG_INCLUDE_DIRS} )
+add_subdirectory(metaSMT)
+list(INSERT CMAKE_PREFIX_PATH 0 "${CMAKE_BINARY_DIR}")
+#list(INSERT CMAKE_PREFIX_PATH 0 "${metaSMT_BINARY_DIR}/src")
+find_package(metaSMT REQUIRED)
+add_definitions("${metaSMT_CXXFLAGS}")
+
+### includes
+include_directories(${metaSMT_INCLUDE_DIR})
+include_directories(${Boost_INCLUDE_DIRS})
+include_directories(${GLOG_INCLUDE_DIRS})
 
 if(SystemC_FOUND)
-  find_package(Threads REQUIRED)
   include_directories(${SystemC_INCLUDE_DIR})
 endif(SystemC_FOUND)
 
+enable_testing ()
+
 add_subdirectory(src)
 
-enable_testing ()
 set(${PROJECT_NAME}_LIBS ${CMAKE_INSTALL_PREFIX}/lib/lib${PROJECT_NAME}.a ${metaSMT_LIBRARIES} ${GLOG_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY})
 set(${PROJECT_NAME}_INCLUDE ${CMAKE_INSTALL_PREFIX}/include ${metaSMT_INCLUDE_DIR} ${Boost_INCLUDE_DIRS} ${GLOG_INCLUDE_DIRS})
 
@@ -59,7 +109,6 @@ if(SystemC_FOUND)
   LIST(APPEND ${PROJECT_NAME}_INCLUDE ${SystemC_INCLUDE_DIR})
   LIST(APPEND ${PROJECT_NAME}_LIBS ${SystemC_LIBRARY})
 endif(SystemC_FOUND)
-
 
 ## create CRAVE CMake config file
 file(WRITE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
@@ -82,14 +131,15 @@ foreach(LIBPATH ${${PROJECT_NAME}_LIBS})
   LIST(APPEND ${PROJECT_NAME}_RPATH -Wl,-rpath=${LIBDIR})
 endforeach()  
 string(REPLACE ";" " " ${PROJECT_NAME}_RPATH "${${PROJECT_NAME}_RPATH}")
-## create ${PROJECT_NAME} CMake make config file
+
+## create CRAVE CMake make config file
 file(WRITE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.makefile
 "${PROJECT_NAME}_INCLUDES := ${${PROJECT_NAME}_MINCLUDE}
 ${PROJECT_NAME}_LIBRARIES := ${${PROJECT_NAME}_MLIBS} 
 ${PROJECT_NAME}_RPATH := ${${PROJECT_NAME}_RPATH}
 ")
 
-## create ${PROJECT_NAME} pkgconfig make config file
+## create CRAVE pkgconfig make config file
 string(REPLACE ";" " " ${PROJECT_NAME}_MLIBS "${${PROJECT_NAME}_LIBS}")
 file(WRITE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.pc
 "Name: ${PROJECT_NAME}
@@ -98,6 +148,7 @@ Cflags: ${${PROJECT_NAME}_MINCLUDE}
 Libs: ${${PROJECT_NAME}_MLIBS} 
 ")
 
+## install
 INSTALL( FILES 
 	${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
 	${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.py
@@ -107,7 +158,54 @@ INSTALL( FILES
 	${PROJECT_BINARY_DIR}/${PROJECT_NAME}.pc
 	DESTINATION lib/pkgconfig/)
 
-
 add_subdirectory ( tests )
 
+############################################################
+##                CPack settings                          ##
+############################################################
 
+option( CRAVE_BUNDLE_PACKAGE_BY_DATE "use date for package name instead of git description" on)
+
+if( CRAVE_BUNDLE_PACKAGE_BY_DATE )
+
+  # CPack version numbers for release tarball name.
+  if(UNIX)
+  execute_process(COMMAND date +%Y OUTPUT_VARIABLE CPACK_PACKAGE_VERSION_MAJOR ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+  execute_process(COMMAND date +%m OUTPUT_VARIABLE CPACK_PACKAGE_VERSION_MINOR ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+  execute_process(COMMAND date +%d OUTPUT_VARIABLE CPACK_PACKAGE_VERSION_PATCH ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+  endif()
+  set(VERSION "${CPACK_PACKAGE_VERSION_MAJOR}-${CPACK_PACKAGE_VERSION_MINOR}-${CPACK_PACKAGE_VERSION_PATCH}")
+else()
+  include(cmake/get_git_version.cmake)
+  get_git_version(VERSION crave-bundle-)
+endif()
+
+message(STATUS "crave-bundle VERSION: ${VERSION}")
+
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "CRAVE - Constrained RAndom Verification Environment for SystemC/C++")
+set(CPACK_PACKAGE_VENDOR "CRAVE development team")
+set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_CURRENT_SOURCE_DIR}/README.md)
+set(CPACK_GENERATOR TGZ)
+set(
+CPACK_SOURCE_PACKAGE_FILE_NAME
+"${PROJECT_NAME}-${VERSION}"
+CACHE INTERNAL "tarball basename"
+)
+set(CPACK_SOURCE_GENERATOR TGZ)
+
+set(CPACK_SOURCE_IGNORE_FILES
+"/\\\\.git"
+"/deps.*/"
+"/build.*/"
+"/root.*/"
+"^${PROJECT_SOURCE_DIR}/logs"
+"^${PROJECT_SOURCE_DIR}/crave.cfg"
+"^${PROJECT_SOURCE_DIR}/temp*"
+"^${PROJECT_SOURCE_DIR}/tmp*"
+"^${PROJECT_SOURCE_DIR}/Makefile.local"
+"^${PROJECT_SOURCE_DIR}/coverage.log"
+"^${PROJECT_SOURCE_DIR}/lcov_output"
+"~$"
+)
+include(CPack)
+  
