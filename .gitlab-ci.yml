@@ -2,3 +2,8 @@ build:
   script: 
   - git submodule update --init
   - make
+  cache:
+    paths:
+    - deps/
+
+  
