@@ -2,7 +2,8 @@ build:
   script: 
   - ./show_linux_distribution.sh
   - git submodule update --init
-  - export BOOST_ROOT=/usr
+  - mkdir -p /home/radames/share/deps
+  - ln -s /home/radames/share/deps deps
   - make -j
   - make test -j
   tags:
