@@ -2,6 +2,7 @@ build:
   script: 
   - ./show_linux_distribution.sh
   - git submodule update --init
+  - export BOOST_ROOT=/usr
   - make -j
   - make test -j
   tags:
@@ -9,6 +10,3 @@ build:
   cache:
     paths:
     - deps/
-    
-
-  
