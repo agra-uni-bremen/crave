@@ -19,11 +19,11 @@ function getGitInfo {
 
 
 I=`basename $0`
-echo $I version 1.0, 2016-01-23
+echo $I version 1.0, 2016-02-01
 echo
 
 getGitInfo .
-getGitInfo examples
+#getGitInfo examples
 getGitInfo dependencies
 getGitInfo metaSMT
 
