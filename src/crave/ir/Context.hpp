@@ -281,10 +281,65 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
     dist_ref_to_var_map[id] = var_term.id();
     return new LogicalAndOpr(val_equal_tmp, tmp_inside);
   }
+  
+  template <typename Integer, typename CollectionTerm>
+  result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_inside>::type const& tag,
+                         Variable<Integer> const& var_term, CollectionTerm const& c) {
+    typedef typename boost::proto::result_of::value<CollectionTerm>::type Collection;
+    typedef typename boost::range_value<Collection>::type CollectionEntry;
+
+    unsigned width = bitsize_traits<Integer>::value;
+    bool sign = crave::is_signed<Integer>::value;
+
+    std::set<Constant> constants;
+    distribution<Integer> dist;
+    BOOST_FOREACH(CollectionEntry const & i, boost::proto::value(c)) {
+      constants.insert(Constant(i, width, sign));
+      dist(weighted_value<Integer>(i, 1));
+    }
+
+    unsigned id = new_var_id();
+    result_type tmp_var = new_var(id, width, sign);
+    boost::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<Integer>(dist, tmp_var));
+    dist_references_.push_back(std::make_pair(id, ref_expr));
+
+    result_type val_equal_tmp(new EqualOpr(boost::proto::eval(var_term, *this), tmp_var));
+    result_type tmp_inside(new Inside(tmp_var, constants));
+    dist_ref_to_var_map[id] = var_term.id();
+    return new LogicalAndOpr(val_equal_tmp, tmp_inside);
+  }
 
   template <typename Integer, typename DistInt>
   result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_dist>::type const& tag,
                          WriteReference<Integer> const& var_term, distribution_tag<DistInt> const& dist_expr) {
+    distribution<DistInt> const& dist = boost::proto::value(dist_expr);
+    unsigned width = bitsize_traits<DistInt>::value;
+    bool sign = crave::is_signed<DistInt>::value;
+
+    unsigned id = new_var_id();
+    result_type tmp_var = new_var(id, width, sign);
+    boost::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<DistInt>(dist, tmp_var));
+    dist_references_.push_back(std::make_pair(id, ref_expr));
+
+    result_type in_ranges;
+    BOOST_FOREACH(weighted_range<DistInt> const & r, dist.ranges()) {
+      result_type left(new Constant(r.left_, width, sign));
+      result_type right(new Constant(r.right_, width, sign));
+      result_type left_cond(new LessEqualOpr(left, tmp_var));
+      result_type right_cond(new LessEqualOpr(tmp_var, right));
+      result_type in_range(new LogicalAndOpr(left_cond, right_cond));
+      result_type tmp(in_ranges != 0 ? new LogicalOrOpr(in_ranges, in_range) : in_range);
+      in_ranges = tmp;
+    }
+
+    result_type var_equal_tmp(new EqualOpr(boost::proto::eval(var_term, *this), tmp_var));
+    dist_ref_to_var_map[id] = var_term.id();
+    return dist.ranges().size() > 0 ? new LogicalAndOpr(var_equal_tmp, in_ranges) : var_equal_tmp;
+  }
+  
+   template <typename Integer, typename DistInt>
+  result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_dist>::type const& tag,
+                         Variable<Integer> const& var_term, distribution_tag<DistInt> const& dist_expr) {
     distribution<DistInt> const& dist = boost::proto::value(dist_expr);
     unsigned width = bitsize_traits<DistInt>::value;
     bool sign = crave::is_signed<DistInt>::value;
@@ -330,6 +385,17 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
   template <typename Integer1, typename Integer2, typename Integer3>
   result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_bitslice>::type const& tag,
                          Integer1 const& r, Integer2 const& l, WriteReference<Integer3> const& var_term) {
+    int rb = boost::proto::value(r);
+    int lb = boost::proto::value(l);
+    if ((rb < lb) || (rb >= bitsize_traits<Integer3>::value)) {
+      throw std::runtime_error("Invalid range of bitslice");
+    }
+    return new Bitslice(boost::proto::eval(var_term, *this), rb, lb);
+  }
+  
+  template <typename Integer1, typename Integer2, typename Integer3>
+  result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_bitslice>::type const& tag,
+                         Integer1 const& r, Integer2 const& l, Variable<Integer3> const& var_term) {
     int rb = boost::proto::value(r);
     int lb = boost::proto::value(l);
     if ((rb < lb) || (rb >= bitsize_traits<Integer3>::value)) {

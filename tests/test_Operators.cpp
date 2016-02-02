@@ -384,7 +384,7 @@ BOOST_AUTO_TEST_CASE(mult_mod) {
   while (gen.next()) {
     cnt1++;
     BOOST_REQUIRE_EQUAL(gen[a] * gen[b] % 6, 0);
-    gen(a != a || b != b);
+    gen(a != gen[a] || b != gen[b]);
     std::cout << "result: a1=" << gen[a] << ", b1=" << gen[b] << "\n" << std::endl;
     BOOST_REQUIRE_LE(cnt1, cnt);
   }

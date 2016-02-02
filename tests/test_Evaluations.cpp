@@ -393,7 +393,7 @@ BOOST_AUTO_TEST_CASE(divide) {
   eval.assign(b, 0u);
   BOOST_CHECK(!eval.evaluate(a / b));
 }
-/* TODO
+
 BOOST_AUTO_TEST_CASE(element_inside_set) {
   std::set<unsigned> s;
   s.insert(1);
@@ -412,8 +412,8 @@ BOOST_AUTO_TEST_CASE(element_inside_set) {
 
   BOOST_CHECK(eval.evaluate(inside(x, s)));
   BOOST_CHECK(!eval.result<bool>());
-}*/
-/* TODO
+}
+
 BOOST_AUTO_TEST_CASE(element_inside_vec) {
   std::vector<unsigned> v;
   v.push_back(1);
@@ -432,8 +432,8 @@ BOOST_AUTO_TEST_CASE(element_inside_vec) {
 
   BOOST_CHECK(eval.evaluate(inside(x, v)));
   BOOST_CHECK(!eval.result<bool>());
-}*/
-/* TODO
+}
+
 BOOST_AUTO_TEST_CASE(element_inside_array) {
   unsigned a[3];
   a[0] = 1;
@@ -452,8 +452,8 @@ BOOST_AUTO_TEST_CASE(element_inside_array) {
 
   BOOST_CHECK(eval.evaluate(inside(x, a)));
   BOOST_CHECK(!eval.result<bool>());
-}*/
-/* TODO
+}
+
 BOOST_AUTO_TEST_CASE(element_inside_list) {
   std::list<unsigned> l;
   l.push_back(1);
@@ -472,8 +472,8 @@ BOOST_AUTO_TEST_CASE(element_inside_list) {
 
   BOOST_CHECK(eval.evaluate(inside(x, l)));
   BOOST_CHECK(!eval.result<bool>());
-}*/
-/* TODO
+}
+
 BOOST_AUTO_TEST_CASE(element_not_inside) {
   Evaluator eval;
   {
@@ -516,7 +516,7 @@ BOOST_AUTO_TEST_CASE(element_not_inside) {
     BOOST_REQUIRE(eval.evaluate(inside(x, l)));
     BOOST_REQUIRE(eval.result<bool>());
   }
-}*/
+}
 
 BOOST_AUTO_TEST_CASE(if_then_else_t1) {
   Variable<unsigned int> a;

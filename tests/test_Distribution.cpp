@@ -13,7 +13,7 @@ using namespace crave;
 using boost::format;
 
 BOOST_FIXTURE_TEST_SUITE(Distribution_t, Context_Fixture)
-/* TODO
+/*
 BOOST_AUTO_TEST_CASE(Variable_dist_t1) {
   Variable<int> v;
   Generator gen;

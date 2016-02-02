@@ -338,8 +338,6 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_6) {
   BOOST_REQUIRE_EQUAL(cnt, cnt1);
 }
 
-/*
- * TODO
 BOOST_AUTO_TEST_CASE(dist_of_boolean25) {
   Variable<bool> a;
   int counter = 0;
@@ -358,9 +356,7 @@ BOOST_AUTO_TEST_CASE(dist_of_boolean25) {
   BOOST_REQUIRE_LT(counter, -425);
   BOOST_REQUIRE_GT(counter, -575);
 }
-*/
-/*
- * TODO
+
 BOOST_AUTO_TEST_CASE(dist_of_boolean50) {
   Variable<bool> a;
   int counter = 0;
@@ -379,9 +375,7 @@ BOOST_AUTO_TEST_CASE(dist_of_boolean50) {
   BOOST_REQUIRE_LT(counter, 75);
   BOOST_REQUIRE_GT(counter, -75);
 }
-*/
-/*
- * TODO
+
 BOOST_AUTO_TEST_CASE(dist_of_boolean75) {
   Variable<bool> a;
   int counter = 0;
@@ -399,7 +393,7 @@ BOOST_AUTO_TEST_CASE(dist_of_boolean75) {
 
   BOOST_REQUIRE_LT(counter, 575);
   BOOST_REQUIRE_GT(counter, 425);
-}*/
+}
 
 BOOST_AUTO_TEST_SUITE_END()  // Context
 
