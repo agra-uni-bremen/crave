@@ -13,7 +13,7 @@ using namespace crave;
 using boost::format;
 
 BOOST_FIXTURE_TEST_SUITE(Distribution_t, Context_Fixture)
-/*
+
 BOOST_AUTO_TEST_CASE(Variable_dist_t1) {
   Variable<int> v;
   Generator gen;
@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(Variable_dist_t1) {
   int total = 100000;
   for (int i = 0; i < total; i++) {
     BOOST_REQUIRE(gen.next());
-    BOOST_REQUIRE((0 <= v && v <= 5) || (50 <= v && v <= 65) || (100 <= v && v <= 125));
+    BOOST_REQUIRE((0 <= gen[v] && gen[v] <= 5) || (50 <= gen[v] && gen[v] <= 65) || (100 <= gen[v] && gen[v] <= 125));
     ++s[gen[v]];
   }
   int min = s[0], max = s[0];
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(variable_dist_t3) {
   int total = 50000;
   for (int i = 0; i < total; i++) {
     BOOST_REQUIRE(gen.next());
-    BOOST_REQUIRE((1 <= v && v <= 5) || (10 <= v && v <= 20) || (v == -50));
+    BOOST_REQUIRE((1 <= gen[v] && gen[v] <= 5) || (10 <= gen[v] && gen[v] <= 20) || (gen[v] == -50));
     if (1 <= gen[v] && gen[v] <= 5) cnt1++;
     if (10 <= gen[v] && gen[v] <= 20) cnt2++;
     if (gen[v] == -50) cnt3++;
@@ -73,9 +73,9 @@ BOOST_AUTO_TEST_CASE(variable_dist_t4) {
   int total = 10000;
   for (int i = 0; i < total; i++) {
     BOOST_REQUIRE(gen.next());
-    BOOST_REQUIRE(5000 <= v && v <= 6000);
+    BOOST_REQUIRE(5000 <= gen[v] && gen[v] <= 6000);
   }
-}*/
+}
 
 
 BOOST_AUTO_TEST_SUITE_END()  // Context
