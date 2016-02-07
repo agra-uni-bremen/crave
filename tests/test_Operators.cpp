@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(logical_and_t1) {
   gen2(c == (a && b));
 
   BOOST_REQUIRE(gen2.next());
-  BOOST_CHECK_EQUAL(gen[c], false);
+  BOOST_CHECK_EQUAL(gen2[c], false);
 }
 
 BOOST_AUTO_TEST_CASE(logical_or_t1) {
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(logical_or_t1) {
   gen2(c == (a || b));
 
   BOOST_REQUIRE(gen2.next());
-  BOOST_CHECK_EQUAL(gen[c], true);
+  BOOST_CHECK_EQUAL(gen2[c], true);
 }
 
 BOOST_AUTO_TEST_CASE(equal_t1) {
@@ -275,7 +275,7 @@ BOOST_AUTO_TEST_CASE(xor_t1) {
   gen2(c == (a ^ b));
 
   BOOST_REQUIRE(gen2.next());
-  BOOST_CHECK_EQUAL(gen[c] != 0, true);
+  BOOST_CHECK_EQUAL(gen2[c] != 0, true);
 }
 
 BOOST_AUTO_TEST_CASE(xor_t2) {
