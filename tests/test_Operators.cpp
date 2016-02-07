@@ -164,7 +164,8 @@ BOOST_AUTO_TEST_CASE(greater) {
   BOOST_REQUIRE_EQUAL(generated.size(), 256);
 
   VariableDefaultSolver::bypass_constraint_analysis = false;
-}*/
+}
+*/
 /* TODO
 BOOST_AUTO_TEST_CASE(greater_equal) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
@@ -199,7 +200,7 @@ BOOST_AUTO_TEST_CASE(neg_t1) {
   BOOST_REQUIRE(gen.next());
   BOOST_CHECK_EQUAL(gen[b], 1337);
 }
-/* TODO
+
 BOOST_AUTO_TEST_CASE(neg_t2) {
   Variable<bool> a;
   Variable<int> b;
@@ -216,7 +217,7 @@ BOOST_AUTO_TEST_CASE(neg_t2) {
     else
       BOOST_CHECK_EQUAL(gen[d], -42);
   }
-}*/
+}
 
 BOOST_AUTO_TEST_CASE(complement_t1) {
   Variable<int> a;
@@ -415,7 +416,7 @@ BOOST_AUTO_TEST_CASE(divide) {
 
   VariableDefaultSolver::bypass_constraint_analysis = false;
 }
-/* TODO
+
 BOOST_AUTO_TEST_CASE(element_inside_set) {
   std::set<unsigned> s;
   s.insert(1);
@@ -430,27 +431,27 @@ BOOST_AUTO_TEST_CASE(element_inside_set) {
   BOOST_REQUIRE(gen.next());
   BOOST_REQUIRE(s.find(gen[x]) != s.end());
 
-  unsigned first = x;
+  unsigned first = gen[x];
   gen(x != first);
 
   BOOST_REQUIRE(gen.next());
-  BOOST_REQUIRE(s.find(x) != s.end());
+  BOOST_REQUIRE(s.find(gen[x]) != s.end());
 
-  unsigned second = x;
+  unsigned second = gen[x];
   BOOST_REQUIRE_NE(first, second);
   gen(x != second);
 
   BOOST_REQUIRE(gen.next());
-  BOOST_REQUIRE(s.find(x) != s.end());
+  BOOST_REQUIRE(s.find(gen[x]) != s.end());
 
-  unsigned third = x;
+  unsigned third = gen[x];
   BOOST_REQUIRE_NE(third, second);
   BOOST_REQUIRE_NE(first, third);
   gen(x != third);
 
   BOOST_REQUIRE(!gen.next());
-}*/
-/* TODO
+}
+
 BOOST_AUTO_TEST_CASE(element_inside_vec) {
   std::vector<unsigned> v;
   v.push_back(1);
@@ -460,13 +461,13 @@ BOOST_AUTO_TEST_CASE(element_inside_vec) {
   Variable<unsigned> x;
 
   Generator gen;
-  gen(inside(gen[x], v));
+  gen(inside(x, v));
 
   BOOST_REQUIRE(gen.next());
   BOOST_REQUIRE(find(v.begin(), v.end(), gen[x]) != v.end());
 
   unsigned first = gen[x];
-  gen(gen[x] != first);
+  gen(x != first);
 
   BOOST_REQUIRE(gen.next());
   BOOST_REQUIRE(find(v.begin(), v.end(), gen[x]) != v.end());
@@ -484,9 +485,9 @@ BOOST_AUTO_TEST_CASE(element_inside_vec) {
   gen(x != third);
 
   BOOST_REQUIRE(!gen.next());
-}*/
+}
 
-/* TODO
+
 BOOST_AUTO_TEST_CASE(element_inside_array) {
   unsigned a[3];
   a[0] = 1;
@@ -519,8 +520,8 @@ BOOST_AUTO_TEST_CASE(element_inside_array) {
   gen(x != third);
 
   BOOST_REQUIRE(!gen.next());
-}*/
-/* TODO
+}
+
 BOOST_AUTO_TEST_CASE(element_inside_list) {
   std::list<unsigned> l;
   l.push_back(1);
@@ -530,7 +531,7 @@ BOOST_AUTO_TEST_CASE(element_inside_list) {
   Variable<unsigned> x;
 
   Generator gen;
-  gen(inside(gen[x], l));
+  gen(inside(x, l));
 
   BOOST_REQUIRE(gen.next());
   BOOST_REQUIRE(find(l.begin(), l.end(), gen[x]) != l.end());
@@ -554,8 +555,8 @@ BOOST_AUTO_TEST_CASE(element_inside_list) {
   gen(x != third);
 
   BOOST_REQUIRE(!gen.next());
-}*/
-/* TODO
+}
+
 BOOST_AUTO_TEST_CASE(element_not_inside) {
   {
     std::set<unsigned> s;
@@ -587,7 +588,7 @@ BOOST_AUTO_TEST_CASE(element_not_inside) {
 
     BOOST_REQUIRE(!gen.next());
   }
-}*/
+}
 
 BOOST_AUTO_TEST_CASE(if_then_else_t1) {
   unsigned int a;
@@ -629,7 +630,7 @@ BOOST_AUTO_TEST_CASE(if_then_t1) {
     }
   }
 }
-/* TODO
+
 BOOST_AUTO_TEST_CASE(bitslice_t) {
   Variable<short> x;
 
@@ -640,6 +641,6 @@ BOOST_AUTO_TEST_CASE(bitslice_t) {
 
   BOOST_CHECK_THROW(gen(bitslice(3, 10, x) == 0xFF), std::runtime_error);
   BOOST_CHECK_THROW(gen(bitslice(16, 3, x) == 0xFF), std::runtime_error);
-}*/
+}
 
 BOOST_AUTO_TEST_SUITE_END()  // Context
