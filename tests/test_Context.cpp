@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE(Variable_test) {
   while (gen.next()) {
     ++count;
     std::cout << "result: a = " << gen[a] << ", b = " << gen[b] << std::endl;
-    gen(a != a || b != b);
+    gen(a != gen[a] || b != gen[b]);
 
     BOOST_REQUIRE_LE(count, 10);
   }
