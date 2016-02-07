@@ -50,12 +50,6 @@ BOOST_AUTO_TEST_CASE(t_rand_enum) {
   }
 }
 
-// TODO
-BOOST_AUTO_TEST_CASE(t_rand_enum_standalone) {
-  crv_variable<color_enum>* color;
-  BOOST_CHECK_THROW(color = new crv_variable<color_enum>(), std::runtime_error);
-}
-
 class tall_rand_enum_obj : public crv_sequence_item {
  public:
   crv_variable<football_enum> player;

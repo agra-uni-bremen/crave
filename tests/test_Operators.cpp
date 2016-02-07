@@ -144,14 +144,14 @@ BOOST_AUTO_TEST_CASE(less_equal) {
 
   VariableDefaultSolver::bypass_constraint_analysis = false;
 }
-/* TODO
+
 BOOST_AUTO_TEST_CASE(greater) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
 
   Variable<unsigned> a;
 
   Generator gen;
-  gen(a > (std::numeric_limits<unsigned>::max - 256));
+  gen(a > (std::numeric_limits<unsigned>::max() - 256));
 
   std::set<unsigned> generated;
   for (unsigned iterations = 0; gen.next(); ++iterations) {
@@ -165,15 +165,15 @@ BOOST_AUTO_TEST_CASE(greater) {
 
   VariableDefaultSolver::bypass_constraint_analysis = false;
 }
-*/
-/* TODO
+
+
 BOOST_AUTO_TEST_CASE(greater_equal) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
 
   Variable<unsigned> a;
 
   Generator gen;
-  gen(a >= (std::numeric_limits<unsigned>::max - 256));
+  gen(a >= (std::numeric_limits<unsigned>::max() - 256));
 
   std::set<unsigned> generated;
   for (unsigned iterations = 0; gen.next(); ++iterations) {
@@ -186,7 +186,7 @@ BOOST_AUTO_TEST_CASE(greater_equal) {
   BOOST_REQUIRE_EQUAL(generated.size(), 257);
 
   VariableDefaultSolver::bypass_constraint_analysis = false;
-}*/
+}
 
 BOOST_AUTO_TEST_CASE(neg_t1) {
   Variable<int> a;

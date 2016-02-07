@@ -11,7 +11,6 @@ using namespace crave;
 using boost::format;
 
 BOOST_FIXTURE_TEST_SUITE(Context_t, Context_Fixture)
-//todo
 
 BOOST_AUTO_TEST_CASE(multiple_solver_instances) {
   Generator gen1, gen2;
@@ -21,14 +20,14 @@ BOOST_AUTO_TEST_CASE(multiple_solver_instances) {
   gen1.next();
   gen2.next();
 }
-//todo
+
 BOOST_AUTO_TEST_CASE(constants) {
   Variable<unsigned> x;
   Generator gen(x == 135421);
   gen();
   BOOST_CHECK_EQUAL(gen[x], 135421);
 }
-//todo
+
 BOOST_AUTO_TEST_CASE(boolean) {
   Variable<bool> b;
 
@@ -43,7 +42,7 @@ BOOST_AUTO_TEST_CASE(boolean) {
 
   BOOST_CHECK_THROW(gen(b != b2)(), std::runtime_error);
 }
-//todo
+
 BOOST_AUTO_TEST_CASE(by_reference) {
   unsigned b = 0;
   Variable<unsigned> a;
@@ -57,7 +56,7 @@ BOOST_AUTO_TEST_CASE(by_reference) {
     if (b > 10) break;
   }
 }
-//todo
+
 // temporaly fix a variable to a certain value using the assign operator
 BOOST_AUTO_TEST_CASE(named_reference) {
   unsigned bv = 0;
@@ -76,7 +75,7 @@ BOOST_AUTO_TEST_CASE(named_reference) {
     if (bv > 10) break;
   }
 }
-//todo
+
 BOOST_AUTO_TEST_CASE(soft_constraint_t) {
   Generator gen;
   Variable<int> r;
@@ -98,7 +97,7 @@ struct randv_test_s : public crv_sequence_item {
   randv_test_s(crv_object_name) {}
 };
 
-//todo
+
 BOOST_AUTO_TEST_CASE(randv_test) {
   Generator gen;
   randv_test_s item("item");
@@ -116,7 +115,6 @@ BOOST_AUTO_TEST_CASE(randv_test) {
   BOOST_REQUIRE_EQUAL(count, 4);
 }
 
-//todo
 BOOST_AUTO_TEST_CASE(randv_var_ref_mixed_test) {
   Generator gen;
   crv_variable<int> a;
@@ -134,7 +132,6 @@ BOOST_AUTO_TEST_CASE(randv_var_ref_mixed_test) {
   BOOST_REQUIRE_EQUAL(count, 4);
 }
 
-//todo
 BOOST_AUTO_TEST_CASE(alu) {
   Variable<unsigned> op;
   Variable<unsigned> a;
@@ -150,10 +147,9 @@ BOOST_AUTO_TEST_CASE(alu) {
       ;
   gen();  // create a new assignment
 
-  // printf("result: op=%d, a=%d, b=%d\n", gen[op], gen[a], gen[b]);
+   printf("result: op=%d, a=%d, b=%d\n", gen[op], gen[a], gen[b]);
 }
 
-//todo
 BOOST_AUTO_TEST_CASE(alu_enum) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
 
@@ -239,7 +235,6 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_1) {
   BOOST_CHECK(a + b >= 120);
 }
 
-//todo
 BOOST_AUTO_TEST_CASE(mixed_bv_width_2) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
 
@@ -260,7 +255,6 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_2) {
   VariableDefaultSolver::bypass_constraint_analysis = false;
 }
 
-//todo
 BOOST_AUTO_TEST_CASE(mixed_bv_width_3) {
   crv_variable<short> a;
   Generator gen;
@@ -278,7 +272,6 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_3) {
   BOOST_CHECK_EQUAL(generated.size(), 19);
 }
 
-//todo
 BOOST_AUTO_TEST_CASE(mixed_bv_width_4) {
   crv_variable<int> a;
   Generator gen;
@@ -296,7 +289,6 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_4) {
   BOOST_CHECK_EQUAL(generated.size(), 19);
 }
 
-//todo
 BOOST_AUTO_TEST_CASE(mixed_bv_width_5) {
   crv_variable<short> a;
   crv_variable<signed char> b;
@@ -321,7 +313,6 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_5) {
   BOOST_CHECK_EQUAL(cnt, cnt1);
 }
 
-//todo
 BOOST_AUTO_TEST_CASE(mixed_bv_width_6) {
   crv_variable<short> a;
   crv_variable<signed char> b;

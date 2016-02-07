@@ -484,7 +484,6 @@ BOOST_AUTO_TEST_CASE(bitslice_t) {
   BOOST_CHECK_THROW(item.con1&={bitslice(16, 3, item.x()) == 0xFF}, std::runtime_error);
 }
 
-//TODO
 BOOST_AUTO_TEST_CASE(shiftleft) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
 
@@ -510,7 +509,6 @@ BOOST_AUTO_TEST_CASE(shiftleft) {
   VariableDefaultSolver::bypass_constraint_analysis = false;
 }
 
-//TODO
 BOOST_AUTO_TEST_CASE(shiftright) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
 
@@ -536,7 +534,6 @@ BOOST_AUTO_TEST_CASE(shiftright) {
   VariableDefaultSolver::bypass_constraint_analysis = false;
 }
 
-//TODO
 BOOST_AUTO_TEST_CASE(plus_minus) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
 
