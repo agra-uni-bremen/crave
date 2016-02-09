@@ -12,63 +12,87 @@ using boost::format;
 
 BOOST_FIXTURE_TEST_SUITE(Context_t, Context_Fixture)
 
+struct s_multiple_solver_instances : public crv_sequence_item
+{
+    crv_variable<int> r;
+    crv_constraint con = {r()<6};
+};
+
 BOOST_AUTO_TEST_CASE(multiple_solver_instances) {
-  Generator gen1, gen2;
-  Variable<int> r1, r2;
-  gen1(r1 < 6);
-  gen2(r2 < 6);
-  gen1.next();
-  gen2.next();
+  s_multiple_solver_instances r1;
+  s_multiple_solver_instances r2;
+  r1.randomize();
+  r2.randomize();
 }
+
+struct s_constants : public crv_sequence_item{
+    crv_variable<unsigned> x;
+    crv_constraint con = {x() == 135421};    
+};
 
 BOOST_AUTO_TEST_CASE(constants) {
-  Variable<unsigned> x;
-  Generator gen(x == 135421);
-  gen();
-  BOOST_CHECK_EQUAL(gen[x], 135421);
+  s_constants item;
+  item.randomize();
+  BOOST_CHECK_EQUAL(item.x, 135421);
 }
+
+struct s_boolean : public crv_sequence_item
+{
+    crv_variable<bool> b;
+    crv_constraint con = {b() == b()}; 
+};
 
 BOOST_AUTO_TEST_CASE(boolean) {
-  Variable<bool> b;
-
-  Generator gen;
-  gen(b == b)();  // create a new assignment
-
-  bool b1 = gen[b];
+    s_boolean item;
+    item.randomize();
+    bool b1 = item.b;
   // printf("result: b1=%d\n", b1);
-  gen(b != b1)();
-  bool b2 = gen[b];
+    item.con&={item.b() != b1};
+    item.randomize();
+    bool b2 = item.b;
+    item.con&={item.b() != b2};
+    ;
   // printf("result: b2=%d\n", b2);
 
-  BOOST_CHECK_THROW(gen(b != b2)(), std::runtime_error);
+  BOOST_CHECK_THROW(item.randomize(), std::runtime_error);
 }
 
+struct s_by_reference : public crv_sequence_item
+{
+    crv_variable<unsigned> a;
+    crv_constraint con; 
+};
+
 BOOST_AUTO_TEST_CASE(by_reference) {
+  s_by_reference item;
   unsigned b = 0;
-  Variable<unsigned> a;
+  item.con&={item.a == reference(b)};
 
-  Generator gen(a == reference(b));
-
-  while (gen.next()) {
-    unsigned av = gen[a];
+  while (item.randomize()) {
+    unsigned av = item.a;
     BOOST_REQUIRE_EQUAL(av, b);
     ++b;
     if (b > 10) break;
   }
 }
 
+struct s_named_reference : public crv_sequence_item
+{
+    crv_variable<unsigned> a,c;
+    crv_constraint con;
+};
+
 // temporaly fix a variable to a certain value using the assign operator
 BOOST_AUTO_TEST_CASE(named_reference) {
   unsigned bv = 0;
-  Variable<unsigned> a, c;
+  s_named_reference item;
   ReadReference<unsigned> b(bv);
+  item.con&={item.a() == b};
+  item.con&={item.c() != b};
 
-  Generator gen(a == b);
-  gen(c != b);
-
-  while (gen.next()) {
-    unsigned av = gen[a];
-    unsigned cv = gen[c];
+  while (item.randomize()) {
+    unsigned av = item.a;
+    unsigned cv = item.c;
     BOOST_REQUIRE_EQUAL(av, bv);
     BOOST_REQUIRE_NE(cv, bv);
     ++bv;
@@ -76,45 +100,46 @@ BOOST_AUTO_TEST_CASE(named_reference) {
   }
 }
 
+struct s_soft_constraint_t : crv_sequence_item
+{
+    crv_variable<int> r;
+    crv_constraint con={r() < 6};
+    crv_soft_constraint con2;
+};
+
 BOOST_AUTO_TEST_CASE(soft_constraint_t) {
-  Generator gen;
-  Variable<int> r;
-  gen(r < 6);
-  gen.soft(r == 2);
+  s_soft_constraint_t item;
+  item.con2&={(item.r() == 2)};
 
-  BOOST_REQUIRE(gen.next());
-  BOOST_REQUIRE_EQUAL(gen[r], 2);
+  BOOST_REQUIRE(item.randomize());
+  BOOST_REQUIRE_EQUAL(item.r, 2);
+  item.con2&={(item.r() == 3)};
 
-  gen.soft(r == 3);
-
-  BOOST_REQUIRE(gen.next());
+  BOOST_REQUIRE(item.randomize());
 }
 
 struct randv_test_s : public crv_sequence_item {
   crv_variable<unsigned int> a;
   crv_variable<unsigned int> b;
-  
-  randv_test_s(crv_object_name) {}
+  crv_constraint con;
 };
 
 
 BOOST_AUTO_TEST_CASE(randv_test) {
-  Generator gen;
-  randv_test_s item("item");
+  randv_test_s item;
   std::cout << "init: a = " << item.a << ", b = " << item.b << std::endl;
-  gen(4 <= item.a() && item.a() <= 6)
-  (9 <= item.a() + item.b() && item.a() + item.b() <= 11)(item.b() % 2 == 0);
+  item.con&={4 <= item.a() && item.a() <= 6,9 <= item.a() + item.b() && item.a() + item.b() <= 11,item.b() % 2 == 0};
   int count = 0;
-  while (gen.next()) {
+  while (item.randomize()) {
     ++count;
     std::cout << "result: a = " << item.a << ", b = " << item.b << std::endl;
-    gen(item.a() != item.a || item.b() != item.b);
+    item.con&={(item.a() != item.a || item.b() != item.b)};
     BOOST_REQUIRE_LE(count, 10);
   }
 
   BOOST_REQUIRE_EQUAL(count, 4);
 }
-
+//TODO
 BOOST_AUTO_TEST_CASE(randv_var_ref_mixed_test) {
   Generator gen;
   crv_variable<int> a;
@@ -132,45 +157,47 @@ BOOST_AUTO_TEST_CASE(randv_var_ref_mixed_test) {
   BOOST_REQUIRE_EQUAL(count, 4);
 }
 
+struct s_alu : public crv_sequence_item
+{
+    crv_variable<unsigned> op;
+    crv_variable<unsigned> a;
+    crv_variable<unsigned> b;
+    crv_constraint con={
+        a() < 16,b() < 16,
+        op() < 4, // 4 opcodes
+        (op() != 0 || a() + b() < 16), // no add overflow
+        (op() != 1 || a() > b()), // no sub underflow
+        (op() != 2 || a() * b() < 16), // no m overflow
+        (op() != 3 || b() != 0) // div valid
+    };
+};
 BOOST_AUTO_TEST_CASE(alu) {
-  Variable<unsigned> op;
-  Variable<unsigned> a;
-  Variable<unsigned> b;
-
-  Generator gen;
-  gen(a < 16)
-  (b < 16)(op < 4)             // 4 opcodes
-      (op != 0 || a + b < 16)  // no add overflow
-      (op != 1 || a > b)       // no sub underflow
-      (op != 2 || a * b < 16)  // no m overflow
-      (op != 3 || b != 0)      // div valid
-      ;
-  gen();  // create a new assignment
-
-   printf("result: op=%d, a=%d, b=%d\n", gen[op], gen[a], gen[b]);
+  s_alu item;
+  item.randomize();
+  std::cout << "result: op=" << item.op << ", a=" << item.a << ", b=" << item.b << std::endl;
 }
+
+struct s_alu_enum : public crv_sequence_item
+{
+    crv_variable<unsigned> op,a,b;
+    crv_constraint con={(a() < 16u),
+    (b() < 16u),
+    (op() < 4u),             // 4 opcodes
+    (op() != 0u || a() + b() < 16u),  // no add overflow
+    (op() != 1u || a() > b()),        // no sub underflow
+    (op() != 2u || a() * b() < 16u),  // no m overflow
+    (op() != 3u || b() != 0u)      // div valid
+    };
+};
 
 BOOST_AUTO_TEST_CASE(alu_enum) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
-
-  Variable<unsigned> op;
-  Variable<unsigned> a;
-  Variable<unsigned> b;
-
-  Generator gen;
-  gen(a < 16u)
-  (b < 16u)(op < 4u)             // 4 opcodes
-      (op != 0u || a + b < 16u)  // no add overflow
-      (op != 1u || a > b)        // no sub underflow
-      (op != 2u || a * b < 16u)  // no m overflow
-      (op != 3u || b != 0u)      // div valid
-      ;
-
+  s_alu_enum item;
   unsigned count = 0;
-  while (gen.next()) {
+  while (item.randomize()) {
     ++count;
-    gen(op != gen[op] || a != gen[a] || b != gen[b]);
-
+    item.con&={item.op() != item.op || item.a() != item.a || item.b() != item.b};
+    item.randomize();
     BOOST_REQUIRE_LE(count, 600);
   }
   BOOST_REQUIRE_EQUAL(count, 572);
@@ -178,74 +205,82 @@ BOOST_AUTO_TEST_CASE(alu_enum) {
   VariableDefaultSolver::bypass_constraint_analysis = false;
 }
 
+struct s_pythagoras : public crv_sequence_item
+{
+    crv_variable<unsigned long long> a,b,c;
+    crv_constraint con={a() * a() + b() * b() == c() * c()};
+};
+
 BOOST_AUTO_TEST_CASE(pythagoras) {
-  Variable<unsigned long long> a;
-  Variable<unsigned long long> b;
-  Variable<unsigned long long> c;
-
-  Generator gen;
-  gen(a * a + b * b == c * c)();  // create a new assignment
-
-  unsigned long long av = gen[a];
-  unsigned long long bv = gen[b];
-  unsigned long long cv = gen[c];
+  s_pythagoras item;
+  item.randomize();
+  
+  unsigned long long av = item.a;
+  unsigned long long bv = item.b;
+  unsigned long long cv = item.c;
 
   BOOST_CHECK_EQUAL(av * av + bv * bv, cv * cv);
 }
 
+struct s_negative_var : public crv_sequence_item
+{
+    crv_variable<int> a,b;
+    crv_constraint con={a() + b() <= 120,a() > 120};
+};
+
 BOOST_AUTO_TEST_CASE(negative_var) {
-  crv_variable<int> a;
-  crv_variable<int> b;
+  s_negative_var item;
+  item.randomize();
 
-  Generator gen;
-  gen(a() + b() <= 120)
-  (a() > 120);
+  std::cout << format("result: a=%d, b=%d\n") % item.a % item.b;
 
-  gen();
-
-  std::cout << format("result: a=%d, b=%d\n") % a % b;
-
-  BOOST_CHECK(a + b <= 120);
+  BOOST_CHECK(item.a + item.b <= 120);
 }
 
+struct s_signed_less_zero : public crv_sequence_item
+{
+    crv_variable<int> a;
+    crv_constraint con={a() < 0};
+};
 BOOST_AUTO_TEST_CASE(signed_less_zero) {
-  crv_variable<int> a;
+  s_signed_less_zero item;
+  item.randomize();
 
-  Generator gen;
-  gen(a() < 0);
+  std::cout << format("result: a=%d\n") % item.a;
 
-  gen();
-
-  std::cout << format("result: a=%d\n") % a;
-
-  BOOST_CHECK(a < 0);
+  BOOST_CHECK(item.a < 0);
 }
 
-BOOST_AUTO_TEST_CASE(mixed_bv_width_1) {
+struct s_mixed_bv_width_1 : crv_sequence_item
+{
   crv_variable<unsigned long> a;
   crv_variable<unsigned short> b;
+  crv_constraint con={a() + b() >= 120};
+};
 
-  Generator gen;
-  gen(a() + b() >= 120);
+BOOST_AUTO_TEST_CASE(mixed_bv_width_1) {
+  s_mixed_bv_width_1 item;
+  item.randomize();
 
-  gen.next();
+  std::cout << format("result: a=%d, b=%d\n") % item.a % item.b;
 
-  std::cout << format("result: a=%d, b=%d\n") % a % b;
-
-  BOOST_CHECK(a + b >= 120);
+  BOOST_CHECK(item.a + item.b >= 120);
 }
+
+struct s_mixed_bv_width_2 : crv_sequence_item
+{
+    crv_variable<signed char> a;
+    crv_constraint con={a() < 10};
+};
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_2) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
-
-  crv_variable<signed char> a;
-  Generator gen;
-  gen(a() < 10);
-
+  s_mixed_bv_width_2 item;
+  
   std::set<signed char> generated;
-  for (int iterations = 0; gen.next(); ++iterations) {
-    generated.insert(a);
-    gen(a() != a);
+  for (int iterations = 0; item.randomize(); ++iterations) {
+    generated.insert(item.a);
+    item.con&={item.a() != item.a};
 
     BOOST_REQUIRE_LT(iterations, 150);
   }
@@ -255,53 +290,59 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_2) {
   VariableDefaultSolver::bypass_constraint_analysis = false;
 }
 
-BOOST_AUTO_TEST_CASE(mixed_bv_width_3) {
-  crv_variable<short> a;
-  Generator gen;
-  gen(a() < 10);
-  gen(a() > -10);
+struct s_mixed_bv_width_3 : crv_sequence_item
+{
+    crv_variable<short> a;
+    crv_constraint con={a() < 10,a() > -10};
+};
 
+BOOST_AUTO_TEST_CASE(mixed_bv_width_3) {
+  s_mixed_bv_width_3 item;
   std::set<short> generated;
-  for (unsigned iterations = 0; gen.next(); ++iterations) {
-    generated.insert(a);
-    gen(a() != a);
+  for (unsigned iterations = 0; item.randomize(); ++iterations) {
+    generated.insert(item.a);
+    item.con&={(item.a() != item.a)};
 
     BOOST_REQUIRE_LT(iterations, 20);
   }
 
   BOOST_CHECK_EQUAL(generated.size(), 19);
 }
+
+struct s_mixed_bv_width_4 : crv_sequence_item
+{
+    crv_variable<int> a;
+    crv_constraint con={a() < (signed char)10,a() > (short)-10};
+};
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_4) {
-  crv_variable<int> a;
-  Generator gen;
-  gen(a() < (signed char)10);
-  gen(a() > (short)-10);
 
+  s_mixed_bv_width_4 item;
   std::set<int> generated;
-  for (unsigned iterations = 0; gen.next(); ++iterations) {
-    generated.insert(a);
-    gen(a() != a);
-
+  for (unsigned iterations = 0; item.randomize(); ++iterations) {
+    generated.insert(item.a);
     BOOST_REQUIRE_LT(iterations, 20);
   }
 
   BOOST_CHECK_EQUAL(generated.size(), 19);
 }
 
-BOOST_AUTO_TEST_CASE(mixed_bv_width_5) {
-  crv_variable<short> a;
+struct s_mixed_bv_width_5 : crv_sequence_item
+{
+      crv_variable<short> a;
   crv_variable<signed char> b;
-  Generator gen;
-  gen(-3 <= a() && a() <= 3);
-  gen(-3 <= b() && b() <= 3);
-  gen((-2 <= a() + b()) && (a() + b() <= 2));
+  crv_constraint con={-3 <= a() && a() <= 3,7
+                      -3 <= b() && b() <= 3,
+                      (-2 <= a() + b()) && (a() + b() <= 2)
+  };
+};
 
+BOOST_AUTO_TEST_CASE(mixed_bv_width_5) {
+  s_mixed_bv_width_5 item;
   int cnt = 0;
-  while (gen.next()) {
+  while (item.randomize()) {
     cnt++;
-    gen((a() != a) || (b() != b));
-
+    item.con&={(item.a() != item.a) || (item.b() != item.b)};
     BOOST_REQUIRE_LT(cnt, 300);
   }
 
@@ -313,38 +354,42 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_5) {
   BOOST_CHECK_EQUAL(cnt, cnt1);
 }
 
-BOOST_AUTO_TEST_CASE(mixed_bv_width_6) {
+struct s_mixed_bv_width_6 : public crv_sequence_item
+{
   crv_variable<short> a;
   crv_variable<signed char> b;
+  crv_constraint con={-3 <= a() && a() <= 3,-3 <= b() && b() <= 3,a() * b() % 6 == 0};
+};
 
-  Generator gen;
-  gen(-3 <= a() && a() <= 3)
-  (-3 <= b() && b() <= 3)(a() * b() % 6 == 0);
-
+BOOST_AUTO_TEST_CASE(mixed_bv_width_6) {
+  s_mixed_bv_width_6 item;
   int cnt = 0;
   for (int i = -3; i <= 3; i++)
     for (int j = -3; j <= 3; j++)
       if (i * j % 6 == 0) cnt++;
 
   int cnt1 = 0;
-  while (gen.next()) {
+  while (item.randomize()) {
     cnt1++;
-    BOOST_REQUIRE_EQUAL(a * b % 6, 0);
-    gen(a() != a || b() != b);
+    BOOST_REQUIRE_EQUAL(item.a * item.b % 6, 0);
+    item.con&={item.a() != item.a || item.b() != item.b};
   }
 
   BOOST_REQUIRE_EQUAL(cnt, cnt1);
 }
 
-BOOST_AUTO_TEST_CASE(dist_of_boolean25) {
-  crv_variable<bool> a;
-  int counter = 0;
+struct s_dist_of_boolean25 : crv_sequence_item
+{
+    crv_variable<bool> a;
+    crv_constraint con={dist(a(), distribution<bool>::create(0.25))};
+};
 
-  Generator gen;
-  gen(dist(a(), distribution<bool>::create(0.25)));
+BOOST_AUTO_TEST_CASE(dist_of_boolean25) {
+  s_dist_of_boolean25 item;
+  int counter = 0;
   for (unsigned i = 0; i < 1000; i++) {
-    BOOST_REQUIRE(gen.next());
-    if (a) {
+    BOOST_REQUIRE(item.randomize());
+    if (item.a) {
       ++counter;
     } else {
       --counter;
@@ -355,15 +400,17 @@ BOOST_AUTO_TEST_CASE(dist_of_boolean25) {
   BOOST_REQUIRE_GT(counter, -575);
 }
 
+struct s_dist_of_boolean50 : crv_sequence_item 
+{
+      crv_variable<bool> a;
+      crv_constraint con={dist(a(), distribution<bool>::create(0.5))};
+};
 BOOST_AUTO_TEST_CASE(dist_of_boolean50) {
-  crv_variable<bool> a;
+  s_dist_of_boolean50 item;
   int counter = 0;
-
-  Generator gen;
-  gen(dist(a(), distribution<bool>::create(0.5)));
   for (unsigned i = 0; i < 1000; i++) {
-    BOOST_REQUIRE(gen.next());
-    if (a) {
+    BOOST_REQUIRE(item.randomize());
+    if (item.a) {
       ++counter;
     } else {
       --counter;
@@ -374,15 +421,17 @@ BOOST_AUTO_TEST_CASE(dist_of_boolean50) {
   BOOST_REQUIRE_GT(counter, -75);
 }
 
+struct s_dist_of_boolean75 : public crv_sequence_item
+{
+    crv_variable<bool> a;
+    crv_constraint con={dist(a(), distribution<bool>::create(0.75))};
+};
 BOOST_AUTO_TEST_CASE(dist_of_boolean75) {
-  crv_variable<bool> a;
+  s_dist_of_boolean75 item;
   int counter = 0;
-
-  Generator gen;
-  gen(dist(a(), distribution<bool>::create(0.75)));
   for (unsigned i = 0; i < 1000; i++) {
-    BOOST_REQUIRE(gen.next());
-    if (a) {
+    BOOST_REQUIRE(item.randomize());
+    if (item.a) {
       ++counter;
     } else {
       --counter;
