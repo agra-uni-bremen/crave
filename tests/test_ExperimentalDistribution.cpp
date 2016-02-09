@@ -14,17 +14,19 @@ using boost::format;
 
 BOOST_FIXTURE_TEST_SUITE(Distribution_t, Context_Fixture)
 
+struct s_crv_variable_dist_t1 : public crv_sequence_item
+{
+    crv_variable<int> v;
+    crv_constraint con={dist(v(), distribution<int>::create(range<int>(0, 5))(range<int>(50, 65))(range<int>(100, 125)))};
+};
 BOOST_AUTO_TEST_CASE(crv_variable_dist_t1) {
-  crv_variable<int> v;
-  Generator gen;
-  gen(dist(v(), distribution<int>::create(range<int>(0, 5))(range<int>(50, 65))(range<int>(100, 125))));
-
+  s_crv_variable_dist_t1 item;
   std::map<int, int> s;
   int total = 100000;
   for (int i = 0; i < total; i++) {
-    BOOST_REQUIRE(gen.next());
-    BOOST_REQUIRE((0 <= v && v <= 5) || (50 <= v && v <= 65) || (100 <= v && v <= 125));
-    ++s[v];
+    BOOST_REQUIRE(item.randomize());
+    BOOST_REQUIRE((0 <= item.v && item.v <= 5) || (50 <= item.v && item.v <= 65) || (100 <= item.v && item.v <= 125));
+    ++s[item.v];
   }
   int min = s[0], max = s[0];
   for (int i = 1; i <= 200; i++)
@@ -38,43 +40,56 @@ BOOST_AUTO_TEST_CASE(crv_variable_dist_t1) {
   BOOST_REQUIRE_LT(100. * (max - avg) / avg, 10);
 }
 
+struct s_crv_variable_dist_t2 : public crv_sequence_item
+{
+    crv_variable<int> v;
+    crv_constraint con;
+};
+
 BOOST_AUTO_TEST_CASE(crv_variable_dist_t2) {
-  crv_variable<int> v;
-  Generator gen;
+  s_crv_variable_dist_t2 item;
   BOOST_CHECK_THROW(
-      gen(dist(v(), distribution<int>::create(range<int>(0, 10))(range<int>(50, 75))(range<int>(30, 51)))),
+      item.con={dist(item.v(), distribution<int>::create(range<int>(0, 10))(range<int>(50, 75))(range<int>(30, 51)))},
       std::runtime_error);
 }
 
+struct s_crv_variable_dist_t3 : public crv_sequence_item
+{
+    crv_variable<char> v;
+    crv_constraint con={dist(v(), distribution<char>::create(weighted_range<char>(1, 5, 50))(weighted_range<char>(10, 20, 20))(
+                    weighted_range<char>(-50, -50, 30)))};
+};
+
 BOOST_AUTO_TEST_CASE(crv_variable_dist_t3) {
-  crv_variable<char> v;
-  Generator gen;
-  gen(dist(v(), distribution<char>::create(weighted_range<char>(1, 5, 50))(weighted_range<char>(10, 20, 20))(
-                    weighted_range<char>(-50, -50, 30))));
+  s_crv_variable_dist_t3 item;
   int cnt1 = 0, cnt2 = 0, cnt3 = 0;
   int total = 50000;
   for (int i = 0; i < total; i++) {
-    BOOST_REQUIRE(gen.next());
-    BOOST_REQUIRE((1 <= v && v <= 5) || (10 <= v && v <= 20) || (v == -50));
-    if (1 <= v && v <= 5) cnt1++;
-    if (10 <= v && v <= 20) cnt2++;
-    if (v == -50) cnt3++;
+    BOOST_REQUIRE(item.randomize());
+    BOOST_REQUIRE((1 <= item.v && item.v <= 5) || (10 <= item.v && item.v <= 20) || (item.v == -50));
+    if (1 <= item.v && item.v <= 5) cnt1++;
+    if (10 <= item.v && item.v <= 20) cnt2++;
+    if (item.v == -50) cnt3++;
   }
   double q = 50.0 / cnt1;
   BOOST_REQUIRE_LT(abs(cnt2 * q - 20), 0.2);
   BOOST_REQUIRE_LT(abs(cnt3 * q - 30), 0.2);
 }
 
+struct s_crv_variable_dist_t4 : public crv_sequence_item
+{
+    crv_variable<int> v;
+    crv_constraint x={dist(v(), distribution<int>::create(range<int>(0, 10))(range<int>(50, 75))(range<int>(100, 200)))};
+    crv_constraint y={dist(v(), distribution<int>::simple_range(5000, 6000))};
+};
+
 BOOST_AUTO_TEST_CASE(crv_variable_dist_t4) {
-  crv_variable<int> v;
-  Generator gen;
-  gen("x", dist(v(), distribution<int>::create(range<int>(0, 10))(range<int>(50, 75))(range<int>(100, 200))));
-  gen("y", dist(v(), distribution<int>::simple_range(5000, 6000)));
-  gen.disableConstraint("x");
+  s_crv_variable_dist_t4 item;
+  item.x.deactivate();
   int total = 10000;
   for (int i = 0; i < total; i++) {
-    BOOST_REQUIRE(gen.next());
-    BOOST_REQUIRE(5000 <= v && v <= 6000);
+    BOOST_REQUIRE(item.randomize());
+    BOOST_REQUIRE(5000 <= item.v && item.v <= 6000);
   }
 }
 
