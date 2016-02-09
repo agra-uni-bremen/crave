@@ -484,75 +484,65 @@ BOOST_AUTO_TEST_CASE(bitslice_t) {
   BOOST_CHECK_THROW(item.con1&={bitslice(16, 3, item.x()) == 0xFF}, std::runtime_error);
 }
 
+struct s_shiftleft : crv_sequence_item
+{
+    crv_variable<unsigned> a,b,c;
+    crv_constraint con={a() < 256u,b() < ((unsigned)(sizeof(unsigned) * 8u)),c() == (a << b)};
+};
 BOOST_AUTO_TEST_CASE(shiftleft) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
-
-  Variable<unsigned> a;
-  Variable<unsigned> b;
-  Variable<unsigned> c;
-
-  Generator gen;
-  gen(a < 256u)
-  (b < (unsigned)(sizeof(unsigned) * 8u))(c == (a << b));
-
+  s_shiftleft item;
   int count = 0;
-  while (gen.next() && ++count < 500) {
-    unsigned av = gen[a];
-    unsigned bv = gen[b];
+  while (item.randomize() && ++count < 500) {
+    unsigned av = item.a;
+    unsigned bv = item.b;
     unsigned r = av << bv;
 
-    BOOST_REQUIRE_EQUAL(r, gen[c]);
-
-    gen(a != gen[a] || b != gen[b]);
+    BOOST_REQUIRE_EQUAL(r, item.c);
+    item.con&={item.a() != item.a || item.b() != item.b};
   }
 
   VariableDefaultSolver::bypass_constraint_analysis = false;
 }
 
+struct s_shiftright : public crv_sequence_item
+{
+    crv_variable<unsigned> a,b,c;
+    crv_constraint con={a() > 256u,b() < 8u,c() == (a() >> b())};
+    
+};
 BOOST_AUTO_TEST_CASE(shiftright) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
-
-  Variable<unsigned> a;
-  Variable<unsigned> b;
-  Variable<unsigned> c;
-
-  Generator gen;
-  gen(a > 256u)
-  (b < 8u)(c == (a >> b));
-
+  s_shiftright item;
   int count = 0;
-  while (gen.next() && ++count < 500) {
-    unsigned av = gen[a];
-    unsigned bv = gen[b];
+  while (item.randomize() && ++count < 500) {
+    unsigned av = item.a;
+    unsigned bv = item.b;
     unsigned r = av >> bv;
 
-    BOOST_REQUIRE_EQUAL(r, gen[c]);
-
-    gen(a != gen[a] || b != gen[b]);
+    BOOST_REQUIRE_EQUAL(r, item.c);
+    item.con&={item.a != item.a(),item.b() != item.b};
   }
 
   VariableDefaultSolver::bypass_constraint_analysis = false;
 }
 
+struct s_plus_minus : crv_sequence_item
+{
+    crv_variable<unsigned> a,b,q,r;
+    crv_constraint con={b() != 0u,b()<a(),(q() == a() + b()),r() == a() - b()};
+};
 BOOST_AUTO_TEST_CASE(plus_minus) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
-
-  Variable<unsigned> a;
-  Variable<unsigned> b;
-  Variable<unsigned> q;
-  Variable<unsigned> r;
-
-  Generator gen;
-  gen(b != 0u)
-  (b < a)(q == a + b)(r == a - b);
+  s_plus_minus item;
 
   unsigned cnt = 0u;
-  while (gen.next() && cnt < 300) {
-    BOOST_REQUIRE_EQUAL(gen[a] + gen[b], gen[q]);
-    BOOST_REQUIRE_EQUAL(gen[a] - gen[b], gen[r]);
+  while (item.randomize() && cnt < 300) {
+    BOOST_REQUIRE_EQUAL(item.a + item.b, item.q);
+    BOOST_REQUIRE_EQUAL(item.a - item.b, item.r);
 
-    gen(a != gen[a] || b != gen[b]);
-    std::cout << "#" << cnt++ << ": result: a=" << gen[a] << ", b=" << gen[b] << ", q=" << gen[q] << ", r=" << gen[r]
+    item.con&={(item.a() != item.a || item.b() != item.b)};
+    std::cout << "#" << cnt++ << ": result: a=" << item.a << ", b=" << item.b << ", q=" << item.q << ", r=" << item.r
               << "\n" << std::endl;
   }
 
@@ -588,24 +578,21 @@ BOOST_AUTO_TEST_CASE(mult_mod_t1) {
   BOOST_REQUIRE_EQUAL(cnt, cnt1);
 }
 
+struct s_divide : public crv_sequence_item
+{
+    crv_variable<unsigned char> a,b,q,r;
+    crv_constraint con={b() != (unsigned char)0u,a() < (unsigned char)16u,b() < (unsigned char)16u,q() == a() / b(),r() == a() % b()};
+};
+
 BOOST_AUTO_TEST_CASE(divide) {
+  s_divide item;
   VariableDefaultSolver::bypass_constraint_analysis = true;
 
-  Variable<unsigned char> a;
-  Variable<unsigned char> b;
-  Variable<unsigned char> q;
-  Variable<unsigned char> r;
-
-  Generator gen;
-  gen(b != (unsigned char)0u)
-  (a < (unsigned char)16u)(b < (unsigned char)16u)(q == a / b)(r == a % b);
-
-  while (gen.next()) {
-    BOOST_REQUIRE_EQUAL(gen[a] / gen[b], gen[q]);
-    BOOST_REQUIRE_EQUAL(gen[a] % gen[b], gen[r]);
-
-    gen(a != gen[a] || b != gen[b]);
-    std::cout << "result: a=" << gen[a] << ", b=" << gen[b] << ", q=" << gen[q] << ", r=" << gen[r] << "\n"
+  while (item.randomize()) {
+    BOOST_REQUIRE_EQUAL(item.a / item.b, item.q);
+    BOOST_REQUIRE_EQUAL(item.a % item.b, item.r);
+    item.con={item.a() != item.a,item.b() != item.b};
+    std::cout << "result: a=" << item.a << ", b=" << item.b << ", q=" << item.q << ", r=" << item.r << "\n"
               << std::endl;
   }
 
