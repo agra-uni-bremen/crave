@@ -14,36 +14,39 @@ BOOST_FIXTURE_TEST_SUITE(Context_t, Context_Fixture)
 
 struct s_multiple_solver_instances : public crv_sequence_item
 {
+    s_multiple_solver_instances(crv_object_name){}
     crv_variable<int> r;
     crv_constraint con = {r()<6};
 };
 
 BOOST_AUTO_TEST_CASE(multiple_solver_instances) {
-  s_multiple_solver_instances r1;
-  s_multiple_solver_instances r2;
+  s_multiple_solver_instances r1("r1");
+  s_multiple_solver_instances r2("r2");
   r1.randomize();
   r2.randomize();
 }
 
 struct s_constants : public crv_sequence_item{
+    s_constants(crv_object_name){}
     crv_variable<unsigned> x;
     crv_constraint con = {x() == 135421};    
 };
 
 BOOST_AUTO_TEST_CASE(constants) {
-  s_constants item;
+  s_constants item("item");
   item.randomize();
   BOOST_CHECK_EQUAL(item.x, 135421);
 }
 
 struct s_boolean : public crv_sequence_item
 {
+    s_boolean(crv_object_name){}
     crv_variable<bool> b;
     crv_constraint con = {b() == b()}; 
 };
 
 BOOST_AUTO_TEST_CASE(boolean) {
-    s_boolean item;
+    s_boolean item("item");
     item.randomize();
     bool b1 = item.b;
   // printf("result: b1=%d\n", b1);
@@ -59,12 +62,13 @@ BOOST_AUTO_TEST_CASE(boolean) {
 
 struct s_by_reference : public crv_sequence_item
 {
+    s_by_reference(crv_object_name){}
     crv_variable<unsigned> a;
     crv_constraint con; 
 };
 
 BOOST_AUTO_TEST_CASE(by_reference) {
-  s_by_reference item;
+  s_by_reference item("item");
   unsigned b = 0;
   item.con&={item.a == reference(b)};
 
@@ -78,6 +82,7 @@ BOOST_AUTO_TEST_CASE(by_reference) {
 
 struct s_named_reference : public crv_sequence_item
 {
+    s_named_reference(crv_object_name){}
     crv_variable<unsigned> a,c;
     crv_constraint con;
 };
@@ -85,7 +90,7 @@ struct s_named_reference : public crv_sequence_item
 // temporaly fix a variable to a certain value using the assign operator
 BOOST_AUTO_TEST_CASE(named_reference) {
   unsigned bv = 0;
-  s_named_reference item;
+  s_named_reference item("item");
   ReadReference<unsigned> b(bv);
   item.con&={item.a() == b};
   item.con&={item.c() != b};
@@ -102,13 +107,14 @@ BOOST_AUTO_TEST_CASE(named_reference) {
 
 struct s_soft_constraint_t : crv_sequence_item
 {
+    s_soft_constraint_t(crv_object_name){}
     crv_variable<int> r;
     crv_constraint con={r() < 6};
     crv_soft_constraint con2;
 };
 
 BOOST_AUTO_TEST_CASE(soft_constraint_t) {
-  s_soft_constraint_t item;
+  s_soft_constraint_t item("item");
   item.con2&={(item.r() == 2)};
 
   BOOST_REQUIRE(item.randomize());
@@ -119,6 +125,7 @@ BOOST_AUTO_TEST_CASE(soft_constraint_t) {
 }
 
 struct randv_test_s : public crv_sequence_item {
+  randv_test_s(crv_object_name){}
   crv_variable<unsigned int> a;
   crv_variable<unsigned int> b;
   crv_constraint con;
@@ -126,7 +133,7 @@ struct randv_test_s : public crv_sequence_item {
 
 
 BOOST_AUTO_TEST_CASE(randv_test) {
-  randv_test_s item;
+  randv_test_s item("item");
   std::cout << "init: a = " << item.a << ", b = " << item.b << std::endl;
   item.con&={4 <= item.a() && item.a() <= 6,9 <= item.a() + item.b() && item.a() + item.b() <= 11,item.b() % 2 == 0};
   int count = 0;
@@ -162,6 +169,7 @@ BOOST_AUTO_TEST_CASE(randv_var_ref_mixed_test) {
 
 struct s_alu : public crv_sequence_item
 {
+    s_alu(crv_object_name){}
     crv_variable<unsigned> op;
     crv_variable<unsigned> a;
     crv_variable<unsigned> b;
@@ -175,7 +183,7 @@ struct s_alu : public crv_sequence_item
     };
 };
 BOOST_AUTO_TEST_CASE(alu) {
-  s_alu item;
+  s_alu item("item");
   item.randomize();
   std::cout << "result: op=" << item.op << ", a=" << item.a << ", b=" << item.b << std::endl;
 }
@@ -228,12 +236,13 @@ BOOST_AUTO_TEST_CASE(pythagoras) {
 
 struct s_negative_var : public crv_sequence_item
 {
+    s_negative_var(crv_object_name){}
     crv_variable<int> a,b;
     crv_constraint con={a() + b() <= 120,a() > 120};
 };
 
 BOOST_AUTO_TEST_CASE(negative_var) {
-  s_negative_var item;
+  s_negative_var item("item");
   item.randomize();
 
   std::cout << format("result: a=%d, b=%d\n") % item.a % item.b;
@@ -243,11 +252,12 @@ BOOST_AUTO_TEST_CASE(negative_var) {
 
 struct s_signed_less_zero : public crv_sequence_item
 {
+    s_signed_less_zero(crv_object_name){}
     crv_variable<int> a;
     crv_constraint con={a() < 0};
 };
 BOOST_AUTO_TEST_CASE(signed_less_zero) {
-  s_signed_less_zero item;
+  s_signed_less_zero item("item");
   item.randomize();
 
   std::cout << format("result: a=%d\n") % item.a;
@@ -257,13 +267,14 @@ BOOST_AUTO_TEST_CASE(signed_less_zero) {
 
 struct s_mixed_bv_width_1 : crv_sequence_item
 {
+  s_mixed_bv_width_1(crv_object_name){}
   crv_variable<unsigned long> a;
   crv_variable<unsigned short> b;
   crv_constraint con={a() + b() >= 120};
 };
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_1) {
-  s_mixed_bv_width_1 item;
+  s_mixed_bv_width_1 item("item");
   item.randomize();
 
   std::cout << format("result: a=%d, b=%d\n") % item.a % item.b;
@@ -273,13 +284,14 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_1) {
 
 struct s_mixed_bv_width_2 : crv_sequence_item
 {
+    s_mixed_bv_width_2(crv_object_name){}
     crv_variable<signed char> a;
     crv_constraint con={a() < 10};
 };
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_2) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
-  s_mixed_bv_width_2 item;
+  s_mixed_bv_width_2 item("item");
   
   std::set<signed char> generated;
   for (int iterations = 0; item.randomize(); ++iterations) {
@@ -296,12 +308,13 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_2) {
 
 struct s_mixed_bv_width_3 : crv_sequence_item
 {
+    s_mixed_bv_width_3(crv_object_name){}
     crv_variable<short> a;
     crv_constraint con={a() < 10,a() > -10};
 };
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_3) {
-  s_mixed_bv_width_3 item;
+  s_mixed_bv_width_3 item("item");
   std::set<short> generated;
   for (unsigned iterations = 0; item.randomize(); ++iterations) {
     generated.insert(item.a);
@@ -315,13 +328,14 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_3) {
 
 struct s_mixed_bv_width_4 : crv_sequence_item
 {
+    s_mixed_bv_width_4(crv_object_name){}
     crv_variable<int> a;
     crv_constraint con={a() < (signed char)10,a() > (short)-10};
 };
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_4) {
 
-  s_mixed_bv_width_4 item;
+  s_mixed_bv_width_4 item("item");
   std::set<int> generated;
   for (unsigned iterations = 0; item.randomize(); ++iterations) {
     generated.insert(item.a);
@@ -333,7 +347,8 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_4) {
 
 struct s_mixed_bv_width_5 : crv_sequence_item
 {
-      crv_variable<short> a;
+    s_mixed_bv_width_5(crv_object_name){}
+  crv_variable<short> a;
   crv_variable<signed char> b;
   crv_constraint con={-3 <= a() && a() <= 3,7
                       -3 <= b() && b() <= 3,
@@ -342,7 +357,7 @@ struct s_mixed_bv_width_5 : crv_sequence_item
 };
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_5) {
-  s_mixed_bv_width_5 item;
+  s_mixed_bv_width_5 item("item");
   int cnt = 0;
   while (item.randomize()) {
     cnt++;
@@ -360,13 +375,14 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_5) {
 
 struct s_mixed_bv_width_6 : public crv_sequence_item
 {
+  s_mixed_bv_width_6(crv_object_name){}
   crv_variable<short> a;
   crv_variable<signed char> b;
   crv_constraint con={-3 <= a() && a() <= 3,-3 <= b() && b() <= 3,a() * b() % 6 == 0};
 };
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_6) {
-  s_mixed_bv_width_6 item;
+  s_mixed_bv_width_6 item("item");
   int cnt = 0;
   for (int i = -3; i <= 3; i++)
     for (int j = -3; j <= 3; j++)
