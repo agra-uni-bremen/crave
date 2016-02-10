@@ -16,11 +16,12 @@ BOOST_FIXTURE_TEST_SUITE(Distribution_t, Context_Fixture)
 
 struct s_crv_variable_dist_t1 : public crv_sequence_item
 {
+    s_crv_variable_dist_t1(crv_object_name){}
     crv_variable<int> v;
     crv_constraint con={dist(v(), distribution<int>::create(range<int>(0, 5))(range<int>(50, 65))(range<int>(100, 125)))};
 };
 BOOST_AUTO_TEST_CASE(crv_variable_dist_t1) {
-  s_crv_variable_dist_t1 item;
+  s_crv_variable_dist_t1 item("item");
   std::map<int, int> s;
   int total = 100000;
   for (int i = 0; i < total; i++) {
@@ -42,12 +43,13 @@ BOOST_AUTO_TEST_CASE(crv_variable_dist_t1) {
 
 struct s_crv_variable_dist_t2 : public crv_sequence_item
 {
+    s_crv_variable_dist_t2(crv_object_name){}
     crv_variable<int> v;
     crv_constraint con;
 };
 
 BOOST_AUTO_TEST_CASE(crv_variable_dist_t2) {
-  s_crv_variable_dist_t2 item;
+  s_crv_variable_dist_t2 item("item");
   BOOST_CHECK_THROW(
       item.con={dist(item.v(), distribution<int>::create(range<int>(0, 10))(range<int>(50, 75))(range<int>(30, 51)))},
       std::runtime_error);
@@ -55,13 +57,14 @@ BOOST_AUTO_TEST_CASE(crv_variable_dist_t2) {
 
 struct s_crv_variable_dist_t3 : public crv_sequence_item
 {
+    s_crv_variable_dist_t3(crv_object_name){}
     crv_variable<char> v;
     crv_constraint con={dist(v(), distribution<char>::create(weighted_range<char>(1, 5, 50))(weighted_range<char>(10, 20, 20))(
                     weighted_range<char>(-50, -50, 30)))};
 };
 
 BOOST_AUTO_TEST_CASE(crv_variable_dist_t3) {
-  s_crv_variable_dist_t3 item;
+  s_crv_variable_dist_t3 item("item");
   int cnt1 = 0, cnt2 = 0, cnt3 = 0;
   int total = 50000;
   for (int i = 0; i < total; i++) {
@@ -78,13 +81,14 @@ BOOST_AUTO_TEST_CASE(crv_variable_dist_t3) {
 
 struct s_crv_variable_dist_t4 : public crv_sequence_item
 {
+    s_crv_variable_dist_t4(crv_object_name){}
     crv_variable<int> v;
     crv_constraint x={dist(v(), distribution<int>::create(range<int>(0, 10))(range<int>(50, 75))(range<int>(100, 200)))};
     crv_constraint y={dist(v(), distribution<int>::simple_range(5000, 6000))};
 };
 
 BOOST_AUTO_TEST_CASE(crv_variable_dist_t4) {
-  s_crv_variable_dist_t4 item;
+  s_crv_variable_dist_t4 item("item");
   item.x.deactivate();
   int total = 10000;
   for (int i = 0; i < total; i++) {
