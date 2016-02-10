@@ -210,12 +210,13 @@ BOOST_AUTO_TEST_CASE(alu_enum) {
 
 struct s_pythagoras : public crv_sequence_item
 {
+    s_pythagoras(crv_object_name){}
     crv_variable<unsigned long long> a,b,c;
     crv_constraint con={a() * a() + b() * b() == c() * c()};
 };
 
 BOOST_AUTO_TEST_CASE(pythagoras) {
-  s_pythagoras item;
+  s_pythagoras item("pythagoras");
   item.randomize();
   
   unsigned long long av = item.a;
