@@ -508,13 +508,14 @@ BOOST_AUTO_TEST_CASE(shiftleft) {
 
 struct s_shiftright : public crv_sequence_item
 {
+    s_shiftright(crv_object_name){}
     crv_variable<unsigned> a,b,c;
     crv_constraint con={a() > 256u,b() < 8u,c() == (a() >> b())};
-    
 };
+
 BOOST_AUTO_TEST_CASE(shiftright) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
-  s_shiftright item;
+  s_shiftright item("shiftright");
   int count = 0;
   while (item.randomize() && ++count < 500) {
     unsigned av = item.a;
@@ -530,12 +531,13 @@ BOOST_AUTO_TEST_CASE(shiftright) {
 
 struct s_plus_minus : crv_sequence_item
 {
+    s_plus_minus(crv_object_name){}
     crv_variable<unsigned> a,b,q,r;
     crv_constraint con={b() != 0u,b()<a(),(q() == a() + b()),r() == a() - b()};
 };
 BOOST_AUTO_TEST_CASE(plus_minus) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
-  s_plus_minus item;
+  s_plus_minus item("item");
 
   unsigned cnt = 0u;
   while (item.randomize() && cnt < 300) {
@@ -581,12 +583,13 @@ BOOST_AUTO_TEST_CASE(mult_mod_t1) {
 
 struct s_divide : public crv_sequence_item
 {
+    s_divide(crv_object_name){}
     crv_variable<unsigned char> a,b,q,r;
     crv_constraint con={b() != (unsigned char)0u,a() < (unsigned char)16u,b() < (unsigned char)16u,q() == a() / b(),r() == a() % b()};
 };
 
 BOOST_AUTO_TEST_CASE(divide) {
-  s_divide item;
+  s_divide item("item");
   VariableDefaultSolver::bypass_constraint_analysis = true;
 
   while (item.randomize()) {
