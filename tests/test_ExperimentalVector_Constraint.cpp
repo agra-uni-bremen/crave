@@ -276,13 +276,14 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_4) {
 
 struct s_bool_rand_vec : public crv_sequence_item
 {
+    s_bool_rand_vec(crv_object_name){}
     crv_vector<bool> a;
     crv_constraint con={a().size() == 10,foreach(a(), a()[_i] != a()[_i - 1])};
 };
 
 BOOST_AUTO_TEST_CASE(bool_rand_vec) {
   
-  s_bool_rand_vec item;
+  s_bool_rand_vec item("item");
   BOOST_REQUIRE(item.randomize());
   BOOST_REQUIRE(item.a.size() == 10);
   for (uint i = 1; i < item.a.size(); i++) BOOST_REQUIRE(item.a[i] != item.a[i - 1]);
