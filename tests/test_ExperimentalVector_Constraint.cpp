@@ -93,13 +93,14 @@ BOOST_AUTO_TEST_CASE(unique_test_1) {
 
 struct s_unique_test_2 : crv_sequence_item
 {
+    s_unique_test_2(crv_object_name){}
     crv_vector<unsigned int> v;
     crv_constraint con={v().size() == 7,foreach(v(), v()[_i] < 6)};
     crv_constraint con2={unique(v())};
 };
 
 BOOST_AUTO_TEST_CASE(unique_test_2) {
-  s_unique_test_2 item;
+  s_unique_test_2 item("item");
   BOOST_REQUIRE(!item.randomize());
   item.con2.deactivate();
   BOOST_REQUIRE(item.randomize());
@@ -113,12 +114,13 @@ BOOST_AUTO_TEST_CASE(unique_test_2) {
 
 struct s_soft_unique_test : crv_sequence_item
 {
+    s_soft_unique_test(crv_object_name){}
     crv_vector<unsigned int> v;
     crv_constraint con={v().size() == 7,foreach(v(), v()[_i] < 6)};
     crv_soft_constraint con2={unique(v())};
 };
 BOOST_AUTO_TEST_CASE(soft_unique_test) {
-  s_soft_unique_test item;
+  s_soft_unique_test item("item");
   BOOST_REQUIRE(item.randomize());
 }
 
@@ -174,6 +176,7 @@ BOOST_AUTO_TEST_CASE(index_constraint_test) {
 
 struct s_soft_vec_constraint1 : public crv_sequence_item
 {
+    s_soft_vec_constraint1(crv_object_name){}
     crv_vector<unsigned int> v;
     crv_constraint con={v().size() == 10,foreach(v(), v()[_i] >= v()[_i - 1])};
     crv_soft_constraint con2={foreach(v(), v()[_i] < v()[_i - 1])};
@@ -181,6 +184,7 @@ struct s_soft_vec_constraint1 : public crv_sequence_item
 
 struct s_soft_vec_constraint2 : public crv_sequence_item
 {
+    s_soft_vec_constraint2(crv_object_name){}
     crv_vector<unsigned int> v;
     crv_constraint con={v().size() == 4,foreach(v(), v()[_i] >= v()[_i - 1]),foreach(v(), v()[_i] <= 1000)};
     crv_soft_constraint con2={foreach(v(), v()[_i] <= v()[_i - 1])};
@@ -188,8 +192,8 @@ struct s_soft_vec_constraint2 : public crv_sequence_item
 };
 
 BOOST_AUTO_TEST_CASE(soft_vec_constraint) {
-  s_soft_vec_constraint1 item1;
-  s_soft_vec_constraint2 item2;
+  s_soft_vec_constraint1 item1("item");
+  s_soft_vec_constraint2 item2("item");
   BOOST_REQUIRE(item1.randomize());
   BOOST_REQUIRE(item2.randomize());
   for (int j = 0; j < 10; j++) {
@@ -205,12 +209,13 @@ BOOST_AUTO_TEST_CASE(soft_vec_constraint) {
 
 struct s_mixed_bv_width_1 : public crv_sequence_item
 {
+    s_mixed_bv_width_1(crv_object_name){}
     crv_vector<signed char> a;
     crv_constraint con={a().size() == 28,foreach(a(), a()[_i] < (short)-100),unique(a())};
 };
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_1) {
-  s_mixed_bv_width_1 item;
+  s_mixed_bv_width_1 item("item");
   BOOST_REQUIRE(item.randomize());
   for (uint i = 0; i < item.a.size(); i++) {
     BOOST_REQUIRE_LT(item.a[i], -100);
@@ -222,12 +227,13 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_1) {
 
 struct s_mixed_bv_width_2 : public crv_sequence_item
 {
+    s_mixed_bv_width_2(crv_object_name){}
     crv_vector<short> a;
     crv_constraint con={a().size() == 19,foreach(a(), a()[_i] < 10),foreach(a(), a()[_i] > -10),unique(a())};
 };
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_2) {
-  s_mixed_bv_width_2 item;
+  s_mixed_bv_width_2 item("item");
   BOOST_REQUIRE(item.randomize());
   for (uint i = 0; i < item.a.size(); i++) BOOST_REQUIRE(-10 < item.a[i] && item.a[i] < 10);
   BOOST_REQUIRE(check_unique(item.a));
@@ -235,12 +241,13 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_2) {
 
 struct s_mixed_bv_width_3 : public crv_sequence_item
 {
+  s_mixed_bv_width_3(crv_object_name){}
   crv_vector<int> a;
   crv_constraint con={a().size() == 19,foreach(a(), a()[_i] < (signed char)10),foreach(a(), a()[_i] > (short)-10),unique(a())};
 };
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_3) {
-  s_mixed_bv_width_3 item;
+  s_mixed_bv_width_3 item("item");
   BOOST_REQUIRE(item.randomize());
   for (uint i = 0; i < item.a.size(); i++) BOOST_REQUIRE(-10 < item.a[i] && item.a[i] < 10);
   BOOST_REQUIRE(check_unique(item.a));
@@ -248,13 +255,14 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_3) {
 
 struct s_mixed_bv_width_4 : public crv_sequence_item
 {
+    s_mixed_bv_width_4(crv_object_name){}
     crv_vector<short> a;
     crv_constraint con={a().size() == 10,foreach(a(), -3 <= a()[_i] && a()[_i] <= 3),foreach(a(), a()[_i] != 0),foreach(a(), a()[_i] * a()[_i - 1] % 6 == 0),foreach(a(), _i != 0 || a()[_i] % 2 == 0)};
 };
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_4) {
 
-  s_mixed_bv_width_4 item;
+  s_mixed_bv_width_4 item("item");
   BOOST_REQUIRE(item.randomize());
   for (uint i = 0; i < item.a.size(); i++) {
     BOOST_REQUIRE(-3 <= item.a[i] && item.a[i] <= 3);
