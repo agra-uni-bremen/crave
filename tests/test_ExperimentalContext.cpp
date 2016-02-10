@@ -139,23 +139,26 @@ BOOST_AUTO_TEST_CASE(randv_test) {
 
   BOOST_REQUIRE_EQUAL(count, 4);
 }
-//TODO
-BOOST_AUTO_TEST_CASE(randv_var_ref_mixed_test) {
-  Generator gen;
+
+/* TODO
+struct s_randv_var_ref_mixed_test : public crv_sequence_item
+{
   crv_variable<int> a;
   Variable<int> b;
-  gen(4 <= a() && a() <= 6)
-  (9 <= a() + b && a() + b <= 11)(b % 2 == 0);
+  crv_constraint con={4 <= a() && a() <= 6,9 <= a() + b && a() + b <= 11,b % 2 == 0};
+};
+BOOST_AUTO_TEST_CASE(randv_var_ref_mixed_test) {
+  s_randv_var_ref_mixed_test item;
   unsigned count = 0;
-  while (gen.next()) {
+  while (item.randomize()) {
     ++count;
-    std::cout << "result: a = " << a << ", b = " << gen[b] << std::endl;
-    gen(a() != a || b != gen[b]);
-
+    std::cout << "result: a = " << (item.a) << ", b = " << (item.b);
+    std::cout << std::endl;
+    item.con&={(item.a() != item.a || item.b() != item.b)};
     BOOST_REQUIRE_LE(count, 10);
   }
   BOOST_REQUIRE_EQUAL(count, 4);
-}
+}*/
 
 struct s_alu : public crv_sequence_item
 {

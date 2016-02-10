@@ -140,13 +140,13 @@ BOOST_AUTO_TEST_CASE(not_equal_t1) {
 }
 
 BOOST_AUTO_TEST_CASE(less) {
-  Variable<unsigned> a;
+  crv_variable<unsigned> a;
   crv_variable<unsigned> b;
   Evaluator eval;
 
   for (unsigned int i = 0u; i < 50u; ++i) {
-    eval.assign(a, i);
-    BOOST_CHECK(eval.evaluate(a < 50u));
+    eval.assign(a(), i);
+    BOOST_CHECK(eval.evaluate(a() < 50u));
     BOOST_CHECK(eval.result<bool>());
 
     eval.assign(b(), i);
@@ -156,13 +156,13 @@ BOOST_AUTO_TEST_CASE(less) {
 }
 
 BOOST_AUTO_TEST_CASE(less_equal) {
-  Variable<unsigned> a;
+  crv_variable<unsigned> a;
   crv_variable<unsigned> b;
   Evaluator eval;
 
   for (unsigned int i = 0u; i <= 50u; ++i) {
-    eval.assign(a, i);
-    BOOST_CHECK(eval.evaluate(a <= 50u));
+    eval.assign(a(), i);
+    BOOST_CHECK(eval.evaluate(a() <= 50u));
     BOOST_CHECK(eval.result<bool>());
 
     eval.assign(b(), i);
@@ -172,13 +172,13 @@ BOOST_AUTO_TEST_CASE(less_equal) {
 }
 
 BOOST_AUTO_TEST_CASE(greater) {
-  Variable<unsigned> a;
+  crv_variable<unsigned> a;
   crv_variable<unsigned> b;
   Evaluator eval;
 
   for (int i = 50; i > 0; --i) {
-    eval.assign(a, i);
-    BOOST_CHECK(eval.evaluate(a > 0u));
+    eval.assign(a(), i);
+    BOOST_CHECK(eval.evaluate(a() > 0u));
     BOOST_CHECK(eval.result<bool>());
 
     eval.assign(b(), i);
@@ -188,13 +188,13 @@ BOOST_AUTO_TEST_CASE(greater) {
 }
 
 BOOST_AUTO_TEST_CASE(greater_equal) {
-  Variable<unsigned> a;
+  crv_variable<unsigned> a;
   crv_variable<unsigned> b;
   Evaluator eval;
 
   for (int i = 50; i >= 0; --i) {
-    eval.assign(a, i);
-    BOOST_CHECK(eval.evaluate(a >= 0u));
+    eval.assign(a(), i);
+    BOOST_CHECK(eval.evaluate(a() >= 0u));
     BOOST_CHECK(eval.result<bool>());
 
     eval.assign(b(), i);
@@ -302,52 +302,52 @@ BOOST_AUTO_TEST_CASE(xor_t2) {
 }
 
 BOOST_AUTO_TEST_CASE(shiftleft) {
-  Variable<unsigned> a;
-  Variable<char> b;
+  crv_variable<unsigned> a;
+  crv_variable<char> b;
   Evaluator eval;
 
   int count = 0;
   while (++count < 256) {
 
-    eval.assign(a, count);
-    eval.assign(b, count % (sizeof(unsigned) << 3u));
+    eval.assign(a(), count);
+    eval.assign(b(), count % (sizeof(unsigned) << 3u));
 
-    BOOST_CHECK(eval.evaluate(a << b));
+    BOOST_CHECK(eval.evaluate(a() << b()));
     BOOST_CHECK_EQUAL(eval.result<unsigned>(), count << (count % (sizeof(unsigned) << 3u)));
   }
 }
 
 BOOST_AUTO_TEST_CASE(shiftright) {
-  Variable<unsigned> a;
-  Variable<char> b;
+  crv_variable<unsigned> a;
+  crv_variable<char> b;
   Evaluator eval;
 
   int count = 0;
   while (256 > ++count) {
 
-    eval.assign(a, count + 256);
-    eval.assign(b, count % 8);
+    eval.assign(a(), count + 256);
+    eval.assign(b(), count % 8);
 
-    BOOST_CHECK(eval.evaluate(a >> b));
+    BOOST_CHECK(eval.evaluate(a() >> b()));
     BOOST_CHECK_EQUAL(eval.result<unsigned>(), (count + 256) >> (count % 8));
   }
 }
 
 BOOST_AUTO_TEST_CASE(plus_minus) {
-  Variable<unsigned int> a;
-  Variable<unsigned int> b;
+  crv_variable<unsigned int> a;
+  crv_variable<unsigned int> b;
   Evaluator eval;
 
   unsigned int cnt = 0;
   while (cnt++ < 300) {
 
-    eval.assign(a, cnt * cnt);
-    eval.assign(b, cnt + cnt);
+    eval.assign(a(), cnt * cnt);
+    eval.assign(b(), cnt + cnt);
 
-    BOOST_CHECK(eval.evaluate(a + b));
+    BOOST_CHECK(eval.evaluate(a() + b()));
     BOOST_CHECK_EQUAL(eval.result<unsigned>(), (cnt * cnt) + (cnt + cnt));
 
-    BOOST_CHECK(eval.evaluate(a - b));
+    BOOST_CHECK(eval.evaluate(a() - b()));
     BOOST_CHECK_EQUAL(eval.result<unsigned>(), (cnt * cnt) - (cnt + cnt));
   }
 }
@@ -374,25 +374,25 @@ BOOST_AUTO_TEST_CASE(mult_mod) {
 }
 
 BOOST_AUTO_TEST_CASE(divide) {
-  Variable<short> a;
-  Variable<short> b;
+  crv_variable<short> a;
+  crv_variable<short> b;
   Evaluator eval;
 
   unsigned int cnt = 1;
   while (cnt++ < 256) {
 
-    eval.assign(a, cnt * cnt);
-    eval.assign(b, cnt + cnt);
+    eval.assign(a(), cnt * cnt);
+    eval.assign(b(), cnt + cnt);
 
-    BOOST_CHECK(eval.evaluate(a / b));
+    BOOST_CHECK(eval.evaluate(a() / b()));
     BOOST_CHECK_EQUAL(eval.result<short>(), (cnt * cnt) / (cnt + cnt));
 
-    BOOST_CHECK(eval.evaluate(a % b));
+    BOOST_CHECK(eval.evaluate(a() % b()));
     BOOST_CHECK_EQUAL(eval.result<short>(), (cnt * cnt) % (cnt + cnt));
   }
 
-  eval.assign(b, 0u);
-  BOOST_CHECK(!eval.evaluate(a / b));
+  eval.assign(b(), 0u);
+  BOOST_CHECK(!eval.evaluate(a() / b()));
 }
 
 BOOST_AUTO_TEST_CASE(element_inside_set) {
@@ -520,14 +520,14 @@ BOOST_AUTO_TEST_CASE(element_not_inside) {
 }
 
 BOOST_AUTO_TEST_CASE(if_then_else_t1) {
-  Variable<unsigned int> a;
+  crv_variable<unsigned int> a;
   crv_variable<unsigned int> b;
   Evaluator eval;
-  expression expr = make_expression(if_then_else(a<5, b()> 0 && b() <= 50, b() > 50 && b() <= 100));
+  expression expr = make_expression(if_then_else(a()<5, b()> 0 && b() <= 50, b() > 50 && b() <= 100));
 
   for (int i = 0; i < 10; ++i) {
 
-    eval.assign(a, i);
+    eval.assign(a(), i);
     eval.assign(b(), 25);
     BOOST_REQUIRE(eval.evaluate(expr));
 
@@ -548,14 +548,14 @@ BOOST_AUTO_TEST_CASE(if_then_else_t1) {
 }
 
 BOOST_AUTO_TEST_CASE(if_then_t1) {
-  Variable<unsigned int> a;
+  crv_variable<unsigned int> a;
   crv_variable<unsigned int> b;
   Evaluator eval;
-  expression expr = make_expression(if_then(a<5, b()> 0 && b() <= 100));
+  expression expr = make_expression(if_then(a()<5, b()> 0 && b() <= 100));
 
   for (int i = 0; i < 10; ++i) {
 
-    eval.assign(a, i);
+    eval.assign(a(), i);
     eval.assign(b(), 25u);
     BOOST_REQUIRE(eval.evaluate(expr));
     BOOST_REQUIRE(eval.result<bool>());

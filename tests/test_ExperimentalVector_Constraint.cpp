@@ -91,32 +91,35 @@ BOOST_AUTO_TEST_CASE(unique_test_1) {
   }
 }
 
+struct s_unique_test_2 : crv_sequence_item
+{
+    crv_vector<unsigned int> v;
+    crv_constraint con={v().size() == 7,foreach(v(), v()[_i] < 6)};
+    crv_constraint con2={unique(v())};
+};
+
 BOOST_AUTO_TEST_CASE(unique_test_2) {
-  crv_vector<unsigned int> v;
-  Generator gen;
-  gen(v().size() == 7);
-  gen(foreach(v(), v()[_i] < 6));
-
-  gen("unique", unique(v()));
-  BOOST_REQUIRE(!gen.next());
-
-  gen.disableConstraint("unique");
-  BOOST_REQUIRE(gen.next());
-  BOOST_REQUIRE(v.size() == 7);
-  for (uint i = 0; i < v.size(); i++) {
-    std::cout << v[i] << " ";
-    BOOST_REQUIRE(v[i] < 6);
+  s_unique_test_2 item;
+  BOOST_REQUIRE(!item.randomize());
+  item.con2.deactivate();
+  BOOST_REQUIRE(item.randomize());
+  BOOST_REQUIRE(item.v.size() == 7);
+  for (uint i = 0; i < item.v.size(); i++) {
+    std::cout << item.v[i] << " ";
+    BOOST_REQUIRE(item.v[i] < 6);
   }
   std::cout << std::endl;
 }
 
+struct s_soft_unique_test : crv_sequence_item
+{
+    crv_vector<unsigned int> v;
+    crv_constraint con={v().size() == 7,foreach(v(), v()[_i] < 6)};
+    crv_soft_constraint con2={unique(v())};
+};
 BOOST_AUTO_TEST_CASE(soft_unique_test) {
-  crv_vector<unsigned int> v;
-  Generator gen;
-  gen(v().size() == 7);
-  gen(foreach(v(), v()[_i] < 6));
-  gen.soft(unique(v()));
-  BOOST_REQUIRE(gen.next());
+  s_soft_unique_test item;
+  BOOST_REQUIRE(item.randomize());
 }
 
 struct Item4 : public crv_sequence_item {
@@ -169,104 +172,112 @@ BOOST_AUTO_TEST_CASE(index_constraint_test) {
   }
 }
 
+struct s_soft_vec_constraint1 : public crv_sequence_item
+{
+    crv_vector<unsigned int> v;
+    crv_constraint con={v().size() == 10,foreach(v(), v()[_i] >= v()[_i - 1])};
+    crv_soft_constraint con2={foreach(v(), v()[_i] < v()[_i - 1])};
+};
+
+struct s_soft_vec_constraint2 : public crv_sequence_item
+{
+    crv_vector<unsigned int> v;
+    crv_constraint con={v().size() == 4,foreach(v(), v()[_i] >= v()[_i - 1]),foreach(v(), v()[_i] <= 1000)};
+    crv_soft_constraint con2={foreach(v(), v()[_i] <= v()[_i - 1])};
+    crv_soft_constraint con3={foreach(v(), if_then(_i == 0, v()[_i] % 13 == 3))};
+};
+
 BOOST_AUTO_TEST_CASE(soft_vec_constraint) {
-  crv_vector<unsigned int> v;
-
-  Generator gen;
-  gen(v().size() == 10);
-  gen(foreach(v(), v()[_i] >= v()[_i - 1]));
-  gen.soft(foreach(v(), v()[_i] < v()[_i - 1]));
-  BOOST_REQUIRE(gen.next());
-
-  Generator gen1;
-  gen1(v().size() == 4);
-  gen1(foreach(v(), v()[_i] >= v()[_i - 1]));
-  gen1(foreach(v(), v()[_i] <= 1000));
-  gen1.soft(foreach(v(), v()[_i] <= v()[_i - 1]));
-  gen1.soft(foreach(v(), if_then(_i == 0, v()[_i] % 13 == 3)));
-  BOOST_REQUIRE(gen1.next());
+  s_soft_vec_constraint1 item1;
+  s_soft_vec_constraint2 item2;
+  BOOST_REQUIRE(item1.randomize());
+  BOOST_REQUIRE(item2.randomize());
   for (int j = 0; j < 10; j++) {
-    BOOST_REQUIRE_EQUAL(v.size(), 4);
-    std::cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << std::endl;
-    BOOST_CHECK_EQUAL(v[0], v[1]);
-    BOOST_CHECK_EQUAL(v[1], v[2]);
-    BOOST_CHECK_EQUAL(v[2], v[3]);
-    BOOST_CHECK_EQUAL(v[0] % 13, 3);
-    if (!gen1.next()) break;
+    BOOST_REQUIRE_EQUAL(item1.v.size(), 4);
+    std::cout << item1.v[0] << " " << item1.v[1] << " " << item1.v[2] << " " << item1.v[3] << std::endl;
+    BOOST_CHECK_EQUAL(item1.v[0], item1.v[1]);
+    BOOST_CHECK_EQUAL(item1.v[1], item1.v[2]);
+    BOOST_CHECK_EQUAL(item1.v[2], item1.v[3]);
+    BOOST_CHECK_EQUAL(item1.v[0] % 13, 3);
+    if (!item1.randomize()) break;
   }
 }
+
+struct s_mixed_bv_width_1 : public crv_sequence_item
+{
+    crv_vector<signed char> a;
+    crv_constraint con={a().size() == 28,foreach(a(), a()[_i] < (short)-100),unique(a())};
+};
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_1) {
-  crv_vector<signed char> a;
-  Generator gen;
-  gen(a().size() == 28);
-  gen(foreach(a(), a()[_i] < (short)-100));
-  gen(unique(a()));
-
-  BOOST_REQUIRE(gen.next());
-  for (uint i = 0; i < a.size(); i++) {
-    BOOST_REQUIRE_LT(a[i], -100);
-    std::cout << " " << (int)a[i];
+  s_mixed_bv_width_1 item;
+  BOOST_REQUIRE(item.randomize());
+  for (uint i = 0; i < item.a.size(); i++) {
+    BOOST_REQUIRE_LT(item.a[i], -100);
+    std::cout << " " << (int)item.a[i];
   }
   std::cout << std::endl;
-  BOOST_REQUIRE(check_unique(a));
+  BOOST_REQUIRE(check_unique(item.a));
 }
+
+struct s_mixed_bv_width_2 : public crv_sequence_item
+{
+    crv_vector<short> a;
+    crv_constraint con={a().size() == 19,foreach(a(), a()[_i] < 10),foreach(a(), a()[_i] > -10),unique(a())};
+};
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_2) {
-  crv_vector<short> a;
-  Generator gen;
-  gen(a().size() == 19);
-  gen(foreach(a(), a()[_i] < 10));
-  gen(foreach(a(), a()[_i] > -10));
-  gen(unique(a()));
-
-  BOOST_REQUIRE(gen.next());
-  for (uint i = 0; i < a.size(); i++) BOOST_REQUIRE(-10 < a[i] && a[i] < 10);
-  BOOST_REQUIRE(check_unique(a));
+  s_mixed_bv_width_2 item;
+  BOOST_REQUIRE(item.randomize());
+  for (uint i = 0; i < item.a.size(); i++) BOOST_REQUIRE(-10 < item.a[i] && item.a[i] < 10);
+  BOOST_REQUIRE(check_unique(item.a));
 }
+
+struct s_mixed_bv_width_3 : public crv_sequence_item
+{
+  crv_vector<int> a;
+  crv_constraint con={a().size() == 19,foreach(a(), a()[_i] < (signed char)10),foreach(a(), a()[_i] > (short)-10),unique(a())};
+};
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_3) {
-  crv_vector<int> a;
-  Generator gen;
-  gen(a().size() == 19);
-  gen(foreach(a(), a()[_i] < (signed char)10));
-  gen(foreach(a(), a()[_i] > (short)-10));
-  gen(unique(a()));
-
-  BOOST_REQUIRE(gen.next());
-  for (uint i = 0; i < a.size(); i++) BOOST_REQUIRE(-10 < a[i] && a[i] < 10);
-  BOOST_REQUIRE(check_unique(a));
+  s_mixed_bv_width_3 item;
+  BOOST_REQUIRE(item.randomize());
+  for (uint i = 0; i < item.a.size(); i++) BOOST_REQUIRE(-10 < item.a[i] && item.a[i] < 10);
+  BOOST_REQUIRE(check_unique(item.a));
 }
 
-BOOST_AUTO_TEST_CASE(mixed_bv_width_4) {
-  crv_vector<short> a;
-  Generator gen;
-  gen(a().size() == 10);
-  gen(foreach(a(), -3 <= a()[_i] && a()[_i] <= 3));
-  gen(foreach(a(), a()[_i] != 0));
-  gen(foreach(a(), a()[_i] * a()[_i - 1] % 6 == 0));
-  gen(foreach(a(), _i != 0 || a()[_i] % 2 == 0));
+struct s_mixed_bv_width_4 : public crv_sequence_item
+{
+    crv_vector<short> a;
+    crv_constraint con={a().size() == 10,foreach(a(), -3 <= a()[_i] && a()[_i] <= 3),foreach(a(), a()[_i] != 0),foreach(a(), a()[_i] * a()[_i - 1] % 6 == 0),foreach(a(), _i != 0 || a()[_i] % 2 == 0)};
+};
 
-  BOOST_REQUIRE(gen.next());
-  for (uint i = 0; i < a.size(); i++) {
-    BOOST_REQUIRE(-3 <= a[i] && a[i] <= 3);
-    BOOST_REQUIRE(a[i] != 0);
+BOOST_AUTO_TEST_CASE(mixed_bv_width_4) {
+
+  s_mixed_bv_width_4 item;
+  BOOST_REQUIRE(item.randomize());
+  for (uint i = 0; i < item.a.size(); i++) {
+    BOOST_REQUIRE(-3 <= item.a[i] && item.a[i] <= 3);
+    BOOST_REQUIRE(item.a[i] != 0);
     if (i == 0)
-      BOOST_REQUIRE(a[i] % 2 == 0);
+      BOOST_REQUIRE(item.a[i] % 2 == 0);
     else
-      BOOST_REQUIRE(a[i] * a[i - 1] % 6 == 0);
+      BOOST_REQUIRE(item.a[i] * item.a[i - 1] % 6 == 0);
   }
 }
 
-BOOST_AUTO_TEST_CASE(bool_rand_vec) {
-  crv_vector<bool> a;
-  Generator gen;
-  gen(a().size() == 10);
-  gen(foreach(a(), a()[_i] != a()[_i - 1]));
+struct s_bool_rand_vec : public crv_sequence_item
+{
+    crv_vector<bool> a;
+    crv_constraint con={a().size() == 10,foreach(a(), a()[_i] != a()[_i - 1])};
+};
 
-  BOOST_REQUIRE(gen.next());
-  BOOST_REQUIRE(a.size() == 10);
-  for (uint i = 1; i < a.size(); i++) BOOST_REQUIRE(a[i] != a[i - 1]);
+BOOST_AUTO_TEST_CASE(bool_rand_vec) {
+  
+  s_bool_rand_vec item;
+  BOOST_REQUIRE(item.randomize());
+  BOOST_REQUIRE(item.a.size() == 10);
+  for (uint i = 1; i < item.a.size(); i++) BOOST_REQUIRE(item.a[i] != item.a[i - 1]);
 }
 
 BOOST_AUTO_TEST_SUITE_END()  // Context
