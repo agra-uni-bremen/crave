@@ -488,7 +488,7 @@ struct s_shiftleft : crv_sequence_item
 {
     s_shiftleft(crv_object_name){}
     crv_variable<unsigned> a,b,c;
-    crv_constraint con={a() < 256u,b() < ((unsigned)(sizeof(unsigned) * 8u)),c() == (a << b)};
+    crv_constraint con={a() < 256u,b() < ((unsigned)(sizeof(unsigned) * 8u)),c() == (a() << b())};
 };
 BOOST_AUTO_TEST_CASE(shiftleft) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
