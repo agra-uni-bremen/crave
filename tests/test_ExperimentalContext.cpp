@@ -54,7 +54,6 @@ BOOST_AUTO_TEST_CASE(boolean) {
     item.randomize();
     bool b2 = item.b;
     item.con&={item.b() != b2};
-    ;
   // printf("result: b2=%d\n", b2);
 
   BOOST_CHECK_THROW(item.randomize(), std::runtime_error);
@@ -400,12 +399,13 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_6) {
 
 struct s_dist_of_boolean25 : crv_sequence_item
 {
+    s_dist_of_boolean25(crv_object_name){}
     crv_variable<bool> a;
     crv_constraint con={dist(a(), distribution<bool>::create(0.25))};
 };
 
 BOOST_AUTO_TEST_CASE(dist_of_boolean25) {
-  s_dist_of_boolean25 item;
+  s_dist_of_boolean25 item("item");
   int counter = 0;
   for (unsigned i = 0; i < 1000; i++) {
     BOOST_REQUIRE(item.randomize());
@@ -422,11 +422,12 @@ BOOST_AUTO_TEST_CASE(dist_of_boolean25) {
 
 struct s_dist_of_boolean50 : crv_sequence_item 
 {
+      s_dist_of_boolean50(crv_object_name){}
       crv_variable<bool> a;
       crv_constraint con={dist(a(), distribution<bool>::create(0.5))};
 };
 BOOST_AUTO_TEST_CASE(dist_of_boolean50) {
-  s_dist_of_boolean50 item;
+  s_dist_of_boolean50 item("item");
   int counter = 0;
   for (unsigned i = 0; i < 1000; i++) {
     BOOST_REQUIRE(item.randomize());
@@ -443,11 +444,12 @@ BOOST_AUTO_TEST_CASE(dist_of_boolean50) {
 
 struct s_dist_of_boolean75 : public crv_sequence_item
 {
+    s_dist_of_boolean75(crv_object_name){}
     crv_variable<bool> a;
     crv_constraint con={dist(a(), distribution<bool>::create(0.75))};
 };
 BOOST_AUTO_TEST_CASE(dist_of_boolean75) {
-  s_dist_of_boolean75 item;
+  s_dist_of_boolean75 item("item");
   int counter = 0;
   for (unsigned i = 0; i < 1000; i++) {
     BOOST_REQUIRE(item.randomize());
