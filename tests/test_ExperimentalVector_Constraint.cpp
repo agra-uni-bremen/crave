@@ -196,6 +196,7 @@ BOOST_AUTO_TEST_CASE(soft_vec_constraint) {
   s_soft_vec_constraint2 item2("item");
   BOOST_REQUIRE(item1.randomize());
   BOOST_REQUIRE(item2.randomize());
+  
   for (int j = 0; j < 10; j++) {
     BOOST_REQUIRE_EQUAL(item1.v.size(), 4);
     std::cout << item1.v[0] << " " << item1.v[1] << " " << item1.v[2] << " " << item1.v[3] << std::endl;

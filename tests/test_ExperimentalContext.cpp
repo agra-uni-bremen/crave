@@ -53,10 +53,9 @@ BOOST_AUTO_TEST_CASE(boolean) {
     item.con&={item.b() != b1};
     item.randomize();
     bool b2 = item.b;
-    item.con&={item.b() != b2};
   // printf("result: b2=%d\n", b2);
 
-  BOOST_CHECK_THROW(item.randomize(), std::runtime_error);
+  BOOST_CHECK_THROW(item.con&={item.b() != b2}, std::runtime_error);
 }
 
 struct s_by_reference : public crv_sequence_item
@@ -338,6 +337,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_4) {
   std::set<int> generated;
   for (unsigned iterations = 0; item.randomize(); ++iterations) {
     generated.insert(item.a);
+    item.con&={item.a() != item.a};
     BOOST_REQUIRE_LT(iterations, 20);
   }
 
@@ -349,7 +349,7 @@ struct s_mixed_bv_width_5 : crv_sequence_item
     s_mixed_bv_width_5(crv_object_name){}
   crv_variable<short> a;
   crv_variable<signed char> b;
-  crv_constraint con={-3 <= a() && a() <= 3,7
+  crv_constraint con={-3 <= a() && a() <= 3,
                       -3 <= b() && b() <= 3,
                       (-2 <= a() + b()) && (a() + b() <= 2)
   };
