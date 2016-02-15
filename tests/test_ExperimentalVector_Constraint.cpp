@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(fibo_test) {
   BOOST_REQUIRE_EQUAL(it.v[1], 1);
   for (uint i = 2; i < it.v.size(); i++) BOOST_REQUIRE_EQUAL(it.v[i], it.v[i - 1] + it.v[i - 2]);
 }
-
+/* TODO
 struct Item1 : public crv_sequence_item {
   Item1(crv_object_name) {}
 
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(free_vector_test) {
   BOOST_REQUIRE(it.v.size() > 0);
   for (uint i = 0; i < it.v.size(); i++) std::cout << it.v[i] << " ";
   std::cout << std::endl;
-}
+}*/
 
 struct Item2 : public crv_sequence_item {
   Item2(crv_object_name){ }
