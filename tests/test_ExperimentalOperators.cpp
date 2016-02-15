@@ -595,7 +595,7 @@ BOOST_AUTO_TEST_CASE(divide) {
   while (item.randomize()) {
     BOOST_REQUIRE_EQUAL(item.a / item.b, item.q);
     BOOST_REQUIRE_EQUAL(item.a % item.b, item.r);
-    item.con={item.a() != item.a,item.b() != item.b};
+    item.con&={item.a() != item.a,item.b() != item.b};
     std::cout << "result: a=" << item.a << ", b=" << item.b << ", q=" << item.q << ", r=" << item.r << "\n"
               << std::endl;
   }
