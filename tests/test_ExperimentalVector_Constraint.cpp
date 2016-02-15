@@ -174,37 +174,33 @@ BOOST_AUTO_TEST_CASE(index_constraint_test) {
   }
 }
 
-struct s_soft_vec_constraint1 : public crv_sequence_item
+struct s_soft_vec_constraint : public crv_sequence_item
 {
-    s_soft_vec_constraint1(crv_object_name){}
-    crv_vector<unsigned int> v;
-    crv_constraint con={v().size() == 10,foreach(v(), v()[_i] >= v()[_i - 1])};
-    crv_soft_constraint con2={foreach(v(), v()[_i] < v()[_i - 1])};
-};
-
-struct s_soft_vec_constraint2 : public crv_sequence_item
-{
-    s_soft_vec_constraint2(crv_object_name){}
-    crv_vector<unsigned int> v;
-    crv_constraint con={v().size() == 4,foreach(v(), v()[_i] >= v()[_i - 1]),foreach(v(), v()[_i] <= 1000)};
-    crv_soft_constraint con2={foreach(v(), v()[_i] <= v()[_i - 1])};
-    crv_soft_constraint con3={foreach(v(), if_then(_i == 0, v()[_i] % 13 == 3))};
+    s_soft_vec_constraint(crv_object_name){}
+    crv_constraint con;
+    crv_soft_constraint con2;
 };
 
 BOOST_AUTO_TEST_CASE(soft_vec_constraint) {
-  s_soft_vec_constraint1 item1("item");
-  s_soft_vec_constraint2 item2("item");
+  crv_vector<unsigned int> v;
+  s_soft_vec_constraint item1("item");
+  s_soft_vec_constraint item2("item");
+  
+  item1.con&={v().size() == 10,foreach(v(), v()[_i] >= v()[_i - 1])};
+  item1.con2&={foreach(v(), v()[_i] < v()[_i - 1])};
+  item2.con&={v().size() == 4,foreach(v(), v()[_i] >= v()[_i - 1]),foreach(v(), v()[_i] <= 1000)};
+  item2.con2&={foreach(v(), v()[_i] <= v()[_i - 1]),foreach(v(), if_then(_i == 0, v()[_i] % 13 == 3))};
   BOOST_REQUIRE(item1.randomize());
   BOOST_REQUIRE(item2.randomize());
   
   for (int j = 0; j < 10; j++) {
-    BOOST_REQUIRE_EQUAL(item1.v.size(), 4);
-    std::cout << item1.v[0] << " " << item1.v[1] << " " << item1.v[2] << " " << item1.v[3] << std::endl;
-    BOOST_CHECK_EQUAL(item1.v[0], item1.v[1]);
-    BOOST_CHECK_EQUAL(item1.v[1], item1.v[2]);
-    BOOST_CHECK_EQUAL(item1.v[2], item1.v[3]);
-    BOOST_CHECK_EQUAL(item1.v[0] % 13, 3);
-    if (!item1.randomize()) break;
+    BOOST_REQUIRE_EQUAL(v.size(), 4);
+    std::cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << std::endl;
+    BOOST_CHECK_EQUAL(v[0], v[1]);
+    BOOST_CHECK_EQUAL(v[1], v[2]);
+    BOOST_CHECK_EQUAL(v[2], v[3]);
+    BOOST_CHECK_EQUAL(v[0] % 13, 3);
+    if (!item2.randomize()) break;
   }
 }
 
