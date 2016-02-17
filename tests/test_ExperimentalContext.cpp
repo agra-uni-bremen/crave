@@ -44,19 +44,17 @@ struct s_boolean : public crv_sequence_item
     crv_variable<bool> b;
     crv_constraint con = {b() == b()}; 
 };
-/* TODO
+
 BOOST_AUTO_TEST_CASE(boolean) {
     s_boolean item("item");
-    item.randomize();
+    BOOST_REQUIRE(item.randomize());
     bool b1 = item.b;
-  // printf("result: b1=%d\n", b1);
     item.con&={item.b() != b1};
-    item.randomize();
+    BOOST_REQUIRE(item.randomize());
     bool b2 = item.b;
-  // printf("result: b2=%d\n", b2);
-
-  BOOST_CHECK_THROW(item.con&={item.b() != b2}, std::runtime_error);
-}*/
+    item.con&={item.b() != b2};
+    BOOST_REQUIRE(!item.randomize());
+}
 
 struct s_by_reference : public crv_sequence_item
 {
@@ -145,25 +143,27 @@ BOOST_AUTO_TEST_CASE(randv_test) {
   BOOST_REQUIRE_EQUAL(count, 4);
 }
 
-/* TODO
 struct s_randv_var_ref_mixed_test : public crv_sequence_item
 {
   crv_variable<int> a;
-  Variable<int> b;
+  int b_value;
+  WriteReference<int> b { &b_value };
   crv_constraint con={4 <= a() && a() <= 6,9 <= a() + b && a() + b <= 11,b % 2 == 0};
+  s_randv_var_ref_mixed_test(crv_object_name) {}
 };
+
 BOOST_AUTO_TEST_CASE(randv_var_ref_mixed_test) {
-  s_randv_var_ref_mixed_test item;
+  s_randv_var_ref_mixed_test item("item");
   unsigned count = 0;
   while (item.randomize()) {
     ++count;
-    std::cout << "result: a = " << (item.a) << ", b = " << (item.b);
+    std::cout << "result: a = " << item.a << ", b = " << item.b_value;
     std::cout << std::endl;
-    item.con&={(item.a() != item.a || item.b() != item.b)};
+    item.con&={(item.a() != item.a || item.b != item.b_value)};
     BOOST_REQUIRE_LE(count, 10);
   }
   BOOST_REQUIRE_EQUAL(count, 4);
-}*/
+}
 
 struct s_alu : public crv_sequence_item
 {

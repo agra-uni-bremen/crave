@@ -94,18 +94,14 @@ BOOST_AUTO_TEST_CASE(Variable_test) {
   Generator gen;
   Variable<int> a;
   Variable<int> b;
-  std::cout << "init: a = " << gen[a] << ", b = " << gen[b] << std::endl;
   gen(4 <= a && a <= 6)
   (9 <= a + b && a + b <= 11)(b % 2 == 0);
   int count = 0;
   while (gen.next()) {
     ++count;
-    std::cout << "result: a = " << gen[a] << ", b = " << gen[b] << std::endl;
     gen(a != gen[a] || b != gen[b]);
-
     BOOST_REQUIRE_LE(count, 10);
   }
-
   BOOST_REQUIRE_EQUAL(count, 4);
 }
 
