@@ -1,0 +1,9 @@
+Scanning dependencies of target Project_boost_test
+[ 50%] Building CXX object CMakeFiles/Project_boost_test.dir/boost_test.o
+/home/niklas/Schreibtisch/crave/tests/boost_test.cpp:1:45: fatal error: boost/test/included/unit_test.hpp: Datei oder Verzeichnis nicht gefunden
+ #include <boost/test/included/unit_test.hpp>
+                                             ^
+compilation terminated.
+make[2]: *** [CMakeFiles/Project_boost_test.dir/boost_test.o] Fehler 1
+make[1]: *** [CMakeFiles/Project_boost_test.dir/all] Fehler 2
+make: *** [all] Fehler 2

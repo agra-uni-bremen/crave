@@ -1,0 +1,1 @@
+/usr/bin/g++   -g3 -gdwarf-2    CMakeFiles/solver_independent_tests.dir/solver_independent_tests.o  -o solver_independent_tests  -L/home/niklas/Schreibtisch/crave/tests -rdynamic libProject_boost_test.a -lProject -lpthread 

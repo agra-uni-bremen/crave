@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/niklas/Schreibtisch/crave/tests",
+  "command": "/usr/bin/g++    -g3 -gdwarf-2 -I/home/niklas/Schreibtisch/crave/tests/../src    -o CMakeFiles/Project_boost_test.dir/boost_test.o -c /home/niklas/Schreibtisch/crave/tests/boost_test.cpp",
+  "file": "/home/niklas/Schreibtisch/crave/tests/boost_test.cpp"
+},
+{
+  "directory": "/home/niklas/Schreibtisch/crave/tests",
+  "command": "/usr/bin/g++    -g3 -gdwarf-2 -I/home/niklas/Schreibtisch/crave/tests/../src    -o CMakeFiles/solver_independent_tests.dir/solver_independent_tests.o -c /home/niklas/Schreibtisch/crave/tests/solver_independent_tests.cpp",
+  "file": "/home/niklas/Schreibtisch/crave/tests/solver_independent_tests.cpp"
+}
+]
