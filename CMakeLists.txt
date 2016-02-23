@@ -159,6 +159,7 @@ INSTALL( FILES
 	DESTINATION lib/pkgconfig/)
 
 add_subdirectory ( tests )
+add_subdirectory ( examples )
 
 ############################################################
 ##                CPack settings                          ##
