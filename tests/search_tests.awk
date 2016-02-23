@@ -26,7 +26,9 @@ $0 ~ "^ *#include  *\"" {
   sub("^[^\"]*\" *", "");
   sub(" *\".*$", "");
   #print "#include", $0
-  callfile($0)
+  callfile("core/" $0)
+  callfile("experimental/" $0)
+  callfile($0);
 }
 
 END {
