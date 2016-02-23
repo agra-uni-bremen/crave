@@ -149,7 +149,7 @@ struct neg_s2 : crv_sequence_item {
     crv_variable<int> b;
     crv_variable<int> c;
     crv_variable<int> d;
-    crv_constraint con1= {dist(a(), distribution<bool>::create(0.5)), b() == 1337 && c() == 42, if_then_else(a(), d() == -b(), d() == -c())};
+    crv_constraint con1= {dist(a(), distribution<bool>::create(0.5)) && b() == 1337 && c() == 42 && if_then_else(a(), d() == -b(), d() == -c())};
 
     neg_s2(crv_object_name) { }
 };
@@ -157,7 +157,7 @@ struct neg_s2 : crv_sequence_item {
 BOOST_AUTO_TEST_CASE(neg_t2) {
     neg_s2 item("item");
     for (int i = 0; i < 50; ++i) {
-        BOOST_CHECK(item.randomize());
+        BOOST_REQUIRE(item.randomize());
         if (item.a)
             BOOST_CHECK_EQUAL(item.d, -1337);
         else
