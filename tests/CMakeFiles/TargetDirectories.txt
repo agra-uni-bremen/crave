@@ -1,2 +1,0 @@
-/home/niklas/Schreibtisch/crave/tests/CMakeFiles/Project_boost_test.dir
-/home/niklas/Schreibtisch/crave/tests/CMakeFiles/solver_independent_tests.dir

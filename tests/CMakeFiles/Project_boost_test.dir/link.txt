@@ -1,2 +1,0 @@
-/usr/bin/ar cr libProject_boost_test.a  CMakeFiles/Project_boost_test.dir/boost_test.o
-/usr/bin/ranlib libProject_boost_test.a

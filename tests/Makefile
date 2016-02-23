@@ -140,19 +140,19 @@ boost_test.s:
 .PHONY : boost_test.s
 
 # target to build an object file
-solver_independent_tests.o:
-	$(MAKE) -f CMakeFiles/solver_independent_tests.dir/build.make CMakeFiles/solver_independent_tests.dir/solver_independent_tests.o
-.PHONY : solver_independent_tests.o
+core/solver_independent_tests.o:
+	$(MAKE) -f CMakeFiles/solver_independent_tests.dir/build.make CMakeFiles/solver_independent_tests.dir/core/solver_independent_tests.o
+.PHONY : core/solver_independent_tests.o
 
 # target to preprocess a source file
-solver_independent_tests.i:
-	$(MAKE) -f CMakeFiles/solver_independent_tests.dir/build.make CMakeFiles/solver_independent_tests.dir/solver_independent_tests.i
-.PHONY : solver_independent_tests.i
+core/solver_independent_tests.i:
+	$(MAKE) -f CMakeFiles/solver_independent_tests.dir/build.make CMakeFiles/solver_independent_tests.dir/core/solver_independent_tests.i
+.PHONY : core/solver_independent_tests.i
 
 # target to generate assembly for a file
-solver_independent_tests.s:
-	$(MAKE) -f CMakeFiles/solver_independent_tests.dir/build.make CMakeFiles/solver_independent_tests.dir/solver_independent_tests.s
-.PHONY : solver_independent_tests.s
+core/solver_independent_tests.s:
+	$(MAKE) -f CMakeFiles/solver_independent_tests.dir/build.make CMakeFiles/solver_independent_tests.dir/core/solver_independent_tests.s
+.PHONY : core/solver_independent_tests.s
 
 # Help Target
 help:
@@ -167,9 +167,9 @@ help:
 	@echo "... boost_test.o"
 	@echo "... boost_test.i"
 	@echo "... boost_test.s"
-	@echo "... solver_independent_tests.o"
-	@echo "... solver_independent_tests.i"
-	@echo "... solver_independent_tests.s"
+	@echo "... core/solver_independent_tests.o"
+	@echo "... core/solver_independent_tests.i"
+	@echo "... core/solver_independent_tests.s"
 .PHONY : help
 
 
