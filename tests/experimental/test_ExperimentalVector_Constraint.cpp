@@ -44,7 +44,7 @@ struct Item1 : public crv_sequence_item {
   crv_vector<unsigned int> v;
 };
 
-BOOST_AUTO_TEST_CASE(free_vector_test) {
+BOOST_TODO_AUTO_TEST_CASE(free_vector_testXYZ) {
   Item1 it{"item"};
   it.randomize();
   BOOST_REQUIRE(it.u.size() == 0);
