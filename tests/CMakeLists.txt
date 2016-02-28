@@ -12,12 +12,14 @@ function (add_all_tests prog cfile)
   )
   
   string(REPLACE "\n" ";" test_cases "${test_cases}")
-
+  MESSAGE( STATUS "TESTFILE is: " ${cfile} )
   foreach(test  ${test_cases})
+    MESSAGE( STATUS "TestCASE is: " ${test} )
     #message(STATUS "${prog}/${test} ${prog} -t ${test}")
     add_test("${prog}/${test}" ${prog} -t ${test})
     set_tests_properties ("${prog}/${test}" PROPERTIES TIMEOUT ${CRAVE_TIMEOUT})
   endforeach(test)
+  
 endfunction(add_all_tests)
 
 find_library(PTHREAD pthread)
@@ -65,4 +67,6 @@ if(SystemC_FOUND)
   add_all_tests( SystemC_Data core/test_SystemC_Data.cpp)
   target_link_libraries ( SystemC_Data ${SystemC_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${PROJECT_NAME})
 endif(SystemC_FOUND)
+
+
 
