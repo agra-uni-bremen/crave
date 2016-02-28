@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(Variable_dist_t1) {
   gen(dist(v, distribution<int>::create(range<int>(0, 5))(range<int>(50, 65))(range<int>(100, 125))));
 
   std::map<int, int> s;
-  int total = 100000;
+  int total = 10000;
   for (int i = 0; i < total; i++) {
     BOOST_REQUIRE(gen.next());
     BOOST_REQUIRE((0 <= gen[v] && gen[v] <= 5) || (50 <= gen[v] && gen[v] <= 65) || (100 <= gen[v] && gen[v] <= 125));
@@ -33,9 +33,9 @@ BOOST_AUTO_TEST_CASE(Variable_dist_t1) {
       if (s[i] > max) max = s[i];
     }
   double avg = total / (6. + 16. + 26.);
-  // allow 10% deviation
-  BOOST_REQUIRE_LT(100. * (avg - min) / avg, 10);
-  BOOST_REQUIRE_LT(100. * (max - avg) / avg, 10);
+  // allow 20% deviation
+  BOOST_REQUIRE_LT(100. * (avg - min) / avg, 20);
+  BOOST_REQUIRE_LT(100. * (max - avg) / avg, 20);
 }
 
 BOOST_AUTO_TEST_CASE(variable_dist_t2) {
