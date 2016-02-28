@@ -494,7 +494,7 @@ BOOST_AUTO_TEST_CASE(shiftleft) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
   s_shiftleft item("item");
   int count = 0;
-  while (item.randomize() && ++count < 450) {
+  while (item.randomize() && ++count < 420) {
     unsigned av = item.a;
     unsigned bv = item.b;
     unsigned r = av << bv;
