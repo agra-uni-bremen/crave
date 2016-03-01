@@ -31,7 +31,7 @@ struct Item : public rand_obj {
 
 BOOST_AUTO_TEST_CASE(fibo_test) {
   Item it;
-  BOOST_REQUIRE(t.next());
+  BOOST_REQUIRE(it.next());
   BOOST_REQUIRE_LE(30, it.v.size());
   BOOST_REQUIRE_LE(it.v.size(), 50);
   BOOST_REQUIRE_EQUAL(it.v[0], 0);
