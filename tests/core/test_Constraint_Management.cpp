@@ -15,13 +15,13 @@ using boost::assign::list_of;
 
 void print_vec(std::ostream& out, std::vector<std::string> const& v) {
   out << "( ";
-  BOOST_FOREACH(std::string u, v) { out << u << ' '; }
+  BOOST_FOREACH (std::string u, v) { out << u << ' '; }
   out << ')';
 }
 
 void print_vec_vec(std::ostream& out, std::vector<std::vector<std::string> > const& v) {
   out << "( ";
-  BOOST_FOREACH(std::vector<std::string> const & u, v) {
+  BOOST_FOREACH (std::vector<std::string> const& u, v) {
     print_vec(out, u);
     out << ' ';
   }
@@ -166,7 +166,7 @@ class ItemPacketBaseConstraint : public rand_obj {
     constraint(msg_length() > 2);
     constraint(src_addr() != dest_addr());
     constraint(msg().size() == msg_length());
-    constraint(foreach(msg(), msg()[i_] >= ' ' && msg()[i_] <= 'z'));
+    constraint(foreach (msg(), msg()[i_] >= ' ' && msg()[i_] <= 'z'));
   }
 
   placeholder i_;
@@ -207,8 +207,7 @@ BOOST_AUTO_TEST_CASE(no_conflict) {
   randv<unsigned short> b(0);
   randv<unsigned short> c(0);
   Generator gen;
-  gen("a", a() != b())
-  ("b", b() != c());
+  gen("a", a() != b())("b", b() != c());
 
   BOOST_REQUIRE(gen.next());
   std::vector<std::vector<std::string> > result = gen.analyseContradiction();
@@ -220,8 +219,7 @@ BOOST_AUTO_TEST_CASE(one_conflict1) {
   randv<bool> b(0);
   randv<bool> c(0);
   Generator gen;
-  gen("a", a() != b())
-  ("b", b() != c())("c", a() != c());
+  gen("a", a() != b())("b", b() != c())("c", a() != c());
 
   BOOST_REQUIRE(!gen.next());
   std::vector<std::vector<std::string> > result = gen.analyseContradiction();
@@ -239,8 +237,7 @@ BOOST_AUTO_TEST_CASE(one_conflict2) {
   randv<unsigned short> a(0);
   randv<unsigned short> b(0);
   Generator gen;
-  gen("a", a() == 3)
-  ("b", a() > 4)("c", b() == 0);
+  gen("a", a() == 3)("b", a() > 4)("c", b() == 0);
 
   BOOST_REQUIRE(!gen.next());
   std::vector<std::vector<std::string> > result = gen.analyseContradiction();
@@ -259,8 +256,7 @@ BOOST_AUTO_TEST_CASE(two_conflicts1) {
   randv<unsigned short> b(0);
   randv<unsigned short> c(0);
   Generator gen;
-  gen("a", a() == 1)
-  ("b", a() > 5)("c", b() == 0)("d", c() == b() && c() != 0);
+  gen("a", a() == 1)("b", a() > 5)("c", b() == 0)("d", c() == b() && c() != 0);
 
   BOOST_REQUIRE(!gen.next());
   std::vector<std::vector<std::string> > result = gen.analyseContradiction();
@@ -291,8 +287,7 @@ BOOST_AUTO_TEST_CASE(two_conflicts2) {
   randv<unsigned short> e(0);
 
   Generator gen;
-  gen("a", a() != b())
-  ("b", b() != c())("c", a() != c())("d", d() == 0)("e", e() == d() && e() != 0);
+  gen("a", a() != b())("b", b() != c())("c", a() != c())("d", d() == 0)("e", e() == d() && e() != 0);
 
   BOOST_REQUIRE(!gen.next());
   std::vector<std::vector<std::string> > result = gen.analyseContradiction();
@@ -321,8 +316,7 @@ BOOST_AUTO_TEST_CASE(two_conflicts3) {
   randv<unsigned short> c(0);
   randv<unsigned short> d(0);
   Generator gen;
-  gen("c1", a() == 2)
-  ("c2", a() > 5)("c3", b() == d() * 2)("c4", c() % a() == 1)("c5", c() == b());
+  gen("c1", a() == 2)("c2", a() > 5)("c3", b() == d() * 2)("c4", c() % a() == 1)("c5", c() == b());
 
   BOOST_REQUIRE(!gen.next());
   std::vector<std::vector<std::string> > result = gen.analyseContradiction();
@@ -351,8 +345,7 @@ BOOST_AUTO_TEST_CASE(conflict_with_softs_t1) {
   randv<int> c(0);
 
   Generator gen;
-  gen("c1", a() < 10)
-  ("c2", b() >= 10)("c3", c() != a() && c() != b());
+  gen("c1", a() < 10)("c2", b() >= 10)("c3", c() != a() && c() != b());
   gen.soft("c4", c() == a());
 
   BOOST_CHECK(gen.next());
@@ -372,8 +365,7 @@ BOOST_AUTO_TEST_CASE(conflict_with_softs_t2) {
   randv<unsigned int> a(0), b(0), c(0);
 
   Generator gen;
-  gen("h1", a() >= 100)
-  ("h2", b() > 50 && b() <= 100)("h3", c() % a() == 0);
+  gen("h1", a() >= 100)("h2", b() > 50 && b() <= 100)("h3", c() % a() == 0);
   gen.soft("s1", a() == b());
   gen.soft("s2", a() == c());
   gen.soft("s3", b() != c());

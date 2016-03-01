@@ -78,7 +78,6 @@ BOOST_AUTO_TEST_CASE(single_variable_constraint) {
 }
 
 struct TestObject : public rand_obj {
-
   randv<unsigned> v1r1, v1r2, v1r3;
   TestObject(rand_obj* parent = 0) : rand_obj(parent) { constraint("tree", ((v1r1() * v1r2()) + (v1r3() - 4)) == 10); }
 };

@@ -128,7 +128,6 @@ BOOST_AUTO_TEST_CASE(not_equal_t1) {
   eval.assign(a, 25u);
 
   for (unsigned int i = 0; i < 50u; ++i) {
-
     eval.assign(b, i);
     BOOST_REQUIRE(eval.evaluate(a != b));
 
@@ -307,7 +306,6 @@ BOOST_AUTO_TEST_CASE(shiftleft) {
 
   int count = 0;
   while (++count < 256) {
-
     eval.assign(a, count);
     eval.assign(b, count % (sizeof(unsigned) << 3u));
 
@@ -323,7 +321,6 @@ BOOST_AUTO_TEST_CASE(shiftright) {
 
   int count = 0;
   while (256 > ++count) {
-
     eval.assign(a, count + 256);
     eval.assign(b, count % 8);
 
@@ -339,7 +336,6 @@ BOOST_AUTO_TEST_CASE(plus_minus) {
 
   unsigned int cnt = 0;
   while (cnt++ < 300) {
-
     eval.assign(a, cnt * cnt);
     eval.assign(b, cnt + cnt);
 
@@ -358,7 +354,6 @@ BOOST_AUTO_TEST_CASE(mult_mod) {
 
   for (int i = -3; i <= 3; i++) {
     for (int j = -3; j <= 3; j++) {
-
       eval.assign(a, i);
       eval.assign(b, j);
 
@@ -379,7 +374,6 @@ BOOST_AUTO_TEST_CASE(divide) {
 
   unsigned int cnt = 1;
   while (cnt++ < 256) {
-
     eval.assign(a, cnt * cnt);
     eval.assign(b, cnt + cnt);
 
@@ -525,7 +519,6 @@ BOOST_AUTO_TEST_CASE(if_then_else_t1) {
   expression expr = make_expression(if_then_else(a<5, b> 0 && b <= 50, b > 50 && b <= 100));
 
   for (int i = 0; i < 10; ++i) {
-
     eval.assign(a, i);
     eval.assign(b, 25);
     BOOST_REQUIRE(eval.evaluate(expr));
@@ -553,7 +546,6 @@ BOOST_AUTO_TEST_CASE(if_then_t1) {
   expression expr = make_expression(if_then(a<5, b> 0 && b <= 100));
 
   for (int i = 0; i < 10; ++i) {
-
     eval.assign(a, i);
     eval.assign(b, 25u);
     BOOST_REQUIRE(eval.evaluate(expr));

@@ -25,12 +25,12 @@ struct Item : public crv_sequence_item {
 };
 
 struct Item1 : public crv_sequence_item {
-  Item item={"Item"};
+  Item item = {"Item"};
 
   crv_variable<unsigned int> c;
   crv_variable<unsigned int> d;
 
-  crv_constraint eq={c() == item.a() + 1, d() == item.b() + 1};
+  crv_constraint eq = {c() == item.a() + 1, d() == item.b() + 1};
 
   Item1(crv_object_name) {}
   friend ostream& operator<<(ostream& os, const Item1& it) {

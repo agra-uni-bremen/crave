@@ -41,16 +41,15 @@ BOOST_AUTO_TEST_CASE(Variable_dist_t1) {
 BOOST_AUTO_TEST_CASE(variable_dist_t2) {
   Variable<int> v;
   Generator gen;
-  BOOST_CHECK_THROW(
-      gen(dist(v, distribution<int>::create(range<int>(0, 10))(range<int>(50, 75))(range<int>(30, 51)))),
-      std::runtime_error);
+  BOOST_CHECK_THROW(gen(dist(v, distribution<int>::create(range<int>(0, 10))(range<int>(50, 75))(range<int>(30, 51)))),
+                    std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(variable_dist_t3) {
   Variable<char> v;
   Generator gen;
   gen(dist(v, distribution<char>::create(weighted_range<char>(1, 5, 50))(weighted_range<char>(10, 20, 20))(
-                    weighted_range<char>(-50, -50, 30))));
+                  weighted_range<char>(-50, -50, 30))));
   int cnt1 = 0, cnt2 = 0, cnt3 = 0;
   int total = 50000;
   for (int i = 0; i < total; i++) {
@@ -76,7 +75,6 @@ BOOST_AUTO_TEST_CASE(variable_dist_t4) {
     BOOST_REQUIRE(5000 <= gen[v] && gen[v] <= 6000);
   }
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()  // Context
 

@@ -166,7 +166,6 @@ BOOST_AUTO_TEST_CASE(greater) {
   VariableDefaultSolver::bypass_constraint_analysis = false;
 }
 
-
 BOOST_AUTO_TEST_CASE(greater_equal) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
 
@@ -301,8 +300,7 @@ BOOST_AUTO_TEST_CASE(shiftleft) {
   Variable<unsigned> c;
 
   Generator gen;
-  gen(a < 256u)
-  (b < (unsigned)(sizeof(unsigned) * 8u))(c == (a << b));
+  gen(a < 256u)(b < (unsigned)(sizeof(unsigned) * 8u))(c == (a << b));
 
   int count = 0;
   while (gen.next() && ++count < 500) {
@@ -326,8 +324,7 @@ BOOST_AUTO_TEST_CASE(shiftright) {
   Variable<unsigned> c;
 
   Generator gen;
-  gen(a > 256u)
-  (b < 8u)(c == (a >> b));
+  gen(a > 256u)(b < 8u)(c == (a >> b));
 
   int count = 0;
   while (gen.next() && ++count < 500) {
@@ -352,8 +349,7 @@ BOOST_AUTO_TEST_CASE(plus_minus) {
   Variable<unsigned int> r;
 
   Generator gen;
-  gen(b != 0u)
-  (b < a)(q == a + b)(r == a - b);
+  gen(b != 0u)(b < a)(q == a + b)(r == a - b);
 
   unsigned int cnt = 0u;
   while (gen.next() && cnt < 300) {
@@ -373,8 +369,7 @@ BOOST_AUTO_TEST_CASE(mult_mod) {
   Variable<int> b;
 
   Generator gen;
-  gen(-3 <= a && a <= 3)
-  (-3 <= b && b <= 3)(a * b % 6 == 0);
+  gen(-3 <= a && a <= 3)(-3 <= b && b <= 3)(a * b % 6 == 0);
 
   int cnt = 0;
   for (int i = -3; i <= 3; i++)
@@ -402,8 +397,7 @@ BOOST_AUTO_TEST_CASE(divide) {
   Variable<unsigned char> r;
 
   Generator gen;
-  gen(b != (unsigned char)0u)
-  (a < (unsigned char)16u)(b < (unsigned char)16u)(q == a / b)(r == a % b);
+  gen(b != (unsigned char)0u)(a < (unsigned char)16u)(b < (unsigned char)16u)(q == a / b)(r == a % b);
 
   while (gen.next()) {
     BOOST_REQUIRE_EQUAL(gen[a] / gen[b], gen[q]);
@@ -486,7 +480,6 @@ BOOST_AUTO_TEST_CASE(element_inside_vec) {
 
   BOOST_REQUIRE(!gen.next());
 }
-
 
 BOOST_AUTO_TEST_CASE(element_inside_array) {
   unsigned a[3];
