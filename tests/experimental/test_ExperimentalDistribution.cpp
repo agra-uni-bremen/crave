@@ -14,11 +14,11 @@ using boost::format;
 
 BOOST_FIXTURE_TEST_SUITE(Distribution_t, Context_Fixture)
 
-struct s_crv_variable_dist_t1 : public crv_sequence_item
-{
-    s_crv_variable_dist_t1(crv_object_name){}
-    crv_variable<int> v;
-    crv_constraint con={dist(v(), distribution<int>::create(range<int>(0, 5))(range<int>(50, 65))(range<int>(100, 125)))};
+struct s_crv_variable_dist_t1 : public crv_sequence_item {
+  s_crv_variable_dist_t1(crv_object_name) {}
+  crv_variable<int> v;
+  crv_constraint con = {
+      dist(v(), distribution<int>::create(range<int>(0, 5))(range<int>(50, 65))(range<int>(100, 125)))};
 };
 BOOST_AUTO_TEST_CASE(crv_variable_dist_t1) {
   s_crv_variable_dist_t1 item("item");
@@ -41,26 +41,24 @@ BOOST_AUTO_TEST_CASE(crv_variable_dist_t1) {
   BOOST_REQUIRE_LT(100. * (max - avg) / avg, 10);
 }
 
-struct s_crv_variable_dist_t2 : public crv_sequence_item
-{
-    s_crv_variable_dist_t2(crv_object_name){}
-    crv_variable<int> v;
-    crv_constraint con;
+struct s_crv_variable_dist_t2 : public crv_sequence_item {
+  s_crv_variable_dist_t2(crv_object_name) {}
+  crv_variable<int> v;
+  crv_constraint con;
 };
 
 BOOST_AUTO_TEST_CASE(crv_variable_dist_t2) {
   s_crv_variable_dist_t2 item("item");
   BOOST_CHECK_THROW(
-      item.con={dist(item.v(), distribution<int>::create(range<int>(0, 10))(range<int>(50, 75))(range<int>(30, 51)))},
+      item.con = {dist(item.v(), distribution<int>::create(range<int>(0, 10))(range<int>(50, 75))(range<int>(30, 51)))},
       std::runtime_error);
 }
 
-struct s_crv_variable_dist_t3 : public crv_sequence_item
-{
-    s_crv_variable_dist_t3(crv_object_name){}
-    crv_variable<char> v;
-    crv_constraint con={dist(v(), distribution<char>::create(weighted_range<char>(1, 5, 50))(weighted_range<char>(10, 20, 20))(
-                    weighted_range<char>(-50, -50, 30)))};
+struct s_crv_variable_dist_t3 : public crv_sequence_item {
+  s_crv_variable_dist_t3(crv_object_name) {}
+  crv_variable<char> v;
+  crv_constraint con = {dist(v(), distribution<char>::create(weighted_range<char>(1, 5, 50))(
+                                      weighted_range<char>(10, 20, 20))(weighted_range<char>(-50, -50, 30)))};
 };
 
 BOOST_AUTO_TEST_CASE(crv_variable_dist_t3) {
@@ -79,12 +77,12 @@ BOOST_AUTO_TEST_CASE(crv_variable_dist_t3) {
   BOOST_REQUIRE_LT(abs(cnt3 * q - 30), 0.2);
 }
 
-struct s_crv_variable_dist_t4 : public crv_sequence_item
-{
-    s_crv_variable_dist_t4(crv_object_name){}
-    crv_variable<int> v;
-    crv_constraint x={dist(v(), distribution<int>::create(range<int>(0, 10))(range<int>(50, 75))(range<int>(100, 200)))};
-    crv_constraint y={dist(v(), distribution<int>::simple_range(5000, 6000))};
+struct s_crv_variable_dist_t4 : public crv_sequence_item {
+  s_crv_variable_dist_t4(crv_object_name) {}
+  crv_variable<int> v;
+  crv_constraint x = {
+      dist(v(), distribution<int>::create(range<int>(0, 10))(range<int>(50, 75))(range<int>(100, 200)))};
+  crv_constraint y = {dist(v(), distribution<int>::simple_range(5000, 6000))};
 };
 
 BOOST_AUTO_TEST_CASE(crv_variable_dist_t4) {

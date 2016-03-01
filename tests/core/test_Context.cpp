@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(multiple_solver_instances) {
   BOOST_REQUIRE(gen2.next());
 }
 
- BOOST_AUTO_TEST_CASE(constants) {
+BOOST_AUTO_TEST_CASE(constants) {
   Variable<unsigned> x;
   Generator gen(x == 135421);
   gen();
@@ -94,8 +94,7 @@ BOOST_AUTO_TEST_CASE(Variable_test) {
   Generator gen;
   Variable<int> a;
   Variable<int> b;
-  gen(4 <= a && a <= 6)
-  (9 <= a + b && a + b <= 11)(b % 2 == 0);
+  gen(4 <= a && a <= 6)(9 <= a + b && a + b <= 11)(b % 2 == 0);
   int count = 0;
   while (gen.next()) {
     ++count;
@@ -109,8 +108,7 @@ BOOST_AUTO_TEST_CASE(Variable_var_ref_mixed_test) {
   Generator gen;
   Variable<int> a;
   Variable<int> b;
-  gen(4 <= a && a <= 6)
-  (9 <= a + b && a + b <= 11)(b % 2 == 0);
+  gen(4 <= a && a <= 6)(9 <= a + b && a + b <= 11)(b % 2 == 0);
   unsigned count = 0;
   while (gen.next()) {
     ++count;
@@ -128,8 +126,7 @@ BOOST_AUTO_TEST_CASE(alu) {
   Variable<unsigned> b;
 
   Generator gen;
-  gen(a < 16)
-  (b < 16)(op < 4)             // 4 opcodes
+  gen(a < 16)(b < 16)(op < 4)  // 4 opcodes
       (op != 0 || a + b < 16)  // no add overflow
       (op != 1 || a > b)       // no sub underflow
       (op != 2 || a * b < 16)  // no m overflow
@@ -148,21 +145,20 @@ BOOST_AUTO_TEST_CASE(alu_enum) {
   Variable<unsigned> b;
 
   Generator gen;
-  gen(a < 8u)
-  (b < 8u)(op < 4u)             // 4 opcodes
+  gen(a < 8u)(b < 8u)(op < 4u)  // 4 opcodes
       (op != 0u || a + b < 8u)  // no add overflow
-      (op != 1u || a > b)        // no sub underflow
+      (op != 1u || a > b)       // no sub underflow
       (op != 2u || a * b < 8u)  // no m overflow
-      (op != 3u || b != 0u)      // div valid
+      (op != 3u || b != 0u)     // div valid
       ;
 
   int count = 0;
   for (int a = 0; a < 8; a++)
     for (int b = 0; b < 8; b++) {
-      if (a + b < 8) count++; // op == 0
-      if (a > b) count++; // op == 1
-      if (a * b < 8) count++; // op == 2
-      if (b != 0) count++; // op == 3;
+      if (a + b < 8) count++;  // op == 0
+      if (a > b) count++;      // op == 1
+      if (a * b < 8) count++;  // op == 2
+      if (b != 0) count++;     // op == 3;
     }
 
   while (gen.next()) {
@@ -196,8 +192,7 @@ BOOST_AUTO_TEST_CASE(negative_var) {
   Variable<int> b;
 
   Generator gen;
-  gen(a + b <= 120)
-  (a > 120);
+  gen(a + b <= 120)(a > 120);
 
   gen();
 
@@ -316,8 +311,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_6) {
   Variable<signed char> b;
 
   Generator gen;
-  gen(-3 <= a && a <= 3)
-  (-3 <= b && b <= 3)(a * b % 6 == 0);
+  gen(-3 <= a && a <= 3)(-3 <= b && b <= 3)(a * b % 6 == 0);
 
   int cnt = 0;
   for (int i = -3; i <= 3; i++)
