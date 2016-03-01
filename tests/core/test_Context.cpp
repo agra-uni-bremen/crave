@@ -17,8 +17,8 @@ BOOST_AUTO_TEST_CASE(multiple_solver_instances) {
   Variable<int> r1, r2;
   gen1(r1 < 6);
   gen2(r2 < 6);
-  gen1.next();
-  gen2.next();
+  BOOST_REQUIRE(gen1.next());
+  BOOST_REQUIRE(gen2.next());
 }
 
  BOOST_AUTO_TEST_CASE(constants) {
@@ -226,7 +226,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_1) {
   Generator gen;
   gen(a + b >= 120);
 
-  gen.next();
+  BOOST_REQUIRE(gen.next());
 
   std::cout << format("result: a=%d, b=%d\n") % gen[a] % gen[b];
 

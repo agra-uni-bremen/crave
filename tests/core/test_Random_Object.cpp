@@ -121,14 +121,14 @@ class item2 : public item1 {
 
 BOOST_AUTO_TEST_CASE(t2) {
   item it(0);
-  it.next();
+  BOOST_REQUIRE(it.next());
   std::cout << it.a << " " << it.b << " " << it.c << std::endl;
   BOOST_REQUIRE(it.a + it.b == it.c);
 }
 
 BOOST_AUTO_TEST_CASE(t3) {
   item1 it(0);
-  it.next();
+  BOOST_REQUIRE(it.next());
   std::cout << it.a << " " << it.b << " " << it.c << std::endl;
   BOOST_REQUIRE(it.a + it.b == it.c);
   BOOST_REQUIRE(10 <= it.a && it.a <= 20);
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(t3) {
 
 BOOST_AUTO_TEST_CASE(t4) {
   item2 it(0);
-  it.next();
+  BOOST_REQUIRE(it.next());
   std::cout << it.a << " " << it.b << " " << it.c << std::endl;
   BOOST_REQUIRE(it.a + it.b == it.c);
   BOOST_REQUIRE(10 <= it.a && it.a <= 20);
@@ -266,7 +266,7 @@ BOOST_AUTO_TEST_CASE(binary_search_test) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
 
   Item1 it;
-  it.next();
+  BOOST_REQUIRE(it.next());
   BOOST_REQUIRE_EQUAL(it.x, 5);
 
   VariableDefaultSolver::bypass_constraint_analysis = false;

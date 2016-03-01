@@ -29,7 +29,7 @@ struct Item : public crv_sequence_item {
 
 BOOST_AUTO_TEST_CASE(fibo_test) {
   Item it{"item"};
-  it.randomize();
+  BOOST_REQUIRE(it.randomize());
   BOOST_REQUIRE_LE(30, it.v.size());
   BOOST_REQUIRE_LE(it.v.size(), 50);
   BOOST_REQUIRE_EQUAL(it.v[0], 0);
@@ -46,7 +46,7 @@ struct Item1 : public crv_sequence_item {
 
 BOOST_TODO_AUTO_TEST_CASE(free_vector_testXYZ) {
   Item1 it{"item"};
-  it.randomize();
+  BOOST_REQUIRE(it.randomize());
   BOOST_REQUIRE(it.u.size() == 0);
   BOOST_REQUIRE(it.v.size() > 0);
   for (uint i = 0; i < it.v.size(); i++) std::cout << it.v[i] << " ";
@@ -62,7 +62,7 @@ struct Item2 : public crv_sequence_item {
 
 BOOST_AUTO_TEST_CASE(default_size_test) {
   Item2 it{"item"};
-  it.randomize();
+  BOOST_REQUIRE(it.randomize());
   BOOST_REQUIRE(5 <= it.v.size() && it.v.size() <= 10);
   for (uint i = 0; i < it.v.size(); i++) {
     std::cout << it.v[i] << " ";
@@ -83,7 +83,7 @@ struct Item3 : public crv_sequence_item {
 
 BOOST_AUTO_TEST_CASE(unique_test_1) {
   Item3 it{"item"};
-  it.randomize();
+  BOOST_REQUIRE(it.randomize());
   BOOST_REQUIRE(it.v.size() == 100);
   for (uint i = 0; i < it.v.size(); i++) {
     BOOST_REQUIRE(0 <= it.v[i] && it.v[i] < 100);
@@ -162,7 +162,7 @@ struct Item5 : public crv_sequence_item {
 
 BOOST_AUTO_TEST_CASE(index_constraint_test) {
   Item5 it{"item"};
-  it.randomize();
+  BOOST_REQUIRE(it.randomize());
   BOOST_REQUIRE(it.v.size() == 50);
   for (uint i = 0; i < it.v.size(); i++) {
     if (i < 25)
