@@ -54,7 +54,7 @@ crv_object::~crv_object() {
   crv_obj_map.erase(fullname_);
 }
 
-void crv_object::print_object_hierarchy(int lvl) {
+void crv_object::print_object_hierarchy(int lvl) const {
   std::cout << std::string(2 * lvl, ' ');
   std::cout << name() << " # " << fullname() << " @ " << this << ", parent @ " << parent_ << std::endl;
   for (auto obj : children_) obj->print_object_hierarchy(lvl + 1);

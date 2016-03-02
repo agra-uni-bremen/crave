@@ -29,12 +29,12 @@ class crv_object {
   crv_object();
   ~crv_object();
 
-  virtual std::string obj_kind() { return "crv_object"; }
+  virtual std::string obj_kind() const { return "crv_object"; }
   virtual bool randomize() { return false; }
 
-  std::string name() { return name_; }
-  std::string fullname() { return fullname_; }
-  void print_object_hierarchy(int level = 0);
+  std::string name() const { return name_; }
+  std::string fullname() const { return fullname_; }
+  void print_object_hierarchy(int level = 0) const;
 
   static crv_object* root();
   static crv_object* find(std::string);

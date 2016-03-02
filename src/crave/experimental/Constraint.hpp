@@ -18,7 +18,7 @@ class crv_constraint_base : public crv_object {
  public:
   virtual expression_list const& expr_list() const = 0;
 
-  std::string obj_kind() override final { return "crv_constraint"; }
+  std::string obj_kind() const override final { return "crv_constraint"; }
 
   void activate() {
     if (!active_) {

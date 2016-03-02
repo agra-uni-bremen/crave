@@ -20,7 +20,9 @@ class crv_array : public crv_object {
     }
   }
 
-  std::string obj_kind() override { return "crv_array"; }
+  crv_array(crv_array const &) = delete;
+
+  std::string obj_kind() const override { return "crv_array"; }
 
   expression sum() {
     expression result = value_to_expression(0);

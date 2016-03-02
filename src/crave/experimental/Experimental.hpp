@@ -23,7 +23,7 @@ class crv_sequence_item : public crv_object {
  public:
   crv_sequence_item() : gen_(), built_(false) {}
 
-  std::string obj_kind() override final { return "crv_sequence_item"; }
+  std::string obj_kind() const override final { return "crv_sequence_item"; }
 
   bool randomize() override {
     if (!built_) {

@@ -42,7 +42,9 @@ class crv_coverpoint : public crv_object {
  public:
   crv_coverpoint(crv_object_name = "covpt") : bins_() {}
 
-  std::string obj_kind() override final { return "crv_coverpoint"; }
+  crv_coverpoint(crv_coverpoint const &) = delete;
+
+  std::string obj_kind() const override final { return "crv_coverpoint"; }
 
   std::vector<crv_bin>& bins() { return bins_; }
 
@@ -76,7 +78,9 @@ class crv_covergroup : public crv_object {
  public:
   crv_covergroup() : points_(), vars_(), built_(false), eval_() {}
 
-  std::string obj_kind() override { return "crv_covergroup"; }
+  crv_covergroup(crv_covergroup const &) = delete;
+
+  std::string obj_kind() const override { return "crv_covergroup"; }
 
   void sample() {
     if (!built_) build();
