@@ -16,8 +16,11 @@ class crv_object;
 
 struct crv_object_name {
   crv_object_name(const char*);
+  crv_object_name(const std::string& s) : crv_object_name(s.c_str()) {}
   crv_object_name(const crv_object_name&) = default;
   ~crv_object_name();
+
+  std::string operator()() { return name_; }
 
   std::string name_;
   crv_object* object_;
