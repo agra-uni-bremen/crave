@@ -42,14 +42,12 @@ class crv_object {
 
  protected:
   crv_object(const crv_object& other)
-      : name_(other.name_), orig_name_(other.orig_name_), parent_(other.parent_), children_(other.children_), fullname_(other.fullname_) {}
+      : name_(other.name_), orig_name_(other.orig_name_), parent_(), children_(), fullname_(other.fullname_) {}
 
   void remove_child(crv_object*);
 
   virtual void request_rebuild() {
-    if (parent_ != nullptr) {
-      parent_->request_rebuild();
-    }
+    if (parent_) parent_->request_rebuild();
   }
 
   std::string name_;
@@ -60,7 +58,7 @@ class crv_object {
   std::unordered_map<std::string, unsigned> local_name_map_;
 
  private:
-  crv_object(int) : name_("root"), orig_name_(name_), parent_(0), children_(), fullname_(name_) {}
+  crv_object(int) : name_("root"), orig_name_(name_), parent_(), children_(), fullname_(name_) {}
 };
 
 };  // namespace crave

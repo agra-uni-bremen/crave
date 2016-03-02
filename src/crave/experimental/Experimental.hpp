@@ -21,11 +21,14 @@ namespace crave {
 
 class crv_sequence_item : public crv_object {
  public:
-  crv_sequence_item() : gen_(), built_(false) {}
+  crv_sequence_item() : gen_(), built_(false), cloned_(false) {}
+
+  crv_sequence_item(crv_sequence_item const & other) : gen_(), built_(false), cloned_(true), crv_object(other) {}
 
   std::string obj_kind() const override final { return "crv_sequence_item"; }
 
   bool randomize() override {
+    assert(!cloned_ && "cloned crv_sequence_item cannot be randomized");
     if (!built_) {
       gen_ = std::make_shared<Generator>();
       recursive_build(*gen_);
@@ -36,6 +39,7 @@ class crv_sequence_item : public crv_object {
 
   template <typename... Exprs>
   bool randomize_with(Exprs... exprs) {
+    assert(!cloned_ && "cloned crv_sequence_item cannot be randomized");
     // TODO Generator caching
     rand_with_gen_ = std::make_shared<Generator>();
     recursive_build(*rand_with_gen_);
@@ -79,6 +83,7 @@ class crv_sequence_item : public crv_object {
   std::shared_ptr<Generator> gen_;
   std::shared_ptr<Generator> rand_with_gen_;
   bool built_;
+  bool cloned_;
 };
 
 template <typename... Exprs> 

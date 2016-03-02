@@ -49,6 +49,8 @@ class crv_constraint_ : public crv_constraint_base {
  public:
   crv_constraint_(crv_object_name = (type == ConstraintType::hard ? "hard_cstr" : "soft_cstr")) {}
 
+  crv_constraint_(crv_constraint_ const &) = default;
+  
   template <typename... Exprs>
   crv_constraint_(Exprs... exprs) 
       :  crv_constraint_() {
