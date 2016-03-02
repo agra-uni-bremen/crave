@@ -60,26 +60,6 @@ class crv_sequence_item : public crv_object {
     crv_object::request_rebuild();
   }
 
-  void recursive_build(Generator& gen) {
-    for (crv_object* obj : children_) {
-      if (obj->obj_kind() == "crv_constraint") {
-        crv_constraint_base* cstr = (crv_constraint_base*)obj;
-        if (!cstr->active()) continue;
-        unsigned cnt = 0;
-        if (!cstr->soft()) {
-          for (auto e : cstr->expr_list()) 
-            gen(cstr->fullname() + "#" + std::to_string(cnt++), e);
-        } else {
-          for (auto e : cstr->expr_list())
-            gen.soft(cstr->fullname() + "#" + std::to_string(cnt++), e);
-        }            
-      } else if (obj->obj_kind() == "crv_sequence_item") {
-        crv_sequence_item* item = (crv_sequence_item*)obj;
-        item->recursive_build(gen);
-      }
-    }
-  }
-
   std::shared_ptr<Generator> gen_;
   std::shared_ptr<Generator> rand_with_gen_;
   bool built_;
@@ -109,10 +89,6 @@ bool solve(Exprs... exprs) {
       std::set<int> s;                                                         \
       BOOST_PP_SEQ_FOR_EACH(__CRAVE_EXPERIMENTAL_INSERT, s, __VA_ARGS__);      \
       enum_internal = {inside(var, s)};                                        \
-      if (!parent_) {                                                          \
-        throw std::runtime_error("crv_variable<enum> cannot be orphaned");     \
-      }                                                                        \
-      parent_->children_.push_back(&enum_internal);                            \
     }                                                                          \
                                                                                \
    private:                                                                    \
@@ -133,11 +109,8 @@ bool solve(Exprs... exprs) {
       std::set<int> s;                                                               \
       for (enum_name value : enum_name::_values()) s.insert(value);                  \
       enum_internal = {inside(var, s)};                                              \
-      if (!parent_) {                                                                \
-        throw std::runtime_error("crv_variable<enum> cannot be orphaned");           \
-      }                                                                              \
-      parent_->children_.push_back(&enum_internal);                                  \
     }                                                                                \
+    int _to_integral() const { return actual_value(); }                              \
     enum_name _to_enum() const { return enum_name::_from_integral(actual_value()); } \
     const char* _to_string() const { _to_enum()._to_string(); }                      \
     operator enum_name() const { return _to_enum(); }                                \

@@ -9,6 +9,8 @@
 
 namespace crave {
 
+struct Generator;
+
 struct crv_object_name;
 class crv_object;
 
@@ -49,6 +51,8 @@ class crv_object {
   virtual void request_rebuild() {
     if (parent_) parent_->request_rebuild();
   }
+
+  void recursive_build(Generator& gen);
 
   std::string name_;
   std::string orig_name_;
