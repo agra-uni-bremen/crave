@@ -21,8 +21,8 @@ struct s_multiple_solver_instances : public crv_sequence_item {
 BOOST_AUTO_TEST_CASE(multiple_solver_instances) {
   s_multiple_solver_instances r1("r1");
   s_multiple_solver_instances r2("r2");
-  r1.randomize();
-  r2.randomize();
+  BOOST_REQUIRE(r1.randomize());
+  BOOST_REQUIRE(r2.randomize());
 }
 
 struct s_constants : public crv_sequence_item {
@@ -33,7 +33,7 @@ struct s_constants : public crv_sequence_item {
 
 BOOST_AUTO_TEST_CASE(constants) {
   s_constants item("item");
-  item.randomize();
+  BOOST_REQUIRE(item.randomize());
   BOOST_CHECK_EQUAL(item.x, 135421);
 }
 
@@ -175,7 +175,7 @@ struct s_alu : public crv_sequence_item {
 };
 BOOST_AUTO_TEST_CASE(alu) {
   s_alu item("item");
-  item.randomize();
+  BOOST_REQUIRE(item.randomize());
   std::cout << "result: op=" << item.op << ", a=" << item.a << ", b=" << item.b << std::endl;
 }
 
@@ -221,8 +221,7 @@ struct s_pythagoras : public crv_sequence_item {
 
 BOOST_AUTO_TEST_CASE(pythagoras) {
   s_pythagoras item("pythagoras");
-  item.randomize();
-
+  BOOST_REQUIRE(item.randomize());
   unsigned long long av = item.a;
   unsigned long long bv = item.b;
   unsigned long long cv = item.c;
@@ -238,7 +237,7 @@ struct s_negative_var : public crv_sequence_item {
 
 BOOST_AUTO_TEST_CASE(negative_var) {
   s_negative_var item("item");
-  item.randomize();
+  BOOST_REQUIRE(item.randomize());
 
   std::cout << format("result: a=%d, b=%d\n") % item.a % item.b;
 
@@ -252,7 +251,7 @@ struct s_signed_less_zero : public crv_sequence_item {
 };
 BOOST_AUTO_TEST_CASE(signed_less_zero) {
   s_signed_less_zero item("item");
-  item.randomize();
+  BOOST_REQUIRE(item.randomize());
 
   std::cout << format("result: a=%d\n") % item.a;
 
@@ -268,7 +267,7 @@ struct s_mixed_bv_width_1 : crv_sequence_item {
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_1) {
   s_mixed_bv_width_1 item("item");
-  item.randomize();
+  BOOST_REQUIRE(item.randomize());
 
   std::cout << format("result: a=%d, b=%d\n") % item.a % item.b;
 

@@ -31,7 +31,7 @@ struct Item : public rand_obj {
 
 BOOST_AUTO_TEST_CASE(fibo_test) {
   Item it;
-  it.next();
+  BOOST_REQUIRE(it.next());
   BOOST_REQUIRE_LE(30, it.v.size());
   BOOST_REQUIRE_LE(it.v.size(), 50);
   BOOST_REQUIRE_EQUAL(it.v[0], 0);
@@ -48,7 +48,7 @@ struct Item1 : public rand_obj {
 
 BOOST_AUTO_TEST_CASE(free_vector_test) {
   Item1 it;
-  it.next();
+  BOOST_REQUIRE(it.next());
   BOOST_REQUIRE(it.u.size() == 0);
   BOOST_REQUIRE(it.v.size() > 0);
   for (uint i = 0; i < it.v.size(); i++) std::cout << it.v[i] << " ";
@@ -64,7 +64,7 @@ struct Item2 : public rand_obj {
 
 BOOST_AUTO_TEST_CASE(default_size_test) {
   Item2 it;
-  it.next();
+  BOOST_REQUIRE(it.next());
   BOOST_REQUIRE(it.v.size() == default_rand_vec_size());
   for (uint i = 0; i < it.v.size(); i++) {
     std::cout << it.v[i] << " ";
@@ -87,7 +87,7 @@ struct Item3 : public rand_obj {
 
 BOOST_AUTO_TEST_CASE(unique_test_1) {
   Item3 it;
-  it.next();
+  BOOST_REQUIRE(it.next());
   BOOST_REQUIRE(it.v.size() == 100);
   for (uint i = 0; i < it.v.size(); i++) {
     BOOST_REQUIRE(0 <= it.v[i] && it.v[i] < 100);
@@ -169,7 +169,7 @@ struct Item5 : public rand_obj {
 BOOST_AUTO_TEST_CASE(index_constraint_test) {
   Item5 it;
   it.constraint.printDotGraph(std::cout);
-  it.next();
+  BOOST_REQUIRE(it.next());
   BOOST_REQUIRE(it.v.size() == 50);
   for (uint i = 0; i < it.v.size(); i++) {
     if (i < 25)
@@ -294,7 +294,7 @@ struct Item6 : public rand_obj {
 
 BOOST_AUTO_TEST_CASE(only_size_constrained_vect_test) {
   Item6 it;
-  it.next();
+  BOOST_REQUIRE(it.next());
   BOOST_REQUIRE_EQUAL(it.v.size(), default_rand_vec_size() + 7);
 }
 
