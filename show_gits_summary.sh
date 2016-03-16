@@ -9,7 +9,7 @@ function getGitInfo {
   pwd
   GURL=`git config --get remote.origin.url`
   LCH=`git log -1 --format="%H"`
-  GBR=`git branch | grep '*'`
+  GBR=`git rev-parse --abbrev-ref HEAD`
   echo " Git url: $GURL" 
   echo " Git branch: $GBR" 
   echo " Last commit hash: $LCH"
