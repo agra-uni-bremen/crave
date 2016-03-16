@@ -56,18 +56,22 @@ gcc --version
 echo "#################################################################"
 echo
 
+GBR=`git rev-parse --abbrev-ref HEAD`
+CRAVE_BUILD=build-${GBR}
+git checkout Makefile
+sed -i "s/build/${CRAVE_BUILD}/" Makefile
 
-showRegionBegin "Build crave-bundle"
+showRegionBegin "${CRAVE_BUILD}"
 
 pwd
 echo "make:"
 make
 
-showRegionEnd "Build crave bundle"
+showRegionEnd "${CRAVE_BUILD}"
 
 showRegionBegin "make test"
 
-cd build
+cd ${CRAVE_BUILD}
 pwd
 echo "make test:"
 make test
