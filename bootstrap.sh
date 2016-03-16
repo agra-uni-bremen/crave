@@ -9,7 +9,8 @@ SYSTEMC=systemc-2.3
 SWORD=SWORD-1.1
 CUDD=cudd-2.4.2
 MINISAT=minisat-git
-BOOLECTOR=boolector-1.5.118
+LINGELING=lingeling-ayv-86bf266-140429 #lingeling-bal-2293bef-151129
+BOOLECTOR=boolector-2.2.0 #boolector-2.0.6
 Z3=Z3-git
 CVC4=cvc4-1.4
 
@@ -94,7 +95,7 @@ DIS_SWORD="yes"
 for BACKEND in $BACKENDS
 do
   if [[ "$BACKEND" = "boolector" ]]; then
-    REQUIRES="$MINISAT $BOOLECTOR $REQUIRES"
+    REQUIRES="$LINGELING $BOOLECTOR $REQUIRES"
     CMAKE_ARGS="-DmetaSMT_USE_Boolector=on $CMAKE_ARGS"
     DIS_BOOLECTOR="no"
   fi
