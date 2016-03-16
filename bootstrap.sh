@@ -10,7 +10,7 @@ SWORD=SWORD-1.1
 CUDD=cudd-2.4.2
 MINISAT=minisat-git
 LINGELING=lingeling-ayv-86bf266-140429 #lingeling-bal-2293bef-151129
-BOOLECTOR=boolector-2.0.6 #boolector-2.2.0
+BOOLECTOR=boolector-2.2.0 #boolector-2.0.6
 Z3=Z3-git
 CVC4=cvc4-1.4
 
