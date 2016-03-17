@@ -1,5 +1,5 @@
 if ( NOT CRAVE_TIMEOUT )
-  set(CRAVE_TIMEOUT 10)
+  set(CRAVE_TIMEOUT 15)
 endif()
 include_directories (../src)
 
