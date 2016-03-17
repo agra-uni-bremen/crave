@@ -56,7 +56,7 @@ gcc --version
 echo "#################################################################"
 echo
 
-GBR=`git rev-parse --abbrev-ref HEAD`
+GBR=`git branch | grep '*' | sed 's/* //'`
 CRAVE_BUILD=build-${GBR}
 git checkout Makefile
 sed -i "s/build/${CRAVE_BUILD}/" Makefile
