@@ -52,18 +52,20 @@ echo
 echo "Environment variables"
 echo "CC: $CC"
 echo "CXX: $CXX"
-gcc --version
+$CXX --version
 echo "#################################################################"
 echo
 
-GBR=`git branch | grep '*' | sed 's/* //'`
-CRAVE_BUILD=build-${GBR}
-git checkout Makefile
-sed -i "s/build/${CRAVE_BUILD}/" Makefile
+#GBR=`git branch | grep '*' | sed 's/* //'`
+#CRAVE_BUILD=build-${GBR}
+CRAVE_BUILD=build
+#git checkout Makefile
+#sed -i "s/build/${CRAVE_BUILD}/" Makefile
 
 showRegionBegin "${CRAVE_BUILD}"
 
 pwd
+rm build* -Rf # clean
 echo "make:"
 make
 
