@@ -499,7 +499,7 @@ void metaSMTVisitorImpl<SolverType>::visitShiftLeftOpr(ShiftLeftOpr const &o) {
   evalBinExpr(o, fst, snd);
 
   result_type result = evaluate(solver_, qf_bv::bvshl(fst.first, snd.first));
-  exprStack_.push(std::make_pair(result, fst.second || snd.second));
+  exprStack_.push(std::make_pair(result, fst.second));
 }
 
 template <typename SolverType>
@@ -508,16 +508,15 @@ void metaSMTVisitorImpl<SolverType>::visitShiftRightOpr(ShiftRightOpr const &o) 
   evalBinExpr(o, fst, snd);
 
   result_type result = evaluate(solver_, qf_bv::bvshr(fst.first, snd.first));
-  exprStack_.push(std::make_pair(result, fst.second || snd.second));
+  exprStack_.push(std::make_pair(result, fst.second));
 }
 
 template <typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitIfThenElse(IfThenElse const &ite) {
   stack_entry fst, snd, trd;
   evalTernExpr(ite, fst, snd, trd);
-
   result_type result = evaluate(solver_, preds::Ite(preds::equal(fst.first, preds::True), snd.first, trd.first));
-  exprStack_.push(std::make_pair(result, fst.second || snd.second || trd.second));
+  exprStack_.push(std::make_pair(result, false));
 }
 
 template <typename SolverType>

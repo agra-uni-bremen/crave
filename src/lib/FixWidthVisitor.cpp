@@ -1,10 +1,27 @@
 // Copyright 2014 The CRAVE developers. All rights reserved.//
 
 #include "../crave/ir/visitor/FixWidthVisitor.hpp"
+#include "../crave/ir/VariableContainer.hpp"
+#include "../crave/frontend/Variable.hpp"
+#include "../crave/backend/FactoryMetaSMT.hpp"
 
 #include <stdexcept>
 
 namespace crave {
+
+FixWidthVisitor::result_type FixWidthVisitor::fixWidth(Node const& expr) {
+  expr.visit(this);
+  stack_entry entry;
+  pop(entry);
+  return cond_ ? new LogicalAndOpr(entry.first, cond_) : entry.first;
+}
+
+void FixWidthVisitor::addCondition(result_type c) {
+  if (cond_)
+    cond_ = new LogicalAndOpr(cond_, c);
+  else
+    cond_ = c;
+}
 
 void FixWidthVisitor::pop(stack_entry& fst) {
   assert(exprStack_.size() >= 1);
@@ -167,9 +184,42 @@ void FixWidthVisitor::visitDevideOpr(const DevideOpr& d) { visitNumberResultBinE
 
 void FixWidthVisitor::visitModuloOpr(const ModuloOpr& m) { visitNumberResultBinExpr(m); }
 
-void FixWidthVisitor::visitShiftLeftOpr(const ShiftLeftOpr& shl) { visitNumberResultBinExpr(shl); }
+template <typename T>
+void FixWidthVisitor::visitShiftOpr(const T& obj) {
+  // XXX: Only Boolector 2.x requires for (op1 << op2) and (op1 >> op2) that width(op2) == log2(width(op1)).
+  // The following assumes that solver_type_ will not be changed at runtime.
+  static bool first_call = true;
+  if (first_call) {
+    // init solver
+    delete FactoryMetaSMT::getNewInstance();
+    first_call = false;
+  }
+  if (FactoryMetaSMT::solver_type_ != BOOLECTOR) {
+    visitNumberResultBinExpr(obj);
+    return;
+  }
 
-void FixWidthVisitor::visitShiftRightOpr(const ShiftRightOpr& shr) { visitNumberResultBinExpr(shr); }
+  stack_entry op1, op2;
+  evalBinExpr(obj, op1, op2);
+  int op2_target_width = 0;
+  while ((1 << op2_target_width) < op1.second) ++op2_target_width;
+  result_type op2_expr = op2.first;
+  if (op2.second < op2_target_width) {
+    // extend rhs
+   op2_expr = new ExtendExpression(op2.first, op2_target_width - op2.second);
+  } else if (op2.second > op2_target_width) {
+    // use temp var
+    unsigned id = new_var_id();
+    op2_expr = new VariableExpr(id, op2_target_width, false);
+    variable_container().variables[id] = op2_expr; // XXX: this assumes a global variable container, which might not be the case in the future
+    addCondition(new EqualOpr(op2.first, new ExtendExpression(op2_expr, op2.second - op2_target_width)));
+  }
+  exprStack_.push(std::make_pair(new T(op1.first, op2_expr), op1.second));
+}
+
+void FixWidthVisitor::visitShiftLeftOpr(const ShiftLeftOpr& shl) { visitShiftOpr(shl); }
+
+void FixWidthVisitor::visitShiftRightOpr(const ShiftRightOpr& shr) { visitShiftOpr(shr); }
 
 void FixWidthVisitor::visitVectorAccess(const VectorAccess& va) {
   stack_entry lhs, rhs;
