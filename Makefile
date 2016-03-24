@@ -35,24 +35,17 @@ distclean:
 doxygen:
 	 doxygen Doxyfile
 
-.PHONY: gcov
-gcov:
-	@find ${BUILD} -name *.gcno | xargs gcov -bl > coverage.log
-	@${BUILD}/gcovFilter/gcovFilter coverage.log
-	@rm *.gcov
-	@rm coverage.log
-
 .PHONY: lcov_with_bc
 lcov_with_bc:
 	@rm lcov_output -Rf
 	@mkdir lcov_output
-	@lcov --quiet --capture --rc lcov_branch_coverage=1 --directory ${BUILD} --base-directory ${SRCDIR}/crave/src --no-external --output-file lcov_output/coverage.info
+	@lcov --quiet --capture --rc lcov_branch_coverage=1 --directory ${BUILD} --base-directory ${SRCDIR}/src --no-external --output-file lcov_output/coverage.info
 	@genhtml lcov_output/coverage.info --branch-coverage --output-directory lcov_output
 
 .PHONY: lcov
 lcov:
 	@rm lcov_output -Rf
 	@mkdir lcov_output
-	@lcov --quiet --capture --directory ${BUILD} --base-directory ${SRCDIR}/crave/src --no-external --output-file lcov_output/coverage.info
+	@lcov --quiet --capture --directory ${BUILD} --base-directory ${SRCDIR}/src --no-external --output-file lcov_output/coverage.info
 	@genhtml lcov_output/coverage.info --output-directory lcov_output
 
