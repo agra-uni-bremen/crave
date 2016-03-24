@@ -56,6 +56,12 @@ gcc --version
 echo "#################################################################"
 echo
 
+CI_SKIP=`git log -1 --oneline | grep "[ci skip]"`
+
+if [ -n "$CI_SKIP" ]; then
+  echo "skip build"
+  exit
+fi
 
 showRegionBegin "Build crave-bundle"
 
