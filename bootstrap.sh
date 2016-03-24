@@ -5,7 +5,7 @@ BUILD_DIR=$PWD/build
 
 BOOST=boost-1_50_0
 GLOG=glog-svn
-SYSTEMC=systemc-2.3
+SYSTEMC=systemc-2.3.1
 SWORD=SWORD-1.1
 CUDD=cudd-2.4.2
 MINISAT=minisat-git
