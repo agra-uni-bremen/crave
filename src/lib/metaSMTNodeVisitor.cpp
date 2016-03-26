@@ -6,16 +6,15 @@
 
 #include <metaSMT/BitBlast.hpp>
 #include <metaSMT/DirectSolver_Context.hpp>
-#include <metaSMT/UnpackFuture_Context.hpp>
 
 #include <glog/logging.h>
 #include <string>
 
-#define DEFINE_SOLVER(inCrave, inMetaSMT)                                                        \
+#define DEFINE_SOLVER(SOLVER_ENUM, SOLVER_T)                                                     \
   namespace crave {                                                                              \
   template <>                                                                                    \
-  struct FactorySolver<inCrave> {                                                                \
-    typedef metaSMT::DirectSolver_Context<metaSMT::UnpackFuture_Context<inMetaSMT> > SolverType; \
+  struct FactorySolver<SOLVER_ENUM> {                                                            \
+    typedef metaSMT::DirectSolver_Context<SOLVER_T> SolverType;                                  \
     static bool isDefined() { return true; }                                                     \
     static metaSMTVisitor* getNewInstance() { return new metaSMTVisitorImpl<SolverType>(); }     \
   };                                                                                             \
@@ -23,7 +22,16 @@
 
 #ifdef metaSMT_USE_Boolector
 #include <metaSMT/backend/Boolector.hpp>
-DEFINE_SOLVER(crave::BOOLECTOR, metaSMT::solver::Boolector);
+namespace crave {
+class BoolectorSolver : public metaSMT::solver::Boolector {
+ public:
+  BoolectorSolver() {
+    boolector_set_opt(_btor, "rewrite_level", 1);
+//    assert(boolector_set_sat_solver_minisat(_btor));
+  }
+};
+}
+DEFINE_SOLVER(crave::BOOLECTOR, crave::BoolectorSolver);
 #endif
 
 #ifdef metaSMT_USE_CVC4
@@ -46,16 +54,12 @@ DEFINE_SOLVER(crave::Z3, metaSMT::solver::Z3_Backend);
 #include "../crave/RandomSeedManager.hpp"
 namespace crave {
 extern RandomSeedManager rng;
-}
-namespace metaSMT {
-namespace solver {
-class CUDD_Distributed_ : public CUDD_Distributed {
+class CUDD_Solver : public metaSMT::solver::CUDD_Distributed {
  public:
-  CUDD_Distributed_() { gen.seed((*crave::rng.get())()); }
+  CUDD_Solver() { gen.seed((*crave::rng.get())()); }
 };
 }
-}
-DEFINE_SOLVER(crave::CUDD, metaSMT::BitBlast<metaSMT::solver::CUDD_Distributed_>);
+DEFINE_SOLVER(crave::CUDD, metaSMT::BitBlast<crave::CUDD_Solver>);
 #endif
 
 #undef DEFINE_SOLVER
