@@ -1,8 +1,19 @@
-build:
+before_script:
+- ./show_linux_distribution.sh
+- git submodule update --init
+- ln -s /home/radames/software/crave-bundle/deps deps
+
+build_all_solvers:
   script: 
-  - ./show_linux_distribution.sh
-  - git submodule update --init
-  - ln -s /home/radames/software/crave-bundle/deps deps
+  - ./bootstrap.sh -d deps --systemc -b boolector -b cudd -b cvc4 -b sword -b z3 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
+  - cd build
+  - make -j
+  - make test -j
+  tags:
+  - linux
+
+build_default:
+  script: 
   - make -j
   - make test -j
   tags:

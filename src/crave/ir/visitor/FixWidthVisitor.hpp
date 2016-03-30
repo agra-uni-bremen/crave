@@ -17,7 +17,7 @@ class FixWidthVisitor : NodeVisitor {
   typedef std::pair<result_type, int> stack_entry;
 
  public:
-  FixWidthVisitor() : NodeVisitor(), exprStack_() {}
+  FixWidthVisitor() : NodeVisitor(), exprStack_(), cond_() {}
 
  private:
   virtual void visitNode(Node const&);
@@ -72,16 +72,17 @@ class FixWidthVisitor : NodeVisitor {
   template <typename T>
   void visitBooleanResultBinExpr(const T& object);
 
+  template <typename T>
+  void visitShiftOpr(const T& object);
+
+  void addCondition(result_type c);
+
  public:
-  result_type fixWidth(Node const& expr) {
-    expr.visit(this);
-    stack_entry entry;
-    pop(entry);
-    return entry.first;
-  }
+  result_type fixWidth(Node const& expr);
 
  private:
   std::stack<stack_entry> exprStack_;
+  result_type cond_;
 };
 
 }  // end namespace crave

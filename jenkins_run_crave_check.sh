@@ -52,7 +52,7 @@ echo
 echo "Environment variables"
 echo "CC: $CC"
 echo "CXX: $CXX"
-gcc --version
+$CXX --version
 echo "#################################################################"
 echo
 
@@ -63,13 +63,14 @@ if [ -n "$CI_SKIP" ]; then
   exit
 fi
 
-showRegionBegin "Build crave-bundle"
+showRegionBegin "Build crave"
 
 pwd
+rm build -Rf # clean
 echo "make:"
 make
 
-showRegionEnd "Build crave bundle"
+showRegionEnd "Build crave"
 
 showRegionBegin "make test"
 
