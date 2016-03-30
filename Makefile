@@ -19,7 +19,6 @@ ifdef CACHE
 endif
 
 ${BUILD}/Makefile:
-	#./bootstrap.sh -d ${SRCDIR}/deps --systemc -b cudd -b sword -b z3 -b boolector ${BUILD} ${BOOSTRAP_ARGS}
 	./bootstrap.sh -d ${SRCDIR}/deps --systemc -b cudd -b sword -b boolector ${BUILD} ${BOOSTRAP_ARGS}
 
 .PHONY: update
