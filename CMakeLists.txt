@@ -159,10 +159,7 @@ INSTALL( FILES
 	DESTINATION lib/pkgconfig/)
 
 add_subdirectory ( tests )
-
-if (EXISTS "examples")
-    add_subdirectory(examples)
-  endif()
+add_subdirectory ( examples )
 
 ############################################################
 ##                CPack settings                          ##
