@@ -76,6 +76,63 @@ BOOST_AUTO_TEST_CASE(variable_dist_t4) {
   }
 }
 
+BOOST_AUTO_TEST_CASE(dist_of_boolean25) {
+  Variable<bool> a;
+  int counter = 0;
+
+  Generator gen;
+  gen(dist(a, distribution<bool>::create(0.25)));
+  for (unsigned i = 0; i < 1000; i++) {
+    BOOST_REQUIRE(gen.next());
+    if (gen[a]) {
+      ++counter;
+    } else {
+      --counter;
+    }
+  }
+
+  BOOST_REQUIRE_LT(counter, -425);
+  BOOST_REQUIRE_GT(counter, -575);
+}
+
+BOOST_AUTO_TEST_CASE(dist_of_boolean50) {
+  Variable<bool> a;
+  int counter = 0;
+
+  Generator gen;
+  gen(dist(a, distribution<bool>::create(0.5)));
+  for (unsigned i = 0; i < 1000; i++) {
+    BOOST_REQUIRE(gen.next());
+    if (gen[a]) {
+      ++counter;
+    } else {
+      --counter;
+    }
+  }
+
+  BOOST_REQUIRE_LT(counter, 75);
+  BOOST_REQUIRE_GT(counter, -75);
+}
+
+BOOST_AUTO_TEST_CASE(dist_of_boolean75) {
+  Variable<bool> a;
+  int counter = 0;
+
+  Generator gen;
+  gen(dist(a, distribution<bool>::create(0.75)));
+  for (unsigned i = 0; i < 1000; i++) {
+    BOOST_REQUIRE(gen.next());
+    if (gen[a]) {
+      ++counter;
+    } else {
+      --counter;
+    }
+  }
+
+  BOOST_REQUIRE_LT(counter, 575);
+  BOOST_REQUIRE_GT(counter, 425);
+}
+
 BOOST_AUTO_TEST_SUITE_END()  // Context
 
 //  vim: ft=cpp:ts=2:sw=2:expandtab
