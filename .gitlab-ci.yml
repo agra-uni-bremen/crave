@@ -2,11 +2,13 @@ before_script:
 - ./show_linux_distribution.sh
 - git submodule update --init
 - ln -s /home/radames/software/crave-bundle/deps deps
+- NUM_JOBS=$[`nproc`-1]
+- if [ "$NUM_JOBS" -lt 1 ]; then NUM_JOBS=1; fi
 
 build_default:
   script: 
-  - make -j
-  - make test -j
+  - make -j $NUM_JOBS
+  - make test
   tags:
   - linux
 
@@ -14,35 +16,39 @@ build_boolector:
   script: 
   - ./bootstrap.sh -d deps --systemc -b boolector -b cudd  build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
-  - make -j
-  - make test -j
+  - make -j $NUM_JOBS
+  - ctest --schedule-random -j $NUM_JOBS
   tags:
   - linux
+  allow_failure: true
 
 build_cvc4:
   script: 
   - ./bootstrap.sh -d deps --systemc -b cudd -b cvc4 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
-  - make -j
-  - make test -j
+  - make -j $NUM_JOBS
+  - ctest --schedule-random -j $NUM_JOBS
   tags:
   - linux
+  allow_failure: true
 
 build_sword:
   script: 
   - ./bootstrap.sh -d deps --systemc -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
-  - make -j
-  - make test -j
+  - make -j $NUM_JOBS
+  - ctest --schedule-random -j $NUM_JOBS
   tags:
   - linux
+  allow_failure: true
 
 build_z3:
   script: 
   - ./bootstrap.sh -d deps --systemc -b cudd -b z3 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
-  - make -j
-  - make test -j
+  - make -j $NUM_JOBS
+  - ctest --schedule-random -j $NUM_JOBS
   tags:
   - linux
+  allow_failure: true
 
