@@ -3,18 +3,46 @@ before_script:
 - git submodule update --init
 - ln -s /home/radames/software/crave-bundle/deps deps
 
-build_all_solvers:
-  script: 
-  - ./bootstrap.sh -d deps --systemc -b boolector -b cudd -b cvc4 -b sword -b z3 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
-  - cd build
-  - make -j
-  - make test -j
-  tags:
-  - linux
-
 build_default:
   script: 
   - make -j
   - make test -j
   tags:
   - linux
+
+build_boolector:
+  script: 
+  - ./bootstrap.sh -d deps --systemc -b boolector -b cudd  build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
+  - cd build
+  - make -j
+  - make test -j
+  tags:
+  - linux
+
+build_cvc4:
+  script: 
+  - ./bootstrap.sh -d deps --systemc -b cudd -b cvc4 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
+  - cd build
+  - make -j
+  - make test -j
+  tags:
+  - linux
+
+build_sword:
+  script: 
+  - ./bootstrap.sh -d deps --systemc -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
+  - cd build
+  - make -j
+  - make test -j
+  tags:
+  - linux
+
+build_z3:
+  script: 
+  - ./bootstrap.sh -d deps --systemc -b cudd -b z3 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
+  - cd build
+  - make -j
+  - make test -j
+  tags:
+  - linux
+
