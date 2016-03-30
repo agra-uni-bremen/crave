@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_CASE(logical_not_t1) {
   logical_not_s1 item("Item");
   BOOST_REQUIRE(item.con.active());
   BOOST_REQUIRE(item.randomize());
-  BOOST_CHECK_EQUAL(item.a, 0);
+  BOOST_REQUIRE_EQUAL(item.a, 0);
 }
 
 struct logical_not_s2 : crv_sequence_item {
@@ -61,13 +61,13 @@ BOOST_AUTO_TEST_CASE(logical_and_t1) {
   BOOST_REQUIRE(item.randomize());
   item.con2.activate();
   BOOST_REQUIRE(item.randomize());
-  BOOST_CHECK_EQUAL(item.c, true);
+  BOOST_REQUIRE_EQUAL(item.c, true);
   item.con1 = {item.a() == true, item.b() == false};
   item.con2.deactivate();
   BOOST_REQUIRE(item.randomize());
   item.con2.activate();
   BOOST_REQUIRE(item.randomize());
-  BOOST_CHECK_EQUAL(item.c, false);
+  BOOST_REQUIRE_EQUAL(item.c, false);
 }
 
 struct logical_or_s1 : crv_sequence_item {
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(logical_or_t1) {
   item.con2.activate();
 
   BOOST_REQUIRE(item.randomize());
-  BOOST_CHECK_EQUAL(item.c, false);
+  BOOST_REQUIRE_EQUAL(item.c, false);
 
   item.con1 = {item.a() == true, item.b() == false};
   item.con2.deactivate();
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(logical_or_t1) {
   item.con2.activate();
 
   BOOST_REQUIRE(item.randomize());
-  BOOST_CHECK_EQUAL(item.c, true);
+  BOOST_REQUIRE_EQUAL(item.c, true);
 }
 
 struct logical_equal_s1 : crv_sequence_item {
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(equal_t1) {
   logical_equal_s1 item("equal");
   BOOST_REQUIRE(item.con.active());
   BOOST_REQUIRE(item.randomize());
-  BOOST_CHECK_EQUAL(item.a, item.b);
+  BOOST_REQUIRE_EQUAL(item.a, item.b);
 }
 
 struct not_equal_s1 : crv_sequence_item {
@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE(not_equal_t1) {
   not_equal_s1 item("item");
   for (int i = 0; i < 300; ++i) {
     BOOST_REQUIRE(item.randomize());
-    BOOST_CHECK_NE(item.a, item.b);
+    BOOST_REQUIRE_NE(item.a, item.b);
   }
 }
 
@@ -140,8 +140,8 @@ struct neg_s1 : crv_sequence_item {
 BOOST_AUTO_TEST_CASE(neg_t1) {
   neg_s1 item("item");
   BOOST_REQUIRE(item.randomize());
-  BOOST_CHECK_EQUAL(item.a, -1337);
-  BOOST_CHECK_EQUAL(item.b, 1337);
+  BOOST_REQUIRE_EQUAL(item.a, -1337);
+  BOOST_REQUIRE_EQUAL(item.b, 1337);
 }
 
 struct neg_s2 : crv_sequence_item {
@@ -160,9 +160,9 @@ BOOST_AUTO_TEST_CASE(neg_t2) {
   for (int i = 0; i < 50; ++i) {
     BOOST_REQUIRE(item.randomize());
     if (item.a)
-      BOOST_CHECK_EQUAL(item.d, -1337);
+      BOOST_REQUIRE_EQUAL(item.d, -1337);
     else
-      BOOST_CHECK_EQUAL(item.d, -42);
+      BOOST_REQUIRE_EQUAL(item.d, -42);
   }
 }
 
@@ -177,8 +177,8 @@ struct comp_s1 : crv_sequence_item {
 BOOST_AUTO_TEST_CASE(complement_t1) {
   comp_s1 item("item");
   BOOST_REQUIRE(item.randomize());
-  BOOST_CHECK_EQUAL(item.a, 0);
-  BOOST_CHECK_EQUAL(item.b, -1);
+  BOOST_REQUIRE_EQUAL(item.a, 0);
+  BOOST_REQUIRE_EQUAL(item.b, -1);
 }
 
 struct bitwise_and_s1 : crv_sequence_item {
@@ -193,7 +193,7 @@ struct bitwise_and_s1 : crv_sequence_item {
 BOOST_AUTO_TEST_CASE(bitwise_and_t1) {
   bitwise_and_s1 item("item");
   BOOST_REQUIRE(item.randomize());
-  BOOST_CHECK_EQUAL(item.c, 40);
+  BOOST_REQUIRE_EQUAL(item.c, 40);
 }
 
 struct bitwise_or_s1 : crv_sequence_item {
@@ -208,7 +208,7 @@ struct bitwise_or_s1 : crv_sequence_item {
 BOOST_AUTO_TEST_CASE(bitwise_or_t1) {
   bitwise_or_s1 item("item");
   BOOST_REQUIRE(item.randomize());
-  BOOST_CHECK_EQUAL(item.c, 1339);
+  BOOST_REQUIRE_EQUAL(item.c, 1339);
 }
 
 struct xor_s1 : crv_sequence_item {
@@ -226,11 +226,11 @@ BOOST_AUTO_TEST_CASE(xor_t1) {
   BOOST_REQUIRE(item.con1.active());
   BOOST_REQUIRE(!item.con2.active());
   BOOST_REQUIRE(item.randomize());
-  BOOST_CHECK_EQUAL(item.c != 0, false);
+  BOOST_REQUIRE_EQUAL(item.c != 0, false);
   item.con1.deactivate();
   item.con2.activate();
   BOOST_REQUIRE(item.randomize());
-  BOOST_CHECK_EQUAL(item.c != 0, true);
+  BOOST_REQUIRE_EQUAL(item.c != 0, true);
 }
 
 struct xor_s2 : crv_sequence_item {
@@ -245,7 +245,7 @@ struct xor_s2 : crv_sequence_item {
 BOOST_AUTO_TEST_CASE(xor_t2) {
   xor_s2 item("item");
   BOOST_REQUIRE(item.randomize());
-  BOOST_CHECK_EQUAL(item.c, 61455);
+  BOOST_REQUIRE_EQUAL(item.c, 61455);
 }
 
 struct element_inside_set_s1 : crv_sequence_item {
@@ -480,8 +480,8 @@ BOOST_AUTO_TEST_CASE(bitslice_t) {
   BOOST_REQUIRE(item.randomize());
   BOOST_REQUIRE_EQUAL((item.x >> 3) & 0xFF, 0xFF);
 
-  BOOST_CHECK_THROW(item.con1 &= {bitslice(3, 10, item.x()) == 0xFF}, std::runtime_error);
-  BOOST_CHECK_THROW(item.con1 &= {bitslice(16, 3, item.x()) == 0xFF}, std::runtime_error);
+  BOOST_REQUIRE_THROW(item.con1 &= {bitslice(3, 10, item.x()) == 0xFF}, std::runtime_error);
+  BOOST_REQUIRE_THROW(item.con1 &= {bitslice(16, 3, item.x()) == 0xFF}, std::runtime_error);
 }
 
 struct s_shiftleft : crv_sequence_item {

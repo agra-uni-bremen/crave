@@ -124,7 +124,7 @@ class Item1 : public rand_obj {
 
 BOOST_AUTO_TEST_CASE(t2) {
   Item1* it;
-  BOOST_CHECK_THROW(it = new Item1, std::runtime_error);
+  BOOST_REQUIRE_THROW(it = new Item1, std::runtime_error);
 }
 
 class ItemPythagoras : public rand_obj {
@@ -348,7 +348,7 @@ BOOST_AUTO_TEST_CASE(conflict_with_softs_t1) {
   gen("c1", a() < 10)("c2", b() >= 10)("c3", c() != a() && c() != b());
   gen.soft("c4", c() == a());
 
-  BOOST_CHECK(gen.next());
+  BOOST_REQUIRE(gen.next());
 
   std::vector<std::string> result = gen.getInactiveSofts();
   std::sort(result.begin(), result.end());
@@ -379,7 +379,7 @@ BOOST_AUTO_TEST_CASE(conflict_with_softs_t2) {
   std::cout << std::endl;
 
   std::vector<std::string> expected = list_of("s1")("s4");
-  BOOST_CHECK_EQUAL_COLLECTIONS(result.begin(), result.end(), expected.begin(), expected.end());
+  BOOST_REQUIRE_EQUAL_COLLECTIONS(result.begin(), result.end(), expected.begin(), expected.end());
 }
 
 class Item2 : public rand_obj {

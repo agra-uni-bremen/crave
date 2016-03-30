@@ -34,7 +34,7 @@ struct s_constants : public crv_sequence_item {
 BOOST_AUTO_TEST_CASE(constants) {
   s_constants item("item");
   BOOST_REQUIRE(item.randomize());
-  BOOST_CHECK_EQUAL(item.x, 135421);
+  BOOST_REQUIRE_EQUAL(item.x, 135421);
 }
 
 struct s_boolean : public crv_sequence_item {
@@ -226,7 +226,7 @@ BOOST_AUTO_TEST_CASE(pythagoras) {
   unsigned long long bv = item.b;
   unsigned long long cv = item.c;
 
-  BOOST_CHECK_EQUAL(av * av + bv * bv, cv * cv);
+  BOOST_REQUIRE_EQUAL(av * av + bv * bv, cv * cv);
 }
 
 struct s_negative_var : public crv_sequence_item {
@@ -241,7 +241,7 @@ BOOST_AUTO_TEST_CASE(negative_var) {
 
   std::cout << format("result: a=%d, b=%d\n") % item.a % item.b;
 
-  BOOST_CHECK(item.a + item.b <= 120);
+  BOOST_REQUIRE(item.a + item.b <= 120);
 }
 
 struct s_signed_less_zero : public crv_sequence_item {
@@ -255,7 +255,7 @@ BOOST_AUTO_TEST_CASE(signed_less_zero) {
 
   std::cout << format("result: a=%d\n") % item.a;
 
-  BOOST_CHECK(item.a < 0);
+  BOOST_REQUIRE(item.a < 0);
 }
 
 struct s_mixed_bv_width_1 : crv_sequence_item {
@@ -271,7 +271,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_1) {
 
   std::cout << format("result: a=%d, b=%d\n") % item.a % item.b;
 
-  BOOST_CHECK(item.a + item.b >= 120);
+  BOOST_REQUIRE(item.a + item.b >= 120);
 }
 
 struct s_mixed_bv_width_2 : crv_sequence_item {
@@ -292,7 +292,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_2) {
     BOOST_REQUIRE_LT(iterations, 150);
   }
 
-  BOOST_CHECK_EQUAL(generated.size(), 138);
+  BOOST_REQUIRE_EQUAL(generated.size(), 138);
 
   VariableDefaultSolver::bypass_constraint_analysis = false;
 }
@@ -313,7 +313,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_3) {
     BOOST_REQUIRE_LT(iterations, 20);
   }
 
-  BOOST_CHECK_EQUAL(generated.size(), 19);
+  BOOST_REQUIRE_EQUAL(generated.size(), 19);
 }
 
 struct s_mixed_bv_width_4 : crv_sequence_item {
@@ -331,7 +331,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_4) {
     BOOST_REQUIRE_LT(iterations, 20);
   }
 
-  BOOST_CHECK_EQUAL(generated.size(), 19);
+  BOOST_REQUIRE_EQUAL(generated.size(), 19);
 }
 
 struct s_mixed_bv_width_5 : crv_sequence_item {
@@ -355,7 +355,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_5) {
     for (signed char j = -3; j <= 3; j++)
       if ((-2 <= i + j) && (i + j <= 2)) cnt1++;
 
-  BOOST_CHECK_EQUAL(cnt, cnt1);
+  BOOST_REQUIRE_EQUAL(cnt, cnt1);
 }
 
 struct s_mixed_bv_width_6 : public crv_sequence_item {

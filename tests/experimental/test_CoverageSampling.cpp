@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(basic_test) {
       cg.sample();
     }
 
-  BOOST_CHECK(cg.covered());
+  BOOST_REQUIRE(cg.covered());
 
   crv_object::root()->print_object_hierarchy();
 }

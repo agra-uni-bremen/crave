@@ -49,7 +49,7 @@ struct s_crv_variable_dist_t2 : public crv_sequence_item {
 
 BOOST_AUTO_TEST_CASE(crv_variable_dist_t2) {
   s_crv_variable_dist_t2 item("item");
-  BOOST_CHECK_THROW(
+  BOOST_REQUIRE_THROW(
       item.con = {dist(item.v(), distribution<int>::create(range<int>(0, 10))(range<int>(50, 75))(range<int>(30, 51)))},
       std::runtime_error);
 }

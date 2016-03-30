@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_CASE(logical_not_t1) {
   gen(!(a != 0));
 
   BOOST_REQUIRE(gen.next());
-  BOOST_CHECK_EQUAL(gen[a], 0);
+  BOOST_REQUIRE_EQUAL(gen[a], 0);
 }
 
 BOOST_AUTO_TEST_CASE(logical_not_t2) {
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(logical_and_t1) {
   gen(c == (a && b));
 
   BOOST_REQUIRE(gen.next());
-  BOOST_CHECK_EQUAL(gen[c], true);
+  BOOST_REQUIRE_EQUAL(gen[c], true);
 
   Generator gen2(a == true);
   gen2(b == false);
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(logical_and_t1) {
   gen2(c == (a && b));
 
   BOOST_REQUIRE(gen2.next());
-  BOOST_CHECK_EQUAL(gen2[c], false);
+  BOOST_REQUIRE_EQUAL(gen2[c], false);
 }
 
 BOOST_AUTO_TEST_CASE(logical_or_t1) {
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(logical_or_t1) {
   gen(c == (a || b));
 
   BOOST_REQUIRE(gen.next());
-  BOOST_CHECK_EQUAL(gen[c], false);
+  BOOST_REQUIRE_EQUAL(gen[c], false);
 
   Generator gen2(a == true);
   gen2(b == false);
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(logical_or_t1) {
   gen2(c == (a || b));
 
   BOOST_REQUIRE(gen2.next());
-  BOOST_CHECK_EQUAL(gen2[c], true);
+  BOOST_REQUIRE_EQUAL(gen2[c], true);
 }
 
 BOOST_AUTO_TEST_CASE(equal_t1) {
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(equal_t1) {
   gen(b == a);
 
   BOOST_REQUIRE(gen.next());
-  BOOST_CHECK_EQUAL(gen[a], gen[b]);
+  BOOST_REQUIRE_EQUAL(gen[a], gen[b]);
 }
 
 BOOST_AUTO_TEST_CASE(not_equal_t1) {
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(not_equal_t1) {
 
   for (int i = 0; i < 300; ++i) {
     BOOST_REQUIRE(gen.next());
-    BOOST_CHECK_NE(gen[a], gen[b]);
+    BOOST_REQUIRE_NE(gen[a], gen[b]);
   }
 }
 
@@ -193,11 +193,11 @@ BOOST_AUTO_TEST_CASE(neg_t1) {
   Generator gen(a == -1337);
 
   BOOST_REQUIRE(gen.next());
-  BOOST_CHECK_EQUAL(gen[a], -1337);
+  BOOST_REQUIRE_EQUAL(gen[a], -1337);
   gen(b == -a);
 
   BOOST_REQUIRE(gen.next());
-  BOOST_CHECK_EQUAL(gen[b], 1337);
+  BOOST_REQUIRE_EQUAL(gen[b], 1337);
 }
 
 BOOST_AUTO_TEST_CASE(neg_t2) {
@@ -210,11 +210,11 @@ BOOST_AUTO_TEST_CASE(neg_t2) {
   gen(if_then_else(a, d == -b, d == -c));
 
   for (int i = 0; i < 50; ++i) {
-    BOOST_CHECK(gen.next());
+    BOOST_REQUIRE(gen.next());
     if (gen[a])
-      BOOST_CHECK_EQUAL(gen[d], -1337);
+      BOOST_REQUIRE_EQUAL(gen[d], -1337);
     else
-      BOOST_CHECK_EQUAL(gen[d], -42);
+      BOOST_REQUIRE_EQUAL(gen[d], -42);
   }
 }
 
@@ -224,11 +224,11 @@ BOOST_AUTO_TEST_CASE(complement_t1) {
   Generator gen(a == 0);
 
   BOOST_REQUIRE(gen.next());
-  BOOST_CHECK_EQUAL(gen[a], 0);
+  BOOST_REQUIRE_EQUAL(gen[a], 0);
   gen(b == ~a);
 
   BOOST_REQUIRE(gen.next());
-  BOOST_CHECK_EQUAL(gen[b], -1);
+  BOOST_REQUIRE_EQUAL(gen[b], -1);
 }
 
 BOOST_AUTO_TEST_CASE(bitwise_and_t1) {
@@ -242,7 +242,7 @@ BOOST_AUTO_TEST_CASE(bitwise_and_t1) {
   gen(c == (a & b));
 
   BOOST_REQUIRE(gen.next());
-  BOOST_CHECK_EQUAL(gen[c], 40);
+  BOOST_REQUIRE_EQUAL(gen[c], 40);
 }
 
 BOOST_AUTO_TEST_CASE(bitwise_or_t1) {
@@ -256,7 +256,7 @@ BOOST_AUTO_TEST_CASE(bitwise_or_t1) {
   gen(c == (a | b));
 
   BOOST_REQUIRE(gen.next());
-  BOOST_CHECK_EQUAL(gen[c], 1339);
+  BOOST_REQUIRE_EQUAL(gen[c], 1339);
 }
 
 BOOST_AUTO_TEST_CASE(xor_t1) {
@@ -268,14 +268,14 @@ BOOST_AUTO_TEST_CASE(xor_t1) {
   gen(c == (a ^ b));
 
   BOOST_REQUIRE(gen.next());
-  BOOST_CHECK_EQUAL(gen[c] != 0, false);
+  BOOST_REQUIRE_EQUAL(gen[c] != 0, false);
 
   Generator gen2(a == false);
   gen2(b == true);
   gen2(c == (a ^ b));
 
   BOOST_REQUIRE(gen2.next());
-  BOOST_CHECK_EQUAL(gen2[c] != 0, true);
+  BOOST_REQUIRE_EQUAL(gen2[c] != 0, true);
 }
 
 BOOST_AUTO_TEST_CASE(xor_t2) {
@@ -289,7 +289,7 @@ BOOST_AUTO_TEST_CASE(xor_t2) {
   gen(c == (a ^ b));
 
   BOOST_REQUIRE(gen.next());
-  BOOST_CHECK_EQUAL(gen[c], 61455);
+  BOOST_REQUIRE_EQUAL(gen[c], 61455);
 }
 
 BOOST_AUTO_TEST_CASE(shiftleft) {
@@ -632,8 +632,8 @@ BOOST_AUTO_TEST_CASE(bitslice_t) {
   BOOST_REQUIRE(gen.next());
   BOOST_REQUIRE_EQUAL((gen[x] >> 3) & 0xFF, 0xFF);
 
-  BOOST_CHECK_THROW(gen(bitslice(3, 10, x) == 0xFF), std::runtime_error);
-  BOOST_CHECK_THROW(gen(bitslice(16, 3, x) == 0xFF), std::runtime_error);
+  BOOST_REQUIRE_THROW(gen(bitslice(3, 10, x) == 0xFF), std::runtime_error);
+  BOOST_REQUIRE_THROW(gen(bitslice(16, 3, x) == 0xFF), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_SUITE_END()  // Context

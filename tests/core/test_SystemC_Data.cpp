@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(sc_bv_t) {
   sc_bv<w> iv = gen[i];
   sc_bv<w> jv = gen[j];
 
-  BOOST_CHECK_NE(iv, jv);
+  BOOST_REQUIRE_NE(iv, jv);
 }
 
 BOOST_AUTO_TEST_CASE(sc_uint_t) {
@@ -79,8 +79,8 @@ BOOST_AUTO_TEST_CASE(sc_int_t) {
 
   // std::cout << format("iv: %d, jv: %d, kv: %d\n") %iv%jv%kv;
 
-  BOOST_CHECK_LT(iv, jv);
-  BOOST_CHECK_EQUAL(rv, kv);
+  BOOST_REQUIRE_LT(iv, jv);
+  BOOST_REQUIRE_EQUAL(rv, kv);
 }
 
 BOOST_AUTO_TEST_CASE(randv_sc_dt_t) {
@@ -96,10 +96,10 @@ BOOST_AUTO_TEST_CASE(randv_sc_dt_t) {
   gen(d() == a() + b());
 
   BOOST_REQUIRE(gen.next());
-  BOOST_CHECK_EQUAL(++a, 0);  // wrap around
-  BOOST_CHECK_EQUAL(b + 1, 16);
-  BOOST_CHECK_EQUAL(c, 14);
-  BOOST_CHECK_EQUAL(d, 14);  // deviation to sc_uint semantics (no overflow, thus d == 30)
+  BOOST_REQUIRE_EQUAL(++a, 0);  // wrap around
+  BOOST_REQUIRE_EQUAL(b + 1, 16);
+  BOOST_REQUIRE_EQUAL(c, 14);
+  BOOST_REQUIRE_EQUAL(d, 14);  // deviation to sc_uint semantics (no overflow, thus d == 30)
 }
 
 BOOST_AUTO_TEST_CASE(randv_sc_dt_op_support_t) {

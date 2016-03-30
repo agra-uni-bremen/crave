@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(constants) {
   Variable<unsigned> x;
   Generator gen(x == 135421);
   gen();
-  BOOST_CHECK_EQUAL(gen[x], 135421);
+  BOOST_REQUIRE_EQUAL(gen[x], 135421);
 }
 
 BOOST_AUTO_TEST_CASE(boolean) {
@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(boolean) {
   bool b2 = gen[b];
   // printf("result: b2=%d\n", b2);
 
-  BOOST_CHECK_THROW(gen(b != b2)(), std::runtime_error);
+  BOOST_REQUIRE_THROW(gen(b != b2)(), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(by_reference) {
@@ -184,7 +184,7 @@ BOOST_AUTO_TEST_CASE(pythagoras) {
   unsigned long long bv = gen[b];
   unsigned long long cv = gen[c];
 
-  BOOST_CHECK_EQUAL(av * av + bv * bv, cv * cv);
+  BOOST_REQUIRE_EQUAL(av * av + bv * bv, cv * cv);
 }
 
 BOOST_AUTO_TEST_CASE(negative_var) {
@@ -198,7 +198,7 @@ BOOST_AUTO_TEST_CASE(negative_var) {
 
   std::cout << format("result: a=%d, b=%d\n") % gen[a] % gen[b];
 
-  BOOST_CHECK(gen[a] + gen[b] <= 120);
+  BOOST_REQUIRE(gen[a] + gen[b] <= 120);
 }
 
 BOOST_AUTO_TEST_CASE(signed_less_zero) {
@@ -211,7 +211,7 @@ BOOST_AUTO_TEST_CASE(signed_less_zero) {
 
   std::cout << format("result: a=%d\n") % gen[a];
 
-  BOOST_CHECK(gen[a] < 0);
+  BOOST_REQUIRE(gen[a] < 0);
 }
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_1) {
@@ -225,7 +225,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_1) {
 
   std::cout << format("result: a=%d, b=%d\n") % gen[a] % gen[b];
 
-  BOOST_CHECK(gen[a] + gen[b] >= 120);
+  BOOST_REQUIRE(gen[a] + gen[b] >= 120);
 }
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_2) {
@@ -243,7 +243,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_2) {
     BOOST_REQUIRE_LT(iterations, 150);
   }
 
-  BOOST_CHECK_EQUAL(generated.size(), 138);
+  BOOST_REQUIRE_EQUAL(generated.size(), 138);
 
   VariableDefaultSolver::bypass_constraint_analysis = false;
 }
@@ -262,7 +262,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_3) {
     BOOST_REQUIRE_LT(iterations, 20);
   }
 
-  BOOST_CHECK_EQUAL(generated.size(), 19);
+  BOOST_REQUIRE_EQUAL(generated.size(), 19);
 }
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_4) {
@@ -279,7 +279,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_4) {
     BOOST_REQUIRE_LT(iterations, 20);
   }
 
-  BOOST_CHECK_EQUAL(generated.size(), 19);
+  BOOST_REQUIRE_EQUAL(generated.size(), 19);
 }
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_5) {
@@ -303,7 +303,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_5) {
     for (signed char j = -3; j <= 3; j++)
       if ((-2 <= i + j) && (i + j <= 2)) cnt1++;
 
-  BOOST_CHECK_EQUAL(cnt, cnt1);
+  BOOST_REQUIRE_EQUAL(cnt, cnt1);
 }
 
 BOOST_AUTO_TEST_CASE(mixed_bv_width_6) {

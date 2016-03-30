@@ -23,13 +23,13 @@ BOOST_AUTO_TEST_CASE(constraint_partitioning) {
   cp.reset();
   cp.mergeConstraints(cm1);
   cp.partition();
-  BOOST_CHECK_EQUAL(cp.getPartitions().size(), 3);
+  BOOST_REQUIRE_EQUAL(cp.getPartitions().size(), 3);
 
   cp.reset();
   cp.mergeConstraints(cm1);
   cp.mergeConstraints(cm2);
   cp.partition();
-  BOOST_CHECK_EQUAL(cp.getPartitions().size(), 2);
+  BOOST_REQUIRE_EQUAL(cp.getPartitions().size(), 2);
 }
 
 BOOST_AUTO_TEST_CASE(constraint_expression_mixing) {
@@ -44,15 +44,15 @@ BOOST_AUTO_TEST_CASE(constraint_expression_mixing) {
   evaluator.assign(t(), 3);
 
   BOOST_REQUIRE(evaluator.evaluate((x() > z()) && (e1 <= 10) && e2));
-  BOOST_CHECK(!evaluator.result<bool>());
+  BOOST_REQUIRE(!evaluator.result<bool>());
 
   evaluator.assign(x(), 9);
 
   BOOST_REQUIRE(evaluator.evaluate((x() > z()) && (e1 + 1 <= 11) && e2));
-  BOOST_CHECK(evaluator.result<bool>());
+  BOOST_REQUIRE(evaluator.result<bool>());
 
   BOOST_REQUIRE(evaluator.evaluate(e1 * e1));
-  BOOST_CHECK_EQUAL(evaluator.result<unsigned>(), 100);
+  BOOST_REQUIRE_EQUAL(evaluator.result<unsigned>(), 100);
 }
 
 BOOST_AUTO_TEST_CASE(single_variable_constraint) {
@@ -69,12 +69,12 @@ BOOST_AUTO_TEST_CASE(single_variable_constraint) {
   cp.reset();
   cp.mergeConstraints(cm);
   cp.partition();
-  BOOST_CHECK_EQUAL(cp.getPartitions().size(), 1);
+  BOOST_REQUIRE_EQUAL(cp.getPartitions().size(), 1);
   ConstraintPartition const& part = cp.getPartitions().at(0);
-  BOOST_CHECK_EQUAL(part.singleVariableConstraintMap().size(), 3);
-  BOOST_CHECK_EQUAL(part.singleVariableConstraintMap().at(a().id()).size(), 2);
-  BOOST_CHECK_EQUAL(part.singleVariableConstraintMap().at(b().id()).size(), 1);
-  BOOST_CHECK_EQUAL(part.singleVariableConstraintMap().at(c().id()).size(), 1);
+  BOOST_REQUIRE_EQUAL(part.singleVariableConstraintMap().size(), 3);
+  BOOST_REQUIRE_EQUAL(part.singleVariableConstraintMap().at(a().id()).size(), 2);
+  BOOST_REQUIRE_EQUAL(part.singleVariableConstraintMap().at(b().id()).size(), 1);
+  BOOST_REQUIRE_EQUAL(part.singleVariableConstraintMap().at(c().id()).size(), 1);
 }
 
 struct TestObject : public crv_sequence_item {
@@ -93,15 +93,15 @@ BOOST_AUTO_TEST_CASE(ComplexityEstimationVisitorTest) {
   crave::NodePtr V1r3Minus(boost::intrusive_ptr<crave::Node>(new crave::MinusOpr(v1r3, c4)));
   crave::NodePtr mulV1r3Plus(boost::intrusive_ptr<crave::Node>(new crave::PlusOpr(mulV1r1V1r2, V1r3Minus)));
   crave::NodePtr equal(boost::intrusive_ptr<crave::Node>(new crave::EqualOpr(mulV1r3Plus, c10)));
-  BOOST_CHECK_EQUAL(visitor.getComplexityEstimation(*v1r1), 8);
-  BOOST_CHECK_EQUAL(visitor.getComplexityEstimation(*v1r2), 8);
-  BOOST_CHECK_EQUAL(visitor.getComplexityEstimation(*v1r3), 4);
-  BOOST_CHECK_EQUAL(visitor.getComplexityEstimation(*c4), 0);
-  BOOST_CHECK_EQUAL(visitor.getComplexityEstimation(*c10), 0);
-  BOOST_CHECK_EQUAL(visitor.getComplexityEstimation(*mulV1r1V1r2), 64);
-  BOOST_CHECK_EQUAL(visitor.getComplexityEstimation(*V1r3Minus), 4);
-  BOOST_CHECK_EQUAL(visitor.getComplexityEstimation(*mulV1r3Plus), 68);
-  BOOST_CHECK_EQUAL(visitor.getComplexityEstimation(*equal), 68);
+  BOOST_REQUIRE_EQUAL(visitor.getComplexityEstimation(*v1r1), 8);
+  BOOST_REQUIRE_EQUAL(visitor.getComplexityEstimation(*v1r2), 8);
+  BOOST_REQUIRE_EQUAL(visitor.getComplexityEstimation(*v1r3), 4);
+  BOOST_REQUIRE_EQUAL(visitor.getComplexityEstimation(*c4), 0);
+  BOOST_REQUIRE_EQUAL(visitor.getComplexityEstimation(*c10), 0);
+  BOOST_REQUIRE_EQUAL(visitor.getComplexityEstimation(*mulV1r1V1r2), 64);
+  BOOST_REQUIRE_EQUAL(visitor.getComplexityEstimation(*V1r3Minus), 4);
+  BOOST_REQUIRE_EQUAL(visitor.getComplexityEstimation(*mulV1r3Plus), 68);
+  BOOST_REQUIRE_EQUAL(visitor.getComplexityEstimation(*equal), 68);
 }
 
 BOOST_AUTO_TEST_SUITE_END()  // Syntax

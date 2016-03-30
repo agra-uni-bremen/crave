@@ -19,12 +19,12 @@ BOOST_AUTO_TEST_CASE(logical_not_t1) {
   evaluator.assign(a(), 0u);
 
   BOOST_REQUIRE(evaluator.evaluate(!(a() != 0)));
-  BOOST_CHECK(evaluator.result<bool>());
+  BOOST_REQUIRE(evaluator.result<bool>());
 
   evaluator.assign(a(), 42u);
 
   BOOST_REQUIRE(evaluator.evaluate(!(a() == 0)));
-  BOOST_CHECK(evaluator.result<bool>());
+  BOOST_REQUIRE(evaluator.result<bool>());
 }
 
 BOOST_AUTO_TEST_CASE(logical_not_t2) {
@@ -35,23 +35,23 @@ BOOST_AUTO_TEST_CASE(logical_not_t2) {
 
   eval.assign(a(), 1u);
 
-  BOOST_CHECK(!eval.evaluate(expr));
+  BOOST_REQUIRE(!eval.evaluate(expr));
 
   eval.assign(b(), 35u);
 
   BOOST_REQUIRE(eval.evaluate(expr));
-  BOOST_CHECK(eval.result<bool>());
+  BOOST_REQUIRE(eval.result<bool>());
 
   eval.assign(a(), 2u);
   eval.assign(b(), 75u);
 
   BOOST_REQUIRE(eval.evaluate(expr));
-  BOOST_CHECK(eval.result<bool>());
+  BOOST_REQUIRE(eval.result<bool>());
 
   eval.assign(a(), 1u);
 
   BOOST_REQUIRE(eval.evaluate(expr));
-  BOOST_CHECK(!eval.result<bool>());
+  BOOST_REQUIRE(!eval.result<bool>());
 }
 
 BOOST_AUTO_TEST_CASE(logical_and_t1) {
@@ -63,19 +63,19 @@ BOOST_AUTO_TEST_CASE(logical_and_t1) {
   eval.assign(a(), true);
   eval.assign(b(), true);
 
-  BOOST_CHECK(eval.evaluate(a() && b()));
-  BOOST_CHECK(eval.result<bool>());
+  BOOST_REQUIRE(eval.evaluate(a() && b()));
+  BOOST_REQUIRE(eval.result<bool>());
 
   eval.assign(c(), false);
 
-  BOOST_CHECK(eval.evaluate(c() == (a() && b())));
-  BOOST_CHECK(!eval.result<bool>());
+  BOOST_REQUIRE(eval.evaluate(c() == (a() && b())));
+  BOOST_REQUIRE(!eval.result<bool>());
 
   eval.assign(a(), false);
   eval.assign(b(), false);
 
-  BOOST_CHECK(eval.evaluate(c() == (a() && b())));
-  BOOST_CHECK(eval.result<bool>());
+  BOOST_REQUIRE(eval.evaluate(c() == (a() && b())));
+  BOOST_REQUIRE(eval.result<bool>());
 }
 
 BOOST_AUTO_TEST_CASE(logical_or_t1) {
@@ -87,19 +87,19 @@ BOOST_AUTO_TEST_CASE(logical_or_t1) {
   eval.assign(a(), false);
   eval.assign(b(), false);
 
-  BOOST_CHECK(eval.evaluate(a() || b()));
-  BOOST_CHECK(!eval.result<bool>());
+  BOOST_REQUIRE(eval.evaluate(a() || b()));
+  BOOST_REQUIRE(!eval.result<bool>());
 
   eval.assign(c(), false);
 
-  BOOST_CHECK(eval.evaluate(c() == (a() || b())));
-  BOOST_CHECK(eval.result<bool>());
+  BOOST_REQUIRE(eval.evaluate(c() == (a() || b())));
+  BOOST_REQUIRE(eval.result<bool>());
 
   eval.assign(a(), true);
   eval.assign(c(), true);
 
-  BOOST_CHECK(eval.evaluate(c() == (a() || b())));
-  BOOST_CHECK(eval.result<bool>());
+  BOOST_REQUIRE(eval.evaluate(c() == (a() || b())));
+  BOOST_REQUIRE(eval.result<bool>());
 }
 
 BOOST_AUTO_TEST_CASE(equal_t1) {
@@ -110,14 +110,14 @@ BOOST_AUTO_TEST_CASE(equal_t1) {
   eval.assign(a(), 65535);
 
   BOOST_REQUIRE(eval.evaluate(a()));
-  BOOST_CHECK_EQUAL(eval.result<unsigned int>(), 65535);
+  BOOST_REQUIRE_EQUAL(eval.result<unsigned int>(), 65535);
   BOOST_REQUIRE(eval.evaluate(a() == 65535));
-  BOOST_CHECK(eval.result<bool>());
+  BOOST_REQUIRE(eval.result<bool>());
 
   eval.assign(b(), 5);
 
   BOOST_REQUIRE(eval.evaluate(a() == b()));
-  BOOST_CHECK(!eval.result<bool>());
+  BOOST_REQUIRE(!eval.result<bool>());
 }
 
 BOOST_AUTO_TEST_CASE(not_equal_t1) {
@@ -132,9 +132,9 @@ BOOST_AUTO_TEST_CASE(not_equal_t1) {
     BOOST_REQUIRE(eval.evaluate(a() != b()));
 
     if (i != 25u)
-      BOOST_CHECK(eval.result<bool>());
+      BOOST_REQUIRE(eval.result<bool>());
     else
-      BOOST_CHECK(!eval.result<bool>());
+      BOOST_REQUIRE(!eval.result<bool>());
   }
 }
 
@@ -145,12 +145,12 @@ BOOST_AUTO_TEST_CASE(less) {
 
   for (unsigned int i = 0u; i < 50u; ++i) {
     eval.assign(a(), i);
-    BOOST_CHECK(eval.evaluate(a() < 50u));
-    BOOST_CHECK(eval.result<bool>());
+    BOOST_REQUIRE(eval.evaluate(a() < 50u));
+    BOOST_REQUIRE(eval.result<bool>());
 
     eval.assign(b(), i);
-    BOOST_CHECK(eval.evaluate(b() < 50u));
-    BOOST_CHECK(eval.result<bool>());
+    BOOST_REQUIRE(eval.evaluate(b() < 50u));
+    BOOST_REQUIRE(eval.result<bool>());
   }
 }
 
@@ -161,12 +161,12 @@ BOOST_AUTO_TEST_CASE(less_equal) {
 
   for (unsigned int i = 0u; i <= 50u; ++i) {
     eval.assign(a(), i);
-    BOOST_CHECK(eval.evaluate(a() <= 50u));
-    BOOST_CHECK(eval.result<bool>());
+    BOOST_REQUIRE(eval.evaluate(a() <= 50u));
+    BOOST_REQUIRE(eval.result<bool>());
 
     eval.assign(b(), i);
-    BOOST_CHECK(eval.evaluate(b() <= 50u));
-    BOOST_CHECK(eval.result<bool>());
+    BOOST_REQUIRE(eval.evaluate(b() <= 50u));
+    BOOST_REQUIRE(eval.result<bool>());
   }
 }
 
@@ -177,12 +177,12 @@ BOOST_AUTO_TEST_CASE(greater) {
 
   for (int i = 50; i > 0; --i) {
     eval.assign(a(), i);
-    BOOST_CHECK(eval.evaluate(a() > 0u));
-    BOOST_CHECK(eval.result<bool>());
+    BOOST_REQUIRE(eval.evaluate(a() > 0u));
+    BOOST_REQUIRE(eval.result<bool>());
 
     eval.assign(b(), i);
-    BOOST_CHECK(eval.evaluate(b() > 0u));
-    BOOST_CHECK(eval.result<bool>());
+    BOOST_REQUIRE(eval.evaluate(b() > 0u));
+    BOOST_REQUIRE(eval.result<bool>());
   }
 }
 
@@ -193,12 +193,12 @@ BOOST_AUTO_TEST_CASE(greater_equal) {
 
   for (int i = 50; i >= 0; --i) {
     eval.assign(a(), i);
-    BOOST_CHECK(eval.evaluate(a() >= 0u));
-    BOOST_CHECK(eval.result<bool>());
+    BOOST_REQUIRE(eval.evaluate(a() >= 0u));
+    BOOST_REQUIRE(eval.result<bool>());
 
     eval.assign(b(), i);
-    BOOST_CHECK(eval.evaluate(b() >= 0u));
-    BOOST_CHECK(eval.result<bool>());
+    BOOST_REQUIRE(eval.evaluate(b() >= 0u));
+    BOOST_REQUIRE(eval.result<bool>());
   }
 }
 
@@ -208,12 +208,12 @@ BOOST_AUTO_TEST_CASE(neg_t1) {
   Evaluator eval;
 
   eval.assign(a(), 1337);
-  BOOST_CHECK(eval.evaluate(-a() == 1337));
-  BOOST_CHECK(!eval.result<bool>());
+  BOOST_REQUIRE(eval.evaluate(-a() == 1337));
+  BOOST_REQUIRE(!eval.result<bool>());
 
   eval.assign(b(), -1337);
-  BOOST_CHECK(eval.evaluate(a() == -b()));
-  BOOST_CHECK(eval.result<bool>());
+  BOOST_REQUIRE(eval.evaluate(a() == -b()));
+  BOOST_REQUIRE(eval.result<bool>());
 }
 
 BOOST_AUTO_TEST_CASE(neg_t2) {
@@ -222,8 +222,8 @@ BOOST_AUTO_TEST_CASE(neg_t2) {
   Evaluator eval;
 
   eval.assign(b(), -a);
-  BOOST_CHECK(eval.evaluate(b()));
-  BOOST_CHECK_EQUAL(eval.result<int>(), -1337);
+  BOOST_REQUIRE(eval.evaluate(b()));
+  BOOST_REQUIRE_EQUAL(eval.result<int>(), -1337);
 }
 
 BOOST_AUTO_TEST_CASE(complement_t1) {
@@ -233,8 +233,8 @@ BOOST_AUTO_TEST_CASE(complement_t1) {
 
   eval.assign(a(), 0);
   eval.assign(b(), -1);
-  BOOST_CHECK(eval.evaluate(~a() == b()));
-  BOOST_CHECK(eval.result<bool>());
+  BOOST_REQUIRE(eval.evaluate(~a() == b()));
+  BOOST_REQUIRE(eval.result<bool>());
 }
 
 BOOST_AUTO_TEST_CASE(complement_t2) {
@@ -243,8 +243,8 @@ BOOST_AUTO_TEST_CASE(complement_t2) {
   Evaluator eval;
 
   eval.assign(b(), a);
-  BOOST_CHECK(eval.evaluate(~b()));
-  BOOST_CHECK_EQUAL(eval.result<int>(), -43);
+  BOOST_REQUIRE(eval.evaluate(~b()));
+  BOOST_REQUIRE_EQUAL(eval.result<int>(), -43);
 }
 
 BOOST_AUTO_TEST_CASE(bitwise_and_t1) {
@@ -256,7 +256,7 @@ BOOST_AUTO_TEST_CASE(bitwise_and_t1) {
   eval.assign(b(), 1337);
 
   BOOST_REQUIRE(eval.evaluate(a() & b()));
-  BOOST_CHECK_EQUAL(eval.result<unsigned int>(), 40);
+  BOOST_REQUIRE_EQUAL(eval.result<unsigned int>(), 40);
 }
 
 BOOST_AUTO_TEST_CASE(bitwise_or_t1) {
@@ -268,7 +268,7 @@ BOOST_AUTO_TEST_CASE(bitwise_or_t1) {
   eval.assign(b(), 1337);
 
   BOOST_REQUIRE(eval.evaluate(a() | b()));
-  BOOST_CHECK_EQUAL(eval.result<unsigned int>(), 1339);
+  BOOST_REQUIRE_EQUAL(eval.result<unsigned int>(), 1339);
 }
 
 BOOST_AUTO_TEST_CASE(xor_t1) {
@@ -280,12 +280,12 @@ BOOST_AUTO_TEST_CASE(xor_t1) {
   eval.assign(b(), false);
 
   BOOST_REQUIRE(eval.evaluate(a() ^ b()));
-  BOOST_CHECK_EQUAL(eval.result<bool>(), false);
+  BOOST_REQUIRE_EQUAL(eval.result<bool>(), false);
 
   eval.assign(b(), true);
 
   BOOST_REQUIRE(eval.evaluate(a() ^ b()));
-  BOOST_CHECK_EQUAL(eval.result<bool>(), true);
+  BOOST_REQUIRE_EQUAL(eval.result<bool>(), true);
 }
 
 BOOST_AUTO_TEST_CASE(xor_t2) {
@@ -297,7 +297,7 @@ BOOST_AUTO_TEST_CASE(xor_t2) {
   eval.assign(b(), 4080);
 
   BOOST_REQUIRE(eval.evaluate(a() ^ b()));
-  BOOST_CHECK_EQUAL(eval.result<unsigned int>(), 61455);
+  BOOST_REQUIRE_EQUAL(eval.result<unsigned int>(), 61455);
 }
 
 BOOST_AUTO_TEST_CASE(shiftleft) {
@@ -310,8 +310,8 @@ BOOST_AUTO_TEST_CASE(shiftleft) {
     eval.assign(a(), count);
     eval.assign(b(), count % (sizeof(unsigned) << 3u));
 
-    BOOST_CHECK(eval.evaluate(a() << b()));
-    BOOST_CHECK_EQUAL(eval.result<unsigned>(), count << (count % (sizeof(unsigned) << 3u)));
+    BOOST_REQUIRE(eval.evaluate(a() << b()));
+    BOOST_REQUIRE_EQUAL(eval.result<unsigned>(), count << (count % (sizeof(unsigned) << 3u)));
   }
 }
 
@@ -325,8 +325,8 @@ BOOST_AUTO_TEST_CASE(shiftright) {
     eval.assign(a(), count + 256);
     eval.assign(b(), count % 8);
 
-    BOOST_CHECK(eval.evaluate(a() >> b()));
-    BOOST_CHECK_EQUAL(eval.result<unsigned>(), (count + 256) >> (count % 8));
+    BOOST_REQUIRE(eval.evaluate(a() >> b()));
+    BOOST_REQUIRE_EQUAL(eval.result<unsigned>(), (count + 256) >> (count % 8));
   }
 }
 
@@ -340,11 +340,11 @@ BOOST_AUTO_TEST_CASE(plus_minus) {
     eval.assign(a(), cnt * cnt);
     eval.assign(b(), cnt + cnt);
 
-    BOOST_CHECK(eval.evaluate(a() + b()));
-    BOOST_CHECK_EQUAL(eval.result<unsigned>(), (cnt * cnt) + (cnt + cnt));
+    BOOST_REQUIRE(eval.evaluate(a() + b()));
+    BOOST_REQUIRE_EQUAL(eval.result<unsigned>(), (cnt * cnt) + (cnt + cnt));
 
-    BOOST_CHECK(eval.evaluate(a() - b()));
-    BOOST_CHECK_EQUAL(eval.result<unsigned>(), (cnt * cnt) - (cnt + cnt));
+    BOOST_REQUIRE(eval.evaluate(a() - b()));
+    BOOST_REQUIRE_EQUAL(eval.result<unsigned>(), (cnt * cnt) - (cnt + cnt));
   }
 }
 
@@ -358,14 +358,14 @@ BOOST_AUTO_TEST_CASE(mult_mod) {
       eval.assign(a(), i);
       eval.assign(b(), j);
 
-      BOOST_CHECK(eval.evaluate(a() * b() % 6));
-      BOOST_CHECK_EQUAL(eval.result<int>(), i * j % 6);
+      BOOST_REQUIRE(eval.evaluate(a() * b() % 6));
+      BOOST_REQUIRE_EQUAL(eval.result<int>(), i * j % 6);
     }
   }
 
   eval.assign(b(), 0);
 
-  BOOST_CHECK(!eval.evaluate(a() % b()));
+  BOOST_REQUIRE(!eval.evaluate(a() % b()));
 }
 
 BOOST_AUTO_TEST_CASE(divide) {
@@ -378,15 +378,15 @@ BOOST_AUTO_TEST_CASE(divide) {
     eval.assign(a(), cnt * cnt);
     eval.assign(b(), cnt + cnt);
 
-    BOOST_CHECK(eval.evaluate(a() / b()));
-    BOOST_CHECK_EQUAL(eval.result<short>(), (cnt * cnt) / (cnt + cnt));
+    BOOST_REQUIRE(eval.evaluate(a() / b()));
+    BOOST_REQUIRE_EQUAL(eval.result<short>(), (cnt * cnt) / (cnt + cnt));
 
-    BOOST_CHECK(eval.evaluate(a() % b()));
-    BOOST_CHECK_EQUAL(eval.result<short>(), (cnt * cnt) % (cnt + cnt));
+    BOOST_REQUIRE(eval.evaluate(a() % b()));
+    BOOST_REQUIRE_EQUAL(eval.result<short>(), (cnt * cnt) % (cnt + cnt));
   }
 
   eval.assign(b(), 0u);
-  BOOST_CHECK(!eval.evaluate(a() / b()));
+  BOOST_REQUIRE(!eval.evaluate(a() / b()));
 }
 
 BOOST_AUTO_TEST_CASE(element_inside_set) {
@@ -400,13 +400,13 @@ BOOST_AUTO_TEST_CASE(element_inside_set) {
 
   eval.assign(x(), 1);
 
-  BOOST_CHECK(eval.evaluate(inside(x(), s)));
-  BOOST_CHECK(eval.result<bool>());
+  BOOST_REQUIRE(eval.evaluate(inside(x(), s)));
+  BOOST_REQUIRE(eval.result<bool>());
 
   eval.assign(x(), 5);
 
-  BOOST_CHECK(eval.evaluate(inside(x(), s)));
-  BOOST_CHECK(!eval.result<bool>());
+  BOOST_REQUIRE(eval.evaluate(inside(x(), s)));
+  BOOST_REQUIRE(!eval.result<bool>());
 }
 
 BOOST_AUTO_TEST_CASE(element_inside_vec) {
@@ -420,13 +420,13 @@ BOOST_AUTO_TEST_CASE(element_inside_vec) {
 
   eval.assign(x(), 7u);
 
-  BOOST_CHECK(eval.evaluate(inside(x(), v)));
-  BOOST_CHECK(eval.result<bool>());
+  BOOST_REQUIRE(eval.evaluate(inside(x(), v)));
+  BOOST_REQUIRE(eval.result<bool>());
 
   eval.assign(x(), 5u);
 
-  BOOST_CHECK(eval.evaluate(inside(x(), v)));
-  BOOST_CHECK(!eval.result<bool>());
+  BOOST_REQUIRE(eval.evaluate(inside(x(), v)));
+  BOOST_REQUIRE(!eval.result<bool>());
 }
 
 BOOST_AUTO_TEST_CASE(element_inside_array) {
@@ -440,13 +440,13 @@ BOOST_AUTO_TEST_CASE(element_inside_array) {
 
   eval.assign(x(), 9);
 
-  BOOST_CHECK(eval.evaluate(inside(x(), a)));
-  BOOST_CHECK(eval.result<bool>());
+  BOOST_REQUIRE(eval.evaluate(inside(x(), a)));
+  BOOST_REQUIRE(eval.result<bool>());
 
   eval.assign(x(), 5u);
 
-  BOOST_CHECK(eval.evaluate(inside(x(), a)));
-  BOOST_CHECK(!eval.result<bool>());
+  BOOST_REQUIRE(eval.evaluate(inside(x(), a)));
+  BOOST_REQUIRE(!eval.result<bool>());
 }
 
 BOOST_AUTO_TEST_CASE(element_inside_list) {
@@ -460,13 +460,13 @@ BOOST_AUTO_TEST_CASE(element_inside_list) {
 
   eval.assign(x(), 7u);
 
-  BOOST_CHECK(eval.evaluate(inside(x(), l)));
-  BOOST_CHECK(eval.result<bool>());
+  BOOST_REQUIRE(eval.evaluate(inside(x(), l)));
+  BOOST_REQUIRE(eval.result<bool>());
 
   eval.assign(x(), 5u);
 
-  BOOST_CHECK(eval.evaluate(inside(x(), l)));
-  BOOST_CHECK(!eval.result<bool>());
+  BOOST_REQUIRE(eval.evaluate(inside(x(), l)));
+  BOOST_REQUIRE(!eval.result<bool>());
 }
 
 BOOST_AUTO_TEST_CASE(element_not_inside) {
@@ -572,7 +572,7 @@ BOOST_AUTO_TEST_CASE(equal_t2) {
   eval.assign(b(), 2);
 
   BOOST_REQUIRE(eval.evaluate(a() == b()));
-  BOOST_CHECK(!eval.result<bool>());
+  BOOST_REQUIRE(!eval.result<bool>());
 }
 
 BOOST_AUTO_TEST_CASE(equal_t3) {
@@ -586,7 +586,7 @@ BOOST_AUTO_TEST_CASE(equal_t3) {
   eval.assign(c(), 3);
 
   BOOST_REQUIRE(eval.evaluate(a() + b() == c()));
-  BOOST_CHECK(eval.result<bool>());
+  BOOST_REQUIRE(eval.result<bool>());
 }
 
 BOOST_AUTO_TEST_SUITE_END()  // Evaluations

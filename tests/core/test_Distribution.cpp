@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(Variable_dist_t1) {
 BOOST_AUTO_TEST_CASE(variable_dist_t2) {
   Variable<int> v;
   Generator gen;
-  BOOST_CHECK_THROW(gen(dist(v, distribution<int>::create(range<int>(0, 10))(range<int>(50, 75))(range<int>(30, 51)))),
+  BOOST_REQUIRE_THROW(gen(dist(v, distribution<int>::create(range<int>(0, 10))(range<int>(50, 75))(range<int>(30, 51)))),
                     std::runtime_error);
 }
 
