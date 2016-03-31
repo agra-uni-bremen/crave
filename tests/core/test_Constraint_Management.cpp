@@ -131,7 +131,6 @@ class ItemPythagoras : public rand_obj {
  public:
   ItemPythagoras() : rand_obj(), a(this), b(this), c(this) {
     constraint("pythagoras", a() * a() + b() * b() == c() * c());
-    // constraint("div-zero", a() > 0 && b() > 0);
     constraint(a() > 0);
     constraint(b() > 0);
   }

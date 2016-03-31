@@ -36,22 +36,20 @@ BOOST_AUTO_TEST_CASE(fibo_test) {
   BOOST_REQUIRE_EQUAL(it.v[1], 1);
   for (uint i = 2; i < it.v.size(); i++) BOOST_REQUIRE_EQUAL(it.v[i], it.v[i - 1] + it.v[i - 2]);
 }
-/* TODO
+
 struct Item1 : public crv_sequence_item {
   Item1(crv_object_name) {}
 
-  crv_vector<unsigned int> u;
   crv_vector<unsigned int> v;
 };
 
-BOOST_TODO_AUTO_TEST_CASE(free_vector_testXYZ) {
+BOOST_AUTO_TEST_CASE(free_vector_test) {
   Item1 it{"item"};
   BOOST_REQUIRE(it.randomize());
-  BOOST_REQUIRE(it.u.size() == 0);
   BOOST_REQUIRE(it.v.size() > 0);
   for (uint i = 0; i < it.v.size(); i++) std::cout << it.v[i] << " ";
   std::cout << std::endl;
-}*/
+}
 
 struct Item2 : public crv_sequence_item {
   Item2(crv_object_name) {}
@@ -115,6 +113,7 @@ struct s_soft_unique_test : crv_sequence_item {
   crv_constraint con = {v().size() == 7, foreach (v(), v()[_i] < 6)};
   crv_soft_constraint con2 = {unique(v())};
 };
+
 BOOST_AUTO_TEST_CASE(soft_unique_test) {
   s_soft_unique_test item("item");
   BOOST_REQUIRE(item.randomize());

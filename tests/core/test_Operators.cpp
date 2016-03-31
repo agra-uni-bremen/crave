@@ -303,7 +303,7 @@ BOOST_AUTO_TEST_CASE(shiftleft) {
   gen(a < 256u)(b < (unsigned)(sizeof(unsigned) * 8u))(c == (a << b));
 
   int count = 0;
-  while (gen.next() && ++count < 500) {
+  while (gen.next() && ++count < 400) {
     unsigned av = gen[a];
     unsigned bv = gen[b];
     unsigned r = av << bv;
@@ -488,7 +488,6 @@ BOOST_AUTO_TEST_CASE(element_inside_array) {
   a[2] = 9;
 
   Variable<unsigned> x;
-  // unsigned y = a.begin();
   Generator gen;
   gen(inside(x, a));
 
@@ -499,14 +498,14 @@ BOOST_AUTO_TEST_CASE(element_inside_array) {
   gen(x != first);
 
   BOOST_REQUIRE(gen.next());
-  // BOOST_REQUIRE( find(a.begin(), a.end(), x) != a.end());
+  BOOST_REQUIRE(std::find(std::begin(a), std::end(a), gen[x]) != std::end(a));
 
   unsigned second = gen[x];
   BOOST_REQUIRE_NE(first, second);
   gen(x != second);
 
   BOOST_REQUIRE(gen.next());
-  // BOOST_REQUIRE( find(a.begin(), a.end(), x) != a.end());
+  BOOST_REQUIRE(std::find(std::begin(a), std::end(a), gen[x]) != std::end(a));
   unsigned third = gen[x];
   BOOST_REQUIRE_NE(third, second);
   BOOST_REQUIRE_NE(first, third);

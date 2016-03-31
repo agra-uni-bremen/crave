@@ -6,7 +6,6 @@ using namespace crave;
 BOOST_FIXTURE_TEST_SUITE(Syntax, Context_Fixture)
 
 BOOST_AUTO_TEST_CASE(constants) {
-  //  Generator<> gen;
   Variable<unsigned> x;
   check(x < 10);
   check(x == 100);

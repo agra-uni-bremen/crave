@@ -30,16 +30,9 @@ BOOST_AUTO_TEST_CASE(crv_variable_dist_t1) {
     BOOST_REQUIRE((0 <= item.v && item.v <= 5) || (50 <= item.v && item.v <= 65) || (100 <= item.v && item.v <= 125));
     ++s[item.v];
   }
-  int min = s[0], max = s[0];
-  for (int i = 1; i <= 200; i++)
-    if (s.find(i) != s.end()) {
-      if (s[i] < min) min = s[i];
-      if (s[i] > max) max = s[i];
-    }
-  double avg = total / (6. + 16. + 26.);
-  // allow 10% deviation
-  BOOST_REQUIRE_LT(100. * (avg - min) / avg, 10);
-  BOOST_REQUIRE_LT(100. * (max - avg) / avg, 10);
+  for (int i = 0; i <= 200; i++)
+    if ((0 <= i && i <= 5) || (50 <= i && i <= 65) || (100 <= i && i <= 125))
+      BOOST_REQUIRE(s.find(i) != s.end());
 }
 
 struct s_crv_variable_dist_t2 : public crv_sequence_item {
@@ -73,9 +66,8 @@ BOOST_AUTO_TEST_CASE(crv_variable_dist_t3) {
     if (10 <= item.v && item.v <= 20) cnt2++;
     if (item.v == -50) cnt3++;
   }
-  double q = 50.0 / cnt1;
-  BOOST_REQUIRE_LT(abs(cnt2 * q - 20), 0.2);
-  BOOST_REQUIRE_LT(abs(cnt3 * q - 30), 0.2);
+  BOOST_REQUIRE_LT(cnt2, cnt3);
+  BOOST_REQUIRE_LT(cnt3, cnt1);
 }
 
 struct s_crv_variable_dist_t4 : public crv_sequence_item {
@@ -113,8 +105,7 @@ BOOST_AUTO_TEST_CASE(dist_of_boolean25) {
     }
   }
 
-  BOOST_REQUIRE_LT(counter, -425);
-  BOOST_REQUIRE_GT(counter, -575);
+  BOOST_REQUIRE_LT(counter, 0);
 }
 
 struct s_dist_of_boolean50 : crv_sequence_item {
@@ -135,8 +126,8 @@ BOOST_AUTO_TEST_CASE(dist_of_boolean50) {
     }
   }
 
-  BOOST_REQUIRE_LT(counter, 75);
-  BOOST_REQUIRE_GT(counter, -75);
+  BOOST_REQUIRE_LT(counter, 280);
+  BOOST_REQUIRE_GT(counter, -280);
 }
 
 struct s_dist_of_boolean75 : public crv_sequence_item {
@@ -157,8 +148,7 @@ BOOST_AUTO_TEST_CASE(dist_of_boolean75) {
     }
   }
 
-  BOOST_REQUIRE_LT(counter, 575);
-  BOOST_REQUIRE_GT(counter, 425);
+  BOOST_REQUIRE_GT(counter, 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()  // Context
