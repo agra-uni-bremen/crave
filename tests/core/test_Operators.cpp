@@ -259,26 +259,7 @@ BOOST_AUTO_TEST_CASE(bitwise_or_t1) {
   BOOST_REQUIRE_EQUAL(gen[c], 1339);
 }
 
-BOOST_AUTO_TEST_CASE(xor_t1) {
-  Variable<bool> a;
-  Variable<bool> b;
-  Variable<unsigned int> c;
-  Generator gen(a == false);
-  gen(b == false);
-  gen(c == (a ^ b));
-
-  BOOST_REQUIRE(gen.next());
-  BOOST_REQUIRE_EQUAL(gen[c] != 0, false);
-
-  Generator gen2(a == false);
-  gen2(b == true);
-  gen2(c == (a ^ b));
-
-  BOOST_REQUIRE(gen2.next());
-  BOOST_REQUIRE_EQUAL(gen2[c] != 0, true);
-}
-
-BOOST_AUTO_TEST_CASE(xor_t2) {
+BOOST_AUTO_TEST_CASE(bitwise_xor_t1) {
   Variable<unsigned int> a;
   Variable<unsigned int> b;
   Variable<unsigned int> c;

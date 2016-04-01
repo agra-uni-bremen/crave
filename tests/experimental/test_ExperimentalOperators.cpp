@@ -211,39 +211,17 @@ BOOST_AUTO_TEST_CASE(bitwise_or_t1) {
   BOOST_REQUIRE_EQUAL(item.c, 1339);
 }
 
-struct xor_s1 : crv_sequence_item {
-  crv_variable<bool> a;
-  crv_variable<bool> b;
-  crv_variable<unsigned> c;
-  crv_constraint con1 = {a() == false, b() == false, c() == (a() ^ b())};
-  crv_constraint con2 = {a() == false, b() == true, c() == (a() ^ b())};
-
-  xor_s1(crv_object_name) { con2.deactivate(); }
-};
-
-BOOST_AUTO_TEST_CASE(xor_t1) {
-  xor_s1 item("item");
-  BOOST_REQUIRE(item.con1.active());
-  BOOST_REQUIRE(!item.con2.active());
-  BOOST_REQUIRE(item.randomize());
-  BOOST_REQUIRE_EQUAL(item.c != 0, false);
-  item.con1.deactivate();
-  item.con2.activate();
-  BOOST_REQUIRE(item.randomize());
-  BOOST_REQUIRE_EQUAL(item.c != 0, true);
-}
-
-struct xor_s2 : crv_sequence_item {
+struct xor_s : crv_sequence_item {
   crv_variable<unsigned> a;
   crv_variable<unsigned> b;
   crv_variable<unsigned> c;
-  crv_constraint con1 = {a() == 65535, b() == 4080, c() == (a() ^ b())};
+  crv_constraint con = {a() == 65535, b() == 4080, c() == (a() ^ b())};
 
-  xor_s2(crv_object_name) {}
+  xor_s(crv_object_name) {}
 };
 
-BOOST_AUTO_TEST_CASE(xor_t2) {
-  xor_s2 item("item");
+BOOST_AUTO_TEST_CASE(bitwise_xor_t1) {
+  xor_s item("item");
   BOOST_REQUIRE(item.randomize());
   BOOST_REQUIRE_EQUAL(item.c, 61455);
 }
