@@ -1,5 +1,7 @@
 #include "../crave/backend/VectorGenerator.hpp"
 
+#include <string>
+
 namespace crave {
 VectorSolver::VectorSolver(int vector_id)
     : constraints_(), vector_id_(vector_id), solver_(FactoryMetaSMT::getNewInstance()), vec_elements_() {}
@@ -7,16 +9,29 @@ VectorSolver::VectorSolver(int vector_id)
 void VectorSolver::addConstraint(VectorConstraintPtr vc) { constraints_.push_back(vc); }
 
 bool VectorSolver::solve(const VariableGenerator& var_gen) {
+  std::string cstr_name_list;
+  BOOST_FOREACH(VectorConstraintPtr constraint, constraints_) {
+    cstr_name_list += " " + constraint->name();
+  }
+  LOG(INFO) << "Solve constraints of vector " << vector_id_ << " [" << cstr_name_list << "]";
+
   __rand_vec_base* vector = vectorBaseMap[vector_id_];
 
   unsigned int size = default_rand_vec_size();
   if (!var_gen.read(vector->size_var(), &size)) {
     LOG(INFO) << "Use default size for vector " << vector_id_;
+  } else {
+    LOG(INFO) << "Size of vector " << vector_id_ << " = " << size;
   }
   resetSolver(size);
   bool result = solver_->solve(false) || solver_->solve(true);
-  if (result) solver_->readVector(vec_elements_, vector);
-
+  if (result) {
+    solver_->readVector(vec_elements_, vector);
+    LOG(INFO) << "Done solving vector " << vector_id_;
+  }
+  else {
+    LOG(INFO) << "Failed solving vector " << vector_id_;
+  }
   return result;
 }
 
@@ -73,9 +88,12 @@ bool VectorGenerator::solve(const VariableGenerator& var_gen, const std::set<int
     if (vector_solvers_.find(id) != vector_solvers_.end()) continue;
     // unconstrained vector
     __rand_vec_base* vector = vectorBaseMap[id];
+    LOG(INFO) << "Generate unconstrained vector " << id;
     unsigned int size = default_rand_vec_size();
     if (!var_gen.read(vector->size_var(), &size)) {
       LOG(INFO) << "Use default size for vector " << id;
+    } else {
+      LOG(INFO) << "Size of vector " << id << " = " << size;
     }
     vector->gen_values(size);
   }

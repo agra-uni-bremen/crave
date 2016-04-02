@@ -80,8 +80,11 @@ void VariableDefaultSolver::analyseConstraints() {
 }
 
 bool VariableDefaultSolver::solve() {
-  if (!contradictions_.empty()) return false;
-
+  LOG(INFO) << "Solve constraints in partition " << constr_pttn_;
+  if (!contradictions_.empty()) {
+    LOG(INFO) << "Failed because partition has been analyzed to be unsolvable";
+    return false;
+  }
   BOOST_FOREACH(VariableContainer::WriteRefPair & pair, var_ctn_.write_references) {
     int id = pair.first;
     if (bdd_solvers_.find(id) == bdd_solvers_.end()) continue;
@@ -117,8 +120,10 @@ bool VariableDefaultSolver::solve() {
     BOOST_FOREACH(VariableContainer::WriteRefPair & pair, var_ctn_.write_references) {
       solver_->read(*var_ctn_.variables[pair.first], *pair.second);
     }
+    LOG(INFO) << "Done solving partition " << constr_pttn_;
     return true;
   }
+  LOG(INFO) << "Failed due to conflict with read references";
   return false;
 }
 
