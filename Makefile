@@ -32,7 +32,7 @@ distclean:
 
 .PHONY: doxygen
 doxygen:
-	 doxygen Doxyfile
+	doxygen doc/Doxyfile
 
 .PHONY: lcov_with_bc
 lcov_with_bc:
