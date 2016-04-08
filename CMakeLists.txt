@@ -4,30 +4,6 @@ cmake_minimum_required(VERSION 2.8.9)
 set(${PROJECT_NAME}_CONFIG_DIR "share/${PROJECT_NAME}" CACHE PATH 
   "where to install CMake and Make Config files")
 
-SET( CMAKE_CXX_FLAGS_PROFILING "-O0 -g -Wall -fprofile-arcs -ftest-coverage" CACHE STRING
-  "Flags used by the C++ compiler during maintainer builds."
-  FORCE )
-SET( CMAKE_C_FLAGS_PROFILING "-O0 -g -Wall -fprofile-arcs -ftest-coverage" CACHE STRING
-  "Flags used by the C compiler during maintainer builds."
-  FORCE )
-SET( CMAKE_EXE_LINKER_FLAGS_PROFILING
-  "-fprofile-arcs -ftest-coverage" CACHE STRING
-  "Flags used for linking binaries during maintainer builds."
-  FORCE )
-SET( CMAKE_SHARED_LINKER_FLAGS_PROFILING
-  "-fprofile-arcs -ftest-coverage" CACHE STRING
-  "Flags used by the shared libraries linker during maintainer builds."
-  FORCE )
-MARK_AS_ADVANCED(
-  CMAKE_CXX_FLAGS_PROFILING
-  CMAKE_C_FLAGS_PROFILING
-  CMAKE_EXE_LINKER_FLAGS_PROFILING
-  CMAKE_SHARED_LINKER_FLAGS_PROFILING )
-# Update the documentation string of CMAKE_BUILD_TYPE for GUIs
-SET( CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING
-  "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel Profiling."
-  FORCE )
-
 ############################################################
 ##                CRAVE settings                          ##
 ############################################################
@@ -36,14 +12,6 @@ option(CRAVE_ENABLE_EXPERIMENTAL "enable experimental extensions of CRAVE" on)
 
 if (CRAVE_ENABLE_EXPERIMENTAL)
   add_definitions(-std=c++11)
-endif()
-
-option(CRAVE_ENABLE_COVERAGE "enable code coverage for CRAVE tests" off)  
-
-if (CRAVE_ENABLE_COVERAGE)
-  add_definitions(--coverage)
-  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fprofile-arcs -ftest-coverage")
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs -ftest-coverage") 
 endif()
 
 if (metaSMT_USE_Boolector)
@@ -209,4 +177,32 @@ set(CPACK_SOURCE_IGNORE_FILES
 "~$"
 )
 include(CPack)
+
+############################################################
+##                CMAKE flags settings                    ##
+############################################################
+
+SET( CMAKE_CXX_FLAGS_PROFILING "-O0 -g -Wall -Werror -Wextra -pedantic -fprofile-arcs -ftest-coverage" CACHE STRING
+  "Flags used by the C++ compiler during maintainer builds."
+  FORCE )
+SET( CMAKE_C_FLAGS_PROFILING "-O0 -g -Wall -Werror -Wextra -pedantic -fprofile-arcs -ftest-coverage" CACHE STRING
+  "Flags used by the C compiler during maintainer builds."
+  FORCE )
+SET( CMAKE_EXE_LINKER_FLAGS_PROFILING
+  "-fprofile-arcs -ftest-coverage" CACHE STRING
+  "Flags used for linking binaries during maintainer builds."
+  FORCE )
+SET( CMAKE_SHARED_LINKER_FLAGS_PROFILING
+  "-fprofile-arcs -ftest-coverage" CACHE STRING
+  "Flags used by the shared libraries linker during maintainer builds."
+  FORCE )
+MARK_AS_ADVANCED(
+  CMAKE_CXX_FLAGS_PROFILING
+  CMAKE_C_FLAGS_PROFILING
+  CMAKE_EXE_LINKER_FLAGS_PROFILING
+  CMAKE_SHARED_LINKER_FLAGS_PROFILING )
+# Update the documentation string of CMAKE_BUILD_TYPE for GUIs
+SET( CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING
+  "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel Profiling."
+  FORCE )
   
