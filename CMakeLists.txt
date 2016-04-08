@@ -176,24 +176,25 @@ set(CPACK_SOURCE_IGNORE_FILES
 "^${PROJECT_SOURCE_DIR}/lcov_output"
 "~$"
 )
+
 include(CPack)
 
 ############################################################
 ##                CMAKE flags settings                    ##
 ############################################################
 
-SET( CMAKE_CXX_FLAGS_PROFILING "-O0 -g -Wall -Werror -Wextra -pedantic -fprofile-arcs -ftest-coverage" CACHE STRING
+SET( CMAKE_CXX_FLAGS_PROFILING "-O0 -g -Wall -Werror -Wextra -pedantic --coverage" CACHE STRING
   "Flags used by the C++ compiler during maintainer builds."
   FORCE )
-SET( CMAKE_C_FLAGS_PROFILING "-O0 -g -Wall -Werror -Wextra -pedantic -fprofile-arcs -ftest-coverage" CACHE STRING
+SET( CMAKE_C_FLAGS_PROFILING "${CMAKE_CXX_FLAGS_PROFILING}" CACHE STRING
   "Flags used by the C compiler during maintainer builds."
   FORCE )
 SET( CMAKE_EXE_LINKER_FLAGS_PROFILING
-  "-fprofile-arcs -ftest-coverage" CACHE STRING
+  "--coverage" CACHE STRING
   "Flags used for linking binaries during maintainer builds."
   FORCE )
 SET( CMAKE_SHARED_LINKER_FLAGS_PROFILING
-  "-fprofile-arcs -ftest-coverage" CACHE STRING
+  " --coverage" CACHE STRING
   "Flags used by the shared libraries linker during maintainer builds."
   FORCE )
 MARK_AS_ADVANCED(
