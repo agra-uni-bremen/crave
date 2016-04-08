@@ -2,6 +2,7 @@
 SRC_DIR=$( cd $(dirname $0) && pwd)
 
 BUILD_DIR=$PWD/build
+DEPS=$PWD/deps
 
 BOOST=boost-1_50_0
 GLOG=glog-svn
@@ -12,7 +13,7 @@ MINISAT=minisat-git
 LINGELING=lingeling-ayv-86bf266-140429
 BOOLECTOR=boolector-2.2.0
 Z3=Z3-git
-CVC4=cvc4-1.4
+CVC4=cvc4-unstable
 
 CMAKE=cmake
 BUILD_CMAKE="no"
