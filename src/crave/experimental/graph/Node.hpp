@@ -27,14 +27,14 @@ struct Node {
 
   virtual const char* obj_kind() const = 0;
   virtual void accept(NodeVisitor&) = 0;
-
+  virtual ~Node(){}
  protected:
   const char* m_name;
 };
 
 struct Terminal : Node {
   Terminal(const char* name) : Node(name) {}
-
+  virtual ~Terminal(){}
   virtual const char* obj_kind() const { return "Terminal"; }
   virtual void accept(NodeVisitor& v);
 };
@@ -47,6 +47,7 @@ struct NonTerminal : Node {
 struct Selector : NonTerminal {
   virtual const char* obj_kind() const { return "Selector"; }
   virtual void accept(NodeVisitor& v);
+  virtual ~Selector(){}
 };
 
 struct Sequence : NonTerminal {
