@@ -23,7 +23,7 @@ class crv_sequence_item : public crv_object {
  public:
   crv_sequence_item() : gen_(), built_(false), cloned_(false) {}
 
-  crv_sequence_item(crv_sequence_item const & other) : gen_(), built_(false), cloned_(true), crv_object(other) {}
+  crv_sequence_item(crv_sequence_item const & other) : crv_object(other), gen_(), built_(false), cloned_(true) {}
 
   std::string obj_kind() const override final { return "crv_sequence_item"; }
 
