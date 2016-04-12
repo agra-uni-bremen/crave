@@ -53,7 +53,7 @@ class crv_variable_base : public crv_variable_base_ {
  protected:
   crv_variable_base() : var(&value), ref(value), value(), bound_var() {}
   crv_variable_base(const crv_variable_base& other)
-      : var(&value), ref(value), value(other.value), bound_var(other.bound_var), crv_variable_base_(other) {}
+      : crv_variable_base_(other), var(&value), ref(value), value(other.value), bound_var(other.bound_var) {}
 
   T actual_value() const { return bound_var ? bound_var->value : value; }
 
