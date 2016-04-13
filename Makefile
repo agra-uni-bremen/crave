@@ -8,8 +8,8 @@ endif
 ${MAKECMDGOALS}: ${BUILD}/Makefile
 	@${MAKE} -q -s -C ${BUILD}  ${MAKECMDGOALS}|| ${MAKE} -s -C ${BUILD} ${MAKECMDGOALS}
 
+BOOSTRAP_ARGS := --systemc -b cudd -b sword -b boolector
 
-BOOSTRAP_ARGS :=
 ifdef CMAKE
   BOOSTRAP_ARGS += --cmake=${CMAKE}
 endif
@@ -19,7 +19,7 @@ ifdef CACHE
 endif
 
 ${BUILD}/Makefile:
-	./bootstrap.sh -d ${SRCDIR}/deps --systemc -b cudd -b sword -b boolector ${BUILD} ${BOOSTRAP_ARGS}
+	./bootstrap.sh -d ${SRCDIR}/deps ${BUILD} ${BOOSTRAP_ARGS}
 
 .PHONY: update
 update:
