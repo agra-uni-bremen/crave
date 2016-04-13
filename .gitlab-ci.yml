@@ -1,5 +1,5 @@
 before_script:
-- ./show_linux_distribution.sh
+- scripts/show_linux_distribution.sh
 - git submodule update --init
 - ln -s /home/radames/software/crave-bundle/deps deps
 - NUM_JOBS=$[`nproc`-1]
@@ -15,16 +15,15 @@ build_default:
 build_release:
   script: 
   - ./bootstrap.sh -d deps -m RELEASE --systemc -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
-  - cd build
   - make -j $NUM_JOBS
-  - ctest --schedule-random
+  - make test
   tags:
   - linux
   allow_failure: true
 
 build_boolector:
   script: 
-  - ./bootstrap.sh -d deps --systemc -b boolector -b cudd  build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
+  - ./bootstrap.sh -d deps --systemc -b boolector -b cudd build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
   - make -j $NUM_JOBS
   - ctest --schedule-random -j $NUM_JOBS
