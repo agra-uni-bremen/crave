@@ -1,5 +1,6 @@
 SRCDIR:=$(shell pwd)
 BUILD:=$(SRCDIR)/build
+LCOVDIR:=$(BUILD)/lcov_output
 
 ifndef MAKECMDGOALS
 MAKECMDGOALS=all
@@ -36,15 +37,15 @@ doxygen:
 
 .PHONY: lcov_with_bc
 lcov_with_bc:
-	@rm lcov_output -Rf
-	@mkdir lcov_output
-	@lcov --quiet --capture --rc lcov_branch_coverage=1 --directory ${BUILD} --base-directory ${SRCDIR}/src --no-external --output-file lcov_output/coverage.info
-	@genhtml lcov_output/coverage.info --branch-coverage --output-directory lcov_output
+	@rm ${LCOVDIR} -Rf
+	@mkdir ${LCOVDIR}
+	@lcov --quiet --capture --rc lcov_branch_coverage=1 --directory ${BUILD} --base-directory ${SRCDIR}/src --no-external --output-file ${LCOVDIR}/coverage.info
+	@genhtml ${LCOVDIR}/coverage.info --branch-coverage --output-directory ${LCOVDIR}
 
 .PHONY: lcov
 lcov:
-	@rm lcov_output -Rf
-	@mkdir lcov_output
-	@lcov --quiet --capture --directory ${BUILD} --base-directory ${SRCDIR}/src --no-external --output-file lcov_output/coverage.info
-	@genhtml lcov_output/coverage.info --output-directory lcov_output
+	@rm ${LCOVDIR} -Rf
+	@mkdir ${LCOVDIR}
+	@lcov --quiet --capture --directory ${BUILD} --base-directory ${SRCDIR}/src --no-external --output-file ${LCOVDIR}/coverage.info
+	@genhtml ${LCOVDIR}/coverage.info --output-directory ${LCOVDIR}
 
