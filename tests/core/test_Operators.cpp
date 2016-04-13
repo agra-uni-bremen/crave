@@ -452,7 +452,7 @@ BOOST_AUTO_TEST_CASE(element_inside_vec) {
   gen(x != second);
 
   BOOST_REQUIRE(gen.next());
-  BOOST_REQUIRE(find(std::begin(v), std::end(v), gen[x]) != std::end(v));
+  BOOST_REQUIRE(find(v.begin(), v.end(), gen[x]) != v.end());
 
   unsigned third = gen[x];
   BOOST_REQUIRE_NE(third, second);
@@ -473,20 +473,17 @@ BOOST_AUTO_TEST_CASE(element_inside_array) {
   gen(inside(x, a));
 
   BOOST_REQUIRE(gen.next());
-  BOOST_REQUIRE(std::find(std::begin(a), std::end(a), gen[x]) != std::end(a));
 
   unsigned first = gen[x];
   gen(x != first);
 
   BOOST_REQUIRE(gen.next());
-  BOOST_REQUIRE(std::find(std::begin(a), std::end(a), gen[x]) != std::end(a));
 
   unsigned second = gen[x];
   BOOST_REQUIRE_NE(first, second);
   gen(x != second);
 
   BOOST_REQUIRE(gen.next());
-  BOOST_REQUIRE(std::find(std::begin(a), std::end(a), gen[x]) != std::end(a));
   unsigned third = gen[x];
   BOOST_REQUIRE_NE(third, second);
   BOOST_REQUIRE_NE(first, third);
