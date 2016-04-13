@@ -45,9 +45,9 @@ echo
 echo "#################################################################"
 echo "Information:"
 echo
-./show_gits_summary.sh
+scripts/show_gits_summary.sh
 echo
-./show_linux_distribution.sh
+scripts/show_linux_distribution.sh
 echo 
 echo "Environment variables"
 echo "CC: $CC"
