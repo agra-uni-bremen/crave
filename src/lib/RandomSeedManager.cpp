@@ -3,7 +3,7 @@
 #include <boost/foreach.hpp>
 #include <boost/functional/hash.hpp>
 
-RandomSeedManager::RandomSeedManager(unsigned int seed) : seed_(seed), default_rng_(seed) {}
+RandomSeedManager::RandomSeedManager(unsigned int seed) : default_rng_(seed), seed_(seed) {}
 
 RandomSeedManager::~RandomSeedManager() {
   BOOST_FOREACH(random_map_t::value_type & entry, randomMap_) { delete entry.second; }

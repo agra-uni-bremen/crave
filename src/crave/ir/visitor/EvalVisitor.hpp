@@ -15,7 +15,7 @@ class EvalVisitor : NodeVisitor {
   typedef std::pair<Constant, bool> stack_entry;
 
  public:
-  typedef std::map<int, Constant> eval_map;
+  typedef std::map<unsigned int, Constant> eval_map;
 
   explicit EvalVisitor(eval_map* m) : NodeVisitor(), exprStack_(), evalMap_(m), result_() {}
 
