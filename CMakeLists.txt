@@ -167,15 +167,17 @@ set(CPACK_SOURCE_IGNORE_FILES
 "/deps.*/"
 "/build.*/"
 "/root.*/"
-"^${PROJECT_SOURCE_DIR}/logs"
-"^${PROJECT_SOURCE_DIR}/crave.cfg"
-"^${PROJECT_SOURCE_DIR}/temp*"
-"^${PROJECT_SOURCE_DIR}/tmp*"
-"^${PROJECT_SOURCE_DIR}/Makefile.local"
-"^${PROJECT_SOURCE_DIR}/coverage.log"
-"^${PROJECT_SOURCE_DIR}/lcov_output"
+"/crave-doxygen/"
+"/logs/"
+"crave.cfg"
+"jenkins_run_crave_check.sh"
 "~$"
+"^${PROJECT_SOURCE_DIR}/scripts/"
 )
+
+if (NOT CRAVE_ENABLE_EXPERIMENTAL)
+  LIST(APPEND CPACK_SOURCE_IGNORE_FILES "crave/experimental/" "lib/experimental")
+endif()
 
 include(CPack)
 
