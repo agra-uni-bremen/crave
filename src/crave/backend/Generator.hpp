@@ -35,7 +35,7 @@ struct Generator {
     (*this)(expr);
   }
 
-  ~Generator() { delete var_gen_; }
+  virtual ~Generator() { delete var_gen_; }
 
   void enable_multithreading();
 

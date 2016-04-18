@@ -13,6 +13,7 @@ struct VariableCoverageSolver : VariableSolver {
   VariableCoverageSolver(const VariableContainer& vcon, const ConstraintPartition& cp);
 
   virtual bool solve();
+  virtual ~VariableCoverageSolver(){}
 
  private:
   std::set<std::string> covered_set_;

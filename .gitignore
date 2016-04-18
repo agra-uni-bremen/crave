@@ -1,6 +1,9 @@
-build
+build*/
 deps
 *~
 *.swp
-lcov_output
-logs
+*.cfg
+lcov_output/
+logs/
+doc/crave-doxygen/
+

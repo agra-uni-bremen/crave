@@ -17,6 +17,8 @@ struct VariableGenerator {
   typedef boost::shared_ptr<VariableSolver> VarSolverPtr;
 
   explicit VariableGenerator(const VariableContainer& vcon);
+  
+  virtual ~VariableGenerator(){}
 
   virtual void reset(std::vector<ConstraintPartition>& partitions);
 
