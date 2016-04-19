@@ -54,8 +54,7 @@ BOOST_AUTO_TEST_CASE(t_rand_enum) {
 }
 
 BOOST_AUTO_TEST_CASE(t_rand_enum_standalone) {
-  randv<color_enum>* color;
-  BOOST_REQUIRE_THROW(color = new randv<color_enum>(0), std::runtime_error);
+  BOOST_REQUIRE_THROW(new randv<color_enum>(0), std::runtime_error);
 }
 
 class tall_rand_enum_obj : public rand_obj {

@@ -123,8 +123,7 @@ class Item1 : public rand_obj {
 };
 
 BOOST_AUTO_TEST_CASE(t2) {
-  Item1* it;
-  BOOST_REQUIRE_THROW(it = new Item1, std::runtime_error);
+  BOOST_REQUIRE_THROW(new Item1, std::runtime_error);
 }
 
 class ItemPythagoras : public rand_obj {
