@@ -173,6 +173,8 @@ set(CPACK_SOURCE_IGNORE_FILES
 "jenkins_run_crave_check.sh"
 "~$"
 "^${PROJECT_SOURCE_DIR}/scripts/"
+"^${PROJECT_SOURCE_DIR}/crave.*"
+"^${PROJECT_SOURCE_DIR}/.*.user"
 )
 
 if (NOT CRAVE_ENABLE_EXPERIMENTAL)
