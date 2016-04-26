@@ -47,7 +47,7 @@ class crv_variable_base : public crv_variable_base_ {
   unsigned id() override { return var.id(); }
   void bind(crv_variable_base& other) { bound_var = &other; }
   void unbind() { bound_var = nullptr; }
-  expression bound_expr() { return bound_var ? make_expression(var == bound_var->var) : value_to_expression(true); }
+  expression bound_expr() override { return bound_var ? make_expression(var == bound_var->var) : value_to_expression(true); }
   Constant constant_expr() override { return to_constant_expr<T>()(actual_value()); }
 
  protected:

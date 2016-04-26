@@ -117,12 +117,12 @@ BOOST_AUTO_TEST_CASE(randv_sc_dt_op_support_t) {
   1 * a;
   1 / a;
   1 % a;
-  1 == a;
-  1 != a;
-  1 < a;
-  1 <= a;
-  1 > a;
-  1 >= a;
+  BOOST_CHECK(1 == a);
+  BOOST_CHECK(!(1 != a));
+  BOOST_CHECK(!(1 < a));
+  BOOST_CHECK(1 <= a);
+  BOOST_CHECK(!(1 > a));
+  BOOST_CHECK(1 >= a);
   1 & a;
   1 | a;
   1 ^ a;
@@ -137,12 +137,12 @@ BOOST_AUTO_TEST_CASE(randv_sc_dt_op_support_t) {
   1 * b;
   1 / b;
   1 % b;
-  1 == b;
-  1 != b;
-  1 < b;
-  1 <= b;
-  1 > b;
-  1 >= b;
+  BOOST_CHECK(1 == b);
+  BOOST_CHECK(!(1 != b));
+  BOOST_CHECK(!(1 < b));
+  BOOST_CHECK(1 <= b);
+  BOOST_CHECK(!(1 > b));
+  BOOST_CHECK(1 >= b);
   1 & b;
   1 | b;
   1 ^ b;
@@ -152,22 +152,22 @@ BOOST_AUTO_TEST_CASE(randv_sc_dt_op_support_t) {
   b << a;
   b >> a;
 
-  b == a;
-  b != a;
-  b < a;
-  b <= a;
-  b > a;
-  b >= a;
+  BOOST_CHECK(b == a);
+  BOOST_CHECK(!(b != a));
+  BOOST_CHECK(!(b < a));
+  BOOST_CHECK(b <= a);
+  BOOST_CHECK(!(b > a));
+  BOOST_CHECK(b >= a);
   a + b;
   a - b;
   a* b;
   a / b;
   a % b;
 
-  1 == c;
-  1 != c;
-  c == 1;
-  c != 1;
+  BOOST_CHECK(1 == c);
+  BOOST_CHECK(!(1 != c));
+  BOOST_CHECK(c == 1);
+  BOOST_CHECK(!(c != 1));
 }
 
 BOOST_AUTO_TEST_SUITE_END()  // SystemC_Data

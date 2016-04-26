@@ -70,7 +70,7 @@ struct to_constant_expr<T, typename boost::enable_if<is_sysc_dt<T> >::type> {
   RANDV_SCDT_BINARY_OPERATOR(Typename, <= );
 
 template <int N>
-class randv<sc_dt::sc_bv<N> > : public randv_base<sc_dt::sc_bv<N> > {
+struct randv<sc_dt::sc_bv<N> > : public randv_base<sc_dt::sc_bv<N> > {
   typedef sc_dt::sc_bv<N> sc_bv;
   RANDV_COMMON_INTERFACE(sc_bv);
   RANDV_SCDT_PRIM_INTERFACE(sc_bv);
@@ -79,7 +79,7 @@ RANDV_SCDT_BINARY_OPERATOR(sc_dt::sc_bv, == );
 RANDV_SCDT_BINARY_OPERATOR(sc_dt::sc_bv, != );
 
 template <int N>
-class randv<sc_dt::sc_int<N> > : public randv_base<sc_dt::sc_int<N> > {
+struct randv<sc_dt::sc_int<N> > : public randv_base<sc_dt::sc_int<N> > {
   typedef sc_dt::sc_int<N> sc_int;
   RANDV_COMMON_INTERFACE(sc_int);
   RANDV_ARITHMETIC_INTERFACE(sc_int);
@@ -90,7 +90,7 @@ RANDV_SCDT_VALUE_OPERATORS(sc_dt::sc_int);
 RANDV_SCDT_COMPARISON_OPERATORS(sc_dt::sc_int);
 
 template <int N>
-class randv<sc_dt::sc_uint<N> > : public randv_base<sc_dt::sc_uint<N> > {
+struct randv<sc_dt::sc_uint<N> > : public randv_base<sc_dt::sc_uint<N> > {
   typedef sc_dt::sc_uint<N> sc_uint;
   RANDV_COMMON_INTERFACE(sc_uint);
   RANDV_ARITHMETIC_INTERFACE(sc_uint);

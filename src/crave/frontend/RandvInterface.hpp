@@ -92,7 +92,7 @@ namespace crave {
   }
 
 template <>
-class randv<bool> : public randv_base<bool> {
+struct randv<bool> : public randv_base<bool> {
   RANDV_COMMON_INTERFACE(bool);
   RANDV_PRIM_INTERFACE(bool);
   RANDV_BITWISE_INTERFACE(bool);
@@ -101,7 +101,7 @@ class randv<bool> : public randv_base<bool> {
 // for all C/C++ built-in integer types
 #define RANDV_INTEGER_TYPE(typename)                    \
   template <>                                           \
-  class randv<typename> : public randv_base<typename> { \
+  struct randv<typename> : public randv_base<typename> { \
     RANDV_COMMON_INTERFACE(typename);                   \
     RANDV_PRIM_INTERFACE(typename);                     \
     RANDV_ARITHMETIC_INTERFACE(typename);               \
