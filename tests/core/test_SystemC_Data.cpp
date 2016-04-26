@@ -164,10 +164,10 @@ BOOST_AUTO_TEST_CASE(randv_sc_dt_op_support_t) {
   a / b;
   a % b;
 
-  BOOST_CHECK(1 == c);
-  BOOST_CHECK(!(1 != c));
-  BOOST_CHECK(c == 1);
-  BOOST_CHECK(!(c != 1));
+  BOOST_CHECK(!(1 == c));
+  BOOST_CHECK(1 != c);
+  BOOST_CHECK(!(c == 1));
+  BOOST_CHECK(c != 1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()  // SystemC_Data
