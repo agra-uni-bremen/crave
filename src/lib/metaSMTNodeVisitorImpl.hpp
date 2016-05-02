@@ -689,7 +689,6 @@ bool metaSMTVisitorImpl<SolverType>::read(Node const &v, std::string &str) {
 
 template <typename SolverType>
 bool metaSMTVisitorImpl<SolverType>::readVector(const std::vector<VariablePtr> &vec, __rand_vec_base *rand_vec) {
-  unsigned int i = 0;
   std::vector<std::string> sv;
   BOOST_FOREACH(VariablePtr var, vec) {
     typename result_map::const_iterator ite(terminals_.find(var->id()));
