@@ -385,8 +385,8 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
   template <typename Integer1, typename Integer2, typename Integer3>
   result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_bitslice>::type const& tag,
                          Integer1 const& r, Integer2 const& l, WriteReference<Integer3> const& var_term) {
-    int rb = boost::proto::value(r);
-    int lb = boost::proto::value(l);
+    unsigned int rb = boost::proto::value(r);
+    unsigned int lb = boost::proto::value(l);
     if ((rb < lb) || (rb >= bitsize_traits<Integer3>::value)) {
       throw std::runtime_error("Invalid range of bitslice");
     }
