@@ -8,28 +8,18 @@ namespace crave {
 
 class crv_constraint_base : public crv_object {
  protected:
-  crv_constraint_base() : active_(true) {}
+  crv_constraint_base();
 
  public:
   virtual expression_list const& expr_list() const = 0;
 
-  std::string obj_kind() const override final { return "crv_constraint"; }
+  std::string obj_kind() const override final;
 
-  void activate() {
-    if (!active_) {
-      active_ = true;
-      request_rebuild();
-    }
-  }
+  void activate();
 
-  void deactivate() {
-    if (active_) {
-      active_ = false;
-      request_rebuild();
-    }
-  }
+  void deactivate();
 
-  bool active() const { return active_; }
+  bool active() const;
 
   virtual bool soft() const = 0;
 
