@@ -22,29 +22,18 @@ struct Rule {
 
   Rule(const char* name);
 
-  const char* name() const { return m_name; }
+  const char* name() const;
 
-  void bind_rand_obj(rand_obj* obj) {
-    m_rand_obj = obj;
-    main = boost::bind(&Rule::gen, this);
-  }
+  void bind_rand_obj(rand_obj* obj);
 
-  bool is_rand_obj_covered() const { return m_rand_obj == 0 || m_rand_obj->constraint.isCovered(); }
-  void reset_coverage() {
-    if (m_rand_obj) m_rand_obj->constraint.resetCoverage();
-  }
+  bool is_rand_obj_covered() const;
+  void reset_coverage();
 
  private:
   const char* m_name;
   rand_obj* m_rand_obj;
 
-  void gen() {
-    if (m_rand_obj) {
-      if (is_rand_obj_covered())
-        LOG(INFO) << "Rule " << m_name << " has its rand_obj covered, now generate a random solution";
-      assert(m_rand_obj->next_cov());
-    }
-  }
+  void gen();
 };
 }
 }
