@@ -187,7 +187,7 @@ include(CPack)
 ##                CMAKE flags settings                    ##
 ############################################################
 
-SET( CMAKE_CXX_FLAGS_PROFILING "-O0 -g -Wall -Werror -Wextra -pedantic --coverage" CACHE STRING
+SET( CMAKE_CXX_FLAGS_PROFILING "-O0 -g -Wall -Wextra -pedantic --coverage" CACHE STRING
   "Flags used by the C++ compiler during maintainer builds."
   FORCE )
 SET( CMAKE_C_FLAGS_PROFILING "${CMAKE_CXX_FLAGS_PROFILING}" CACHE STRING
