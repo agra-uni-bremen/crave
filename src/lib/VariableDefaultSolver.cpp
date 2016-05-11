@@ -89,7 +89,7 @@ bool VariableDefaultSolver::solve() {
     int id = pair.first;
     if (bdd_solvers_.find(id) == bdd_solvers_.end()) continue;
     SolverPtr bdd_solver = bdd_solvers_[id];
-    assert(bdd_solver->solve());  // otherwise, contradiction must have been found!
+    CHECK(bdd_solver->solve());  // otherwise, contradiction must have been found!
     std::string str;
     bdd_solver->read(*var_ctn_.variables[id], str);
     NodePtr value(new Constant(pair.second->to_constant(str)));
