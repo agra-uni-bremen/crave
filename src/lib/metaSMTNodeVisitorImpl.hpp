@@ -75,7 +75,7 @@ class metaSMTVisitorImpl : public metaSMTVisitor {
   virtual void makeSoftAssertion(Node const &);
   virtual void makeSuggestion(Node const &);
   virtual void makeAssumption(Node const &);
-  virtual std::vector<unsigned int> analyseSofts(bool exact);
+  virtual std::vector<unsigned int> analyseSofts();
   virtual std::vector<std::vector<unsigned int> > analyseContradiction(std::map<unsigned int, NodePtr> const &);
   virtual bool solve(bool ignoreSofts);
   virtual bool read(Node const &var, AssignResult &);
@@ -147,7 +147,7 @@ template <typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitNode(Node const &) {}
 
 template <typename SolverType>
-void metaSMTVisitorImpl<SolverType>::visitTerminal(Terminal const &t) {}
+void metaSMTVisitorImpl<SolverType>::visitTerminal(Terminal const &) {}
 
 template <typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitUnaryExpr(UnaryExpression const &ue) {
@@ -532,19 +532,19 @@ void metaSMTVisitorImpl<SolverType>::visitBitslice(Bitslice const &b) {
 }
 
 template <typename SolverType>
-void metaSMTVisitorImpl<SolverType>::visitVectorAccess(VectorAccess const &o) {
+void metaSMTVisitorImpl<SolverType>::visitVectorAccess(VectorAccess const &) {
   throw std::runtime_error("VectorAccess is not allowed in metaSMTNodeVisitor.");
 }
 template <typename SolverType>
-void metaSMTVisitorImpl<SolverType>::visitVectorExpr(VectorExpr const &ve) {
+void metaSMTVisitorImpl<SolverType>::visitVectorExpr(VectorExpr const &) {
   throw std::runtime_error("VectorExpr is not allowed in metaSMTNodeVisitor.");
 }
 template <typename SolverType>
-void metaSMTVisitorImpl<SolverType>::visitForEach(ForEach const &fe) {
+void metaSMTVisitorImpl<SolverType>::visitForEach(ForEach const &) {
   throw std::runtime_error("ForEach is not allowed in metaSMTNodeVisitor.");
 }
 template <typename SolverType>
-void metaSMTVisitorImpl<SolverType>::visitUnique(Unique const &u) {
+void metaSMTVisitorImpl<SolverType>::visitUnique(Unique const &) {
   throw std::runtime_error("Unique is not allowed in metaSMTNodeVisitor.");
 }
 
@@ -589,7 +589,7 @@ void metaSMTVisitorImpl<SolverType>::makeAssumption(Node const &expr) {
 }
 
 template <typename SolverType>
-std::vector<unsigned int> metaSMTVisitorImpl<SolverType>::analyseSofts(bool exact) {
+std::vector<unsigned int> metaSMTVisitorImpl<SolverType>::analyseSofts() {
   std::vector<unsigned int> result;
   // implements soft constraint semantics of the HVL e
   for (unsigned int i = 0; i < softs_.size(); i++) {

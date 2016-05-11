@@ -25,11 +25,11 @@ void GetSupportSetVisitor::visitTernaryExpr(const TernaryExpression& t) {
   t.c()->visit(this);
 }
 
-void GetSupportSetVisitor::visitPlaceholder(const Placeholder& pl) {}
+void GetSupportSetVisitor::visitPlaceholder(const Placeholder&) {}
 
 void GetSupportSetVisitor::visitVariableExpr(const VariableExpr& v) { support_vars.insert(v.id()); }
 
-void GetSupportSetVisitor::visitConstant(const Constant& c) {}
+void GetSupportSetVisitor::visitConstant(const Constant&) {}
 
 void GetSupportSetVisitor::visitVectorExpr(const VectorExpr& v) { support_vars.insert(v.id()); }
 

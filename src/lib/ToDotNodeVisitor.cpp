@@ -28,7 +28,7 @@ void ToDotVisitor::visitUnaryExpr(UnaryExpression const &ue) {
   out_ << "\t" << reinterpret_cast<long>(&ue) << " -> " << reinterpret_cast<long>(ue.child().get()) << std::endl;
 }
 
-void ToDotVisitor::visitUnaryOpr(UnaryOperator const &uo) { out_ << "UnOp"; }
+void ToDotVisitor::visitUnaryOpr(UnaryOperator const &) { out_ << "UnOp"; }
 
 void ToDotVisitor::visitBinaryExpr(BinaryExpression const &be) {
   be.lhs()->visit(this);

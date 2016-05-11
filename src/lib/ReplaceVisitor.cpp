@@ -52,8 +52,8 @@ void ReplaceVisitor::evalTernSubscript(int& a, int& b, int& c) {
   subscript_stack_.pop();
 }
 
-void ReplaceVisitor::visitNode(Node const& n) {}
-void ReplaceVisitor::visitTerminal(Terminal const& t) {}
+void ReplaceVisitor::visitNode(Node const&) {}
+void ReplaceVisitor::visitTerminal(Terminal const&) {}
 void ReplaceVisitor::visitUnaryExpr(UnaryExpression const& e) { e.child()->visit(this); }
 void ReplaceVisitor::visitUnaryOpr(UnaryOperator const&) {}
 void ReplaceVisitor::visitBinaryExpr(BinaryExpression const& e) {
@@ -340,7 +340,7 @@ void ReplaceVisitor::visitIfThenElse(IfThenElse const& i) {
 
 void ReplaceVisitor::visitForEach(ForEach const& fe) { fe.rhs()->visit(this); }
 
-void ReplaceVisitor::visitUnique(Unique const& u) {
+void ReplaceVisitor::visitUnique(Unique const&) {
   throw std::runtime_error("Unique is not allowed in ReplaceVisitor.");
 }
 

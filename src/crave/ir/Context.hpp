@@ -80,7 +80,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
   result_type operator()(boost::proto::tag::terminal, result_type const& r) { return r; }
 
   template <typename value_type>
-  result_type operator()(boost::proto::tag::terminal t, write_ref_tag<value_type> const& ref) {
+  result_type operator()(boost::proto::tag::terminal, write_ref_tag<value_type> const& ref) {
     std::map<int, result_type>::const_iterator ite = variables_.find(ref.id);
 
     if (ite != variables_.end()) {
@@ -162,7 +162,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
   }
 
   template <typename Expr1, typename Expr2>
-  result_type operator()(boost::proto::tag::function f, boost::proto::terminal<operator_if_then>::type const& t,
+  result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_if_then>::type const&,
                          Expr1 const& e1, Expr2 const& e2) {
     return new IfThenElse(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this), new Constant(true));
   }
@@ -224,7 +224,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
   }
 
   template <typename Integer>
-  result_type operator()(boost::proto::tag::terminal t, read_ref_tag<Integer> const& ref) {
+  result_type operator()(boost::proto::tag::terminal, read_ref_tag<Integer> const& ref) {
     std::map<int, result_type>::const_iterator ite = variables_.find(ref.id);
 
     if (ite != variables_.end()) {
@@ -256,7 +256,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
   }
 
   template <typename Integer, typename CollectionTerm>
-  result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_inside>::type const& tag,
+  result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_inside>::type const&,
                          WriteReference<Integer> const& var_term, CollectionTerm const& c) {
     typedef typename boost::proto::result_of::value<CollectionTerm>::type Collection;
     typedef typename boost::range_value<Collection>::type CollectionEntry;
@@ -283,7 +283,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
   }
   
   template <typename Integer, typename CollectionTerm>
-  result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_inside>::type const& tag,
+  result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_inside>::type const&,
                          Variable<Integer> const& var_term, CollectionTerm const& c) {
     typedef typename boost::proto::result_of::value<CollectionTerm>::type Collection;
     typedef typename boost::range_value<Collection>::type CollectionEntry;
@@ -310,7 +310,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
   }
 
   template <typename Integer, typename DistInt>
-  result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_dist>::type const& tag,
+  result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_dist>::type const&,
                          WriteReference<Integer> const& var_term, distribution_tag<DistInt> const& dist_expr) {
     distribution<DistInt> const& dist = boost::proto::value(dist_expr);
     unsigned width = bitsize_traits<DistInt>::value;
@@ -338,7 +338,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
   }
   
    template <typename Integer, typename DistInt>
-  result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_dist>::type const& tag,
+  result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_dist>::type const&,
                          Variable<Integer> const& var_term, distribution_tag<DistInt> const& dist_expr) {
     distribution<DistInt> const& dist = boost::proto::value(dist_expr);
     unsigned width = bitsize_traits<DistInt>::value;
@@ -366,13 +366,13 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
   }
 
   template <typename Expr1, typename Expr2>
-  result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_foreach>::type const& tag,
+  result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_foreach>::type const&,
                          Expr1 const& e1, Expr2 const& e2) {
     return new ForEach(boost::proto::eval(e1, *this), boost::proto::eval(e2, *this));
   }
 
   template <typename Expr>
-  result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_unique>::type const& tag,
+  result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_unique>::type const&,
                          Expr const& e) {
     return new Unique(boost::proto::eval(e, *this));
   }
@@ -383,7 +383,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
   }
 
   template <typename Integer1, typename Integer2, typename Integer3>
-  result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_bitslice>::type const& tag,
+  result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_bitslice>::type const&,
                          Integer1 const& r, Integer2 const& l, WriteReference<Integer3> const& var_term) {
     unsigned int rb = boost::proto::value(r);
     unsigned int lb = boost::proto::value(l);
@@ -394,7 +394,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
   }
   
   template <typename Integer1, typename Integer2, typename Integer3>
-  result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_bitslice>::type const& tag,
+  result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_bitslice>::type const&,
                          Integer1 const& r, Integer2 const& l, Variable<Integer3> const& var_term) {
     unsigned long rb = boost::proto::value(r);
     unsigned long lb = boost::proto::value(l);

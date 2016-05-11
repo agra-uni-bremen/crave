@@ -94,7 +94,7 @@ void ComplexityEstimationVisitor::visitComplexBinExpr(const T& object) {
   exprStack_.push(std::make_pair(new T(lhs.first, rhs.first), complexity));
 }
 
-void ComplexityEstimationVisitor::visitPlaceholder(const Placeholder& pl) {
+void ComplexityEstimationVisitor::visitPlaceholder(const Placeholder&) {
   throw std::runtime_error("Placeholder is not allowed in ComplexityEstimationVisitor.");
 }
 
@@ -168,15 +168,15 @@ void ComplexityEstimationVisitor::visitShiftLeftOpr(const ShiftLeftOpr& shl) { v
 
 void ComplexityEstimationVisitor::visitShiftRightOpr(const ShiftRightOpr& shr) { visitSimpleBinExpr(shr); }
 
-void ComplexityEstimationVisitor::visitVectorAccess(const VectorAccess& va) {
+void ComplexityEstimationVisitor::visitVectorAccess(const VectorAccess&) {
   throw std::runtime_error("VectorAccess is not allowed in ComplexityEstimationVisitor.");
 }
 
-void ComplexityEstimationVisitor::visitForEach(const ForEach& fe) {
+void ComplexityEstimationVisitor::visitForEach(const ForEach&) {
   throw std::runtime_error("ForEach is not allowed in ComplexityEstimationVisitor.");
 }
 
-void ComplexityEstimationVisitor::visitUnique(const Unique& u) {
+void ComplexityEstimationVisitor::visitUnique(const Unique&) {
   throw std::runtime_error("Unique is not allowed in ComplexityEstimationVisitor.");
 }
 

@@ -30,7 +30,7 @@ void PrintVisitor::visitSequence(Sequence& seq) {
   --depth;
 }
 
-void UpdateVisitor::visitTerminal(Terminal& t) {}
+void UpdateVisitor::visitTerminal(Terminal&) {}
 
 void UpdateVisitor::visitNonTerminal(NonTerminal& nt) {
   if (nt.name()) {

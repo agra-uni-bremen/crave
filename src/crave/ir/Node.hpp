@@ -20,7 +20,7 @@ class Node {
  protected:
   Node() : count_(0) {}
   virtual ~Node() {}
-  Node(Node const& n) : count_(0) {}
+  Node(Node const&) : count_(0) {}
 
  public:
   virtual void visit(NodeVisitor* v) const { v->visitNode(*this); }
