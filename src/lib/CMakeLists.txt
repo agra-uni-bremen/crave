@@ -43,6 +43,7 @@ if (CRAVE_ENABLE_EXPERIMENTAL)
     experimental/ConstrainedRandomGraph.cpp  
     experimental/Experimental.cpp
     experimental/ConstraintBase.cpp
+    experimental/SequenceItem.cpp
     experimental/graph/Rule.cpp
   )
 endif (CRAVE_ENABLE_EXPERIMENTAL)
