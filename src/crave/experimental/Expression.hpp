@@ -19,9 +19,9 @@ class expression_list {
     add_exprs(exprs...);
   }
 
-  void operator=(expression_list const& list) { exprs_ = list.exprs_; }
+  void operator=(expression_list const& list);
 
-  void join(expression_list const& list) { exprs_.insert(end(), list.begin(), list.end()); }
+  void join(expression_list const& list);
 
   template <typename Expr>
   void add_expr(Expr expr) {
