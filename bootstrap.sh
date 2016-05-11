@@ -12,7 +12,7 @@ CUDD=cudd-2.4.2
 MINISAT=minisat-git
 LINGELING=lingeling-ayv-86bf266-140429
 BOOLECTOR=boolector-2.2.0
-Z3=Z3-git
+Z3=Z3-4.4.1
 CVC4=cvc4-unstable
 
 CMAKE=cmake
@@ -20,9 +20,7 @@ BUILD_CMAKE="no"
 CMAKE_PACKAGE=cmake-2.8.4
 
 CMAKE_ARGS="
-  -DmetaSMT_ENABLE_BINDINGS=off
   -DmetaSMT_ENABLE_TESTS=off
-  -DmetaSMT_ENABLE_TOOLBOX=off
 "
 
 
