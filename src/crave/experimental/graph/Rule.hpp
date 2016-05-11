@@ -20,7 +20,7 @@ struct Rule {
   action_type main;
   action_type exit;
 
-  Rule(const char* name) : entry(), main(), exit(), m_name(name), m_rand_obj(0) { global_rule_map[name] = this; }
+  Rule(const char* name);
 
   const char* name() const { return m_name; }
 
