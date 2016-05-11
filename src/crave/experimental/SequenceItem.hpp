@@ -3,6 +3,9 @@
 #pragma once
 
 #include "../backend/Generator.hpp"
+#include "Object.hpp"
+#include "Expression.hpp"
+#include "Coverage.hpp"
 
 namespace crave
 {
