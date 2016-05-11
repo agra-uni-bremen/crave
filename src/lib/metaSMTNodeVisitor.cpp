@@ -115,7 +115,6 @@ metaSMTVisitor* FactoryMetaSMT::getNewInstance(SolverTypes type) {
       TRY_GET_SOLVER_WHEN_UNDEFINED(CVC4);
       TRY_GET_SOLVER_WHEN_UNDEFINED(SWORD);
       TRY_GET_SOLVER_WHEN_UNDEFINED(CUDD);
-      assert(false && "No solver has been defined.");
       throw std::runtime_error("No solver has been defined.");  
   }
 }
