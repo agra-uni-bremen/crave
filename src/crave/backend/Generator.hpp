@@ -10,13 +10,11 @@
 
 namespace crave {
 
-extern VariableContainer variables;
-
 struct Generator {
  public:
   Generator()
     : constr_mng_(),
-      var_ctn_(&variables),
+      var_ctn_(variable_container()),
       ctx_(var_ctn_),
       var_gen_(new VariableGenerator(*var_ctn_)),
       var_cov_gen_(*var_ctn_),
@@ -29,7 +27,7 @@ struct Generator {
   template <typename Expr>
   explicit Generator(Expr expr)
     : constr_mng_(),
-      var_ctn_(&variables),
+      var_ctn_(variable_container()),
       ctx_(var_ctn_),
       var_gen_(new VariableGenerator(*var_ctn_)),
       var_cov_gen_(*var_ctn_),

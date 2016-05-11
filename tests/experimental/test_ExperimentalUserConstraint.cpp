@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_CASE(constraint_partitioning) {
   crv_variable<unsigned> a, b, c, d, e;
   ConstraintPartitioner cp;
   ConstraintManager cm1, cm2;
-  Context ctx(&crave::variables);
+  Context ctx(variable_container());
   cm1.makeConstraint(a() > b(), &ctx);
   cm1.makeConstraint(c() > d(), &ctx);
   cm1.makeConstraint(e() > 1, &ctx);
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(single_variable_constraint) {
   crv_variable<unsigned> a, b, c, d;
   ConstraintPartitioner cp;
   ConstraintManager cm;
-  Context ctx(&crave::variables);
+  Context ctx(variable_container());
   cm.makeConstraint(a() > 1, &ctx);
   cm.makeConstraint(a() < 2, &ctx);
   cm.makeConstraint((1 < b()) || (b() < 10), &ctx);

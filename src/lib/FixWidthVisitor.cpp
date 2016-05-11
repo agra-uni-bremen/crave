@@ -211,7 +211,7 @@ void FixWidthVisitor::visitShiftOpr(const T& obj) {
     // use temp var
     unsigned id = new_var_id();
     op2_expr = new VariableExpr(id, op2_target_width, false);
-    variable_container().variables[id] = op2_expr; // XXX: this assumes a global variable container, which might not be the case in the future
+    variable_container()->variables[id] = op2_expr; // XXX: this assumes a global variable container, which might not be the case in the future
     addCondition(new EqualOpr(op2.first, new ExtendExpression(op2_expr, op2.second - op2_target_width)));
   }
   exprStack_.push(std::make_pair(new T(op1.first, op2_expr), op1.second));

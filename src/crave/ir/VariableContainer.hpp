@@ -25,6 +25,6 @@ struct VariableContainer {
   std::map<int, int> dist_ref_to_var_map;
 };
 
-VariableContainer& variable_container();
+VariableContainer* variable_container();
 
 }  // end namespace crave
