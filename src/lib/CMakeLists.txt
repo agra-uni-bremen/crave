@@ -45,6 +45,7 @@ if (CRAVE_ENABLE_EXPERIMENTAL)
     experimental/ConstraintBase.cpp
     experimental/SequenceItem.cpp
     experimental/Expression.cpp
+    experimental/VariableBase.cpp
     experimental/graph/Rule.cpp
   )
 endif (CRAVE_ENABLE_EXPERIMENTAL)
