@@ -12,7 +12,7 @@
 namespace crave {
 
 template <typename T>
-class randv;
+struct randv;
 template <typename T>
 struct Variable;
 template <typename T>

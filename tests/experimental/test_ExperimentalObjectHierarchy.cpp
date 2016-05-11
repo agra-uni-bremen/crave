@@ -16,6 +16,7 @@ struct random_object1 : crv_object {
   base_object v1{"v1"};
   base_object v2{"v2"};
   random_object1(crv_object_name) {}
+  virtual ~random_object1() { }
 };
 
 struct random_object2 : crv_object {
@@ -23,6 +24,7 @@ struct random_object2 : crv_object {
   base_object v3{"v3"};
 
   random_object2(crv_object_name) {}
+  virtual ~random_object2() { }
 };
 
 struct random_object3 : crv_object {
@@ -32,7 +34,7 @@ struct random_object3 : crv_object {
   random_object1* obj1;
 
   random_object3(crv_object_name);
-  ~random_object3() { delete obj1; }
+  virtual ~random_object3() { delete obj1; }
 };
 
 random_object3::random_object3(crv_object_name) {

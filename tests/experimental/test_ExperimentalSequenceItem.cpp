@@ -169,7 +169,7 @@ class obj1 : public obj {
 
 class obj2 : public obj1 {
  public:
-  obj2(crv_object_name name) : l("l"), obj1(name) {}
+  obj2(crv_object_name name) : obj1(name), l("l") {}
 
   crv_variable<long> g;
   crv_variable<unsigned long> h;

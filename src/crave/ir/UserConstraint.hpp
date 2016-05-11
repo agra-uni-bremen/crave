@@ -35,9 +35,9 @@ int new_constraint_id();
 struct ConstraintManager;
 struct ConstraintPartitioner;
 
-struct UserConstraint;
+class UserConstraint;
 
-struct UserVectorConstraint;
+class UserVectorConstraint;
 typedef boost::shared_ptr<UserVectorConstraint> VectorConstraintPtr;
 
 }  // end namespace crave

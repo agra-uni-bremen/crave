@@ -21,7 +21,10 @@ struct Generator {
       var_gen_(new VariableGenerator(*var_ctn_)),
       var_cov_gen_(*var_ctn_),
       vec_gen_(),
-      covered_(false) {}
+      covered_(false) {
+      std::cerr << "Call Generator Konstruktor!" << std::endl;
+      std::cerr << "ConstraintManager:" << &constr_mng_ << std::endl;
+}
 
   template <typename Expr>
   explicit Generator(Expr expr)
@@ -32,6 +35,8 @@ struct Generator {
       var_cov_gen_(*var_ctn_),
       vec_gen_(),
       covered_(false) {
+      std::cerr << "Call Generator Konstruktor!" << std::endl;
+      std::cerr << "ConstraintManager:" << &constr_mng_ << std::endl;
     (*this)(expr);
   }
 
