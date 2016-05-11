@@ -42,6 +42,7 @@ if (CRAVE_ENABLE_EXPERIMENTAL)
     experimental/GraphVisitor.cpp	
     experimental/ConstrainedRandomGraph.cpp  
     experimental/Experimental.cpp
+    experimental/graph/Rule.cpp
   )
 endif (CRAVE_ENABLE_EXPERIMENTAL)
 
