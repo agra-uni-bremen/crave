@@ -29,7 +29,6 @@ class crv_sequence_item : public crv_object {
 
   bool randomize() override {
     assert(!cloned_ && "cloned crv_sequence_item cannot be randomized");
-    std::cout << "randomize" << std::endl;
     if (!built_) {
       gen_ = std::make_shared<Generator>();
       recursive_build(*gen_);
@@ -40,7 +39,6 @@ class crv_sequence_item : public crv_object {
 
   template <typename... Exprs>
   bool randomize_with(Exprs... exprs) {
-    std::cout << "randomize_with" << std::endl;
     assert(!cloned_ && "cloned crv_sequence_item cannot be randomized");
     // TODO Generator caching
     rand_with_gen_ = std::make_shared<Generator>();
