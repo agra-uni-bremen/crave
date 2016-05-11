@@ -33,8 +33,6 @@ class randv_base : public rand_base {
   operator T() const { return value; }
 
   friend std::ostream& operator<<(std::ostream& os, const randv_base<T>& e) {
-    std::cout << "e:adress " << &e << std::endl;
-    std::cout << "e:value:adress " << &(e.value) << std::endl;
     os << e.value;
     return os;
   }
