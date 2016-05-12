@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(by_reference) {
     if (b > 10) break;
   }
 
-  BOOST_REQUIRE(b > 10);
+  BOOST_REQUIRE_GT(b, 10);
 }
 
 // temporaly fix a variable to a certain value using the assign operator
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(named_reference) {
     if (bv > 10) break;
   }
 
-  BOOST_REQUIRE(bv > 10);
+  BOOST_REQUIRE_GT(bv, 10);
 }
 
 BOOST_AUTO_TEST_CASE(soft_constraint_t) {

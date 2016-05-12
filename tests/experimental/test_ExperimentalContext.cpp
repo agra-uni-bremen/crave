@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(by_reference) {
     if (b > 10) break;
   }
 
-  BOOST_REQUIRE(b > 10);
+  BOOST_REQUIRE_GT(b, 10);
 }
 
 struct s_named_reference : public crv_sequence_item {
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(named_reference) {
     if (bv > 10) break;
   }
 
-  BOOST_REQUIRE(bv > 10);
+  BOOST_REQUIRE_GT(bv, 10);
 }
 
 struct s_soft_constraint_t : crv_sequence_item {
