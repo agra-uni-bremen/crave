@@ -20,6 +20,13 @@ class crv_array : public crv_object {
     }
   }
 
+ ~crv_array(){
+	 for(crv_variable<T>* arr : arr_)
+	 {
+	 	delete arr;
+	 }
+ }
+
   crv_array(crv_array const &) = delete;
 
   std::string obj_kind() const override { return "crv_array"; }
