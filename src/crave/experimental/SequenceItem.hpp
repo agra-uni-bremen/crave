@@ -21,13 +21,8 @@ namespace crave
 
   template <typename... Exprs>
   bool randomize_with(Exprs... exprs) {
-    assert(!cloned_ && "cloned crv_sequence_item cannot be randomized");
-    // TODO Generator caching
-    rand_with_gen_ = std::make_shared<Generator>();
-    recursive_build(*rand_with_gen_);
     expression_list list(exprs...);
-    for (auto e : list) (*rand_with_gen_)(e);
-    return rand_with_gen_->next();
+    return randomize_with_expr_list(list);
   }
 
   void goal(crv_covergroup& group);
@@ -35,6 +30,7 @@ namespace crave
  protected:
   void request_rebuild();
 
+  bool randomize_with_expr_list(expression_list const&);
   std::shared_ptr<Generator> gen_;
   std::shared_ptr<Generator> rand_with_gen_;
   bool built_;

@@ -30,4 +30,14 @@ namespace crave
     gen_.reset();
     crv_object::request_rebuild();
   }
+
+  bool crv_sequence_item::randomize_with_expr_list(const expression_list & list) {
+    assert(!cloned_ && "cloned crv_sequence_item cannot be randomized");
+    // TODO Generator caching
+    rand_with_gen_ = std::make_shared<Generator>();
+    recursive_build(*rand_with_gen_);
+    for (auto e : list) (*rand_with_gen_)(e);
+    return rand_with_gen_->next();
+  }
+
 }
