@@ -26,8 +26,10 @@ namespace crave {
 class BoolectorSolver : public metaSMT::solver::Boolector {
  public:
   BoolectorSolver() {
+#ifndef metaSMT_BOOLECTOR_1_API
     boolector_set_opt(_btor, "rewrite_level", 1);
 //    assert(boolector_set_sat_solver_minisat(_btor));
+#endif
   }
 };
 }
