@@ -6,6 +6,8 @@
 
 namespace crave {
 
+struct Generator;
+
 class crv_constraint_base : public crv_object {
  protected:
   crv_constraint_base();
@@ -22,6 +24,8 @@ class crv_constraint_base : public crv_object {
   bool active() const;
 
   virtual bool soft() const = 0;
+
+  void recursive_build(Generator& gen) const override;
 
  protected:
   bool active_;

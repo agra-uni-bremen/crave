@@ -2,14 +2,15 @@
 
 #pragma once
 
-#include "../backend/Generator.hpp"
 #include "Object.hpp"
 #include "Expression.hpp"
 #include "Coverage.hpp"
 
 namespace crave
 {
- class crv_sequence_item : public crv_object {
+struct Generator;
+
+class crv_sequence_item : public crv_object {
  public:
   crv_sequence_item();
 

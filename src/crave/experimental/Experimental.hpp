@@ -11,6 +11,8 @@
 #include "Coverage.hpp"
 #include "SequenceItem.hpp"
 
+#include "../backend/Generator.hpp"
+
 #include <vector>
 #include <memory>
 

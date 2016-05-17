@@ -55,7 +55,7 @@ class crv_object {
     if (parent_) parent_->request_rebuild();
   }
 
-  void recursive_build(Generator& gen);
+  virtual void recursive_build(Generator& gen) const;
 
   std::string name_;
   std::string orig_name_;
