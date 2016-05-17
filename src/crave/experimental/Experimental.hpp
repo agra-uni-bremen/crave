@@ -63,14 +63,35 @@ class crv_variable<T, typename std::enable_if<simple_enum_wrapper<T>::defined>::
 
 }  // end namespace crave
 
+#ifdef __clang__
+
 #define CRAVE_EXPERIMENTAL_ENUM(enum_name, ...)           \
   template <>                                             \
   struct crave::simple_enum_wrapper<enum_name> {          \
     static constexpr bool defined = true;                 \
     std::vector<int> values() { return { __VA_ARGS__ }; } \
-  };                                                      \
+  };
 
 #define CRAVE_BETTER_ENUM(enum_name, ...)                      \
   BETTER_ENUM(enum_name, int, __VA_ARGS__);                    \
   template <>                                                  \
-  struct crave::is_better_enum<enum_name> : std::true_type {}; \
+  struct crave::is_better_enum<enum_name> : std::true_type {};
+
+#else
+
+#define CRAVE_EXPERIMENTAL_ENUM(enum_name, ...)           \
+  namespace crave {                                       \
+  template <>                                             \
+  struct simple_enum_wrapper<enum_name> {                 \
+    static constexpr bool defined = true;                 \
+    std::vector<int> values() { return { __VA_ARGS__ }; } \
+  }; } // namepsace crave
+
+#define CRAVE_BETTER_ENUM(enum_name, ...)               \
+  BETTER_ENUM(enum_name, int, __VA_ARGS__);             \
+  namespace crave {                                     \
+  template <>                                           \
+  struct is_better_enum<enum_name> : std::true_type {}; \
+  } // namespace crave
+
+#endif
