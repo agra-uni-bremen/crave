@@ -13,10 +13,10 @@
 
 #include "../backend/Generator.hpp"
 
-#include <vector>
-#include <memory>
-
 #include "better-enums/enum.hpp"
+
+#include <vector>
+#include <type_traits>
 
 namespace crave {
 
@@ -27,49 +27,50 @@ bool solve(Exprs... exprs) {
   return gen.next();
 }
 
+template <class T>
+struct is_better_enum : std::false_type {};
+
+template <class T>
+struct simple_enum_wrapper {};
+
+template <typename T>
+class crv_variable<T, typename std::enable_if<is_better_enum<T>::value>::type> : public crv_variable_base<int> {
+  CRV_VARIABLE_ASSIGNMENT_INTERFACE(T);
+ public:
+  crv_variable(const crv_variable& other) : crv_variable_base<int>(other) {}
+  crv_variable(crv_object_name name = "var") {
+    enum_internal = {inside(var, std::vector<int>(T::_values().begin(), T::_values().end()))};
+  }
+  int _to_integral() const { return actual_value(); }
+  T _to_enum() const { return T::_from_integral(actual_value()); }
+  const char* _to_string() const { return _to_enum()._to_string(); }
+  operator T() const { return _to_enum(); }
+ private:
+  crv_constraint enum_internal{"enum_internal"};
+};
+
+template <typename T>
+class crv_variable<T, typename std::enable_if<simple_enum_wrapper<T>::defined>::type> : public crv_variable_base<int> {
+  CRV_VARIABLE_ASSIGNMENT_INTERFACE(T);
+ public:
+  crv_variable(const crv_variable& other) : crv_variable_base<int>(other) {}
+  crv_variable(crv_object_name name = "var") {
+    enum_internal = {inside(var, simple_enum_wrapper<T>().values())};
+  }
+ private:
+  crv_constraint enum_internal{"enum_internal"};
+};
+
 }  // end namespace crave
 
-#define __CRAVE_EXPERIMENTAL_INSERT(s, DATA, ELEM) DATA.insert(ELEM);
+#define CRAVE_EXPERIMENTAL_ENUM(enum_name, ...)           \
+  template <>                                             \
+  struct crave::simple_enum_wrapper<enum_name> {          \
+    static constexpr bool defined = true;                 \
+    std::vector<int> values() { return { __VA_ARGS__ }; } \
+  };                                                      \
 
-#define CRAVE_EXPERIMENTAL_ENUM(enum_name, ...)                                \
-  namespace crave {                                                            \
-  template <>                                                                  \
-  class crv_variable<enum_name> : public crv_variable_base<int> {              \
-    CRV_VARIABLE_ASSIGNMENT_INTERFACE(enum_name);                              \
-                                                                               \
-   public:                                                                     \
-    crv_variable(const crv_variable& other) : crv_variable_base<int>(other) {} \
-    crv_variable(crv_object_name name = "var") {                               \
-      std::set<int> s;                                                         \
-      BOOST_PP_SEQ_FOR_EACH(__CRAVE_EXPERIMENTAL_INSERT, s, __VA_ARGS__);      \
-      enum_internal = {inside(var, s)};                                        \
-    }                                                                          \
-                                                                               \
-   private:                                                                    \
-    crv_constraint enum_internal{"enum_internal"};                             \
-  };                                                                           \
-  }  // namespace crave
-
-#define CRAVE_BETTER_ENUM(enum_name, ...)                                            \
-  BETTER_ENUM(enum_name, int, __VA_ARGS__);                                          \
-  namespace crave {                                                                  \
-  template <>                                                                        \
-  class crv_variable<enum_name> : public crv_variable_base<int> {                    \
-    CRV_VARIABLE_ASSIGNMENT_INTERFACE(enum_name);                                    \
-                                                                                     \
-   public:                                                                           \
-    crv_variable(const crv_variable& other) : crv_variable_base<int>(other) {}       \
-    crv_variable(crv_object_name name = "var") {                                     \
-      std::set<int> s;                                                               \
-      for (enum_name value : enum_name::_values()) s.insert(value);                  \
-      enum_internal = {inside(var, s)};                                              \
-    }                                                                                \
-    int _to_integral() const { return actual_value(); }                              \
-    enum_name _to_enum() const { return enum_name::_from_integral(actual_value()); } \
-    const char* _to_string() const { return _to_enum()._to_string(); }                      \
-    operator enum_name() const { return _to_enum(); }                                \
-                                                                                     \
-   private:                                                                          \
-    crv_constraint enum_internal{"enum_internal"};                                   \
-  };                                                                                 \
-  }  // namespace crave
+#define CRAVE_BETTER_ENUM(enum_name, ...)                      \
+  BETTER_ENUM(enum_name, int, __VA_ARGS__);                    \
+  template <>                                                  \
+  struct crave::is_better_enum<enum_name> : std::true_type {}; \
