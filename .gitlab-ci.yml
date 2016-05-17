@@ -1,5 +1,7 @@
 before_script:
 - scripts/show_linux_distribution.sh
+- export GIT_SSL_NO_VERIFY=1
+- git submodule sync
 - git submodule update --init
 - ln -s /home/radames/software/crave-bundle/deps deps
 - NUM_JOBS=$[`nproc`-1]
