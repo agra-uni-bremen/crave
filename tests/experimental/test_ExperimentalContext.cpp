@@ -63,7 +63,7 @@ struct s_by_reference : public crv_sequence_item {
 BOOST_AUTO_TEST_CASE(by_reference) {
   s_by_reference item("item");
   unsigned b = 0;
-  item.con &= {item.a == reference(b)};
+  item.con &= {item.a() == reference(b)};
 
   while (item.randomize()) {
     unsigned av = item.a;

@@ -28,7 +28,7 @@ OUT& operator<<(OUT& out, write_ref_tag<value_type> const& tag) {
 
 template <typename OUT, typename value_type>
 OUT& operator<<(OUT& out, vector_tag<value_type> const& tag) {
-  out << "vector<" << tag.id << ">";
+  out << "vector<" << tag.id_ << ">";
   return out;
 }
 
