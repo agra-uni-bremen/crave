@@ -9,6 +9,7 @@
 #include "Variable.hpp"
 
 #include "../frontend/RandomBase.hpp"
+#include "../backend/Generator.hpp"
 
 namespace crave {
 
@@ -25,6 +26,8 @@ class crv_vector : public __rand_vec<T>, public crv_object {
     __rand_vec<T>::gen_values(default_rand_vec_size());
     return true;
   }
+
+  void recursive_build(Generator& gen) const override { gen.addVecId(__rand_vec<T>::id()); }
 };
 
 }  // namespace crave
