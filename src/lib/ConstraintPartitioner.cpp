@@ -16,7 +16,7 @@ void ConstraintPartitioner::mergeConstraints(const ConstraintManager& mng) {
   for(ConstraintPtr c : mng.constraints_) {
     if (c->isEnabled()) {
       if (c->isVectorConstraint())
-        vec_constraints_.push_back(boost::static_pointer_cast<UserVectorConstraint>(c));
+        vec_constraints_.push_back(std::static_pointer_cast<UserVectorConstraint>(c));
       else
         constraints_.push_back(c);
     }
