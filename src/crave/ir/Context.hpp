@@ -8,7 +8,6 @@
 #include <boost/proto/context/callable.hpp>
 #include <boost/proto/context/null.hpp>
 #include <boost/range/value_type.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <limits>
 #include <map>

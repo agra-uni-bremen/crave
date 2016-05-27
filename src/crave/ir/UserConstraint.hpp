@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <glog/logging.h>
