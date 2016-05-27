@@ -36,6 +36,6 @@ struct ConstraintPartitioner;
 class UserConstraint;
 
 class UserVectorConstraint;
-typedef boost::shared_ptr<UserVectorConstraint> VectorConstraintPtr;
+typedef std::shared_ptr<UserVectorConstraint> VectorConstraintPtr;
 
 }  // end namespace crave

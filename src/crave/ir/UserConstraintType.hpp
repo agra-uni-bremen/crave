@@ -62,7 +62,7 @@ class UserConstraint {
 template <typename ostream>
 ostream& operator<<(ostream& os, const UserConstraint& constr);
 
-typedef boost::shared_ptr<UserConstraint> ConstraintPtr;
+typedef std::shared_ptr<UserConstraint> ConstraintPtr;
 typedef std::list<ConstraintPtr> ConstraintList;
 
 }  // namespace crave

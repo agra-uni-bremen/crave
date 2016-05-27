@@ -13,7 +13,7 @@ namespace crave {
      *
      */
 struct VariableGenerator {
-  typedef boost::shared_ptr<VariableSolver> VarSolverPtr;
+  typedef std::shared_ptr<VariableSolver> VarSolverPtr;
 
   explicit VariableGenerator(const VariableContainer& vcon);
   

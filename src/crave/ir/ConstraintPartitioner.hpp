@@ -12,7 +12,7 @@
 
 namespace crave {
 
-typedef boost::shared_ptr<UserVectorConstraint> VectorConstraintPtr;
+typedef std::shared_ptr<UserVectorConstraint> VectorConstraintPtr;
 
 struct ConstraintPartitioner {
   void reset();

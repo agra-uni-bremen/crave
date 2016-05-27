@@ -32,6 +32,6 @@ class metaSMTVisitor : public NodeVisitor {
   virtual bool readVector(const std::vector<VariablePtr>& vec, __rand_vec_base* rand_vec) = 0;
 };
 
-typedef boost::shared_ptr<metaSMTVisitor> SolverPtr;
+typedef std::shared_ptr<metaSMTVisitor> SolverPtr;
 
 }  // end namespace crave
