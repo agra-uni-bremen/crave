@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <boost/foreach.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/proto/core.hpp>
 #include <boost/proto/debug.hpp>
@@ -266,7 +265,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
 
     std::set<Constant> constants;
     distribution<Integer> dist;
-    BOOST_FOREACH(CollectionEntry const & i, boost::proto::value(c)) {
+    for(CollectionEntry const & i : boost::proto::value(c)) {
       constants.insert(Constant(i, width, sign));
       dist(weighted_value<Integer>(i, 1));
     }
@@ -293,7 +292,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
 
     std::set<Constant> constants;
     distribution<Integer> dist;
-    BOOST_FOREACH(CollectionEntry const & i, boost::proto::value(c)) {
+    for(CollectionEntry const & i : boost::proto::value(c)) {
       constants.insert(Constant(i, width, sign));
       dist(weighted_value<Integer>(i, 1));
     }
@@ -322,7 +321,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
     dist_references_.push_back(std::make_pair(id, ref_expr));
 
     result_type in_ranges;
-    BOOST_FOREACH(weighted_range<DistInt> const & r, dist.ranges()) {
+    for(weighted_range<DistInt> const & r : dist.ranges()) {
       result_type left(new Constant(r.left_, width, sign));
       result_type right(new Constant(r.right_, width, sign));
       result_type left_cond(new LessEqualOpr(left, tmp_var));
@@ -350,7 +349,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
     dist_references_.push_back(std::make_pair(id, ref_expr));
 
     result_type in_ranges;
-    BOOST_FOREACH(weighted_range<DistInt> const & r, dist.ranges()) {
+    for(weighted_range<DistInt> const & r : dist.ranges()) {
       result_type left(new Constant(r.left_, width, sign));
       result_type right(new Constant(r.right_, width, sign));
       result_type left_cond(new LessEqualOpr(left, tmp_var));

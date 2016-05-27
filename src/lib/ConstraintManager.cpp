@@ -13,7 +13,7 @@ template <typename ostream>
 ostream& operator<<(ostream& os, const ConstraintManager& set) {
   os << "Set " << set.id_ << " has " << set.constraints_.size() << " constraint(s) and has "
      << (set.changed_ ? "" : "not ") << "changed" << std::endl;
-  BOOST_FOREACH(ConstraintPtr item, set.constraints_) { os << item << std::endl; }
+  for(ConstraintPtr item : set.constraints_) { os << item << std::endl; }
   os << std::flush;
   return os;
 }
@@ -104,7 +104,7 @@ ConstraintPtr ConstraintManager::makeConstraint(std::string const& name, int c_i
 
 std::ostream& ConstraintManager::printDotGraph(std::ostream& os) {
   ToDotVisitor visitor(os);
-  BOOST_FOREACH(ConstraintPtr c, constraints_) {
+  for(ConstraintPtr c : constraints_) {
     long a = reinterpret_cast<long>(&*c);
     long b = reinterpret_cast<long>(&(*c->expr()));
     os << "\t" << a << " [label=\"" << c->name() << (c->isSoft() ? " soft" : "") << (c->isCover() ? " cover" : "")

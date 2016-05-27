@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <boost/foreach.hpp>
 #include <string>
 #include <vector>
 
@@ -26,7 +25,7 @@ struct VariableGenerator {
 
   template <typename T>
   bool read(const Variable<T>& var, T* value) const {
-    BOOST_FOREACH(VarSolverPtr vs, solvers_) {
+    for(VarSolverPtr vs : solvers_) {
       if (vs->read(var, value)) return true;
     }
     return false;

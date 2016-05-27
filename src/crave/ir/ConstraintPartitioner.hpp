@@ -3,7 +3,6 @@
 #pragma once
 
 #include <glog/logging.h>
-#include <boost/foreach.hpp>
 #include <vector>
 #include <set>
 

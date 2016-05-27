@@ -14,7 +14,7 @@ VariableDefaultSolver::VariableDefaultSolver(const VariableContainer& vcon, cons
     : VariableSolver(vcon, cp) {
   LOG(INFO) << "Create solver for partition " << constr_pttn_;
 
-  BOOST_FOREACH(ConstraintPtr c, constr_pttn_) {
+  for(ConstraintPtr c : constr_pttn_) {
     if (c->isCover()) continue;  // default solver ignores cover constraints
     if (c->isSoft()) {
       solver_->makeSoftAssertion(*c->expr());
@@ -28,7 +28,7 @@ VariableDefaultSolver::VariableDefaultSolver(const VariableContainer& vcon, cons
   analyseConstraints();
 
   std::set<int> vars_with_dist;
-  BOOST_FOREACH(VariableContainer::ReadRefPair & pair, var_ctn_.dist_references) {
+  for(VariableContainer::ReadRefPair & pair : var_ctn_.dist_references) {
     assert(var_ctn_.dist_ref_to_var_map.find(pair.first) != var_ctn_.dist_ref_to_var_map.end());
     vars_with_dist.insert(var_ctn_.dist_ref_to_var_map.at(pair.first));
   }
@@ -36,7 +36,7 @@ VariableDefaultSolver::VariableDefaultSolver(const VariableContainer& vcon, cons
   if (FactorySolver<CUDD>::isDefined()) {
     LOG(INFO) << "Create BDD solvers for constraints involving single variable";
     std::map<int, ConstraintList> const& svc_map = constr_pttn_.singleVariableConstraintMap();
-    BOOST_FOREACH(VariableContainer::WriteRefPair & pair, var_ctn_.write_references) {
+    for(VariableContainer::WriteRefPair & pair : var_ctn_.write_references) {
       int id = pair.first;
       if (svc_map.find(id) == svc_map.end()) continue;
       if (vars_with_dist.find(id) != vars_with_dist.end()) {
@@ -45,7 +45,7 @@ VariableDefaultSolver::VariableDefaultSolver(const VariableContainer& vcon, cons
       }
       SolverPtr bdd_solver(FactoryMetaSMT::getNewInstance(CUDD));
       bdd_solvers_[id] = bdd_solver;
-      BOOST_FOREACH(ConstraintPtr c, svc_map.at(id)) {
+      for(ConstraintPtr c : svc_map.at(id)) {
         if (c->complexity() > 0 && c->complexity() < complexity_limit_for_bdd) bdd_solver->makeAssertion(*c->expr());
       }
       vars_with_dist.insert(id);
@@ -55,7 +55,7 @@ VariableDefaultSolver::VariableDefaultSolver(const VariableContainer& vcon, cons
 
   if (2 * vars_with_dist.size() > var_ctn_.write_references.size()) return;  // not necessary to randomize more
 
-  BOOST_FOREACH(VariableContainer::WriteRefPair & pair, var_ctn_.write_references) {
+  for(VariableContainer::WriteRefPair & pair : var_ctn_.write_references) {
     if (vars_with_dist.find(pair.first) == vars_with_dist.end()) random_write_refs_.push_back(pair);
   }
 }
@@ -66,15 +66,15 @@ void VariableDefaultSolver::analyseConstraints() {
     analyseSofts();
     LOG(INFO) << "Partition is solvable with " << inactive_softs_.size() << " soft constraint(s) deactivated:";
 
-    BOOST_FOREACH(std::string & s, inactive_softs_) { LOG(INFO) << " " << s; }
+    for(std::string & s : inactive_softs_) { LOG(INFO) << " " << s; }
   } else {
     LOG(INFO) << "Partition has unsatisfiable hard constraints:";
     uint cnt = 0;
 
-    BOOST_FOREACH(std::vector<std::string> & vs, contradictions_) {
+    for(std::vector<std::string> & vs : contradictions_) {
       LOG(INFO) << "  set #" << ++cnt;
 
-      BOOST_FOREACH(std::string & s, vs) { LOG(INFO) << "   " << s; }
+      for(std::string & s : vs) { LOG(INFO) << "   " << s; }
     }
   }
 }
@@ -85,7 +85,7 @@ bool VariableDefaultSolver::solve() {
     LOG(INFO) << "Failed because partition has been analyzed to be unsolvable";
     return false;
   }
-  BOOST_FOREACH(VariableContainer::WriteRefPair & pair, var_ctn_.write_references) {
+  for(VariableContainer::WriteRefPair & pair : var_ctn_.write_references) {
     int id = pair.first;
     if (bdd_solvers_.find(id) == bdd_solvers_.end()) continue;
     SolverPtr bdd_solver = bdd_solvers_[id];
@@ -98,11 +98,11 @@ bool VariableDefaultSolver::solve() {
     solver_->makeSuggestion(*eq);
   }
 
-  BOOST_FOREACH(VariableContainer::ReadRefPair & pair, var_ctn_.read_references) {
+  for(VariableContainer::ReadRefPair & pair : var_ctn_.read_references) {
     solver_->makeAssumption(*pair.second->expr());
   }
 
-  BOOST_FOREACH(VariableContainer::ReadRefPair & pair, var_ctn_.dist_references) {
+  for(VariableContainer::ReadRefPair & pair : var_ctn_.dist_references) {
     solver_->makeSuggestion(*pair.second->expr());
   }
 
@@ -117,7 +117,7 @@ bool VariableDefaultSolver::solve() {
   }
 
   if (solver_->solve()) {
-    BOOST_FOREACH(VariableContainer::WriteRefPair & pair, var_ctn_.write_references) {
+    for(VariableContainer::WriteRefPair & pair : var_ctn_.write_references) {
       solver_->read(*var_ctn_.variables[pair.first], *pair.second);
     }
     LOG(INFO) << "Done solving partition " << constr_pttn_;
@@ -134,7 +134,7 @@ void VariableDefaultSolver::analyseHards() {
   std::vector<std::string> out;
   std::vector<std::vector<unsigned int> > results;
 
-  BOOST_FOREACH(ConstraintPtr c, constr_pttn_) {
+  for(ConstraintPtr c : constr_pttn_) {
     if (!c->isSoft() && !c->isCover()) {
       s.insert(std::make_pair(s.size(), c->expr()));
       out.push_back(c->name());
@@ -142,10 +142,10 @@ void VariableDefaultSolver::analyseHards() {
   }
   results = solver->analyseContradiction(s);
 
-  BOOST_FOREACH(std::vector<unsigned int> result, results) {
+  for(std::vector<unsigned int> result : results) {
     std::vector<std::string> vec;
 
-    BOOST_FOREACH(unsigned int i, result) { vec.push_back(out[i]); }
+    for(unsigned int i : result) { vec.push_back(out[i]); }
     contradictions_.push_back(vec);
   }
 }
@@ -155,7 +155,7 @@ void VariableDefaultSolver::analyseSofts() {
   std::vector<unsigned int>::iterator ite = result.begin();
   unsigned cnt = 0;
 
-  BOOST_FOREACH(ConstraintPtr c, constr_pttn_) {
+  for(ConstraintPtr c : constr_pttn_) {
     if (ite == result.end()) break;
     if (c->isSoft()) {
       if (*ite == cnt) {

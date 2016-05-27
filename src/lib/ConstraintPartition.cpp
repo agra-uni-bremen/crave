@@ -7,7 +7,7 @@ template <typename ostream>
 ostream& operator<<(ostream& os, const ConstraintPartition& cp) {
   os << "[ ";
 
-  BOOST_FOREACH(ConstraintPtr c, cp) { os << c->name() << " "; }
+  for(ConstraintPtr c : cp) { os << c->name() << " "; }
   os << "]";
   os << std::flush;
   return os;
