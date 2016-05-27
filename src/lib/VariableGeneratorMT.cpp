@@ -6,7 +6,7 @@ namespace crave {
 VariableGeneratorMT::VariableGeneratorMT(VariableContainer const& vcon) : VariableGenerator(vcon) {}
 
 void VariableGeneratorMT::createNewSolver(ConstraintPartition& partition, unsigned int index) {
-  solvers_[index] = boost::make_shared<VariableDefaultSolver>(var_ctn_, partition);
+  solvers_[index] = std::make_shared<VariableDefaultSolver>(var_ctn_, partition);
 }
 
 void VariableGeneratorMT::reset(std::vector<ConstraintPartition>& partitions) {

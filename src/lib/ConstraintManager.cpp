@@ -81,11 +81,11 @@ ConstraintPtr ConstraintManager::makeConstraint(std::string const& name, int c_i
   ConstraintPtr c;
 
   if (boost::dynamic_pointer_cast<ForEach>(n) != 0) {
-    c = boost::make_shared<UserVectorConstraint>(c_id, n, name, gssv.getSupportVars(), false, soft, cover);
+    c = std::make_shared<UserVectorConstraint>(c_id, n, name, gssv.getSupportVars(), false, soft, cover);
   } else if (boost::dynamic_pointer_cast<Unique>(n) != 0) {
-    c = boost::make_shared<UserVectorConstraint>(c_id, n, name, gssv.getSupportVars(), true, soft, cover);
+    c = std::make_shared<UserVectorConstraint>(c_id, n, name, gssv.getSupportVars(), true, soft, cover);
   } else {
-    c = boost::make_shared<UserConstraint>(c_id, n, name, gssv.getSupportVars(), soft, cover);
+    c = std::make_shared<UserConstraint>(c_id, n, name, gssv.getSupportVars(), soft, cover);
   }
 
   assert(!c->isSoft() || !c->isCover());              // soft cover constraint not defined/supported yet
