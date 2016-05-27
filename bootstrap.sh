@@ -5,7 +5,7 @@ BUILD_DIR=$PWD/build
 DEPS=$PWD/deps
 
 BOOST=boost-1_50_0
-GLOG=glog-svn
+GLOG=glog-git-0.3.3
 SYSTEMC=systemc-2.3.1
 SWORD=SWORD-1.1
 CUDD=cudd-2.4.2
