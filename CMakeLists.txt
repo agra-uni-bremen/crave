@@ -9,6 +9,8 @@ set(${PROJECT_NAME}_CONFIG_DIR "share/${PROJECT_NAME}" CACHE PATH
 ############################################################
 
 option(CRAVE_ENABLE_EXPERIMENTAL "enable experimental extensions of CRAVE" on)
+option(CRAVE_ENABLE_TESTS        "build tests" on)
+option(CRAVE_BUILD_EXAMPLES      "build and test examples" on)
 
 if (CRAVE_ENABLE_EXPERIMENTAL)
   add_definitions(-std=c++11)
@@ -65,8 +67,6 @@ include_directories(${GLOG_INCLUDE_DIRS})
 if(SystemC_FOUND)
   include_directories(${SystemC_INCLUDE_DIR})
 endif(SystemC_FOUND)
-
-enable_testing ()
 
 add_subdirectory(src)
 
@@ -138,8 +138,15 @@ INSTALL( FILES
 	${PROJECT_BINARY_DIR}/${PROJECT_NAME}.pc
 	DESTINATION lib/pkgconfig/)
 
-add_subdirectory ( tests )
-add_subdirectory ( examples )
+if (CRAVE_ENABLE_TESTS)
+  enable_testing()
+  add_subdirectory(tests)
+endif()
+
+if (CRAVE_BUILD_EXAMPLES)
+  enable_testing()
+  add_subdirectory(examples)
+endif()
 
 ############################################################
 ##                CPack settings                          ##
