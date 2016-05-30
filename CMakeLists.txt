@@ -51,11 +51,11 @@ if (WITH_SYSTEMC)
   find_package(Threads REQUIRED)
 else()
   find_package(SystemC)
+  find_package(Threads QUIET)
 endif()
 
 add_subdirectory(metaSMT)
 list(INSERT CMAKE_PREFIX_PATH 0 "${CMAKE_BINARY_DIR}")
-#list(INSERT CMAKE_PREFIX_PATH 0 "${metaSMT_BINARY_DIR}/src")
 find_package(metaSMT REQUIRED)
 add_definitions("${metaSMT_CXXFLAGS}")
 
