@@ -52,6 +52,36 @@ build_sword:
   - linux
   allow_failure: true
 
+build_sword:
+  script: 
+  - ./bootstrap.sh -d deps --systemc -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
+  - cd build
+  - make -j $NUM_JOBS
+  - ctest --schedule-random -j $NUM_JOBS
+  tags:
+  - linux
+  allow_failure: true
+
+build_sword_no_examples:
+  script: 
+  - ./bootstrap.sh -d deps --systemc -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_BUILD_EXAMPLES=off
+  - cd build
+  - make -j $NUM_JOBS
+  - ctest --schedule-random -j $NUM_JOBS
+  tags:
+  - linux
+  allow_failure: true
+
+build_sword_no_tests:
+  script: 
+  - ./bootstrap.sh -d deps --systemc -b cudd -b sword build -DCRAVE_EXAMPLES_TIMEOUT=180 -DCRAVE_ENABLE_TESTS=off
+  - cd build
+  - make -j $NUM_JOBS
+  - ctest --schedule-random -j $NUM_JOBS
+  tags:
+  - linux
+  allow_failure: true
+
 build_z3:
   script: 
   - ./bootstrap.sh -d deps --systemc -b cudd -b z3 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
