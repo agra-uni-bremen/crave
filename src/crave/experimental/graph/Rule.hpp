@@ -1,4 +1,4 @@
-// Copyright 2014 The CRAVE developers. All rights reserved.
+// Copyright 2012-2016 The CRAVE developers, University of Bremen, Germany. All rights reserved.
 #pragma once
 
 #include "../../ConstrainedRandom.hpp"
