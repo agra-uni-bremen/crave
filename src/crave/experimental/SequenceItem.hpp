@@ -29,7 +29,7 @@ class crv_sequence_item : public crv_object {
   void goal(crv_covergroup& group);
 
  protected:
-  void request_rebuild();
+  void request_rebuild() override;
 
   bool randomize_with_expr_list(expression_list const&);
   std::shared_ptr<Generator> gen_;
