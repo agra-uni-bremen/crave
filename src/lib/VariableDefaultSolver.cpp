@@ -2,6 +2,7 @@
 
 #include <set>
 #include <functional>
+#include <memory>
 
 namespace crave {
 
@@ -129,7 +130,7 @@ bool VariableDefaultSolver::solve() {
 }
 
 void VariableDefaultSolver::analyseHards() {
-  boost::scoped_ptr<metaSMTVisitor> solver(FactoryMetaSMT::getNewInstance());
+  std::unique_ptr<metaSMTVisitor> solver(FactoryMetaSMT::getNewInstance());
 
   std::map<unsigned int, NodePtr> s;
   std::vector<std::string> out;
