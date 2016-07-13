@@ -1,6 +1,6 @@
 #include "../crave/backend/VariableGeneratorMT.hpp"
 #include "../crave/backend/VariableDefaultSolver.hpp"
-#include <boost/thread/thread.hpp>
+#include <thread>
 
 namespace crave {
 VariableGeneratorMT::VariableGeneratorMT(VariableContainer const& vcon) : VariableGenerator(vcon) {}
@@ -9,15 +9,19 @@ void VariableGeneratorMT::createNewSolver(ConstraintPartition& partition, unsign
   solvers_[index] = std::make_shared<VariableDefaultSolver>(var_ctn_, partition);
 }
 
+void joinAll(std::vector<std::thread*> threads) {
+  for(std::thread* thread : threads) thread->join();
+}
+
 void VariableGeneratorMT::reset(std::vector<ConstraintPartition>& partitions) {
   solvers_.resize(partitions.size());
-  boost::thread_group threads;
+  std::vector<std::thread*> threads;
   for (unsigned i = 0; i < partitions.size(); i++) {
-    boost::thread* thread(
-        new boost::thread(boost::bind(&VariableGeneratorMT::createNewSolver, this, boost::ref(partitions.at(i)), i)));
-    threads.add_thread(thread);
+    std::thread* thread(
+        new std::thread(&VariableGeneratorMT::createNewSolver, this, std::ref(partitions.at(i)), i));
+    threads.push_back(thread);
   }
-  threads.join_all();
+  joinAll(threads);
 }
 
 void VariableGeneratorMT::solve(VarSolverPtr vs) {
@@ -27,13 +31,13 @@ void VariableGeneratorMT::solve(VarSolverPtr vs) {
 
 bool VariableGeneratorMT::solve() {
   result_ = true;
-  boost::thread_group threads;
+  std::vector<std::thread*> threads;
   for (unsigned i = 0; i < solvers_.size(); i++) {
     if (!result_) break;
-    boost::thread* thread(new boost::thread(boost::bind(&VariableGeneratorMT::solve, this, solvers_.at(i))));
-    threads.add_thread(thread);
+    std::thread* thread(new std::thread([i,this](){this->solve(this->solvers_.at(i));}));
+    threads.push_back(thread);
   }
-  threads.join_all();
+  joinAll(threads);
   return result_;
 }
 }
