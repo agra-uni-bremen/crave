@@ -5,6 +5,8 @@
 #include <random>
 #include <limits>
 #include <vector>
+#include <stdexcept>
+	
 #include "ConstraintType.hpp"
 #include "WeightedRange.hpp"
 #include "../RandomSeedManager.hpp"

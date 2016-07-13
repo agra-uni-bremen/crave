@@ -1,4 +1,5 @@
 #include "../crave/ir/ConstraintPartitioner.hpp"
+#include <algorithm>
 
 namespace crave {
 

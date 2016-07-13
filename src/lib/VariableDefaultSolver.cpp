@@ -2,6 +2,7 @@
 
 #include <set>
 #include <functional>
+#include <algorithm>
 #include <memory>
 
 namespace crave {
