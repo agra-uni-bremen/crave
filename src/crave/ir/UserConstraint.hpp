@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <boost/lexical_cast.hpp>
-
 #include <glog/logging.h>
 
 #include <ostream>
