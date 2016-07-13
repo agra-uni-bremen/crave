@@ -37,21 +37,9 @@ placeholder _i;
 
 RandomSeedManager rng(std::time(0));
 
-struct random_bit_gen {
-  random_bit_gen() : rnd(0, 1) {}
+std::function<bool(void)> random_bit = [](){return std::uniform_int_distribution<unsigned short>(0, 1)(*rng.get());};
 
-  bool operator()() { return rnd(*rng.get()); }
-
-  boost::uniform_int<unsigned short> rnd;
-};
-
-boost::function0<bool> random_bit = random_bit_gen();
-
-struct RNG {
-  unsigned operator()(unsigned i) { return boost::uniform_int<>(0, i - 1)(*rng.get()); }
-};
-
-boost::function1<unsigned, unsigned> random_unsigned = RNG();
+std::function<unsigned(unsigned)> random_unsigned = [](unsigned i){return std::uniform_int_distribution<>(0, i - 1)(*rng.get());};
 
 // if called with zero seed -> use default seed std::time(0)
 void set_global_seed(unsigned int s) {
