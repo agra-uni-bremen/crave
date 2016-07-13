@@ -1,7 +1,6 @@
 // Copyright 2012-2016 The CRAVE developers, University of Bremen, Germany. All rights reserved.//
 
 #pragma once
-#include <boost/function.hpp>
 #include <metaSMT/frontend/QF_BV.hpp>
 #include <metaSMT/DirectSolver_Context.hpp>
 #include <metaSMT/support/cardinality.hpp>
@@ -13,6 +12,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <functional>
 
 #include "../crave/ir/visitor/metaSMTNodeVisitor.hpp"
 #include "../crave/frontend/AssignResult.hpp"
@@ -23,7 +23,7 @@ namespace preds = metaSMT::logic;
 namespace qf_bv = metaSMT::logic::QF_BV;
 using metaSMT::evaluate;
 
-extern boost::function1<unsigned, unsigned> random_unsigned;
+extern std::function<unsigned(unsigned)> random_unsigned;
 
 template <typename SolverType>
 class metaSMTVisitorImpl : public metaSMTVisitor {

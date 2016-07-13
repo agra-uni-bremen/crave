@@ -1,10 +1,11 @@
 #include "../crave/backend/VariableDefaultSolver.hpp"
 
 #include <set>
+#include <functional>
 
 namespace crave {
 
-extern boost::function1<unsigned, unsigned> random_unsigned;
+extern std::function<unsigned(unsigned)> random_unsigned;
 
 bool VariableDefaultSolver::bypass_constraint_analysis = false;
 
