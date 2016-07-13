@@ -4,6 +4,7 @@
 
 #include <map>
 #include <utility>
+#include <memory>
 #include <vector>
 
 #include "ReferenceExpression.hpp"
@@ -12,8 +13,8 @@
 namespace crave {
 
 struct VariableContainer {
-  typedef std::pair<int, boost::shared_ptr<ReferenceExpression> > ReadRefPair;
-  typedef std::pair<int, boost::shared_ptr<AssignResult> > WriteRefPair;
+  typedef std::pair<int, std::shared_ptr<ReferenceExpression> > ReadRefPair;
+  typedef std::pair<int, std::shared_ptr<AssignResult> > WriteRefPair;
 
   std::map<int, NodePtr> variables;
   std::map<int, NodePtr> vector_variables;

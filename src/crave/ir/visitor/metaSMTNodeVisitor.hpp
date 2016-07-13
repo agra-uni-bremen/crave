@@ -7,6 +7,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "../../frontend/RandomBase.hpp"
 #include "../../frontend/AssignResult.hpp"

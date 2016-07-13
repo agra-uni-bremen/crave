@@ -5,8 +5,7 @@
 #include <set>
 #include <string>
 #include <list>
-
-#include <boost/make_shared.hpp>
+#include <memory>
 
 #include "Node.hpp"
 

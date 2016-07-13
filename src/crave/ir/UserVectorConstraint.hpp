@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <boost/make_shared.hpp>
-
 #include <string>
 #include <set>
 
