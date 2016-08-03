@@ -50,6 +50,11 @@ if (metaSMT_USE_SWORD)
   add_all_tests(use_SWORD core/use_SWORD.cpp)
 endif (metaSMT_USE_SWORD)
 
+if (metaSMT_USE_YICES2)
+  add_executable(use_YICES2 core/use_Yices2.cpp)
+  add_all_tests(use_YICES2 core/use_Yices2.cpp)
+endif (metaSMT_USE_YICES2)
+
 #if (metaSMT_USE_CUDD)
 #  add_executable(use_Cudd use_Cudd.cpp)
 #  add_all_tests(use_Cudd use_Cudd.cpp)

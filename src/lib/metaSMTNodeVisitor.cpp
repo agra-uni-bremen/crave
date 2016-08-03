@@ -51,6 +51,11 @@ DEFINE_SOLVER(crave::SWORD, metaSMT::solver::SWORD_Backend);
 DEFINE_SOLVER(crave::Z3, metaSMT::solver::Z3_Backend);
 #endif
 
+#ifdef metaSMT_USE_YICES2
+#include <metaSMT/backend/Yices2.hpp>
+DEFINE_SOLVER(crave::YICES2, metaSMT::solver::Yices2);
+#endif
+
 #ifdef metaSMT_USE_CUDD
 #include <metaSMT/backend/CUDD_Distributed.hpp>
 #include "../crave/RandomSeedManager.hpp"
@@ -81,6 +86,8 @@ void FactoryMetaSMT::setSolverType(std::string const& type) {
     solver_type_ = SWORD;
   else if (type == "Cudd")
     solver_type_ = CUDD;
+  else if (type == "Yices2")
+    solver_type_ = YICES2;
 }
 
 #define TRY_GET_SOLVER(solver)                                                        \
@@ -103,6 +110,8 @@ metaSMTVisitor* FactoryMetaSMT::getNewInstance(SolverTypes type) {
   switch (type) {
     case BOOLECTOR:
       TRY_GET_SOLVER(BOOLECTOR);
+    case YICES2:
+      TRY_GET_SOLVER(YICES2);
     case CVC4:
       TRY_GET_SOLVER(CVC4);
     case Z3:
@@ -114,6 +123,7 @@ metaSMTVisitor* FactoryMetaSMT::getNewInstance(SolverTypes type) {
     default:  // UNDEFINED_SOLVER
       TRY_GET_SOLVER_WHEN_UNDEFINED(BOOLECTOR);
       TRY_GET_SOLVER_WHEN_UNDEFINED(Z3);
+      TRY_GET_SOLVER_WHEN_UNDEFINED(YICES2);
       TRY_GET_SOLVER_WHEN_UNDEFINED(CVC4);
       TRY_GET_SOLVER_WHEN_UNDEFINED(SWORD);
       TRY_GET_SOLVER_WHEN_UNDEFINED(CUDD);

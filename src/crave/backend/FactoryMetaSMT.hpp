@@ -13,7 +13,8 @@ enum SolverTypes {
   CVC4,
   Z3,
   SWORD,
-  CUDD
+  CUDD,
+  YICES2
 };
 
 struct FactoryMetaSMT {

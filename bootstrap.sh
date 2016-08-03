@@ -14,6 +14,7 @@ LINGELING=lingeling-ayv-86bf266-140429
 BOOLECTOR=boolector-2.2.0
 Z3=Z3-4.4.1
 CVC4=cvc4-unstable
+YICES2=yices-2.4.2
 
 CMAKE=cmake
 BUILD_CMAKE="no"
@@ -30,7 +31,7 @@ $0 sets up a CRAVE build folder.
 usage: $0 [--free] [--non-free] build
   --boost=/p/t/b    use this version of the Boost libraries
   --backend val     use the backend val, following backends can be
-   -b val           activated: boolector, cvc4, z3, sword, cudd
+   -b val           activated: boolector, cvc4, z3, sword, cudd, yices2
   --systemc         build SystemC
   --systemc=/p/t/s  use this version of SystemC
   --clean           delete build folder before creating a new one
@@ -82,7 +83,7 @@ if [[ "$CLEAN" ]]; then
   rm -rf $BUILD_DIR
 fi
 
-BACKENDS="${BACKENDS:-boolector cvc4 z3 sword cudd }"
+BACKENDS="${BACKENDS:-boolector cvc4 z3 sword cudd yices 2}"
 echo "activated backends are: $BACKENDS"
 
 DIS_BOOLECTOR="yes"
@@ -90,6 +91,7 @@ DIS_CVC4="yes"
 DIS_CUDD="yes"
 DIS_Z3="yes"
 DIS_SWORD="yes"
+DIS_YICES2="yes"
 
 for BACKEND in $BACKENDS
 do
@@ -118,6 +120,11 @@ do
     CMAKE_ARGS="-DmetaSMT_USE_SWORD=on $CMAKE_ARGS"
     DIS_SWORD="no"
   fi
+  if [[ "$BACKEND" = "yices2" ]]; then
+    REQUIRES="$YICES2 $REQUIRES"
+    CMAKE_ARGS="-DmetaSMT_USE_YICES2=on $CMAKE_ARGS"
+    DIS_YICES2="no"
+  fi
 done
 
 if [[ "$DIS_BOOLECTOR" = "yes" ]]; then
@@ -134,6 +141,9 @@ if [[ "$DIS_Z3" = "yes" ]]; then
 fi
 if [[ "$DIS_SWORD" = "yes" ]]; then
   CMAKE_ARGS="-DmetaSMT_USE_SWORD=off $CMAKE_ARGS"
+fi
+if [[ "$DIS_YICES2" = "yes" ]]; then
+  CMAKE_ARGS="-DmetaSMT_USE_YICES2=off $CMAKE_ARGS"
 fi
 
 mk_and_abs_dir() {
