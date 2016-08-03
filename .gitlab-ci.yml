@@ -42,9 +42,9 @@ build_cvc4:
   - linux
   allow_failure: true
 
-build_sword:
+build_yices2:
   script: 
-  - ./bootstrap.sh -d deps --systemc -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
+  - ./bootstrap.sh -d deps --systemc -b cudd -b yices2 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
   - make -j $NUM_JOBS
   - ctest --schedule-random -j $NUM_JOBS
