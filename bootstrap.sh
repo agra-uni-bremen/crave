@@ -14,7 +14,7 @@ LINGELING=lingeling-ayv-86bf266-140429
 BOOLECTOR=boolector-2.2.0
 Z3=Z3-4.4.1
 CVC4=cvc4-unstable
-YICES2=yices-2.4.2
+YICES2=yices-2.5.1
 
 CMAKE=cmake
 BUILD_CMAKE="no"
