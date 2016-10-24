@@ -83,7 +83,7 @@ if [[ "$CLEAN" ]]; then
   rm -rf $BUILD_DIR
 fi
 
-BACKENDS="${BACKENDS:-boolector cvc4 z3 sword cudd yices 2}"
+BACKENDS="${BACKENDS:-boolector cvc4 z3 sword cudd yices2}"
 echo "activated backends are: $BACKENDS"
 
 DIS_BOOLECTOR="yes"

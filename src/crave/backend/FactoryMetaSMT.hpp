@@ -10,11 +10,11 @@ namespace crave {
 enum SolverTypes {
   UNDEFINED_SOLVER,
   BOOLECTOR,
-  CVC4,
-  Z3,
   SWORD,
+  YICES2,
+  Z3,
+  CVC4,
   CUDD,
-  YICES2
 };
 
 struct FactoryMetaSMT {
