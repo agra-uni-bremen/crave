@@ -41,19 +41,24 @@ DEFINE_SOLVER(crave::BOOLECTOR, crave::BoolectorSolver);
 DEFINE_SOLVER(crave::CVC4, metaSMT::solver::CVC4);
 #endif
 
+#ifdef metaSMT_USE_STP
+#include <metaSMT/backend/STP.hpp>
+DEFINE_SOLVER(crave::STP, metaSMT::solver::STP);
+#endif
+
 #ifdef metaSMT_USE_SWORD
 #include <metaSMT/backend/SWORD_Backend.hpp>
 DEFINE_SOLVER(crave::SWORD, metaSMT::solver::SWORD_Backend);
 #endif
 
-#ifdef metaSMT_USE_Z3
-#include <metaSMT/backend/Z3_Backend.hpp>
-DEFINE_SOLVER(crave::Z3, metaSMT::solver::Z3_Backend);
-#endif
-
 #ifdef metaSMT_USE_YICES2
 #include <metaSMT/backend/Yices2.hpp>
 DEFINE_SOLVER(crave::YICES2, metaSMT::solver::Yices2);
+#endif
+
+#ifdef metaSMT_USE_Z3
+#include <metaSMT/backend/Z3_Backend.hpp>
+DEFINE_SOLVER(crave::Z3, metaSMT::solver::Z3_Backend);
 #endif
 
 #ifdef metaSMT_USE_CUDD
@@ -80,14 +85,16 @@ void FactoryMetaSMT::setSolverType(std::string const& type) {
     solver_type_ = BOOLECTOR;
   else if (type == "CVC4")
     solver_type_ = CVC4;
-  else if (type == "Z3")
-    solver_type_ = Z3;
+  else if (type == "STP")
+    solver_type_ = STP;
   else if (type == "SWORD")
     solver_type_ = SWORD;
-  else if (type == "Cudd")
-    solver_type_ = CUDD;
   else if (type == "Yices2")
     solver_type_ = YICES2;
+  else if (type == "Z3")
+    solver_type_ = Z3;
+  else if (type == "Cudd")
+    solver_type_ = CUDD;
 }
 
 #define TRY_GET_SOLVER(solver)                                                        \
@@ -110,19 +117,22 @@ metaSMTVisitor* FactoryMetaSMT::getNewInstance(SolverTypes type) {
   switch (type) {
     case BOOLECTOR:
       TRY_GET_SOLVER(BOOLECTOR);
-    case YICES2:
-      TRY_GET_SOLVER(YICES2);
-    case CVC4:
-      TRY_GET_SOLVER(CVC4);
-    case Z3:
-      TRY_GET_SOLVER(Z3);
     case SWORD:
       TRY_GET_SOLVER(SWORD);
+    case STP:
+      TRY_GET_SOLVER(STP);
+    case YICES2:
+      TRY_GET_SOLVER(YICES2);
+    case Z3:
+      TRY_GET_SOLVER(Z3);
+    case CVC4:
+      TRY_GET_SOLVER(CVC4);
     case CUDD:
       TRY_GET_SOLVER(CUDD);
     default:  // UNDEFINED_SOLVER
       TRY_GET_SOLVER_WHEN_UNDEFINED(BOOLECTOR);
       TRY_GET_SOLVER_WHEN_UNDEFINED(SWORD);
+      TRY_GET_SOLVER_WHEN_UNDEFINED(STP);
       TRY_GET_SOLVER_WHEN_UNDEFINED(YICES2);
       TRY_GET_SOLVER_WHEN_UNDEFINED(Z3);
       TRY_GET_SOLVER_WHEN_UNDEFINED(CVC4);

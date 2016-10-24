@@ -52,6 +52,16 @@ build_yices2:
   - linux
   allow_failure: true
 
+build_stp:
+  script: 
+  - ./bootstrap.sh -d deps --systemc -b cudd -b stp build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
+  - cd build
+  - make -j $NUM_JOBS
+  - ctest --schedule-random -j $NUM_JOBS
+  tags:
+  - linux
+  allow_failure: true
+
 build_sword:
   script: 
   - ./bootstrap.sh -d deps --systemc -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180

@@ -7,14 +7,18 @@ DEPS=$PWD/deps
 BOOST=boost-1_50_0
 GLOG=glog-git-0.3.3
 SYSTEMC=systemc-2.3.1
+
+BOOLECTOR=boolector-2.2.0
+CVC4=cvc4-unstable
+STP=stp-git-basic
 SWORD=SWORD-1.1
-CUDD=cudd-2.4.2
+YICES2=yices-2.5.1
+Z3=Z3-4.4.1
+
 MINISAT=minisat-git
 LINGELING=lingeling-ayv-86bf266-140429
-BOOLECTOR=boolector-2.2.0
-Z3=Z3-4.4.1
-CVC4=cvc4-unstable
-YICES2=yices-2.5.1
+
+CUDD=cudd-2.4.2
 
 CMAKE=cmake
 BUILD_CMAKE="no"
@@ -31,7 +35,7 @@ $0 sets up a CRAVE build folder.
 usage: $0 [--free] [--non-free] build
   --boost=/p/t/b    use this version of the Boost libraries
   --backend val     use the backend val, following backends can be
-   -b val           activated: boolector, cvc4, z3, sword, cudd, yices2
+   -b val           activated: boolector, cvc4, stp, sword, yices2, z3 and cudd
   --systemc         build SystemC
   --systemc=/p/t/s  use this version of SystemC
   --clean           delete build folder before creating a new one
@@ -83,15 +87,17 @@ if [[ "$CLEAN" ]]; then
   rm -rf $BUILD_DIR
 fi
 
-BACKENDS="${BACKENDS:-boolector cvc4 z3 sword cudd yices2}"
+BACKENDS="${BACKENDS:-boolector cvc4 stp sword yices2 z3 cudd}"
 echo "activated backends are: $BACKENDS"
 
 DIS_BOOLECTOR="yes"
 DIS_CVC4="yes"
-DIS_CUDD="yes"
-DIS_Z3="yes"
+DIS_STP="yes"
 DIS_SWORD="yes"
 DIS_YICES2="yes"
+DIS_Z3="yes"
+
+DIS_CUDD="yes"
 
 for BACKEND in $BACKENDS
 do
@@ -100,20 +106,15 @@ do
     CMAKE_ARGS="-DmetaSMT_USE_Boolector=on $CMAKE_ARGS"
     DIS_BOOLECTOR="no"
   fi
-  if [[ "$BACKEND" = "cudd" ]]; then
-    REQUIRES="$CUDD $REQUIRES"
-    CMAKE_ARGS="-DmetaSMT_USE_CUDD=on $CMAKE_ARGS"
-    DIS_CUDD="no"
-  fi
   if [[ "$BACKEND" = "cvc4" ]]; then
     REQUIRES="$CVC4 $REQUIRES"
     CMAKE_ARGS="-DmetaSMT_USE_CVC4=on $CMAKE_ARGS"
     DIS_CVC4="no"
   fi
-  if [[ "$BACKEND" = "z3" ]]; then
-    REQUIRES="$Z3 $REQUIRES"
-    CMAKE_ARGS="-DmetaSMT_USE_Z3=on $CMAKE_ARGS"
-    DIS_Z3="no"
+  if [[ "$BACKEND" = "stp" ]]; then
+    REQUIRES="$STP $REQUIRES"
+    CMAKE_ARGS="-DmetaSMT_USE_STP=on $CMAKE_ARGS"
+    DIS_STP="no"
   fi
   if [[ "$BACKEND" = "sword" ]]; then
     REQUIRES="$SWORD $REQUIRES"
@@ -125,6 +126,17 @@ do
     CMAKE_ARGS="-DmetaSMT_USE_YICES2=on $CMAKE_ARGS"
     DIS_YICES2="no"
   fi
+  if [[ "$BACKEND" = "z3" ]]; then
+    REQUIRES="$Z3 $REQUIRES"
+    CMAKE_ARGS="-DmetaSMT_USE_Z3=on $CMAKE_ARGS"
+    DIS_Z3="no"
+  fi
+
+  if [[ "$BACKEND" = "cudd" ]]; then
+    REQUIRES="$CUDD $REQUIRES"
+    CMAKE_ARGS="-DmetaSMT_USE_CUDD=on $CMAKE_ARGS"
+    DIS_CUDD="no"
+  fi
 done
 
 if [[ "$DIS_BOOLECTOR" = "yes" ]]; then
@@ -133,17 +145,20 @@ fi
 if [[ "$DIS_CVC4" = "yes" ]]; then
   CMAKE_ARGS="-DmetaSMT_USE_CVC4=off $CMAKE_ARGS"
 fi
-if [[ "$DIS_CUDD" = "yes" ]]; then
-  CMAKE_ARGS="-DmetaSMT_USE_CUDD=off $CMAKE_ARGS"
-fi
-if [[ "$DIS_Z3" = "yes" ]]; then
-  CMAKE_ARGS="-DmetaSMT_USE_Z3=off $CMAKE_ARGS"
+if [[ "$DIS_STP" = "yes" ]]; then
+  CMAKE_ARGS="-DmetaSMT_USE_STP=off $CMAKE_ARGS"
 fi
 if [[ "$DIS_SWORD" = "yes" ]]; then
   CMAKE_ARGS="-DmetaSMT_USE_SWORD=off $CMAKE_ARGS"
 fi
 if [[ "$DIS_YICES2" = "yes" ]]; then
   CMAKE_ARGS="-DmetaSMT_USE_YICES2=off $CMAKE_ARGS"
+fi
+if [[ "$DIS_Z3" = "yes" ]]; then
+  CMAKE_ARGS="-DmetaSMT_USE_Z3=off $CMAKE_ARGS"
+fi
+if [[ "$DIS_CUDD" = "yes" ]]; then
+  CMAKE_ARGS="-DmetaSMT_USE_CUDD=off $CMAKE_ARGS"
 fi
 
 mk_and_abs_dir() {

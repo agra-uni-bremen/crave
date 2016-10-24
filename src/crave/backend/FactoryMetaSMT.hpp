@@ -11,6 +11,7 @@ enum SolverTypes {
   UNDEFINED_SOLVER,
   BOOLECTOR,
   SWORD,
+  STP,
   YICES2,
   Z3,
   CVC4,
