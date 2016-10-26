@@ -51,11 +51,6 @@ DEFINE_SOLVER(crave::STP, metaSMT::solver::STP);
 DEFINE_SOLVER(crave::SWORD, metaSMT::solver::SWORD_Backend);
 #endif
 
-#ifdef metaSMT_USE_YICES2
-#include <metaSMT/backend/Yices2.hpp>
-DEFINE_SOLVER(crave::YICES2, metaSMT::solver::Yices2);
-#endif
-
 #ifdef metaSMT_USE_Z3
 #include <metaSMT/backend/Z3_Backend.hpp>
 DEFINE_SOLVER(crave::Z3, metaSMT::solver::Z3_Backend);

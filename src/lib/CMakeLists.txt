@@ -5,6 +5,7 @@ SET(CRAVE_LIB_SRC
   FixWidthVisitor.cpp
   GetSupportSetVisitor.cpp
   metaSMTNodeVisitor.cpp
+  metaSMTNodeVisitorYices2.cpp
   ReplaceVisitor.cpp
   ToDotNodeVisitor.cpp
   CraveSettings.cpp
