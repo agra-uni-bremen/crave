@@ -3,11 +3,11 @@
 #pragma once
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "../../frontend/RandomBase.hpp"
 #include "../../frontend/AssignResult.hpp"
@@ -33,6 +33,6 @@ class metaSMTVisitor : public NodeVisitor {
   virtual bool readVector(const std::vector<VariablePtr>& vec, __rand_vec_base* rand_vec) = 0;
 };
 
-typedef boost::shared_ptr<metaSMTVisitor> SolverPtr;
+typedef std::shared_ptr<metaSMTVisitor> SolverPtr;
 
 }  // end namespace crave

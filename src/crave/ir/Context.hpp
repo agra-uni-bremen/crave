@@ -2,14 +2,12 @@
 
 #pragma once
 
-#include <boost/foreach.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/proto/core.hpp>
 #include <boost/proto/debug.hpp>
 #include <boost/proto/context/callable.hpp>
 #include <boost/proto/context/null.hpp>
 #include <boost/range/value_type.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <limits>
 #include <map>
@@ -31,8 +29,8 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
   typedef NodePtr result_type;
 
  private:
-  typedef std::pair<int, boost::shared_ptr<crave::ReferenceExpression> > ReadRefPair;
-  typedef std::pair<int, boost::shared_ptr<crave::AssignResult> > WriteRefPair;
+  typedef std::pair<int, std::shared_ptr<crave::ReferenceExpression> > ReadRefPair;
+  typedef std::pair<int, std::shared_ptr<crave::AssignResult> > WriteRefPair;
 
  public:
   explicit Context(VariableContainer* vars)
@@ -89,7 +87,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
       result_type var = new_var(static_cast<var_tag<value_type> >(ref));
 
       write_references_.push_back(
-          std::make_pair(ref.id, boost::shared_ptr<crave::AssignResult>(new AssignResultToRef<value_type>(ref.ref))));
+          std::make_pair(ref.id, std::shared_ptr<crave::AssignResult>(new AssignResultToRef<value_type>(ref.ref))));
       return var;
     }
   }
@@ -232,7 +230,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
     } else {
       result_type var = new_var(static_cast<var_tag<Integer> >(ref));
 
-      boost::shared_ptr<crave::ReferenceExpression> refExpr(new ReferenceExpressionImpl<Integer>(ref.ref, var));
+      std::shared_ptr<crave::ReferenceExpression> refExpr(new ReferenceExpressionImpl<Integer>(ref.ref, var));
       read_references_.push_back(std::make_pair(ref.id, refExpr));
 
       return var;
@@ -266,14 +264,14 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
 
     std::set<Constant> constants;
     distribution<Integer> dist;
-    BOOST_FOREACH(CollectionEntry const & i, boost::proto::value(c)) {
+    for(CollectionEntry const & i : boost::proto::value(c)) {
       constants.insert(Constant(i, width, sign));
       dist(weighted_value<Integer>(i, 1));
     }
 
     unsigned id = new_var_id();
     result_type tmp_var = new_var(id, width, sign);
-    boost::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<Integer>(dist, tmp_var));
+    std::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<Integer>(dist, tmp_var));
     dist_references_.push_back(std::make_pair(id, ref_expr));
 
     result_type val_equal_tmp(new EqualOpr(boost::proto::eval(var_term, *this), tmp_var));
@@ -293,14 +291,14 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
 
     std::set<Constant> constants;
     distribution<Integer> dist;
-    BOOST_FOREACH(CollectionEntry const & i, boost::proto::value(c)) {
+    for(CollectionEntry const & i : boost::proto::value(c)) {
       constants.insert(Constant(i, width, sign));
       dist(weighted_value<Integer>(i, 1));
     }
 
     unsigned id = new_var_id();
     result_type tmp_var = new_var(id, width, sign);
-    boost::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<Integer>(dist, tmp_var));
+    std::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<Integer>(dist, tmp_var));
     dist_references_.push_back(std::make_pair(id, ref_expr));
 
     result_type val_equal_tmp(new EqualOpr(boost::proto::eval(var_term, *this), tmp_var));
@@ -318,11 +316,11 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
 
     unsigned id = new_var_id();
     result_type tmp_var = new_var(id, width, sign);
-    boost::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<DistInt>(dist, tmp_var));
+    std::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<DistInt>(dist, tmp_var));
     dist_references_.push_back(std::make_pair(id, ref_expr));
 
     result_type in_ranges;
-    BOOST_FOREACH(weighted_range<DistInt> const & r, dist.ranges()) {
+    for(weighted_range<DistInt> const & r : dist.ranges()) {
       result_type left(new Constant(r.left_, width, sign));
       result_type right(new Constant(r.right_, width, sign));
       result_type left_cond(new LessEqualOpr(left, tmp_var));
@@ -346,11 +344,11 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
 
     unsigned id = new_var_id();
     result_type tmp_var = new_var(id, width, sign);
-    boost::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<DistInt>(dist, tmp_var));
+    std::shared_ptr<crave::ReferenceExpression> ref_expr(new DistReferenceExpr<DistInt>(dist, tmp_var));
     dist_references_.push_back(std::make_pair(id, ref_expr));
 
     result_type in_ranges;
-    BOOST_FOREACH(weighted_range<DistInt> const & r, dist.ranges()) {
+    for(weighted_range<DistInt> const & r : dist.ranges()) {
       result_type left(new Constant(r.left_, width, sign));
       result_type right(new Constant(r.right_, width, sign));
       result_type left_cond(new LessEqualOpr(left, tmp_var));

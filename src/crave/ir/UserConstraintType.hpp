@@ -5,10 +5,7 @@
 #include <set>
 #include <string>
 #include <list>
-
-#include <boost/foreach.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
+#include <memory>
 
 #include "Node.hpp"
 
@@ -64,7 +61,7 @@ class UserConstraint {
 template <typename ostream>
 ostream& operator<<(ostream& os, const UserConstraint& constr);
 
-typedef boost::shared_ptr<UserConstraint> ConstraintPtr;
+typedef std::shared_ptr<UserConstraint> ConstraintPtr;
 typedef std::list<ConstraintPtr> ConstraintList;
 
 }  // namespace crave

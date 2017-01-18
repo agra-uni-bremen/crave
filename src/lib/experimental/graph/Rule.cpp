@@ -1,5 +1,6 @@
 // Copyright 2012-2016 The CRAVE developers, University of Bremen, Germany. All rights reserved.
 #include "../../../crave/experimental/graph/Rule.hpp"
+#include <functional>
 
 namespace crave {
 
@@ -11,7 +12,7 @@ namespace graph {
     
     void Rule::bind_rand_obj(rand_obj* obj) {
     m_rand_obj = obj;
-    main = boost::bind(&Rule::gen, this);
+    main = std::bind(&Rule::gen, this);
   }
     bool Rule::is_rand_obj_covered() const { return m_rand_obj == 0 || m_rand_obj->constraint.isCovered(); }
     

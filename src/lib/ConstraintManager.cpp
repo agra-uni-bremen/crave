@@ -3,8 +3,6 @@
 #include "../crave/ir/visitor/ToDotNodeVisitor.hpp"
 #include "../crave/ir/visitor/ComplexityEstimationVisitor.hpp"
 
-#include <boost/make_shared.hpp>
-
 #include <glog/logging.h>
 
 namespace crave {
@@ -13,7 +11,7 @@ template <typename ostream>
 ostream& operator<<(ostream& os, const ConstraintManager& set) {
   os << "Set " << set.id_ << " has " << set.constraints_.size() << " constraint(s) and has "
      << (set.changed_ ? "" : "not ") << "changed" << std::endl;
-  BOOST_FOREACH(ConstraintPtr item, set.constraints_) { os << item << std::endl; }
+  for(ConstraintPtr item : set.constraints_) { os << item << std::endl; }
   os << std::flush;
   return os;
 }
@@ -81,11 +79,11 @@ ConstraintPtr ConstraintManager::makeConstraint(std::string const& name, int c_i
   ConstraintPtr c;
 
   if (boost::dynamic_pointer_cast<ForEach>(n) != 0) {
-    c = boost::make_shared<UserVectorConstraint>(c_id, n, name, gssv.getSupportVars(), false, soft, cover);
+    c = std::make_shared<UserVectorConstraint>(c_id, n, name, gssv.getSupportVars(), false, soft, cover);
   } else if (boost::dynamic_pointer_cast<Unique>(n) != 0) {
-    c = boost::make_shared<UserVectorConstraint>(c_id, n, name, gssv.getSupportVars(), true, soft, cover);
+    c = std::make_shared<UserVectorConstraint>(c_id, n, name, gssv.getSupportVars(), true, soft, cover);
   } else {
-    c = boost::make_shared<UserConstraint>(c_id, n, name, gssv.getSupportVars(), soft, cover);
+    c = std::make_shared<UserConstraint>(c_id, n, name, gssv.getSupportVars(), soft, cover);
   }
 
   assert(!c->isSoft() || !c->isCover());              // soft cover constraint not defined/supported yet
@@ -104,7 +102,7 @@ ConstraintPtr ConstraintManager::makeConstraint(std::string const& name, int c_i
 
 std::ostream& ConstraintManager::printDotGraph(std::ostream& os) {
   ToDotVisitor visitor(os);
-  BOOST_FOREACH(ConstraintPtr c, constraints_) {
+  for(ConstraintPtr c : constraints_) {
     long a = reinterpret_cast<long>(&*c);
     long b = reinterpret_cast<long>(&(*c->expr()));
     os << "\t" << a << " [label=\"" << c->name() << (c->isSoft() ? " soft" : "") << (c->isCover() ? " cover" : "")

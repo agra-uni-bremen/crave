@@ -3,7 +3,6 @@
 #include "../../crave/experimental/graph/Node.hpp"
 #include "../../crave/experimental/graph/GraphVisitor.hpp"
 
-#include <boost/foreach.hpp>
 #include <boost/assert.hpp>
 
 namespace crave {
@@ -19,14 +18,14 @@ void PrintVisitor::visitTerminal(Terminal& t) { ++depth, printNode(t), --depth; 
 void PrintVisitor::visitSelector(Selector& sel) {
   ++depth;
   printNode(sel);
-  BOOST_FOREACH(NodePtr n, sel.children) { n->accept(*this); }
+  for(NodePtr n : sel.children) { n->accept(*this); }
   --depth;
 }
 
 void PrintVisitor::visitSequence(Sequence& seq) {
   ++depth;
   printNode(seq);
-  BOOST_FOREACH(NodePtr n, seq.children) { n->accept(*this); }
+  for(NodePtr n : seq.children) { n->accept(*this); }
   --depth;
 }
 
@@ -39,7 +38,7 @@ void UpdateVisitor::visitNonTerminal(NonTerminal& nt) {
   }
 
   std::vector<NodePtr> updated_children;
-  BOOST_FOREACH(NodePtr n, nt.children) {
+  for(NodePtr n : nt.children) {
     NodePtr tmp = n;
     if (n->name() && m_named_nodes.find(n->name()) != m_named_nodes.end()) {
       // update named child
@@ -119,7 +118,7 @@ void ToDotVisitor::visitSelector(Selector& nt) {
   createNode(1, start, "start", "point", 0);
   createNode(1, end, "end", "point", 0);
 
-  BOOST_FOREACH(NodePtr n, nt.children) {
+  for(NodePtr n : nt.children) {
     n->accept(*this);
     result_type& r = m_stack.top();
     m_stack.pop();
@@ -142,7 +141,7 @@ void ToDotVisitor::visitSequence(Sequence& nt) {
   createNode(1, end, "end", "point", 0);
 
   int last = start;
-  BOOST_FOREACH(NodePtr n, nt.children) {
+  for(NodePtr n : nt.children) {
     n->accept(*this);
     result_type& r = m_stack.top();
     m_stack.pop();

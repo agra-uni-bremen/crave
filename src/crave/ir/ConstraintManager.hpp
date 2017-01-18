@@ -5,8 +5,6 @@
 #include <string>
 #include <map>
 
-#include <boost/lexical_cast.hpp>
-
 #include "UserConstraintType.hpp"
 #include "UserVectorConstraint.hpp"
 #include "Context.hpp"
@@ -53,7 +51,7 @@ struct ConstraintManager {
   template <typename Expr>
   ConstraintPtr makeConstraint(Expr e, Context* ctx, bool const soft = false, bool const cover = false) {
     int id = new_constraint_id();
-    return makeConstraint("constraint_" + boost::lexical_cast<std::string>(id), id, e, ctx, soft, cover);
+    return makeConstraint("constraint_" + std::to_string(id), id, e, ctx, soft, cover);
   }
 
   std::ostream& printDotGraph(std::ostream& os);

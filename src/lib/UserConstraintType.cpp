@@ -19,7 +19,7 @@ ostream& operator<<(ostream& os, const UserConstraint& constr) {
      << (constr.enabled_ ? "enabled" : "disabled");
   os << ", support vars =";
 
-  BOOST_FOREACH(int item, constr.support_vars_) { os << " " << item; }
+  for(int item : constr.support_vars_) { os << " " << item; }
   return os;
 }
 

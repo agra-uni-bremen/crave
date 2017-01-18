@@ -10,7 +10,7 @@ namespace graph {
 
 namespace proto = boost::proto;
     
-typedef boost::shared_ptr<Rule> RulePtr;
+typedef std::shared_ptr<Rule> RulePtr;
 typedef proto::terminal<Rule>::type rule_type;
 
 struct RuleContext : proto::callable_context<RuleContext, proto::null_context> {

@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include <boost/function.hpp>
+#include <functional>
 
 #include "AssignResult.hpp"
 #include "bitsize_traits.hpp"
@@ -12,7 +12,7 @@
 
 namespace crave {
 
-extern boost::function0<bool> random_bit;
+extern std::function<bool(void)> random_bit;
 
 template <typename T>
 struct to_constant_expr<T, typename boost::enable_if<boost::is_integral<T> >::type> {

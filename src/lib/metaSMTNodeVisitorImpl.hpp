@@ -1,8 +1,6 @@
 // Copyright 2012-2016 The CRAVE developers, University of Bremen, Germany. All rights reserved.//
 
 #pragma once
-#include <boost/function.hpp>
-#include <boost/foreach.hpp>
 #include <metaSMT/frontend/QF_BV.hpp>
 #include <metaSMT/DirectSolver_Context.hpp>
 #include <metaSMT/support/cardinality.hpp>
@@ -13,6 +11,8 @@
 #include <utility>
 #include <vector>
 #include <string>
+#include <algorithm>
+#include <functional>
 
 #include "../crave/ir/visitor/metaSMTNodeVisitor.hpp"
 #include "../crave/frontend/AssignResult.hpp"
@@ -23,7 +23,7 @@ namespace preds = metaSMT::logic;
 namespace qf_bv = metaSMT::logic::QF_BV;
 using metaSMT::evaluate;
 
-extern boost::function1<unsigned, unsigned> random_unsigned;
+extern std::function<unsigned(unsigned)> random_unsigned;
 
 template <typename SolverType>
 class metaSMTVisitorImpl : public metaSMTVisitor {
@@ -244,7 +244,7 @@ void metaSMTVisitorImpl<SolverType>::visitInside(Inside const &in) {
   pop(entry);
 
   result_type result = evaluate(solver_, preds::False);
-  BOOST_FOREACH(Constant c, in.collection()) {
+  for(Constant c : in.collection()) {
     stack_entry constExpr;
     c.visit(this);
     pop(constExpr);
@@ -614,7 +614,7 @@ std::vector<std::vector<unsigned int> > metaSMTVisitorImpl<SolverType>::analyseC
 
   typedef std::pair<unsigned int, NodePtr> NodePair;
 
-  BOOST_FOREACH(NodePair entry, s) {
+  for(NodePair entry : s) {
     entry.second->visit(this);
     stack_entry st_entry;
     pop(st_entry);
@@ -637,12 +637,12 @@ bool metaSMTVisitorImpl<SolverType>::solve(bool ignoreSofts) {
   std::random_shuffle(suggestions_.begin(), suggestions_.end(), crave::random_unsigned);
 
   while (true) {
-    BOOST_FOREACH(result_type const & item, assumptions_) { metaSMT::assumption(solver_, item); }
+    for(result_type const & item : assumptions_) { metaSMT::assumption(solver_, item); }
 
-    BOOST_FOREACH(result_type const & item, suggestions_) { metaSMT::assumption(solver_, item); }
+    for(result_type const & item : suggestions_) { metaSMT::assumption(solver_, item); }
 
     if (!ignoreSofts) {
-      BOOST_FOREACH(result_type const & item, softs_) { metaSMT::assumption(solver_, preds::equal(item, preds::True)); }
+      for(result_type const & item : softs_) { metaSMT::assumption(solver_, preds::equal(item, preds::True)); }
     }
 
     if (metaSMT::solve(solver_)) {
@@ -690,7 +690,7 @@ bool metaSMTVisitorImpl<SolverType>::read(Node const &v, std::string &str) {
 template <typename SolverType>
 bool metaSMTVisitorImpl<SolverType>::readVector(const std::vector<VariablePtr> &vec, __rand_vec_base *rand_vec) {
   std::vector<std::string> sv;
-  BOOST_FOREACH(VariablePtr var, vec) {
+  for(VariablePtr var : vec) {
     typename result_map::const_iterator ite(terminals_.find(var->id()));
     if (ite == terminals_.end()) return false;
 

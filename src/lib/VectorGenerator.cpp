@@ -10,7 +10,7 @@ void VectorSolver::addConstraint(VectorConstraintPtr vc) { constraints_.push_bac
 
 bool VectorSolver::solve(const VariableGenerator& var_gen) {
   std::string cstr_name_list;
-  BOOST_FOREACH(VectorConstraintPtr constraint, constraints_) {
+  for(VectorConstraintPtr constraint : constraints_) {
     cstr_name_list += " " + constraint->name();
   }
   LOG(INFO) << "Solve constraints of vector " << vector_id_ << " [" << cstr_name_list << "]";
@@ -49,7 +49,7 @@ void VectorSolver::buildSolver(unsigned int const size) {
     }
   }
 
-  BOOST_FOREACH(VectorConstraintPtr constraint, constraints_) {
+  for(VectorConstraintPtr constraint : constraints_) {
     if (!constraint->isUnique()) {
       ReplaceVisitor replacer(&vec_elements_);
       for (unsigned int i = 0u; i < size; ++i) {
@@ -81,10 +81,10 @@ void VectorSolver::buildSolver(unsigned int const size) {
 VectorGenerator::VectorGenerator() : vector_solvers_() {}
 
 bool VectorGenerator::solve(const VariableGenerator& var_gen, const std::set<int>& vec_ids) {
-  BOOST_FOREACH(VectorSolverMap::value_type & c_pair, vector_solvers_) {
+  for(VectorSolverMap::value_type & c_pair : vector_solvers_) {
     if (!c_pair.second.solve(var_gen)) return false;
   }
-  BOOST_FOREACH(int id, vec_ids) {
+  for(int id : vec_ids) {
     if (vector_solvers_.find(id) != vector_solvers_.end()) continue;
     // unconstrained vector
     __rand_vec_base* vector = vectorBaseMap[id];
@@ -102,7 +102,7 @@ bool VectorGenerator::solve(const VariableGenerator& var_gen, const std::set<int
 
 void VectorGenerator::reset(const std::vector<VectorConstraintPtr>& v) {
   vector_solvers_.clear();
-  BOOST_FOREACH(VectorConstraintPtr vc, v) { addConstraint(vc); }
+  for(VectorConstraintPtr vc : v) { addConstraint(vc); }
 }
 
 void VectorGenerator::addConstraint(VectorConstraintPtr vc) {

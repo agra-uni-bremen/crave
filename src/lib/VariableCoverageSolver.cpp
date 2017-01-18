@@ -6,7 +6,7 @@ VariableCoverageSolver::VariableCoverageSolver(const VariableContainer& vcon, co
     : VariableSolver(vcon, cp) {
   LOG(INFO) << "Create coverage solver for partition " << constr_pttn_;
 
-  BOOST_FOREACH(ConstraintPtr c, constr_pttn_) {
+  for(ConstraintPtr c : constr_pttn_) {
     if (c->isSoft()) {
       continue;  // coverage solver ignores soft constraints for now
     }
@@ -16,14 +16,14 @@ VariableCoverageSolver::VariableCoverageSolver(const VariableContainer& vcon, co
 
 bool VariableCoverageSolver::solve() {
 
-  BOOST_FOREACH(ConstraintPtr c, constr_pttn_) {
+  for(ConstraintPtr c : constr_pttn_) {
     if (!c->isCover()) continue;
     if (covered_set_.find(c->name()) != covered_set_.end()) {
       continue;  // alread covered
     }
     // try solve
 
-    BOOST_FOREACH(VariableContainer::ReadRefPair & pair, var_ctn_.read_references) {
+    for(VariableContainer::ReadRefPair & pair : var_ctn_.read_references) {
       solver_->makeAssumption(*pair.second->expr());
     }
     solver_->makeAssumption(*c->expr());
@@ -31,7 +31,7 @@ bool VariableCoverageSolver::solve() {
       LOG(INFO) << "Solve partition " << constr_pttn_ << " hitting constraint " << c->name();
       covered_set_.insert(c->name());
 
-      BOOST_FOREACH(VariableContainer::WriteRefPair & pair, var_ctn_.write_references) {
+      for(VariableContainer::WriteRefPair & pair : var_ctn_.write_references) {
         solver_->read(*var_ctn_.variables[pair.first], *pair.second);
       }
       return true;

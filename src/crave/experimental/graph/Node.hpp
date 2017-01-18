@@ -2,9 +2,8 @@
 
 #include <string>
 #include <map>
+#include <memory>
 #include <vector>
-
-#include <boost/shared_ptr.hpp>
 
 namespace crave {
 
@@ -14,7 +13,7 @@ struct Node;
 struct Terminal;
 struct Selector;
 struct Sequence;
-typedef boost::shared_ptr<Node> NodePtr;
+typedef std::shared_ptr<Node> NodePtr;
 typedef std::map<std::string, NodePtr> node_map;
 
 struct NodeVisitor;

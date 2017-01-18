@@ -2,10 +2,6 @@
 
 #pragma once
 
-#include <boost/shared_ptr.hpp>
-#include <boost/foreach.hpp>
-#include <boost/lexical_cast.hpp>
-
 #include <glog/logging.h>
 
 #include <ostream>
@@ -38,6 +34,6 @@ struct ConstraintPartitioner;
 class UserConstraint;
 
 class UserVectorConstraint;
-typedef boost::shared_ptr<UserVectorConstraint> VectorConstraintPtr;
+typedef std::shared_ptr<UserVectorConstraint> VectorConstraintPtr;
 
 }  // end namespace crave

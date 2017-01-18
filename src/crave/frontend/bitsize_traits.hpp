@@ -7,7 +7,6 @@
 #include <boost/mpl/sizeof.hpp>
 #include <boost/type_traits/is_signed.hpp>
 #include <boost/utility/enable_if.hpp>
-#include <boost/static_assert.hpp>
 
 namespace crave {
 
@@ -29,7 +28,7 @@ struct placeholder_tag;
 
 template <typename T, typename Enable = void>
 struct bitsize_traits : boost::mpl::int_<0> {
-  BOOST_STATIC_ASSERT(sizeof(T) == 0);
+  static_assert(sizeof(T) == 0, "zero-sized type");
 };
 
 template <typename Integer>

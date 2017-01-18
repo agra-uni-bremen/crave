@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <boost/shared_ptr.hpp>
 #include <list>
 #include <set>
 #include <map>
@@ -10,7 +9,7 @@
 
 namespace crave {
 
-typedef boost::shared_ptr<UserConstraint> ConstraintPtr;
+typedef std::shared_ptr<UserConstraint> ConstraintPtr;
 typedef std::list<ConstraintPtr> ConstraintList;
 
 struct ConstraintPartition {

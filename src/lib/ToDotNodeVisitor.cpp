@@ -1,7 +1,5 @@
 // Copyright 2012-2016 The CRAVE developers, University of Bremen, Germany. All rights reserved.//
 
-#include <boost/foreach.hpp>
-
 #include "../crave/ir/visitor/ToDotNodeVisitor.hpp"
 
 namespace crave {
@@ -96,7 +94,7 @@ void ToDotVisitor::visitInside(Inside const &o) {
   if (putNode(&o)) {
     visitNode(o);
     out_ << " [label=\"inside\n{ ";
-    BOOST_FOREACH(unsigned long u, o.collection()) { out_ << u << " "; }
+    for(unsigned long u : o.collection()) { out_ << u << " "; }
     out_ << "}\"]" << std::endl;
   }
   visitUnaryExpr(o);

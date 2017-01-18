@@ -3,9 +3,6 @@
 
 #include "../../ConstrainedRandom.hpp"
 
-#include <boost/assert.hpp>
-#include <boost/bind.hpp>
-
 namespace crave {
 
 namespace graph {
