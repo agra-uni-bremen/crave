@@ -19,17 +19,20 @@ class CraveSetting : public Setting {
 
  public:
   std::string const& get_backend() const;
-  unsigned int get_seed() const;
+  unsigned int get_specified_seed() const;
+  void set_used_seed(unsigned int);
 
  private:
   std::string module_name_;
 
  private:
   std::string backend_;
-  unsigned int seed_;
+  unsigned int specified_seed_;
+  unsigned int used_seed_;
 
  private:
   std::string const BACKEND;
   std::string const SEED;
+  std::string const LASTSEED;
 };
 }  // namespace crave

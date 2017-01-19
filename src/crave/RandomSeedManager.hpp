@@ -9,6 +9,7 @@ class RandomSeedManager {
   virtual ~RandomSeedManager();
   void set_global_seed(unsigned int s);
   std::mt19937* get();
+  unsigned int get_seed();
   unsigned int charToUIntSeed(const char* name);
 
   bool operator==(const RandomSeedManager& rhs) const {

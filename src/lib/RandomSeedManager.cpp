@@ -13,6 +13,10 @@ void RandomSeedManager::set_global_seed(unsigned int s) {
   default_rng_.seed(s);
 }
 
+unsigned int RandomSeedManager::get_seed() {
+  return seed_;
+}
+
 #ifndef WITH_SYSTEMC
 
 std::mt19937* RandomSeedManager::get() { return &default_rng_; }
