@@ -34,6 +34,7 @@ build_boolector:
 
 build_cvc4:
   script: 
+  - export BOOST_ROOT=deps/boost-1_50_0 # use 1.50 to avoid cvc4 rebuild
   - ./bootstrap.sh -d deps --systemc -b cudd -b cvc4 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
   - make -j $NUM_JOBS
