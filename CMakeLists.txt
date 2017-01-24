@@ -55,7 +55,6 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 set(Boost_NO_BOOST_CMAKE true)
 set(Boost_NO_SYSTEM_PATHS true)
-set(Boost_ADDITIONAL_VERSIONS "1.50.0")
 find_package(Boost REQUIRED COMPONENTS system filesystem)
 
 find_package(Glog REQUIRED)

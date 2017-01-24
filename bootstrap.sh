@@ -4,7 +4,8 @@ SRC_DIR=$( cd $(dirname $0) && pwd)
 BUILD_DIR=$PWD/build
 DEPS=$PWD/deps
 
-BOOST=boost-1_50_0
+BOOST=boost-1_55_0-fs
+
 GLOG=glog-git-0.3.3
 SYSTEMC=systemc-2.3.1
 
@@ -183,6 +184,8 @@ fi &&
 if [ -z "$BOOST_ROOT" ]; then
   REQUIRES="$BOOST $REQUIRES"
   BOOST_ROOT="$DEPS/$BOOST"
+  export DEPS_BOOST=$BOOST
+  
 fi
  
 if [ -n "$CACHE" ]; then
