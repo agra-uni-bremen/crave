@@ -57,7 +57,6 @@ add_library (crave STATIC
 SET(LINK_LIBRARIES
   metaSMT
   ${Boost_SYSTEM_LIBRARY}
-  ${Boost_THREAD_LIBRARY}
   ${Boost_FILESYSTEM_LIBRARY}
 )
 
