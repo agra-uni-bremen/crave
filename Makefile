@@ -1,6 +1,8 @@
 SRCDIR:=$(shell pwd)
 BUILD:=$(SRCDIR)/build
 LCOVDIR:=$(BUILD)/lcov_output
+DEPS_CLEAN:=$(BUILD)/deps-clean
+PARENTDIR:=$(shell dirname ${SRCDIR})
 
 ifndef MAKECMDGOALS
 MAKECMDGOALS=all
@@ -34,6 +36,17 @@ distclean:
 .PHONY: doxygen
 doxygen:
 	doxygen doc/Doxyfile
+
+$(BUILD)/deps-clean:
+	CRAVE_OFFLINE_BUILD=OFF ./bootstrap.sh --boost=do/not/download -d ${DEPS_CLEAN} --download-only ${BOOSTRAP_ARGS}
+
+.PHONY: cleandeps
+cleandeps:
+	rm -rf ${DEPS_CLEAN}
+
+.PHONY: package_deps
+package_deps: $(BUILD)/deps-clean
+	cd $(BUILD) && tar -czf crave_package_deps.tar.gz deps-clean && cd $(SRCDIR)
 
 .PHONY: lcov_with_bc
 lcov_with_bc:
