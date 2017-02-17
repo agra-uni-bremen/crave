@@ -13,6 +13,14 @@ build_default:
   tags:
   - linux
 
+build_default_stp:
+  script: 
+  - CRAVE_SOLVERS='cudd stp' make -j $NUM_JOBS
+  - make test
+  tags:
+  - linux
+  allow_failure: true
+
 build_release:
   script: 
   - ./bootstrap.sh -d deps -m RELEASE --systemc -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
