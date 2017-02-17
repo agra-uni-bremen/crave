@@ -42,6 +42,7 @@ usage: $0 [--free] [--non-free] build
   --clean           delete build folder before creating a new one
   --deps <dir>      build dependencies in this folder
    -d <dir>         can be shared in different projects
+  --download-only   Only download dependencies but not build. Might override other options.
   --install <dir>   configure cmake to install to this directory
    -i <dir>
   --mode <type>     the CMake build type to configure, types are
@@ -73,6 +74,7 @@ while [[ "$@" ]]; do
     --install|-i) INSTALL="$2"; shift;;
     --mode|-m)    CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_BUILD_TYPE=$2"; shift;;
      -D*)         CMAKE_ARGS="$CMAKE_ARGS $1";;
+    --download-only) DL_ONLY=-d;;
     --clean|-c)   CLEAN="true";;
     --cmake=*)    CMAKE="${1#--cmake=}";;
     --cmake)      BUILD_CMAKE="yes";;
@@ -90,6 +92,35 @@ fi
 
 BACKENDS="${BACKENDS:-boolector cvc4 stp sword yices2 z3 cudd}"
 echo "activated backends are: $BACKENDS"
+
+if [[ "$CRAVE_OFFLINE_BUILD" = "ON" ]]; then
+  # Check variables
+  echo "Offline build activated."
+  if [[ -z "$BOOST_ROOT" ]]; then
+    echo "BOOST_ROOT must be set for offline build."
+    exit 1;
+  fi
+  if [[ -z "$SYSTEMC_HOME" ]]; then
+    echo "SYSTEMC_HOME must be set for offline build."
+    exit 1;
+  fi
+  if [ "$BUILD_CMAKE" = "yes" ]; then
+    echo "Building cmake in offline build is not allowed."
+    exit 1;
+  fi
+  
+  if ! [ -f crave_package_deps.tar.gz ]; then
+    echo "Could not find the dependency cache crave_package_deps.tar.gz. Please provide crave_package_deps.tar.gz or switch to online build"
+    exit 1;
+  fi
+  
+  mkdir -p $DEPS
+  tar --strip-components=1 -C $DEPS -xzf crave_package_deps.tar.gz
+  CACHE=$DEPS
+else
+  echo "Regular build activated. Dependencies will be downloaded and built automatically."
+  echo "Offline build can be activated by setting the environment variable CRAVE_OFFLINE_BUILD to ON."
+fi
 
 DIS_BOOLECTOR="yes"
 DIS_CVC4="yes"
@@ -209,7 +240,7 @@ if [ -x "$CMAKE" ]; then
   export PATH="$(dirname $CMAKE):$PATH"
 fi
 
-if ! ./build -j ${NUM_THREADS:-1} "$DEPS" $CACHE $REQUIRES; then
+if ! ./build -j ${NUM_THREADS:-1} $DL_ONLY "$DEPS" $CACHE $REQUIRES; then
   echo "Building dependencies failed. Please see above for error"
   exit 3
 fi
@@ -223,16 +254,17 @@ eval_echo() {
  echo "$@"
 }
 
+if [ -z "$DL_ONLY" ]; then
+  cd $BUILD_DIR
+  eval_echo $CMAKE $SRC_DIR \
+    -DCMAKE_INSTALL_PREFIX="$INSTALL" \
+    -DCMAKE_PREFIX_PATH="$PREFIX_PATH" \
+    $CMAKE_ARGS \
+    -DBOOST_ROOT="$BOOST_ROOT" \
+    -DWITH_SYSTEMC="$WITH_SYSTEMC" \
+    -DSYSTEMC_HOME="$SYSTEMC_HOME" \
+    -DGLOG_ROOT="$GLOG_ROOT"
+  echo "finished bootstrap, you can now call make in $BUILD_DIR"
+fi
 
 
-cd $BUILD_DIR
-eval_echo $CMAKE $SRC_DIR \
-  -DCMAKE_INSTALL_PREFIX="$INSTALL" \
-  -DCMAKE_PREFIX_PATH="$PREFIX_PATH" \
-  $CMAKE_ARGS \
-  -DBOOST_ROOT="$BOOST_ROOT" \
-  -DWITH_SYSTEMC="$WITH_SYSTEMC" \
-  -DSYSTEMC_HOME="$SYSTEMC_HOME" \
-  -DGLOG_ROOT="$GLOG_ROOT"
-
-echo "finished bootstrap, you can now call make in $BUILD_DIR"

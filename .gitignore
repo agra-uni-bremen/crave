@@ -6,4 +6,6 @@ deps
 lcov_output/
 logs/
 doc/crave-doxygen/
+deps-clean
+crave_package_deps.tar.gz
 
