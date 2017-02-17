@@ -1,3 +1,5 @@
+CRAVE_SOLVERS ?= cudd sword boolector
+
 SRCDIR:=$(shell pwd)
 BUILD:=$(SRCDIR)/build
 LCOVDIR:=$(BUILD)/lcov_output
@@ -11,7 +13,7 @@ endif
 ${MAKECMDGOALS}: ${BUILD}/Makefile
 	@${MAKE} -q -s -C ${BUILD}  ${MAKECMDGOALS}|| ${MAKE} -s -C ${BUILD} ${MAKECMDGOALS}
 
-BOOSTRAP_ARGS := --systemc -b cudd -b sword -b boolector
+BOOSTRAP_ARGS := --systemc $(foreach SOLVER, $(CRAVE_SOLVERS), -b $(SOLVER))
 
 ifdef CMAKE
   BOOSTRAP_ARGS += --cmake=${CMAKE}
