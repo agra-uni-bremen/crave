@@ -46,6 +46,8 @@ void init(std::string const& cfg_file) {
    google::InitGoogleLogging(settings.filename().c_str());
    initialized = true;
  }
+#else
+  logging_severity = settings.s_level();
 #endif
 
   // save settings
@@ -53,6 +55,10 @@ void init(std::string const& cfg_file) {
   cSettings.save();
   settings.save();
 }
+
+#ifndef CRAVE_HAVE_GLOG
+int logging_severity;
+#endif
 
 }  // namespace crave
 
