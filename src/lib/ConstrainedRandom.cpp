@@ -2,6 +2,7 @@
 
 #include <ctime>
 #include <string>
+#include <fstream>
 
 #include "../crave/backend/FactoryMetaSMT.hpp"
 #include "../crave/ConstrainedRandom.hpp"

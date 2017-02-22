@@ -2,10 +2,9 @@
 
 #pragma once
 
-#include <fstream>
-#include <set>
 #include <string>
-#include "Settings.hpp"
+
+#include "SettingsType.hpp"
 
 namespace crave {
 class CraveSetting : public Setting {
