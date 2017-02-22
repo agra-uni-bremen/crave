@@ -1,8 +1,5 @@
 // Copyright 2012-2016 The CRAVE developers, University of Bremen, Germany. All rights reserved.//
 
-#include <glog/logging.h>
-#include <boost/filesystem.hpp>
-
 #include <ctime>
 #include <string>
 
@@ -47,45 +44,6 @@ void set_global_seed(unsigned int s) {
 }
 
 void set_solver_backend(std::string const& type) { FactoryMetaSMT::setSolverType(type); }
-
-std::string config_file_name = "crave.cfg";
-std::string const& get_config_file_name() { return config_file_name; }
-void set_config_file_name(std::string const& str) { config_file_name = str; }
-
-void init() { init(get_config_file_name()); }
-
-void init(std::string const& cfg_file) {
-  CraveSetting cSettings(cfg_file);
-  cSettings.load();
-
-  set_global_seed(cSettings.get_specified_seed());
-  set_solver_backend(cSettings.get_backend());
-  set_config_file_name(cfg_file);
-
-  // initalize glog
-  LoggerSetting settings(cfg_file);
-
-  settings.load();
-  FLAGS_log_dir = settings.dirname();
-  FLAGS_max_log_size = settings.filesize();
-  FLAGS_minloglevel = settings.s_level();
-  FLAGS_logtostderr = false;
-  FLAGS_logbufsecs = 0;
-
-  namespace fs = boost::filesystem;
-  fs::path fs_log_dir(settings.dirname());
-  if (!fs::exists(fs_log_dir)) fs::create_directory(fs_log_dir);
-
-  static bool initialized = false;
-  if (!initialized) {
-    google::InitGoogleLogging(settings.filename().c_str());
-    initialized = true;
-  }
-
-  cSettings.set_used_seed(rng.get_seed());
-  cSettings.save();
-  settings.save();
-}
 
 std::ostream& rand_obj::print_dot_graph(std::ostream& os, bool root = true) {
   if (root) os << "digraph AST {" << std::endl;

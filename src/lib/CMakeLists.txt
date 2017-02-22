@@ -1,6 +1,7 @@
 
 SET(CRAVE_LIB_SRC 
   ConstrainedRandom.cpp
+  ConstrainedRandomInit.cpp
   EvalVisitor.cpp
   FixWidthVisitor.cpp
   GetSupportSetVisitor.cpp
