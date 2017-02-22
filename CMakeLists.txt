@@ -57,14 +57,15 @@ set(Boost_NO_BOOST_CMAKE true)
 set(Boost_NO_SYSTEM_PATHS true)
 find_package(Boost REQUIRED COMPONENTS system filesystem)
 
-find_package(Glog REQUIRED)
+find_package(GLOG)
+
+if (GLOG_FOUND)
+  add_definitions(-DCRAVE_HAVE_GLOG)
+endif()
 
 if (WITH_SYSTEMC)
   find_package(SystemC REQUIRED)
   find_package(Threads REQUIRED)
-else()
-  find_package(SystemC)
-  find_package(Threads QUIET)
 endif()
 
 add_subdirectory(metaSMT)
@@ -75,29 +76,56 @@ add_definitions("${metaSMT_CXXFLAGS}")
 ### includes
 include_directories(${metaSMT_INCLUDE_DIR})
 include_directories(${Boost_INCLUDE_DIRS})
-include_directories(${GLOG_INCLUDE_DIRS})
+
+if (GLOG_FOUND)
+  include_directories(${GLOG_INCLUDE_DIRS})
+endif()
 
 if(SystemC_FOUND)
   include_directories(${SystemC_INCLUDE_DIR})
 endif(SystemC_FOUND)
 
-add_subdirectory(src)
+### libs
+SET(ALL_EXTERNAL_LIBS "")
 
-set(${PROJECT_NAME}_LIBS ${CMAKE_INSTALL_PREFIX}/lib/lib${PROJECT_NAME}.a ${metaSMT_LIBRARIES} ${GLOG_LIBRARIES})
-set(${PROJECT_NAME}_INCLUDE ${CMAKE_INSTALL_PREFIX}/include ${metaSMT_INCLUDE_DIR} ${Boost_INCLUDE_DIRS} ${GLOG_INCLUDE_DIRS})
+if (GLOG_FOUND)
+  LIST(APPEND ALL_EXTERNAL_LIBS ${GLOG_LIBRARIES})
+endif()
 
 if(SystemC_FOUND)
-  LIST(APPEND ${PROJECT_NAME}_INCLUDE ${SystemC_INCLUDE_DIR})
-  LIST(APPEND ${PROJECT_NAME}_LIBS ${SystemC_LIBRARY})
+  LIST(APPEND ALL_EXTERNAL_LIBS ${SystemC_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
 endif(SystemC_FOUND)
 
 if( Boost_FILESYSTEM_FOUND )
-  list(APPEND ${PROJECT_NAME}_LIBS ${Boost_FILESYSTEM_LIBRARY})
+  list(APPEND ALL_EXTERNAL_LIBS ${Boost_FILESYSTEM_LIBRARY})
 endif()
 
 if( Boost_SYSTEM_FOUND )
-  list(APPEND ${PROJECT_NAME}_LIBS ${Boost_SYSTEM_LIBRARY})
+  list(APPEND ALL_EXTERNAL_LIBS ${Boost_SYSTEM_LIBRARY})
 endif()
+
+### build
+add_subdirectory(src)
+
+### tests
+if (CRAVE_ENABLE_TESTS)
+  enable_testing()
+  add_subdirectory(tests)
+endif()
+
+if (CRAVE_BUILD_EXAMPLES)
+  enable_testing()
+  add_subdirectory(examples)
+endif()
+
+### config
+set(${PROJECT_NAME}_LIBS ${CMAKE_INSTALL_PREFIX}/lib/lib${PROJECT_NAME}.a ${ALL_EXTERNAL_LIBS} ${metaSMT_LIBRARIES})
+
+GET_DIRECTORY_PROPERTY(ALL_INCLUDES INCLUDE_DIRECTORIES)
+set(${PROJECT_NAME}_INCLUDE ${CMAKE_INSTALL_PREFIX}/include ${ALL_INCLUDES})
+
+GET_DIRECTORY_PROPERTY(${PROJECT_NAME}_DEFINITIONS COMPILE_DEFINITIONS)
+message(STATUS ${${PROJECT_NAME}_DEFINITIONS})
 
 ## create CRAVE CMake config file
 file(WRITE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
@@ -146,16 +174,6 @@ INSTALL( FILES
 INSTALL( FILES 
 	${PROJECT_BINARY_DIR}/${PROJECT_NAME}.pc
 	DESTINATION lib/pkgconfig/)
-
-if (CRAVE_ENABLE_TESTS)
-  enable_testing()
-  add_subdirectory(tests)
-endif()
-
-if (CRAVE_BUILD_EXAMPLES)
-  enable_testing()
-  add_subdirectory(examples)
-endif()
 
 ############################################################
 ##                CPack settings                          ##

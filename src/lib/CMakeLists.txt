@@ -51,24 +51,19 @@ if (CRAVE_ENABLE_EXPERIMENTAL)
   )
 endif (CRAVE_ENABLE_EXPERIMENTAL)
 
-add_library (crave STATIC
+add_library (${PROJECT_NAME} STATIC
   ${CRAVE_LIB_SRC}
 )
 
 SET(LINK_LIBRARIES
   metaSMT
-  ${Boost_SYSTEM_LIBRARY}
-  ${Boost_FILESYSTEM_LIBRARY}
+  ${ALL_EXTERNAL_LIBS}
 )
 
-if(SystemC_FOUND)
-  LIST(APPEND LINK_LIBRARIES ${SystemC_LIBRARY})
-endif(SystemC_FOUND)
+target_link_libraries (${PROJECT_NAME} ${LINK_LIBRARIES})
 
-target_link_libraries (crave ${LINK_LIBRARIES})
-
-install(TARGETS crave
-  EXPORT crave
+install(TARGETS ${PROJECT_NAME}
+  EXPORT ${PROJECT_NAME}
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
   ARCHIVE DESTINATION lib

@@ -20,7 +20,7 @@ function (add_all_tests prog cfile)
 endfunction(add_all_tests)
 
 add_library (${PROJECT_NAME}_boost_test ${STATIC_OR_SHARED} boost_test.cpp)
-link_libraries (${PROJECT_NAME}_boost_test ${PROJECT_NAME} ${Boost_THREAD_LIBRARY} ${CMAKE_THREAD_LIBS_INIT} ${GLOG_LIBRARY})
+link_libraries (${PROJECT_NAME}_boost_test ${ALL_EXTERNAL_LIBS} ${PROJECT_NAME})
 
 add_executable(solver_independent_tests core/solver_independent_tests.cpp)
 add_all_tests(solver_independent_tests core/solver_independent_tests.cpp)
@@ -66,10 +66,9 @@ endif (metaSMT_USE_Z3)
 #endif (metaSMT_USE_CUDD)
 
 if(SystemC_FOUND)
-  include_directories(${SystemC_INCLUDE_DIR})
   add_executable (SystemC_Data core/test_SystemC_Data.cpp)
   add_all_tests( SystemC_Data core/test_SystemC_Data.cpp)
-  target_link_libraries ( SystemC_Data ${SystemC_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${PROJECT_NAME})
+  target_link_libraries ( SystemC_Data ${ALL_EXTERNAL_LIBS} ${PROJECT_NAME})
 endif(SystemC_FOUND)
 
 
