@@ -1,5 +1,7 @@
 // Copyright 2012-2016 The CRAVE developers, University of Bremen, Germany. All rights reserved.
 #include "../../../crave/experimental/graph/Rule.hpp"
+#include "../../../crave/utils/Logging.hpp"
+
 #include <functional>
 
 namespace crave {

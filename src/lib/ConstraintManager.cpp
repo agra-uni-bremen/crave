@@ -2,8 +2,7 @@
 #include "../crave/ir/visitor/GetSupportSetVisitor.hpp"
 #include "../crave/ir/visitor/ToDotNodeVisitor.hpp"
 #include "../crave/ir/visitor/ComplexityEstimationVisitor.hpp"
-
-#include <glog/logging.h>
+#include "../crave/utils/Logging.hpp"
 
 namespace crave {
 

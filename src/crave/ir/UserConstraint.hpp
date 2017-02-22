@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <glog/logging.h>
-
 #include <ostream>
 #include <string>
 #include <vector>

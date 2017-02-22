@@ -1,4 +1,5 @@
 #include "../crave/backend/VariableDefaultSolver.hpp"
+#include "../crave/utils/Logging.hpp"
 
 #include <set>
 #include <functional>

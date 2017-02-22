@@ -1,4 +1,5 @@
 #include "../crave/backend/VariableCoverageSolver.hpp"
+#include "../crave/utils/Logging.hpp"
 
 namespace crave {
 

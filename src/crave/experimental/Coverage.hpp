@@ -8,8 +8,6 @@
 #include "Object.hpp"
 #include "Variable.hpp"
 
-#include <glog/logging.h>
-
 #include <string>
 #include <vector>
 

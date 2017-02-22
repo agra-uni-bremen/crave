@@ -6,8 +6,6 @@
 #include "Expression.hpp"
 #include "Object.hpp"
 
-#include <glog/logging.h>
-
 #include <string>
 
 namespace crave {

@@ -6,6 +6,7 @@
 
 #include "../../crave/experimental/ConstrainedRandomGraph.hpp"
 #include "../../crave/experimental/graph/GraphVisitor.hpp"
+#include "../../crave/utils/Logging.hpp"
 
 namespace crave {
 

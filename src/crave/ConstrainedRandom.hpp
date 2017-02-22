@@ -11,6 +11,7 @@
 #include "backend/Generator.hpp"
 #include "frontend/RandomBase.hpp"
 #include "ir/UserExpression.hpp"
+#include "utils/Logging.hpp"
 
 /*!
  * \brief Default namespace of crave.

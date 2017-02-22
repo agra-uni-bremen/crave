@@ -1,4 +1,5 @@
 #include "../crave/backend/VectorGenerator.hpp"
+#include "../crave/utils/Logging.hpp"
 
 #include <string>
 

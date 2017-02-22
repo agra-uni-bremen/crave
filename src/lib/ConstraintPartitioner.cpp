@@ -1,4 +1,6 @@
 #include "../crave/ir/ConstraintPartitioner.hpp"
+#include "../crave/utils/Logging.hpp"
+
 #include <algorithm>
 
 namespace crave {

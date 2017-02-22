@@ -2,12 +2,12 @@
 
 #include "../crave/ir/visitor/metaSMTNodeVisitor.hpp"
 #include "../crave/backend/FactoryMetaSMT.hpp"
+#include "../crave/utils/Logging.hpp"
 #include "metaSMTNodeVisitorImpl.hpp"
 
 #include <metaSMT/BitBlast.hpp>
 #include <metaSMT/DirectSolver_Context.hpp>
 
-#include <glog/logging.h>
 #include <string>
 
 #define DEFINE_SOLVER(SOLVER_ENUM, SOLVER_T)                                                     \

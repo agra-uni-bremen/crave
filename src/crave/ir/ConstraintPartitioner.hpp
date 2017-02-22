@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <glog/logging.h>
 #include <vector>
 #include <set>
 
