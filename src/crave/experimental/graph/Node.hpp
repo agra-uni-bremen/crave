@@ -1,3 +1,4 @@
+// Copyright 2012-2017 The CRAVE developers, University of Bremen, Germany. All rights reserved.//
 #pragma once
 
 #include <string>
@@ -18,22 +19,51 @@ typedef std::map<std::string, NodePtr> node_map;
 
 struct NodeVisitor;
 
+/**
+ * Graph Node
+ */
 struct Node {
+  /**
+   * constructor
+   * @param name name of the Node
+  */
   Node(const char* name = 0) : m_name(name) {}
 
+  /**
+   * get node name
+   * @return name of this node
+   */
   const char* name() const { return m_name; }
+
+  /**
+   * function to rename this node
+   * @param name new name of this node
+   */
   void rename(const char* name) { m_name = name; }
 
+  /**
+   * get object kind
+   * @return object kind as string
+   */
   virtual const char* obj_kind() const = 0;
+
+  /**
+   * accept function for visitor pattern
+   */
   virtual void accept(NodeVisitor&) = 0;
-  virtual ~Node(){}
+
+  /**
+   * destructor
+   */
+  virtual ~Node() {}
+
  protected:
   const char* m_name;
 };
 
 struct Terminal : Node {
   Terminal(const char* name) : Node(name) {}
-  virtual ~Terminal(){}
+  virtual ~Terminal() {}
   virtual const char* obj_kind() const { return "Terminal"; }
   virtual void accept(NodeVisitor& v);
 };
@@ -46,7 +76,7 @@ struct NonTerminal : Node {
 struct Selector : NonTerminal {
   virtual const char* obj_kind() const { return "Selector"; }
   virtual void accept(NodeVisitor& v);
-  virtual ~Selector(){}
+  virtual ~Selector() {}
 };
 
 struct Sequence : NonTerminal {

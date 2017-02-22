@@ -1,0 +1,41 @@
+ /*! 
+ * \defgroup oldAPI Old API
+ * \brief Components of the old API for CRAVE.
+ * 
+ * The old API is deprecated and should no longer be used.
+ * it was formerly used by CRAVE and uses its own "naming" so to speak.
+ * The main difference to the new API is the naming of some components, theier functionality and how things are done.
+ * However, the old API does not rely on C++11 features and may be used if C++11 is not available.
+ * <table>
+ * <tr><td><b>Object</b></td><td><b>Old name</b></td><td><b>New name</b></td></tr>
+ * <tr><td>Base for random objects</td><td>crave::rand_obj</td><td>crave::crv_sequence_item</td></tr>
+ * <tr><td>Constraint</td><td>- (Defined with constraint)</td><td>crave::crv_constraint</td></tr>
+ * <tr><td>Variables</td><td>crave::randv</td><td>crave::crv_variable</td></tr>
+ * <tr><td>Enum definer</td><td>\ref CRAVE_ENUM </td><td>\ref CRAVE_BETTER_ENUM </td></tr>
+ * </table>
+ * 
+ * \defgroup newAPI New API
+ * \brief Components of the new and used API for CRAVE.
+ * 
+ * The new API uses the latest feature available via C++11, supports Coverage and has a syntax more close to System Verilog contrainted random generation.
+ * You can also randomize object with inline constraints.
+ * <table>
+ * <tr><td><b>Object</b></td><td><b>Old name</b></td><td><b>New name</b></td></tr>
+ * <tr><td>Base for random objects</td><td>crave::rand_obj</td><td>crave::crv_sequence_item</td></tr>
+ * <tr><td>Constraint</td><td>- (Defined with constraint)</td><td>crave::crv_constraint</td></tr>
+ * <tr><td>Variables</td><td>crave::randv</td><td>crave::crv_variable</td></tr>
+ * <tr><td>Enum definer</td><td>\ref CRAVE_ENUM </td><td>\ref CRAVE_BETTER_ENUM </td></tr>
+ * </table>
+ * 
+ * \defgroup setting Settings
+ * \brief Components used to configure CRAVE.
+ * 
+ * Both APIs have common functionality to set options. 
+ * These functions and classes are collected here.
+ * 
+ * \defgroup operators Operators
+ * \brief Components used for special tasks in constraints.
+ * 
+ * Both APIs use the same constraint definition syntax.
+ * The syntax allows some special operators and operands to be used, which are collected here.
+ */

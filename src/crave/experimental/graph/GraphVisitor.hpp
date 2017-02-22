@@ -1,8 +1,9 @@
+// Copyright 2012-2017 The CRAVE developers, University of Bremen, Germany. All rights reserved.//
 #pragma once
 
+#include <iostream>
 #include <set>
 #include <stack>
-#include <iostream>
 #include <string>
 
 #include "Node.hpp"
@@ -11,12 +12,18 @@ namespace crave {
 
 namespace graph {
 
+/**
+ * Visitor interface for class Node
+ */
 struct NodeVisitor {
   virtual void visitTerminal(Terminal&) = 0;
   virtual void visitSelector(Selector&) = 0;
   virtual void visitSequence(Sequence&) = 0;
 };
 
+/**
+ * Visitor for class Node for printing
+ */
 struct PrintVisitor : NodeVisitor {
   PrintVisitor() : depth(0) {}
 
@@ -31,6 +38,9 @@ struct PrintVisitor : NodeVisitor {
   void printNode(Node& n);
 };
 
+/**
+ * Node visitor to update Nodes
+ */
 struct UpdateVisitor : NodeVisitor {
   UpdateVisitor(node_map& m) : m_named_nodes(m), m_on_path() {}
 
@@ -46,6 +56,9 @@ struct UpdateVisitor : NodeVisitor {
   void visitNonTerminal(NonTerminal& nt);
 };
 
+/**
+ * Node visitor for convertion to Dot
+ */
 struct ToDotVisitor : NodeVisitor {
   typedef std::pair<int, int> result_type;
 
