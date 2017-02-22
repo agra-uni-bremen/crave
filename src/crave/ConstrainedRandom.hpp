@@ -79,8 +79,9 @@ void init();
  * 0 indicates a random seed.
  * </p><p> 
  * Also the config file contains settings for the logger.
- * The path to the log file, its maximum size and a log level between 0..2 can be set.
- * Use log level 0 to see every log message and log level 2 to see the minimum.
+ * The path to the log file, its maximum size and a log severity level between 0..3 can be set.
+ * The severity levels are INFO, WARNING, ERROR, and FATAL (0, 1, 2, and 3, respectively).
+ * The amount of log messages decreases with increasing severity level.
  * </p><p>
  * If the file does not exist, it will be created with a default config of CRAVE.
  */

@@ -40,7 +40,7 @@ CRAVE uses the following external dependencies:
 * [Boost] - you need at least version 1.50.0, set the environment variable BOOST_ROOT to your 
 boost installation directory (e.g. /usr) or CRAVE will automatically download and build boost-1.55.0. 
 For faster build, it is recommended to choose the first option.
-* [Glog] - similarly, set GLOG_ROOT or CRAVE will automatically download and build glog.
+* [Glog] - similarly, set GLOG_ROOT or CRAVE will automatically download and build glog. GLOG_ROOT can be set to an invalid path (e.g. 'export GLOG_ROOT=do/not/use') to disable Glog. In this case a very simple logger will be used instead.
 * [Boolector] - Boolector can be disabled by via the environment variable CRAVE_SOLVERS (see below).
 * [CUDD] - CUDD can be disabled by by via the environment variable CRAVE_SOLVERS (see below), but this is not recommended.
 * [SWORD] - SWORD can be disabled by via the environment variable CRAVE_SOLVERS (see below).
@@ -102,14 +102,14 @@ the executing directory. The default configuration is shown in the following:
     <logger>
     	<filename>crave</filename>
     	<directory>./logs</directory>
-    	<level>0</level>
+    	<level>2</level>
     	<filesize>100</filesize>
     </logger>
 
 The value 'auto' means that CRAVE will automatically select a backend among 
 the available SMT solvers. Other possible values are for example 'boolector', 'sword', 'z3', etc.
 Change the seed to a positive integer, if you want to use this integer as the fixed seed.
-For further information, please refer to the doxygen documentation.
+For further information, especially on the logger, please refer to the doxygen documentation.
 
  Known issues
 --------------
