@@ -24,24 +24,12 @@ build correctly:
 * CMake (at least v2.8.9)
 
 
- Editing CRAVE's Makefile
--------------------------
-
-For now, the following line from Makefile is the only one you need to pay attention to:
-
-    BOOSTRAP_ARGS := --systemc -b cudd -b sword -b boolector
-
-The editable options are '--systemc' and '-b', which will be described in the following.
-
-
  SystemC Support
 -----------------
 
 You need to set the environment variable SYSTEMC_HOME to your SystemC installation 
 directory (which also must contains a static library). Otherwise, CRAVE will automatically 
 download and build systemc-2.3.1 from GitHub.
-It is also possible to build CRAVE without SystemC support by removing the option '--systemc',
-but this is not recommended.
 
 
  Other external dependencies
@@ -50,17 +38,19 @@ but this is not recommended.
 CRAVE uses the following external dependencies:
 
 * [Boost] - you need at least version 1.50.0, set the environment variable BOOST_ROOT to your 
-boost installation directory (e.g. /usr) or CRAVE will automatically download and build boost-1.50.0. 
+boost installation directory (e.g. /usr) or CRAVE will automatically download and build boost-1.55.0. 
 For faster build, it is recommended to choose the first option.
 * [Glog] - similarly, set GLOG_ROOT or CRAVE will automatically download and build glog.
-* [Boolector] - Boolector can be disabled by removing the option '-b boolector'.
-* [CUDD] - CUDD can be disabled by removing the option '-b cudd', but this is not recommended.
-* [SWORD] - SWORD can be disabled by removing the option '-b sword'.
-* [CVC4] - CVC4 can be enabled by adding the option '-b cvc4'. Building CVC4 takes considerable time so it is disabled by default.
-* [Z3] - Z3 can be enabled by adding the option '-b z3'. Building Z3 takes considerable time so it is disabled by default.
-* [STP] - STP can be enabled by adding the option '-b stp'. Building STP takes considerable time so it is disabled by default.
-* [Yices2] - Yices2 can be enabled by adding the option '-b yices2'. Building Yices2 takes considerable time so it is disabled by default.
+* [Boolector] - Boolector can be disabled by via the environment variable CRAVE_SOLVERS (see below).
+* [CUDD] - CUDD can be disabled by by via the environment variable CRAVE_SOLVERS (see below), but this is not recommended.
+* [SWORD] - SWORD can be disabled by via the environment variable CRAVE_SOLVERS (see below).
+* [CVC4] - CVC4 can be enabled by by via the environment variable CRAVE_SOLVERS (see below). Building CVC4 takes considerable time so it is disabled by default.
+* [Z3] - Z3 can be enabled by via the environment variable CRAVE_SOLVERS (see below). Building Z3 takes considerable time so it is disabled by default.
+* [STP] - STP can be enabled by via the environment variable CRAVE_SOLVERS (see below). Building STP takes considerable time so it is disabled by default.
+* [Yices2] - Yices2 can be enabled by via the environment variable CRAVE_SOLVERS (see below). Building Yices2 takes considerable time so it is disabled by default.
 
+If the environment variable CRAVE_SOLVERS is not set, Boolector, CUDD and SWORD will be used.
+For example, to build CRAVE with CUDD, STP and Z3, call 'export CRAVE_SOLVERS='cudd stp z3'' before 'make'.
 Please make sure that at least one SMT backend is enabled.
 
 
@@ -127,8 +117,7 @@ For further information, please refer to the doxygen documentation.
 In the default configuration CRAVE will use SWORD as one of its SMT backends.
 SWORD is provided as binary program for Linux x86 and x86_64 platforms. However,
 this version of SWORD is incompatible with RHEL 5 or derived operating systems (e.g. 
-CentOS 5). On such systems, SWORD must be disabled before building CRAVE by editing
-'-b sword' out of the Makefile.
+CentOS 5). On such systems, SWORD must be disabled before building CRAVE via the environment variable CRAVE_SOLVERS.
 
 [Boost]: http://www.boost.org
 [CUDD]:  http://vlsi.colorado.edu/~fabio/CUDD/
