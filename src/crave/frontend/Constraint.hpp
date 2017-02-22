@@ -1,11 +1,11 @@
-// Copyright 2012-2016 The CRAVE developers, University of Bremen, Germany. All rights reserved.
+// Copyright 2012-2017 The CRAVE developers, University of Bremen, Germany. All rights reserved.
 
 #pragma once
 
 #include "ConstraintType.hpp"
-#include "WriteReference.hpp"
+#include "Operators.hpp"
+#include "PlaceHolder.hpp"
 #include "ReadReference.hpp"
 #include "Variable.hpp"
-#include "PlaceHolder.hpp"
 #include "VectorConstraint.hpp"
-#include "Operators.hpp"
+#include "WriteReference.hpp"

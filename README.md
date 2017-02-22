@@ -21,8 +21,7 @@ Please install the following packages to ensure the external packages will
 build correctly:
 
 * zlib and bzip2 development libraries (e.g. zlib1g-dev, libbz2-dev)
-* CMake
-* Python development libraries
+* CMake (at least v2.8.9)
 
 
  Editing CRAVE's Makefile
@@ -59,9 +58,10 @@ For faster build, it is recommended to choose the first option.
 * [SWORD] - SWORD can be disabled by removing the option '-b sword'.
 * [CVC4] - CVC4 can be enabled by adding the option '-b cvc4'. Building CVC4 takes considerable time so it is disabled by default.
 * [Z3] - Z3 can be enabled by adding the option '-b z3'. Building Z3 takes considerable time so it is disabled by default.
-* [Boolector] - Boolector can be disabled by removing the option '-b boolector'.
+* [STP] - STP can be enabled by adding the option '-b stp'. Building STP takes considerable time so it is disabled by default.
+* [Yices2] - Yices2 can be enabled by adding the option '-b yices2'. Building Yices2 takes considerable time so it is disabled by default.
 
-Please make sure that at least one SMT backend ([SWORD], [Z3], [CVC4] or [Boolector]) is enabled.
+Please make sure that at least one SMT backend is enabled.
 
 
  Build and install CRAVE
@@ -72,7 +72,7 @@ Please make sure that at least one SMT backend ([SWORD], [Z3], [CVC4] or [Boolec
 2. Call 'make test', all tests should pass (with very few execeptions).
 3. Call 'make install'.
 
-To clean CRAVE you can delete the build directory and call 'make' again.
+To clean CRAVE you can delete the build directory (e.g. 'rm -Rf build') and call 'make' again.
 
  Examples
 ----------
@@ -94,6 +94,10 @@ support for C++11). The basic examples are available in both APIs as listed belo
 to execute these examples look into the build/examples directory.
 See also the other examples and the test cases in crave/tests, which cover all implemented features.
 
+ Documentation
+-------------------------
+
+The doxygen documentation can be generated in doc/crave-doxygen by calling 'make doxygen'.
 
  Configuration file
 -----------------------
@@ -113,9 +117,9 @@ the executing directory. The default configuration is shown in the following:
     </logger>
 
 The value 'auto' means that CRAVE will automatically select a backend among 
-the available SMT solvers. Other possible values are 'boolector', 'cvc4', 'z3' and 'sword'.
+the available SMT solvers. Other possible values are for example 'boolector', 'sword', 'z3', etc.
 Change the seed to a positive integer, if you want to use this integer as the fixed seed.
-
+For further information, please refer to the doxygen documentation.
 
  Known issues
 --------------
@@ -132,4 +136,6 @@ CentOS 5). On such systems, SWORD must be disabled before building CRAVE by edit
 [Z3]: https://github.com/Z3Prover/z3
 [Boolector]: http://fmv.jku.at/boolector/
 [CVC4]: http://cvc4.cs.nyu.edu
+[Yices2]: http://yices.csl.sri.com/
+[STP]: https://github.com/stp/stp
 [Glog]: https://code.google.com/p/google-glog/

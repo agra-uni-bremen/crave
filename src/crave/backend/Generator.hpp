@@ -1,4 +1,4 @@
-// Copyright 2012-2016 The CRAVE developers, University of Bremen, Germany. All rights reserved.//
+// Copyright 2012-2017 The CRAVE developers, University of Bremen, Germany. All rights reserved.//
 
 #pragma once
 
@@ -10,6 +10,12 @@
 
 namespace crave {
 
+/*!
+ * \brief Backend generator to generate random values with constraints.
+ * 
+ * Try to avoid usage of this class directly.
+ * CRAVE usually uses this class internally.
+ */
 struct Generator {
  public:
   Generator()

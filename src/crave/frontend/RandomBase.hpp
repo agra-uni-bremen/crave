@@ -1,14 +1,14 @@
-// Copyright 2012-2016 The CRAVE developers, University of Bremen, Germany. All rights reserved.
+// Copyright 2012-2017 The CRAVE developers, University of Bremen, Germany. All rights reserved.
 
 #pragma once
 
-#include <vector>
 #include <map>
-#include <string>
 #include <ostream>
+#include <string>
+#include <vector>
+#include "AssignResultToRef.hpp"
 #include "Constraint.hpp"
 #include "Distribution.hpp"
-#include "AssignResultToRef.hpp"
 #include "RandBase.hpp"
 #include "RandvInterface.hpp"
 
@@ -16,34 +16,109 @@ using std::ostream;
 
 namespace crave {
 
+/*
+ * Default size of random vector if not otherwise specified by constraints
+ */
 unsigned int default_rand_vec_size();
 
+/**
+ * \ingroup oldAPI
+ * \brief Most basic base class of rand_vec<T>.
+ */
 class __rand_vec_base {
  public:
+  /**
+   * \brief Destructor.
+   */
   virtual ~__rand_vec_base() {}
+  /**
+   * \brief Sets values of this vector with a given std::vector.
+   * 
+   * The values are parsed from a std::string in order to get numeral values as well as enum values.
+   * 
+   * \param values Values to set for this vector.
+   */
   virtual void set_values(const std::vector<std::string>&) = 0;
+
+  /**
+   * \brief Get the symbolic size of this vector to use in constraints.
+   * @return Symbolic size
+   */
   virtual Variable<unsigned int> const& size_var() const = 0;
+
+  /**
+   * \brief Get the Id of this vector.
+   * \return Id of this vector
+   */
   virtual int id() const = 0;
+
+  /**
+   * \brief Generate random values for a given vector size.
+   * 
+   * Creates a number of random values for this vector.
+   * All values are stored inside the vector.
+   * Afterwards the size of this vector ist num.
+   * 
+   * \param num vector size.
+   */
   virtual void gen_values(unsigned num) = 0;
 };
 
 extern std::map<int, __rand_vec_base*> vectorBaseMap;
 
+/**
+ * \ingroup oldAPI
+ * \brief Template specialization of random vectors.
+ * 
+ * This class distintcts the variable type of the symbol (T1) and the true values type to be stored (T2).
+ * In subclasses, T1 and T2 are the same exept for the bool case.
+ */
 template <typename T1, typename T2>
 class __rand_vec_base1 : public __rand_vec_base {
  public:
+  /**
+   * \brief Empty Constructor.
+   */
   __rand_vec_base1() { vectorBaseMap[sym_vec.id()] = this; }
 
+  /**
+   * \brief Access to the symbolic vector.
+   * \return The whole symbolic vector wrapped by this object.
+   */
   const Vector<T1>& operator()() const { return sym_vec; }
 
+  /**
+   * \brief Access to an element in the real vector via the array access operator[].
+   * \param idx The id to access in the vector
+   * \return Value at the given index
+   */
   T1& operator[](const int& idx) const { return (T1&)real_vec[idx]; }
 
+  /**
+   * \brief Pushes a value into the real vector.
+   * 
+   * The semantic is the same as std::vector::push_back().
+   * 
+   * \param x the value to be pushed
+   */
   void push_back(const T1& x) { real_vec.push_back(x); }
 
+  /**
+   * \brief Removes all values from the internal real vector.
+   * 
+   * The semantic is the same as std::vector::clear().
+   */
   void clear() { real_vec.clear(); }
 
+  /**
+   * \brief Return the size of the real vector.
+   * \return size of the vector
+   */
   std::size_t size() { return real_vec.size(); }
 
+  /**
+   * \brief Prints the vector to std::cout.
+   */
   void print() {
     std::cout << "vector " << sym_vec.id() << ": ";
     for (uint i = 0; i < real_vec.size(); i++) std::cout << real_vec[i] << ", ";
@@ -78,26 +153,57 @@ class __rand_vec_base1 : public __rand_vec_base {
   std::vector<T2> real_vec;
 };
 
+/**
+ * \ingroup oldAPI
+ * \ingroup newAPI
+ * \brief Base class of a random vector.
+ * 
+ * Simply sets T1 equal T2.
+ */
 template <typename T>
 class __rand_vec : public __rand_vec_base1<T, T> {};
 
+/**
+ * \ingroup oldAPI
+ * \brief Specialization for boolean random vector.
+ */
 template <>
 class __rand_vec<bool> : public __rand_vec_base1<bool, char> {};
 
+/**
+ * \ingroup oldAPI
+ * \deprecated As all old API entities, it is recommended to use the \ref newAPI "new API". The equivalent in the new API is \ref crave::crv_vector
+ * \brief A vector of randomizable values of Type T.
+ * 
+ * The random vector is the way to define a vector of randomziable values.
+ * Constraints can be defined with random accessed alements or the whole vector.
+ */
 template <typename T>
 class rand_vec : public __rand_vec<T>, public rand_base {
  public:
+  /**
+   * \brief Constructor with parent object.
+   * \param parent Pointer to parent object
+   */
   explicit rand_vec(rand_obj_base* parent = 0) : __rand_vec<T>() {
     if (parent != 0) parent->add_base_child(this);
   }
 
+  /**
+   * \brief Generate next random values for all elements.
+   * 
+   * Generates as many random values as defined by default_rand_vec_size().
+   * The size of the vector is equal to default_rand_vec_size() afterwards.
+   * 
+   * \return true
+   */
   virtual bool next() {
     __rand_vec<T>::gen_values(default_rand_vec_size());
     return true;
   }
 
   virtual void gather_values(std::vector<int64_t>* ch) { ch->push_back(this->size()); }
-  
+
   virtual std::string obj_kind() const { return "rand_vec"; }
 };
 

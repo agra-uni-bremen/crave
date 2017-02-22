@@ -1,8 +1,8 @@
-// Copyright 2012-2016 The CRAVE developers, University of Bremen, Germany. All rights reserved.
+// Copyright 2012-2017 The CRAVE developers, University of Bremen, Germany. All rights reserved.
 #pragma once
 
-#include "Rule.hpp"
 #include <boost/proto/proto.hpp>
+#include "Rule.hpp"
 
 namespace crave {
 
@@ -13,22 +13,40 @@ namespace proto = boost::proto;
 typedef std::shared_ptr<Rule> RulePtr;
 typedef proto::terminal<Rule>::type rule_type;
 
+/**
+ * Graph-based RuleContext, highly experimental
+ */
 struct RuleContext : proto::callable_context<RuleContext, proto::null_context> {
   typedef NodePtr result_type;
 
+  /**
+   * constructor
+   * @param the first rule
+   */
   template <typename Expr>
   RuleContext& operator()(Expr expr) {
     BOOST_ASSERT(proto::eval(expr, *this));
     return *this;
   }
 
+  /**
+   * access operator
+   * @param r proto::terminal<Rule>
+   * @return Rule
+   */
   Rule& operator[](rule_type& r) { return proto::value(r); }
 
+  /**
+   * Terminal rule
+   */
   result_type operator()(proto::tag::terminal, Rule& r) {
     if (m_named_nodes.find(r.name()) != m_named_nodes.end()) return m_named_nodes[r.name()];
     return m_named_nodes[r.name()] = NodePtr(new Terminal(r.name()));
   }
 
+  /**
+   * e1 >> e2
+   */
   template <typename Expr1, typename Expr2>
   result_type operator()(proto::tag::shift_right, Expr1& e1, Expr2& e2) {
     Sequence* seq = new Sequence;
@@ -37,6 +55,9 @@ struct RuleContext : proto::callable_context<RuleContext, proto::null_context> {
     return NodePtr(seq);
   }
 
+  /**
+   * e1 || e2
+   */
   template <typename Expr1, typename Expr2>
   result_type operator()(proto::tag::bitwise_or, Expr1& e1, Expr2& e2) {
     Selector* sel = new Selector;
@@ -45,6 +66,9 @@ struct RuleContext : proto::callable_context<RuleContext, proto::null_context> {
     return NodePtr(sel);
   }
 
+  /**
+   * Rule assignment (r = e)
+   */
   template <typename Expr>
   result_type operator()(proto::tag::assign, rule_type& r, Expr& e) {
     NodePtr n = proto::eval(e, *this);
@@ -57,9 +81,30 @@ struct RuleContext : proto::callable_context<RuleContext, proto::null_context> {
     return m_named_nodes[n->name()] = n;
   }
 
+  /**
+   * Set the root rule
+   * @param r rule
+   */
   void root(rule_type& r);
+
+  /**
+   * print dot graph to an output stream
+   * @param r the root rule
+   * @param out output stream
+   */
   void print_dot_graph(rule_type& r, std::ostream& out);
+
+  /**
+   * print to dot graph to file
+   * @param r the root rule
+   * @param filename output file
+   */
   void to_dot_file(rule_type& r, const char* filename);
+
+  /**
+   * display graph
+   * @param r the root rule
+   */
   void display_graph(rule_type& r);
 
  private:

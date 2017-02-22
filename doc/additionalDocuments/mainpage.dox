@@ -1,0 +1,20 @@
+/*!\mainpage Constrained Random Verification with SystemC/C++
+ *
+ * \section build_sec Build instruction
+ * Please refer to README.md for the documentation of the CRAVE build system.
+ *
+ * \section what_sec What is CRAVE?
+ * CRAVE is a C++ library for Constrained Random Verification in the SystemC/C++-based enviroment. 
+ * CRAVE can be used either standalone or within the upcoming UVM-SystemC verification standard.
+ *
+ * If you are not familiar with CRAVE, a brief introduction to the \ref constrDef offers a good starting point.
+ * It is also helpful to have a look at the CRAVE examples to get a feeling for the usage of CRAVE.
+ *
+ * You can find the examples under examples/experimental_api for the latest \ref newAPI and examples/crave2_api for the \ref oldAPI.
+ * Each folder contains an example that demonstrates a specific feature or usage pattern of CRAVE.
+ * For your conveniences, the examples are also included in this documentation (Tab Examples in the top toolbar).
+ * To execute the examples and see their outputs, the executables are to be found under build/examples if you follow the instructions in README.md. 
+ *
+ * CRAVE also offers various \ref setting to specify among others the solver backend, the seed for randomization and the logging behavior.
+ * 
+ */
