@@ -13,6 +13,22 @@ build_default:
   tags:
   - linux
 
+build_install:
+  script: 
+  - ./bootstrap.sh -d deps --systemc -b cudd -b sword build -DCRAVE_BUILD_EXAMPLES=off -DCRAVE_ENABLE_TESTS=off
+  - cd build
+  - make -j $NUM_JOBS install
+  - CRAVE_INSTALL_DIR=`pwd`/root/share/crave
+  - mkdir build-test-install
+  - cd build-test-install
+  - cmake ../../deps/test-crave-install -Dcrave_DIR=$CRAVE_INSTALL_DIR
+  - make -j $NUM_JOBS
+  - ./main 2>result || true
+  - TMP=`grep 'German' result`
+  - if [ "$TMP" == "" ]; then exit 1; fi 
+  tags:
+  - linux
+
 build_default_stp:
   script: 
   - CRAVE_SOLVERS='cudd stp' make -j $NUM_JOBS
