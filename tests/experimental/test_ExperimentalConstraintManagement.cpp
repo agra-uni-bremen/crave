@@ -4,6 +4,9 @@
 #include <crave/experimental/Coverage.hpp>
 #include <crave/experimental/Constraint.hpp>
 
+#include <ostream>
+using std::ostream;
+
 using namespace crave;
 
 BOOST_FIXTURE_TEST_SUITE(ConstraintManagement, Context_Fixture)

@@ -3,7 +3,6 @@
 #pragma once
 
 #include <map>
-#include <ostream>
 #include <string>
 #include <vector>
 #include "AssignResultToRef.hpp"
@@ -11,8 +10,6 @@
 #include "Distribution.hpp"
 #include "RandBase.hpp"
 #include "RandvInterface.hpp"
-
-using std::ostream;
 
 namespace crave {
 

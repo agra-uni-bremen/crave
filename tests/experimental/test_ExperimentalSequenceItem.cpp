@@ -5,6 +5,7 @@
 #include <set>
 #include <iostream>
 
+using std::ostream;
 using boost::format;
 using namespace crave;
 
