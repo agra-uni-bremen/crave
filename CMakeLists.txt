@@ -71,7 +71,7 @@ endif()
 add_subdirectory(metaSMT)
 list(INSERT CMAKE_PREFIX_PATH 0 "${CMAKE_BINARY_DIR}")
 find_package(metaSMT REQUIRED)
-string(REPLACE " " ";" metaSMT_DEFINITIONS ${metaSMT_CXXFLAGS})
+string(REPLACE " " ";" metaSMT_DEFINITIONS "${metaSMT_CXXFLAGS}")
 add_definitions(${metaSMT_DEFINITIONS})
 
 ### includes
