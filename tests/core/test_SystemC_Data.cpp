@@ -4,13 +4,9 @@
 #include <crave/ConstrainedRandom.hpp>
 #include <crave/frontend/SystemC.hpp>
 
-#include <systemc.h>
-
 #include <boost/format.hpp>
 #include <iostream>
 using boost::format;
-
-int sc_main(int argc, char** argv) { return 1; }
 
 using namespace crave;
 
