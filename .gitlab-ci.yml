@@ -1,41 +1,34 @@
+image: ubuntu:xenial
+
 before_script:
 - scripts/show_linux_distribution.sh
+- apt-get update
+- apt-get -y upgrade
+- apt-get install -y build-essential cmake git wget unzip zlib1g-dev # essential
+- apt-get install -y bison flex # for STP
+- apt-get install -y python-dev libgmp-dev # for Z3
+- apt-get install -y gperf # for Yices2
+- apt-get install -y autoconf libtool openjdk-8-jdk # for CVC4
 - GIT_SSL_NO_VERIFY=true git submodule sync
 - GIT_SSL_NO_VERIFY=true git submodule update --init
-- ln -s /home/radames/software/crave-bundle/deps deps
 - NUM_JOBS=$[`nproc`-1]
 - if [ "$NUM_JOBS" -lt 1 ]; then NUM_JOBS=1; fi
-
+  
 build_default:
   script: 
   - make -j $NUM_JOBS
   - make test
   tags:
-  - linux
+  - docker
 
-build_install:
+fast_build:
   script: 
-  - ./bootstrap.sh -d deps --systemc -b cudd -b sword build -DCRAVE_BUILD_EXAMPLES=off -DCRAVE_ENABLE_TESTS=off
+  - ./bootstrap.sh -d deps -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_BUILD_EXAMPLES=off
   - cd build
-  - make -j $NUM_JOBS install
-  - CRAVE_INSTALL_DIR=`pwd`/root/share/crave
-  - mkdir build-test-install
-  - cd build-test-install
-  - cmake ../../deps/test-crave-install -Dcrave_DIR=$CRAVE_INSTALL_DIR
   - make -j $NUM_JOBS
-  - ./main 2>result || true
-  - TMP=`grep 'German' result`
-  - if [ "$TMP" == "" ]; then exit 1; fi 
+  - ctest --schedule-random
   tags:
-  - linux
-
-build_default_stp:
-  script: 
-  - CRAVE_SOLVERS='cudd stp' make -j $NUM_JOBS
-  - make test
-  tags:
-  - linux
-  allow_failure: true
+  - docker
 
 build_release:
   script: 
@@ -43,7 +36,33 @@ build_release:
   - make -j $NUM_JOBS
   - make test
   tags:
-  - linux
+  - docker
+
+build_install:
+  script: 
+  - ./bootstrap.sh -d deps --systemc -b cudd -b sword build -DCRAVE_BUILD_EXAMPLES=off -DCRAVE_ENABLE_TESTS=off
+  - cd build
+  - make -j $NUM_JOBS install
+  - CRAVE_INSTALL_DIR=`pwd`/root/share/crave
+  - git clone --depth 1 https://github.com/hoangmle/test-crave-install.git
+  - cd test-crave-install
+  - cmake . -Dcrave_DIR=$CRAVE_INSTALL_DIR
+  - make -j $NUM_JOBS
+  - ./main 2>result || true
+  - cat result
+  - TMP=`grep 'German' result`
+  - if [ "$TMP" == "" ]; then exit 1; fi 
+  tags:
+  - docker
+
+### optional builds in the following
+
+build_default_stp:
+  script: 
+  - CRAVE_SOLVERS='cudd stp' make -j $NUM_JOBS
+  - make test
+  tags:
+  - docker
   allow_failure: true
 
 build_boolector:
@@ -51,20 +70,19 @@ build_boolector:
   - ./bootstrap.sh -d deps --systemc -b boolector -b cudd build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
   - make -j $NUM_JOBS
-  - ctest --schedule-random -j $NUM_JOBS
+  - ctest --schedule-random
   tags:
-  - linux
+  - docker
   allow_failure: true
 
 build_cvc4:
   script: 
-  - export BOOST_ROOT=deps/boost-1_50_0 # use 1.50 to avoid cvc4 rebuild
   - ./bootstrap.sh -d deps --systemc -b cudd -b cvc4 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
   - make -j $NUM_JOBS
-  - ctest --schedule-random -j $NUM_JOBS
+  - ctest --schedule-random
   tags:
-  - linux
+  - docker
   allow_failure: true
 
 build_yices2:
@@ -72,49 +90,9 @@ build_yices2:
   - ./bootstrap.sh -d deps --systemc -b cudd -b yices2 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
   - make -j $NUM_JOBS
-  - ctest --schedule-random -j $NUM_JOBS
+  - ctest --schedule-random
   tags:
-  - linux
-  allow_failure: true
-
-build_stp:
-  script: 
-  - ./bootstrap.sh -d deps --systemc -b cudd -b stp build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
-  - cd build
-  - make -j $NUM_JOBS
-  - ctest --schedule-random -j $NUM_JOBS
-  tags:
-  - linux
-  allow_failure: true
-
-build_sword:
-  script: 
-  - ./bootstrap.sh -d deps --systemc -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
-  - cd build
-  - make -j $NUM_JOBS
-  - ctest --schedule-random -j $NUM_JOBS
-  tags:
-  - linux
-  allow_failure: true
-
-build_sword_no_examples:
-  script: 
-  - ./bootstrap.sh -d deps --systemc -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_BUILD_EXAMPLES=off
-  - cd build
-  - make -j $NUM_JOBS
-  - ctest --schedule-random -j $NUM_JOBS
-  tags:
-  - linux
-  allow_failure: true
-
-build_sword_no_tests:
-  script: 
-  - ./bootstrap.sh -d deps --systemc -b cudd -b sword build -DCRAVE_EXAMPLES_TIMEOUT=180 -DCRAVE_ENABLE_TESTS=off
-  - cd build
-  - make -j $NUM_JOBS
-  - ctest --schedule-random -j $NUM_JOBS
-  tags:
-  - linux
+  - docker
   allow_failure: true
 
 build_z3:
@@ -122,8 +100,8 @@ build_z3:
   - ./bootstrap.sh -d deps --systemc -b cudd -b z3 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
   - make -j $NUM_JOBS
-  - ctest --schedule-random -j $NUM_JOBS
+  - ctest --schedule-random
   tags:
-  - linux
+  - docker
   allow_failure: true
 
