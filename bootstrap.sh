@@ -10,7 +10,7 @@ GLOG=glog-git-0.3.3
 SYSTEMC=systemc-2.3.1
 
 BOOLECTOR=boolector-2.2.0
-CVC4=cvc4-1.5pre-smtcomp2016
+CVC4=cvc4-smtcomp2015-stable
 STP=stp-git-basic
 SWORD=SWORD-1.1
 YICES2=yices-2.5.1
