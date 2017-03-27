@@ -1,28 +1,41 @@
-image: ubuntu:xenial
-
 before_script:
 - scripts/show_linux_distribution.sh
-- apt-get update
-- apt-get -y upgrade
-- apt-get install -y build-essential cmake git wget unzip zlib1g-dev # essential
-- apt-get install -y bison flex # for STP
-- apt-get install -y python-dev libgmp-dev # for Z3
-- apt-get install -y gperf # for Yices2
-- apt-get install -y autoconf libtool openjdk-8-jdk # for CVC4
-- GIT_SSL_NO_VERIFY=true git submodule sync
-- GIT_SSL_NO_VERIFY=true git submodule update --init
 - NUM_JOBS=$[`nproc`-1]
 - if [ "$NUM_JOBS" -lt 1 ]; then NUM_JOBS=1; fi
   
-build_default:
+build_default_ubuntu:
+  image: ubuntu:xenial
+  script:
+  - scripts/install_apt.sh
+  - make -j $NUM_JOBS
+  - make test
+  tags:
+  - docker
+  
+build_default_centOS:
+  image: centos:centos7
   script: 
+  - scripts/install_yum.sh
   - make -j $NUM_JOBS
   - make test
   tags:
   - docker
 
-fast_build:
+fast_build_ubuntu:
+  image: ubuntu:xenial
+  script:
+  - scripts/install_apt.sh
+  - ./bootstrap.sh -d deps -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_BUILD_EXAMPLES=off
+  - cd build
+  - make -j $NUM_JOBS
+  - ctest --schedule-random
+  tags:
+  - docker
+  
+fast_build_centOS:
+  image: centos:centos7
   script: 
+  - scripts/install_yum.sh
   - ./bootstrap.sh -d deps -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_BUILD_EXAMPLES=off
   - cd build
   - make -j $NUM_JOBS
@@ -30,16 +43,49 @@ fast_build:
   tags:
   - docker
 
-build_release:
-  script: 
+build_release_ubuntu:
+  image: ubuntu:xenial
+  script:
+  - scripts/install_apt.sh
   - ./bootstrap.sh -d deps -m RELEASE --systemc -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - make -j $NUM_JOBS
   - make test
   tags:
   - docker
 
-build_install:
+build_release_centOS:
+  image: centos:centos7
   script: 
+  - scripts/install_yum.sh
+  - ./bootstrap.sh -d deps -m RELEASE --systemc -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
+  - make -j $NUM_JOBS
+  - make test
+  tags:
+  - docker
+  
+build_install_ubuntu:
+  image: ubuntu:xenial
+  script:
+  - scripts/install_apt.sh
+  - ./bootstrap.sh -d deps --systemc -b cudd -b sword build -DCRAVE_BUILD_EXAMPLES=off -DCRAVE_ENABLE_TESTS=off
+  - cd build
+  - make -j $NUM_JOBS install
+  - CRAVE_INSTALL_DIR=`pwd`/root/share/crave
+  - git clone --depth 1 https://github.com/hoangmle/test-crave-install.git
+  - cd test-crave-install
+  - cmake . -Dcrave_DIR=$CRAVE_INSTALL_DIR
+  - make -j $NUM_JOBS
+  - ./main 2>result || true
+  - cat result
+  - TMP=`grep 'German' result`
+  - if [ "$TMP" == "" ]; then exit 1; fi 
+  tags:
+  - docker
+  
+build_install_centOS:
+  image: centos:centos7
+  script: 
+  - scripts/install_yum.sh
   - ./bootstrap.sh -d deps --systemc -b cudd -b sword build -DCRAVE_BUILD_EXAMPLES=off -DCRAVE_ENABLE_TESTS=off
   - cd build
   - make -j $NUM_JOBS install
@@ -58,7 +104,9 @@ build_install:
 ### optional builds in the following
 
 build_default_stp:
-  script: 
+  image: ubuntu:xenial
+  script:
+  - scripts/install_apt.sh
   - CRAVE_SOLVERS='cudd stp' make -j $NUM_JOBS
   - make test
   tags:
@@ -66,7 +114,9 @@ build_default_stp:
   allow_failure: true
 
 build_boolector:
-  script: 
+  image: ubuntu:xenial
+  script:
+  - scripts/install_apt.sh
   - ./bootstrap.sh -d deps --systemc -b boolector -b cudd build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
   - make -j $NUM_JOBS
@@ -76,7 +126,9 @@ build_boolector:
   allow_failure: true
 
 build_cvc4:
-  script: 
+  image: ubuntu:xenial
+  script:
+  - scripts/install_apt.sh
   - ./bootstrap.sh -d deps --systemc -b cudd -b cvc4 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
   - make -j $NUM_JOBS
@@ -86,7 +138,9 @@ build_cvc4:
   allow_failure: true
 
 build_yices2:
-  script: 
+  image: ubuntu:xenial
+  script:
+  - scripts/install_apt.sh
   - ./bootstrap.sh -d deps --systemc -b cudd -b yices2 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
   - make -j $NUM_JOBS
@@ -96,7 +150,9 @@ build_yices2:
   allow_failure: true
 
 build_z3:
-  script: 
+  image: ubuntu:xenial
+  script:
+  - scripts/install_apt.sh
   - ./bootstrap.sh -d deps --systemc -b cudd -b z3 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
   - make -j $NUM_JOBS
