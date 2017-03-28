@@ -1,163 +1,129 @@
-before_script:
-- scripts/show_linux_distribution.sh
-- NUM_JOBS=$[`nproc`-1]
-- if [ "$NUM_JOBS" -lt 1 ]; then NUM_JOBS=1; fi
-  
-build_default_ubuntu:
+.ubuntu: &ubuntu
   image: ubuntu:xenial
-  script:
+  before_script:
+  - scripts/show_linux_distribution.sh
   - scripts/install_apt.sh
-  - make -j $NUM_JOBS
-  - make test
+  - NUM_JOBS=$[`nproc`-1]
+  - if [ "$NUM_JOBS" -lt 1 ]; then NUM_JOBS=1; fi
   tags:
   - docker
+  
+.centOS: &centOS
+  image: centos:centos7
+  before_script:
+  - scripts/show_linux_distribution.sh
+  - scripts/install_yum.sh
+  - NUM_JOBS=$[`nproc`-1]
+  - if [ "$NUM_JOBS" -lt 1 ]; then NUM_JOBS=1; fi
+  tags:
+  - docker
+  
+.build_default: 
+  script: &build_default
+  - make -j $NUM_JOBS
+  - make test
+
+build_default_ubuntu:
+  <<: *ubuntu
+  script: *build_default
   
 build_default_centOS:
-  image: centos:centos7
-  script: 
-  - scripts/install_yum.sh
-  - make -j $NUM_JOBS
-  - make test
-  tags:
-  - docker
+  <<: *centOS
+  script: *build_default
 
-fast_build_ubuntu:
-  image: ubuntu:xenial
-  script:
-  - scripts/install_apt.sh
+.fast_build:
+  script: &fast_build
   - ./bootstrap.sh -d deps -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_BUILD_EXAMPLES=off
   - cd build
   - make -j $NUM_JOBS
   - ctest --schedule-random
-  tags:
-  - docker
+  
+fast_build_ubuntu:
+  <<: *ubuntu
+  script: *fast_build
   
 fast_build_centOS:
-  image: centos:centos7
-  script: 
-  - scripts/install_yum.sh
-  - ./bootstrap.sh -d deps -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_BUILD_EXAMPLES=off
-  - cd build
-  - make -j $NUM_JOBS
-  - ctest --schedule-random
-  tags:
-  - docker
+  <<: *centOS
+  script: *fast_build
 
+.build_release:
+  script: &build_release
+  - ./bootstrap.sh -d deps -m RELEASE --systemc -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
+  - make -j $NUM_JOBS
+  - make test
+  
 build_release_ubuntu:
-  image: ubuntu:xenial
-  script:
-  - scripts/install_apt.sh
-  - ./bootstrap.sh -d deps -m RELEASE --systemc -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
-  - make -j $NUM_JOBS
-  - make test
-  tags:
-  - docker
-
+  <<: *ubuntu
+  script: *build_release
+  
 build_release_centOS:
-  image: centos:centos7
-  script: 
-  - scripts/install_yum.sh
-  - ./bootstrap.sh -d deps -m RELEASE --systemc -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
+  <<: *centOS
+  script: *build_release
+  
+.build_install: 
+  script: &build_install
+  - ./bootstrap.sh -d deps --systemc -b cudd -b sword build -DCRAVE_BUILD_EXAMPLES=off -DCRAVE_ENABLE_TESTS=off
+  - cd build
+  - make -j $NUM_JOBS install
+  - CRAVE_INSTALL_DIR=`pwd`/root/share/crave
+  - git clone --depth 1 https://github.com/hoangmle/test-crave-install.git
+  - cd test-crave-install
+  - cmake . -Dcrave_DIR=$CRAVE_INSTALL_DIR
   - make -j $NUM_JOBS
-  - make test
-  tags:
-  - docker
+  - ./main 2>result || true
+  - cat result
+  - TMP=`grep 'German' result`
+  - if [ "$TMP" == "" ]; then exit 1; fi
   
 build_install_ubuntu:
-  image: ubuntu:xenial
-  script:
-  - scripts/install_apt.sh
-  - ./bootstrap.sh -d deps --systemc -b cudd -b sword build -DCRAVE_BUILD_EXAMPLES=off -DCRAVE_ENABLE_TESTS=off
-  - cd build
-  - make -j $NUM_JOBS install
-  - CRAVE_INSTALL_DIR=`pwd`/root/share/crave
-  - git clone --depth 1 https://github.com/hoangmle/test-crave-install.git
-  - cd test-crave-install
-  - cmake . -Dcrave_DIR=$CRAVE_INSTALL_DIR
-  - make -j $NUM_JOBS
-  - ./main 2>result || true
-  - cat result
-  - TMP=`grep 'German' result`
-  - if [ "$TMP" == "" ]; then exit 1; fi 
-  tags:
-  - docker
+  <<: *ubuntu
+  script: *build_install
   
 build_install_centOS:
-  image: centos:centos7
-  script: 
-  - scripts/install_yum.sh
-  - ./bootstrap.sh -d deps --systemc -b cudd -b sword build -DCRAVE_BUILD_EXAMPLES=off -DCRAVE_ENABLE_TESTS=off
-  - cd build
-  - make -j $NUM_JOBS install
-  - CRAVE_INSTALL_DIR=`pwd`/root/share/crave
-  - git clone --depth 1 https://github.com/hoangmle/test-crave-install.git
-  - cd test-crave-install
-  - cmake . -Dcrave_DIR=$CRAVE_INSTALL_DIR
-  - make -j $NUM_JOBS
-  - ./main 2>result || true
-  - cat result
-  - TMP=`grep 'German' result`
-  - if [ "$TMP" == "" ]; then exit 1; fi 
-  tags:
-  - docker
+  <<: *centOS
+  script: *build_install
 
 ### optional builds in the following
 
 build_default_stp:
-  image: ubuntu:xenial
+  <<: *ubuntu
   script:
-  - scripts/install_apt.sh
   - CRAVE_SOLVERS='cudd stp' make -j $NUM_JOBS
   - make test
-  tags:
-  - docker
   allow_failure: true
 
 build_boolector:
-  image: ubuntu:xenial
+  <<: *ubuntu
   script:
-  - scripts/install_apt.sh
   - ./bootstrap.sh -d deps --systemc -b boolector -b cudd build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
   - make -j $NUM_JOBS
   - ctest --schedule-random
-  tags:
-  - docker
   allow_failure: true
 
 build_cvc4:
-  image: ubuntu:xenial
+  <<: *ubuntu
   script:
-  - scripts/install_apt.sh
   - ./bootstrap.sh -d deps --systemc -b cudd -b cvc4 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
   - make -j $NUM_JOBS
   - ctest --schedule-random
-  tags:
-  - docker
   allow_failure: true
 
 build_yices2:
-  image: ubuntu:xenial
+  <<: *ubuntu
   script:
-  - scripts/install_apt.sh
   - ./bootstrap.sh -d deps --systemc -b cudd -b yices2 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
   - make -j $NUM_JOBS
   - ctest --schedule-random
-  tags:
-  - docker
   allow_failure: true
 
 build_z3:
-  image: ubuntu:xenial
+  <<: *ubuntu
   script:
-  - scripts/install_apt.sh
   - ./bootstrap.sh -d deps --systemc -b cudd -b z3 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
   - make -j $NUM_JOBS
   - ctest --schedule-random
-  tags:
-  - docker
   allow_failure: true
-
