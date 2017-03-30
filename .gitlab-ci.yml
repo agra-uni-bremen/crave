@@ -1,20 +1,17 @@
-.ubuntu: &ubuntu
-  image: ubuntu:xenial
-  before_script:
-  - scripts/show_linux_distribution.sh
-  - scripts/install_apt.sh
+before_script:
+  - scripts/show_linux_distribution_and_install_packages.sh
   - NUM_JOBS=$[`nproc`-1]
   - if [ "$NUM_JOBS" -lt 1 ]; then NUM_JOBS=1; fi
+  - GIT_SSL_NO_VERIFY=true git submodule sync
+  - GIT_SSL_NO_VERIFY=true git submodule update --init
+
+.ubuntu: &ubuntu
+  image: ubuntu:xenial
   tags:
   - docker
   
 .centOS: &centOS
   image: centos:centos7
-  before_script:
-  - scripts/show_linux_distribution.sh
-  - scripts/install_yum.sh
-  - NUM_JOBS=$[`nproc`-1]
-  - if [ "$NUM_JOBS" -lt 1 ]; then NUM_JOBS=1; fi
   tags:
   - docker
   
