@@ -5,29 +5,47 @@ before_script:
   - GIT_SSL_NO_VERIFY=true git submodule sync
   - GIT_SSL_NO_VERIFY=true git submodule update --init
 
-.ubuntu: &ubuntu
+### templates for docker images
+.ubuntu16: &ubuntu16
   image: ubuntu:xenial
+  variables:
+    JDK_PACKAGE_NAME: openjdk-8-jdk
+  tags:
+  - docker
+
+.ubuntu14: &ubuntu14
+  image: ubuntu:trusty
+  variables:
+    JDK_PACKAGE_NAME: openjdk-7-jdk
   tags:
   - docker
   
-.centOS: &centOS
+.centos7: &centos7
   image: centos:centos7
+  variables:
+    JDK_PACKAGE_NAME: java-1.8.0-openjdk
   tags:
   - docker
-  
+
+### template and jobs for the default build that should be testes on all images
 .build_default: 
   script: &build_default
   - make -j $NUM_JOBS
   - make test
 
-build_default_ubuntu:
-  <<: *ubuntu
-  script: *build_default
-  
-build_default_centOS:
-  <<: *centOS
+build_default_ubuntu16:
+  <<: *ubuntu16
   script: *build_default
 
+build_default_ubuntu14:
+  <<: *ubuntu14
+  script: *build_default
+  
+build_default_centos7:
+  <<: *centos7
+  script: *build_default
+
+### template and jobs for a fast build
 .fast_build:
   script: &fast_build
   - ./bootstrap.sh -d deps -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_BUILD_EXAMPLES=off
@@ -35,28 +53,22 @@ build_default_centOS:
   - make -j $NUM_JOBS
   - ctest --schedule-random
   
-fast_build_ubuntu:
-  <<: *ubuntu
-  script: *fast_build
-  
-fast_build_centOS:
-  <<: *centOS
+fast_build_ubuntu14:
+  <<: *ubuntu14
   script: *fast_build
 
+### template and jobs for a build in RELEASE mode
 .build_release:
   script: &build_release
   - ./bootstrap.sh -d deps -m RELEASE --systemc -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - make -j $NUM_JOBS
   - make test
   
-build_release_ubuntu:
-  <<: *ubuntu
+build_release_centos7:
+  <<: *centos7
   script: *build_release
-  
-build_release_centOS:
-  <<: *centOS
-  script: *build_release
-  
+
+### template and jobs for a very fast build with installation
 .build_install: 
   script: &build_install
   - ./bootstrap.sh -d deps --systemc -b cudd -b sword build -DCRAVE_BUILD_EXAMPLES=off -DCRAVE_ENABLE_TESTS=off
@@ -72,25 +84,21 @@ build_release_centOS:
   - TMP=`grep 'German' result`
   - if [ "$TMP" == "" ]; then exit 1; fi
   
-build_install_ubuntu:
-  <<: *ubuntu
-  script: *build_install
-  
-build_install_centOS:
-  <<: *centOS
+build_install_centos7:
+  <<: *centos7
   script: *build_install
 
 ### optional builds in the following
 
 build_default_stp:
-  <<: *ubuntu
+  <<: *ubuntu16
   script:
   - CRAVE_SOLVERS='cudd stp' make -j $NUM_JOBS
   - make test
   allow_failure: true
 
 build_boolector:
-  <<: *ubuntu
+  <<: *ubuntu16
   script:
   - ./bootstrap.sh -d deps --systemc -b boolector -b cudd build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
@@ -99,7 +107,7 @@ build_boolector:
   allow_failure: true
 
 build_cvc4:
-  <<: *ubuntu
+  <<: *ubuntu16
   script:
   - ./bootstrap.sh -d deps --systemc -b cudd -b cvc4 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
@@ -108,7 +116,7 @@ build_cvc4:
   allow_failure: true
 
 build_yices2:
-  <<: *ubuntu
+  <<: *ubuntu16
   script:
   - ./bootstrap.sh -d deps --systemc -b cudd -b yices2 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
@@ -117,7 +125,7 @@ build_yices2:
   allow_failure: true
 
 build_z3:
-  <<: *ubuntu
+  <<: *ubuntu16
   script:
   - ./bootstrap.sh -d deps --systemc -b cudd -b z3 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
