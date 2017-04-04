@@ -1,129 +1,125 @@
 before_script:
-- scripts/show_linux_distribution.sh
-- GIT_SSL_NO_VERIFY=true git submodule sync
-- GIT_SSL_NO_VERIFY=true git submodule update --init
-- ln -s /home/radames/software/crave-bundle/deps deps
-- NUM_JOBS=$[`nproc`-1]
-- if [ "$NUM_JOBS" -lt 1 ]; then NUM_JOBS=1; fi
+  - scripts/show_linux_distribution_and_install_packages.sh
+  - NUM_JOBS=$[`nproc`-1]
+  - if [ "$NUM_JOBS" -lt 1 ]; then NUM_JOBS=1; fi
+  - GIT_SSL_NO_VERIFY=true git submodule sync
+  - GIT_SSL_NO_VERIFY=true git submodule update --init
 
-build_default:
-  script: 
+### templates for docker images
+.ubuntu16: &ubuntu16
+  image: ubuntu:xenial
+  variables:
+    JDK_PACKAGE_NAME: openjdk-8-jdk
+  tags:
+  - docker
+
+.ubuntu14: &ubuntu14
+  image: ubuntu:trusty
+  variables:
+    JDK_PACKAGE_NAME: openjdk-7-jdk
+  tags:
+  - docker
+  
+.centos7: &centos7
+  image: centos:centos7
+  variables:
+    JDK_PACKAGE_NAME: java-1.8.0-openjdk
+  tags:
+  - docker
+
+### template and jobs for the default build (currently with Boolector and CUDD) that should be testes on all images
+.build_default: 
+  script: &build_default
   - make -j $NUM_JOBS
   - make test
-  tags:
-  - linux
 
-build_install:
-  script: 
+build_default_ubuntu16:
+  <<: *ubuntu16
+  script: *build_default
+
+build_default_ubuntu14:
+  <<: *ubuntu14
+  script: *build_default
+  
+build_default_centos7:
+  <<: *centos7
+  script: *build_default
+
+### template and jobs for a fast build
+.fast_build:
+  script: &fast_build
+  - ./bootstrap.sh -d deps -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_BUILD_EXAMPLES=off
+  - cd build
+  - make -j $NUM_JOBS
+  - ctest --schedule-random
+  
+fast_build_ubuntu14:
+  <<: *ubuntu14
+  script: *fast_build
+
+### template and jobs for a build in RELEASE mode
+.build_release:
+  script: &build_release
+  - ./bootstrap.sh -d deps -m RELEASE --systemc -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
+  - make -j $NUM_JOBS
+  - make test
+  
+build_release_centos7:
+  <<: *centos7
+  script: *build_release
+
+### template and jobs for a very fast build with installation
+.build_install: 
+  script: &build_install
   - ./bootstrap.sh -d deps --systemc -b cudd -b sword build -DCRAVE_BUILD_EXAMPLES=off -DCRAVE_ENABLE_TESTS=off
   - cd build
   - make -j $NUM_JOBS install
   - CRAVE_INSTALL_DIR=`pwd`/root/share/crave
-  - mkdir build-test-install
-  - cd build-test-install
-  - cmake ../../deps/test-crave-install -Dcrave_DIR=$CRAVE_INSTALL_DIR
+  - git clone --depth 1 https://github.com/hoangmle/test-crave-install.git
+  - cd test-crave-install
+  - cmake . -Dcrave_DIR=$CRAVE_INSTALL_DIR
   - make -j $NUM_JOBS
   - ./main 2>result || true
+  - cat result
   - TMP=`grep 'German' result`
-  - if [ "$TMP" == "" ]; then exit 1; fi 
-  tags:
-  - linux
+  - if [ "$TMP" == "" ]; then exit 1; fi
+  
+build_install_centos7:
+  <<: *centos7
+  script: *build_install
+
+### optional builds in the following
 
 build_default_stp:
-  script: 
+  <<: *ubuntu16
+  script:
   - CRAVE_SOLVERS='cudd stp' make -j $NUM_JOBS
   - make test
-  tags:
-  - linux
-  allow_failure: true
-
-build_release:
-  script: 
-  - ./bootstrap.sh -d deps -m RELEASE --systemc -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
-  - make -j $NUM_JOBS
-  - make test
-  tags:
-  - linux
-  allow_failure: true
-
-build_boolector:
-  script: 
-  - ./bootstrap.sh -d deps --systemc -b boolector -b cudd build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
-  - cd build
-  - make -j $NUM_JOBS
-  - ctest --schedule-random -j $NUM_JOBS
-  tags:
-  - linux
   allow_failure: true
 
 build_cvc4:
-  script: 
-  - export BOOST_ROOT=deps/boost-1_50_0 # use 1.50 to avoid cvc4 rebuild
+  <<: *ubuntu16
+  script:
   - ./bootstrap.sh -d deps --systemc -b cudd -b cvc4 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
   - make -j $NUM_JOBS
-  - ctest --schedule-random -j $NUM_JOBS
-  tags:
-  - linux
+  - ctest --schedule-random
   allow_failure: true
 
 build_yices2:
-  script: 
+  <<: *ubuntu16
+  script:
   - ./bootstrap.sh -d deps --systemc -b cudd -b yices2 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
   - make -j $NUM_JOBS
-  - ctest --schedule-random -j $NUM_JOBS
-  tags:
-  - linux
-  allow_failure: true
-
-build_stp:
-  script: 
-  - ./bootstrap.sh -d deps --systemc -b cudd -b stp build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
-  - cd build
-  - make -j $NUM_JOBS
-  - ctest --schedule-random -j $NUM_JOBS
-  tags:
-  - linux
-  allow_failure: true
-
-build_sword:
-  script: 
-  - ./bootstrap.sh -d deps --systemc -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
-  - cd build
-  - make -j $NUM_JOBS
-  - ctest --schedule-random -j $NUM_JOBS
-  tags:
-  - linux
-  allow_failure: true
-
-build_sword_no_examples:
-  script: 
-  - ./bootstrap.sh -d deps --systemc -b cudd -b sword build -DCRAVE_TIMEOUT=60 -DCRAVE_BUILD_EXAMPLES=off
-  - cd build
-  - make -j $NUM_JOBS
-  - ctest --schedule-random -j $NUM_JOBS
-  tags:
-  - linux
-  allow_failure: true
-
-build_sword_no_tests:
-  script: 
-  - ./bootstrap.sh -d deps --systemc -b cudd -b sword build -DCRAVE_EXAMPLES_TIMEOUT=180 -DCRAVE_ENABLE_TESTS=off
-  - cd build
-  - make -j $NUM_JOBS
-  - ctest --schedule-random -j $NUM_JOBS
-  tags:
-  - linux
+  - ctest --schedule-random
   allow_failure: true
 
 build_z3:
-  script: 
+  <<: *ubuntu16
+  script:
   - ./bootstrap.sh -d deps --systemc -b cudd -b z3 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
   - make -j $NUM_JOBS
-  - ctest --schedule-random -j $NUM_JOBS
-  tags:
-  - linux
+  - ctest --schedule-random
   allow_failure: true
-
