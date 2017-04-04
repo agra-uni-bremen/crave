@@ -1,4 +1,4 @@
-CRAVE_SOLVERS ?= cudd sword boolector
+CRAVE_SOLVERS ?= cudd boolector
 
 SRCDIR:=$(shell pwd)
 BUILD:=$(SRCDIR)/build

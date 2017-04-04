@@ -43,13 +43,13 @@ For faster build, it is recommended to choose the first option.
 * [Glog] - similarly, set GLOG_ROOT or CRAVE will automatically download and build glog. GLOG_ROOT can be set to an invalid path (e.g. 'export GLOG_ROOT=do/not/use') to disable Glog. In this case a very simple logger will be used instead.
 * [Boolector] - Boolector can be disabled by via the environment variable CRAVE_SOLVERS (see below).
 * [CUDD] - CUDD can be disabled by by via the environment variable CRAVE_SOLVERS (see below), but this is not recommended.
-* [SWORD] - SWORD can be disabled by via the environment variable CRAVE_SOLVERS (see below).
+* [SWORD] - SWORD can be enabled by via the environment variable CRAVE_SOLVERS (see below). It is only available as pre-compiled binary for Linux x86 and x86_64 and might be incompatible with some platforms such as RHEL 5.
 * [CVC4] - CVC4 can be enabled by by via the environment variable CRAVE_SOLVERS (see below). Building CVC4 takes considerable time so it is disabled by default.
 * [Z3] - Z3 can be enabled by via the environment variable CRAVE_SOLVERS (see below). Building Z3 takes considerable time so it is disabled by default.
 * [STP] - STP can be enabled by via the environment variable CRAVE_SOLVERS (see below). Building STP takes considerable time so it is disabled by default.
 * [Yices2] - Yices2 can be enabled by via the environment variable CRAVE_SOLVERS (see below). Building Yices2 takes considerable time so it is disabled by default.
 
-If the environment variable CRAVE_SOLVERS is not set, Boolector, CUDD and SWORD will be used.
+If the environment variable CRAVE_SOLVERS is not set, Boolector and CUDD will be used.
 For example, to build CRAVE with CUDD, STP and Z3, call 'export CRAVE_SOLVERS='cudd stp z3'' before 'make'.
 Please make sure that at least one SMT backend is enabled.
 
@@ -110,14 +110,6 @@ The value 'auto' means that CRAVE will automatically select a backend among
 the available SMT solvers. Other possible values are for example 'boolector', 'sword', 'z3', etc.
 Change the seed to a positive integer, if you want to use this integer as the fixed seed.
 For further information, especially on the logger, please refer to the doxygen documentation.
-
- Known issues
---------------
-
-In the default configuration CRAVE will use SWORD as one of its SMT backends.
-SWORD is provided as binary program for Linux x86 and x86_64 platforms. However,
-this version of SWORD is incompatible with RHEL 5 or derived operating systems (e.g. 
-CentOS 5). On such systems, SWORD must be disabled before building CRAVE via the environment variable CRAVE_SOLVERS.
 
 [Boost]: http://www.boost.org
 [CUDD]:  http://vlsi.colorado.edu/~fabio/CUDD/

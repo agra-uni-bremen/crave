@@ -27,7 +27,7 @@ before_script:
   tags:
   - docker
 
-### template and jobs for the default build that should be testes on all images
+### template and jobs for the default build (currently with Boolector and CUDD) that should be testes on all images
 .build_default: 
   script: &build_default
   - make -j $NUM_JOBS
@@ -95,15 +95,6 @@ build_default_stp:
   script:
   - CRAVE_SOLVERS='cudd stp' make -j $NUM_JOBS
   - make test
-  allow_failure: true
-
-build_boolector:
-  <<: *ubuntu16
-  script:
-  - ./bootstrap.sh -d deps --systemc -b boolector -b cudd build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
-  - cd build
-  - make -j $NUM_JOBS
-  - ctest --schedule-random
   allow_failure: true
 
 build_cvc4:
