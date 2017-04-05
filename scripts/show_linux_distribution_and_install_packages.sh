@@ -62,7 +62,11 @@ parse_ci_job_name
 
 if [[ $os == *"Ubuntu"* ]]; then
   install-apt
+elif [[ $os == *"Debian"* ]]; then
+  install-apt
 elif [[ $os == *"CentOS"* ]]; then
+  install-yum
+elif [[ $os == *"Fedora"* ]]; then
   install-yum
 else
   echo "No installation script can be found for this OS, try to use apt-get"

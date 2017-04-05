@@ -27,6 +27,20 @@ before_script:
   tags:
   - docker
 
+.debian8: &debian8
+  image: debian:jessie
+  variables:
+    JDK_PACKAGE_NAME: openjdk-8-jdk
+  tags:
+  - docker
+
+.fedora25: &fedora25
+  image: fedora:25
+  variables:
+    JDK_PACKAGE_NAME: java-1.8.0-openjdk
+  tags:
+  - docker
+
 ### template and jobs for the default build (currently with Boolector and CUDD) that should be testes on all images
 .build_default: 
   script: &build_default
@@ -43,6 +57,14 @@ build_default_ubuntu14:
   
 build_default_centos7:
   <<: *centos7
+  script: *build_default
+
+build_default_debian8:
+  <<: *debian8
+  script: *build_default
+
+build_default_fedora25:
+  <<: *fedora25
   script: *build_default
 
 ### template and jobs for a fast build
