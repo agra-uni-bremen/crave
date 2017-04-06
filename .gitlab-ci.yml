@@ -49,22 +49,36 @@ before_script:
 
 build_default_ubuntu16:
   <<: *ubuntu16
+  except:
+  - /.*_fastci$/
   script: *build_default
 
 build_default_ubuntu14:
   <<: *ubuntu14
+  only:
+  - development
+  - /.*_ci$/
   script: *build_default
   
 build_default_centos7:
   <<: *centos7
+  only:
+  - development
+  - /.*_ci$/
   script: *build_default
 
 build_default_debian8:
   <<: *debian8
+  only:
+  - development
+  - /.*_ci$/
   script: *build_default
 
 build_default_fedora25:
   <<: *fedora25
+  only:
+  - development
+  - /.*_ci$/
   script: *build_default
 
 ### template and jobs for a fast build
@@ -88,6 +102,8 @@ fast_build_ubuntu14:
   
 build_release_centos7:
   <<: *centos7
+  only:
+  - development
   script: *build_release
 
 ### template and jobs for a very fast build with installation
@@ -108,12 +124,16 @@ build_release_centos7:
   
 build_install_centos7:
   <<: *centos7
+  only:
+  - development
   script: *build_install
 
 ### optional builds in the following
 
 build_default_stp:
   <<: *ubuntu16
+  only:
+  - development
   script:
   - CRAVE_SOLVERS='cudd stp' make -j $NUM_JOBS
   - make test
@@ -121,6 +141,8 @@ build_default_stp:
 
 build_cvc4:
   <<: *ubuntu16
+  only:
+  - development
   script:
   - ./bootstrap.sh -d deps --systemc -b cudd -b cvc4 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
@@ -130,6 +152,8 @@ build_cvc4:
 
 build_yices2:
   <<: *ubuntu16
+  only:
+  - development
   script:
   - ./bootstrap.sh -d deps --systemc -b cudd -b yices2 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
@@ -139,6 +163,8 @@ build_yices2:
 
 build_z3:
   <<: *ubuntu16
+  only:
+  - development
   script:
   - ./bootstrap.sh -d deps --systemc -b cudd -b z3 build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
   - cd build
