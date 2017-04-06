@@ -284,7 +284,8 @@ BOOST_AUTO_TEST_CASE(shiftleft) {
   gen(a < 256u)(b < (unsigned)(sizeof(unsigned) * 8u))(c == (a << b));
 
   int count = 0;
-  while (gen.next() && ++count < 400) {
+  int max_count = 200;
+  while (gen.next() && ++count < max_count) {
     unsigned av = gen[a];
     unsigned bv = gen[b];
     unsigned r = av << bv;
@@ -295,6 +296,7 @@ BOOST_AUTO_TEST_CASE(shiftleft) {
   }
 
   VariableDefaultSolver::bypass_constraint_analysis = false;
+  BOOST_REQUIRE_EQUAL(count, max_count);
 }
 
 BOOST_AUTO_TEST_CASE(shiftright) {
@@ -308,7 +310,8 @@ BOOST_AUTO_TEST_CASE(shiftright) {
   gen(a > 256u)(b < 8u)(c == (a >> b));
 
   int count = 0;
-  while (gen.next() && ++count < 500) {
+  int max_count = 300;
+  while (gen.next() && ++count < max_count) {
     unsigned av = gen[a];
     unsigned bv = gen[b];
     unsigned r = av >> bv;
@@ -319,6 +322,7 @@ BOOST_AUTO_TEST_CASE(shiftright) {
   }
 
   VariableDefaultSolver::bypass_constraint_analysis = false;
+  BOOST_REQUIRE_EQUAL(count, max_count);
 }
 
 BOOST_AUTO_TEST_CASE(plus_minus) {

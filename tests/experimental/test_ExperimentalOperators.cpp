@@ -471,7 +471,8 @@ BOOST_AUTO_TEST_CASE(shiftleft) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
   s_shiftleft item("item");
   int count = 0;
-  while (item.randomize() && ++count < 400) {
+  int max_count = 200;
+  while (item.randomize() && ++count < max_count) {
     unsigned av = item.a;
     unsigned bv = item.b;
     unsigned r = av << bv;
@@ -481,6 +482,7 @@ BOOST_AUTO_TEST_CASE(shiftleft) {
   }
 
   VariableDefaultSolver::bypass_constraint_analysis = false;
+  BOOST_REQUIRE_EQUAL(count, max_count);
 }
 
 struct s_shiftright : public crv_sequence_item {
@@ -493,16 +495,18 @@ BOOST_AUTO_TEST_CASE(shiftright) {
   VariableDefaultSolver::bypass_constraint_analysis = true;
   s_shiftright item("shiftright");
   int count = 0;
-  while (item.randomize() && ++count < 500) {
+  int max_count = 300;
+  while (item.randomize() && ++count < max_count) {
     unsigned av = item.a;
     unsigned bv = item.b;
     unsigned r = av >> bv;
 
     BOOST_REQUIRE_EQUAL(r, item.c);
-    item.con &= {item.a != item.a(), item.b() != item.b};
+    item.con &= {item.a != item.a() || item.b() != item.b};
   }
 
   VariableDefaultSolver::bypass_constraint_analysis = false;
+  BOOST_REQUIRE_EQUAL(count, max_count);
 }
 
 struct s_plus_minus : crv_sequence_item {
