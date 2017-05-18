@@ -28,7 +28,7 @@ class crv_coverpoint : public crv_object {
    * \brief Constructor by name.
    * \param name of the coverpoint, covpt by default.
    */
-  crv_coverpoint(crv_object_name = "covpt") : bins_(), transBins_() {}
+  crv_coverpoint(crv_object_name = "covpt") : simple_bins_(), transition_bins_() {}
 
   /**
    * \brief Deleted copy constructor.
@@ -38,17 +38,17 @@ class crv_coverpoint : public crv_object {
   std::string obj_kind() const override final { return "crv_coverpoint"; }
 
   /**
-   * \brief Returns a vector of all bins of this coverpoint.
+   * \brief Returns a vector of all simple bins of this coverpoint.
    * \return std::vector& of crv_bin
    */
-  std::vector<crv_bin>& bins() { return bins_; }
+  std::vector<crv_bin>& simple_bins() { return simple_bins_; }
 
   /**
    * \brief Adds new bins to the bin list.
    * \param elist List of bin expressions. Each expression will create a new bin with minimum hit count equal to 1.
    */
-  void bins(expression_list elist) {
-    for (auto e : elist) bins_.push_back(crv_bin(e));
+  void add_simple_bins(expression_list elist) {
+    for (auto e : elist) simple_bins_.push_back(crv_bin(e));
   }
 
   /**
@@ -59,14 +59,37 @@ class crv_coverpoint : public crv_object {
    * \param list List of bin expressions.
    */
   void operator=(expression_list list) {
-    bins_.clear();
-    bins(list);
+    simple_bins_.clear();
+    add_simple_bins(list);
+  }
+
+  /**
+   * \brief Adds a new transition bin to the bin list.
+   * \param toAdd the transition bin to add.
+   */
+  void add_transition_bin(crv_transition_bin toAdd) { transition_bins_.push_back(toAdd); }
+
+  /**
+   * \brief Returns the last created transition bin of the coverpoint.
+   * \return crv_transition_bin& of crv_bin
+   */
+  crv_transition_bin& last_transition_bin() { return transition_bins_.back(); }
+
+  /**
+   * \brief Returns the list of all bins of the coverpoint.
+   * \return A vector of crv_abstract_bin pointers
+   */
+  std::vector<crv_abstract_bin*> all_bins() {
+    std::vector<crv_abstract_bin*> res;
+    for (crv_bin& cb : simple_bins_) res.push_back(&cb);
+    for (crv_transition_bin& cb : transition_bins_) res.push_back(&cb);
+    return res;
   }
 
   /**
    * \brief Creates a cross of two coverpoints cp1 and cp2.
    * 
-   * Every bin of cp1 will be paired with every bin of cp2 to create a new bin.
+   * Every simple bin of cp1 will be paired with every simple bin of cp2 to create a new bin.
    * 
    * \param cp1 First coverpoint of the cross
    * \param cp2 Second coverpoint of the cross
@@ -74,8 +97,8 @@ class crv_coverpoint : public crv_object {
    */
   static std::vector<crv_bin> cross(crv_coverpoint& cp1, crv_coverpoint& cp2) {
     std::vector<crv_bin> result;
-    for (crv_bin& cb1 : cp1.bins())
-      for (crv_bin& cb2 : cp2.bins()) result.push_back(crv_bin(cb1.bin_expr() && cb2.bin_expr()));
+    for (crv_bin& cb1 : cp1.simple_bins())
+      for (crv_bin& cb2 : cp2.simple_bins()) result.push_back(crv_bin(cb1.bin_expr() && cb2.bin_expr()));
     return result;
   }
 
@@ -87,44 +110,35 @@ class crv_coverpoint : public crv_object {
    * \return true if the coverpoint is covered, false otherwise.
    */
   bool covered() {
-    for (crv_abstract_bin* cb : allBins())
+    for (crv_abstract_bin* cb : all_bins())
       if (!cb->covered()) return false;
     return true;
   }
 
-  std::vector<crv_abstract_bin*> allBins() {
-    std::vector<crv_abstract_bin*> res;
-    for (crv_bin& cb : bins_) res.push_back(&cb);
-    for (crv_transition_bin& cb : transBins_) res.push_back(&cb);
-    return res;
-  }
-
-  void transBins(crv_transition_bin toAdd) { transBins_.push_back(toAdd); }
-
   template <unsigned int N = 1, unsigned int M = N, typename Expr>
   std::shared_ptr<crv_transition_fsm_state> start_with(Expr expr) {
     std::shared_ptr<crv_transition_fsm_state> root = crv_transition_fsm_state::goto_repeat<N, M>(NULL, expr);
-    transBins(root);
+    add_transition_bin(root);
     return root;
   }
 
   template <unsigned int N = 1, unsigned int M = N, typename Expr>
   std::shared_ptr<crv_transition_fsm_state> start_with_consecutive(Expr expr) {
     std::shared_ptr<crv_transition_fsm_state> root = crv_transition_fsm_state::consecutive_repeat<N, M>(NULL, expr);
-    transBins(root);
+    add_transition_bin(root);
     return root;
   }
 
   template <unsigned int N = 1, unsigned int M = N, typename Expr>
   std::shared_ptr<crv_transition_fsm_state> start_with_nonconsecutive(Expr expr) {
     std::shared_ptr<crv_transition_fsm_state> root = crv_transition_fsm_state::non_consecutive_repeat<N, M>(NULL, expr);
-    transBins(root);
+    add_transition_bin(root);
     return root;
   }
 
  private:
-  std::vector<crv_bin> bins_;
-  std::vector<crv_transition_bin> transBins_;
+  std::vector<crv_bin> simple_bins_;
+  std::vector<crv_transition_bin> transition_bins_;
 };
 
 /**
@@ -154,7 +168,7 @@ class crv_covergroup : public crv_object {
     if (!built_) build();
     for (auto v : vars_) eval_.assign(v->id(), v->constant_expr());
     for (crv_coverpoint* cp : points_)
-      for (crv_abstract_bin* cb : cp->allBins()) cb->calcHit(eval_);
+      for (crv_abstract_bin* cb : cp->all_bins()) cb->calcHit(eval_);
   }
 
   /**
@@ -165,7 +179,7 @@ class crv_covergroup : public crv_object {
     for (crv_coverpoint* cp : points_) {
       std::cout << cp->obj_kind() << " " << cp->name() << std::endl;
       int c = 0;
-      for (crv_abstract_bin* cb : cp->allBins()) {
+      for (crv_abstract_bin* cb : cp->all_bins()) {
         std::cout << "  crv_bin " << c++ << ": " << cb->hit_count() << " " << cb->hit_minimum() << " "
                   << (cb->covered() ? "covered" : "uncovered") << std::endl;
       }
@@ -173,14 +187,14 @@ class crv_covergroup : public crv_object {
   }
 
   /**
-   * \brief Returns an expression_list of uncovered bins.
+   * \brief Returns an expression_list of uncovered simple bins.
    * \return List of expressions of uncovered crv_bin
    */
   expression_list uncovered_as_list() {
     if (!built_) build();
     expression_list result;
     for (crv_coverpoint* cp : points_)
-      for (crv_bin& cb : cp->bins())
+      for (crv_bin& cb : cp->simple_bins())
         if (!cb.covered()) result.add_expr(cb.bin_expr());
     return result;
   }
