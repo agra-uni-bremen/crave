@@ -158,6 +158,41 @@ BOOST_AUTO_TEST_CASE(transition_overlap_test) {
   BOOST_REQUIRE(cg.covered());
 }
 
+struct ieee1800_2012_p530_covergroup : public crv_covergroup {
+  crv_variable<unsigned> a;
+
+  crv_coverpoint cp1{"coverpoint1"};
+
+  ieee1800_2012_p530_covergroup(crv_object_name) {
+      // b2 = 2 [-> 3:5]
+      cp1.start_with<3, 5>(a() == 2);
+      cp1.last_transition_bin().hit_minimum(2);
+      // b3 = 3 [-> 3:5]
+      cp1.start_with<3, 5>(a() == 3);
+      cp1.last_transition_bin().hit_minimum(3);
+      // b5 = 5 [* 3]
+      cp1.start_with_consecutive<3>(a() == 5);
+      cp1.last_transition_bin().hit_minimum(4);
+      // b6 = 1 => 3 [-> 4:6] => 1
+      cp1.start_with(a() == 1)->next<4, 6>(a() == 3)->next(a() == 1);
+      cp1.last_transition_bin().hit_minimum(1);
+      // b7 = 1 => 2 [= 3:6] => 5
+      cp1.start_with(a() == 1)->nonconsecutive_next<3, 6>(a() == 2)->next(a() == 5);
+      cp1.last_transition_bin().hit_minimum(1);
+  }
+};
+
+BOOST_AUTO_TEST_CASE(ieee1800_2012_p530_covergroup_test) {
+  ieee1800_2012_p530_covergroup cg{"covergroup5"};
+
+  sample_from_list(cg, cg.a, {1, 4, 3, 2, 3, 3, 2, 2, 3, 2, 3, 1, 5, 5, 5, 5, 5, 5});
+
+  cg.report();
+
+  BOOST_REQUIRE(cg.covered());
+}
+
+
 BOOST_AUTO_TEST_SUITE_END()  // CoverageSampling
 
 //  vim: ft=cpp:ts=2:sw=2:expandtab
