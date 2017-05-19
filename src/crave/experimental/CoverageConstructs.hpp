@@ -115,21 +115,35 @@ class crv_coverpoint : public crv_object {
     return true;
   }
 
-  template <unsigned int N = 1, unsigned int M = N, typename Expr>
+  //****************************
+  // User visible start-functions
+  //****************************
+
+  template <typename Expr>
   std::shared_ptr<crv_transition_fsm_state> start_with(Expr expr) {
-    std::shared_ptr<crv_transition_fsm_state> root = crv_transition_fsm_state::goto_repeat<N, M>(NULL, expr);
+    std::shared_ptr<crv_transition_fsm_state> root = crv_transition_fsm_state::next(NULL, expr);
     add_transition_bin(root);
     return root;
   }
 
-  template <unsigned int N = 1, unsigned int M = N, typename Expr>
+  // [* N:M]
+  template <unsigned int N, unsigned int M = N, typename Expr>
   std::shared_ptr<crv_transition_fsm_state> start_with_consecutive(Expr expr) {
     std::shared_ptr<crv_transition_fsm_state> root = crv_transition_fsm_state::consecutive_repeat<N, M>(NULL, expr);
     add_transition_bin(root);
     return root;
   }
 
-  template <unsigned int N = 1, unsigned int M = N, typename Expr>
+  // [-> N:M]
+  template <unsigned int N, unsigned int M = N, typename Expr>
+  std::shared_ptr<crv_transition_fsm_state> start_with_goto(Expr expr) {
+    std::shared_ptr<crv_transition_fsm_state> root = crv_transition_fsm_state::goto_repeat<N, M>(NULL, expr);
+    add_transition_bin(root);
+    return root;
+  }
+
+  // [= N:M]
+  template <unsigned int N, unsigned int M = N, typename Expr>
   std::shared_ptr<crv_transition_fsm_state> start_with_nonconsecutive(Expr expr) {
     std::shared_ptr<crv_transition_fsm_state> root = crv_transition_fsm_state::non_consecutive_repeat<N, M>(NULL, expr);
     add_transition_bin(root);

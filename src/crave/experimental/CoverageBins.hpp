@@ -25,18 +25,31 @@ class crv_transition_bin;
 struct crv_transition_fsm_state : std::enable_shared_from_this<crv_transition_fsm_state> {
   friend class crv_transition_bin;
   friend class crv_coverpoint;
+  
+  //****************************
+  // User visible continue-functions
+  //****************************
 
-  template <unsigned int N = 1, unsigned int M = N, typename Expr>
+  // =>
+  template <typename Expr>
   std::shared_ptr<crv_transition_fsm_state> next(Expr expr) {
-    return crv_transition_fsm_state::goto_repeat<N, M>(shared_from_this(), expr);
+    return crv_transition_fsm_state::next(shared_from_this(), expr);
   }
 
-  template <unsigned int N = 1, unsigned int M = N, typename Expr>
+  // [* N:M]
+  template <unsigned int N, unsigned int M = N, typename Expr>
   std::shared_ptr<crv_transition_fsm_state> consecutive_next(Expr expr) {
     return crv_transition_fsm_state::consecutive_repeat<N, M>(shared_from_this(), expr);
   }
 
-  template <unsigned int N = 1, unsigned int M = N, typename Expr>
+  // [-> N:M]
+  template <unsigned int N, unsigned int M = N, typename Expr>
+  std::shared_ptr<crv_transition_fsm_state> goto_next(Expr expr) {
+    return crv_transition_fsm_state::goto_repeat<N, M>(shared_from_this(), expr);
+  }
+
+  // [= N:M]
+  template <unsigned int N, unsigned int M = N, typename Expr>
   std::shared_ptr<crv_transition_fsm_state> nonconsecutive_next(Expr expr) {
     return crv_transition_fsm_state::non_consecutive_repeat<N, M>(shared_from_this(), expr);
   }
@@ -44,11 +57,11 @@ struct crv_transition_fsm_state : std::enable_shared_from_this<crv_transition_fs
   //****************************
   // API abstract functions
   //****************************
-  enum nodeType { REGULAR, CONSEC, NON_CONSEC };
+  enum nodeType { GOTO, CONSEC, NON_CONSEC };
 
   template <unsigned int N = 1, unsigned int M = N, typename Expr>
   static std::shared_ptr<crv_transition_fsm_state> addState(std::shared_ptr<crv_transition_fsm_state> node, Expr expr,
-                                                            nodeType pNodeType = REGULAR) {
+                                                            nodeType pNodeType = CONSEC) {
     if (N <= 0) {
       return node;
     }
@@ -62,25 +75,29 @@ struct crv_transition_fsm_state : std::enable_shared_from_this<crv_transition_fs
     }
     return nextNode;
   }
-
+  
+  //*1
   template <typename Expr>
   static std::shared_ptr<crv_transition_fsm_state> next(std::shared_ptr<crv_transition_fsm_state> node, Expr expr) {
-    return crv_transition_fsm_state::goto_repeat(node, expr);
+    return crv_transition_fsm_state::consecutive_repeat<1>(node, expr);
   }
 
-  template <unsigned int N = 1, unsigned int M = N, typename Expr>
-  static std::shared_ptr<crv_transition_fsm_state> goto_repeat(std::shared_ptr<crv_transition_fsm_state> node,
+  //*
+  template <unsigned int N, unsigned int M = N, typename Expr>
+  static std::shared_ptr<crv_transition_fsm_state> consecutive_repeat(std::shared_ptr<crv_transition_fsm_state> node,
                                                                Expr expr) {
     return addState<N, M>(node, expr);
   }
 
-  template <unsigned int N = 1, unsigned int M = N, typename Expr>
-  static std::shared_ptr<crv_transition_fsm_state> consecutive_repeat(std::shared_ptr<crv_transition_fsm_state> node,
+  //->
+  template <unsigned int N, unsigned int M = N, typename Expr>
+  static std::shared_ptr<crv_transition_fsm_state> goto_repeat(std::shared_ptr<crv_transition_fsm_state> node,
                                                                       Expr expr) {
-    return addState<N, M>(node, expr, CONSEC);
+    return addState<N, M>(node, expr, GOTO);
   }
 
-  template <unsigned int N = 1, unsigned int M = N, typename Expr>
+  //=
+  template <unsigned int N, unsigned int M = N, typename Expr>
   static std::shared_ptr<crv_transition_fsm_state> non_consecutive_repeat(
       std::shared_ptr<crv_transition_fsm_state> node, Expr expr) {
     return addState<N, M>(node, expr, NON_CONSEC);
@@ -95,7 +112,7 @@ struct crv_transition_fsm_state : std::enable_shared_from_this<crv_transition_fs
   nodeType type;
 
   template <typename Expr>
-  crv_transition_fsm_state(Expr nodeExpr, nodeType pType = REGULAR)
+  crv_transition_fsm_state(Expr nodeExpr, nodeType pType = CONSEC)
       : type(pType), succ(NULL), prev(NULL), expr(make_expression(nodeExpr)), minHit(1), maxHit(1) {}
 };
 
@@ -229,7 +246,7 @@ class crv_transition_bin : public crv_abstract_bin {
     if (wasHit) {
       calcHit(eval_, current, resultRuns, hit);
     } else {
-      if (current.state->type == crv_transition_fsm_state::REGULAR) {
+      if (current.state->type == crv_transition_fsm_state::CONSEC) {
         hardFail(eval_, current, resultRuns, hit);
       } else {
         softFail(eval_, current, resultRuns, hit);

@@ -42,12 +42,12 @@ BOOST_AUTO_TEST_CASE(basic_test) {
   BOOST_REQUIRE(cg.covered());
 }
 
-struct my_transitionCovergroup_next : public crv_covergroup {
+struct my_transitionCovergroup_consec : public crv_covergroup {
   crv_variable<unsigned> a;
 
   crv_coverpoint cp1{"coverpoint1"};
 
-  my_transitionCovergroup_next(crv_object_name) {
+  my_transitionCovergroup_consec(crv_object_name) {
       //1
       cp1.start_with(a() == 1);
       cp1.last_transition_bin().hit_minimum(4);
@@ -55,59 +55,59 @@ struct my_transitionCovergroup_next : public crv_covergroup {
       cp1.start_with(a() == 1)->next(a() == 2);
       cp1.last_transition_bin().hit_minimum(1);
       //0 => 1,2[*2] => 0
-      cp1.start_with(a() == 0)->next<2>(a() == 1 || a() == 2)->next(a() == 0);
+      cp1.start_with(a() == 0)->consecutive_next<2>(a() == 1 || a() == 2)->next(a() == 0);
       cp1.last_transition_bin().hit_minimum(1);
       //0 [*2:3] => 1
-      cp1.start_with<2,3>(a() == 0)->next(a() == 1);
+      cp1.start_with_consecutive<2,3>(a() == 0)->next(a() == 1);
       cp1.last_transition_bin().hit_minimum(2);
   }
 };
 
-BOOST_AUTO_TEST_CASE(transition_next_test) {
-  my_transitionCovergroup_next cg{"covergroup2"};
+BOOST_AUTO_TEST_CASE(transition_consec_test) {
+  my_transitionCovergroup_consec cg{"covergroup2"};
 
   sample_from_list(cg, cg.a, {0, 1, 0, 1, 2, 0, 0, 1, 0, 0, 0, 1});
 
   BOOST_REQUIRE(cg.covered());
 }
 
-struct my_transitionCovergroup_consNext : public crv_covergroup {
+struct my_transitionCovergroup_goto : public crv_covergroup {
   crv_variable<unsigned> a;
 
   crv_coverpoint cp1{"coverpoint1"};
 
-  my_transitionCovergroup_consNext(crv_object_name) {
+  my_transitionCovergroup_goto(crv_object_name) {
       //1
-      cp1.start_with_consecutive(a() == 1);
+      cp1.start_with(a() == 1);
       cp1.last_transition_bin().hit_minimum(4);
       //1 [->3]
-      cp1.start_with_consecutive<3>(a() == 1);
+      cp1.start_with_goto<3>(a() == 1);
       cp1.last_transition_bin().hit_minimum(2);
       //0 [->2] => 1
-      cp1.start_with_consecutive<2>(a() == 0)->next(a() == 1);
+      cp1.start_with_goto<2>(a() == 0)->next(a() == 1);
       cp1.last_transition_bin().hit_minimum(3);
       //0 => 1[->2:4] => 0
-      cp1.start_with(a() == 0)->consecutive_next<2,4>(a() == 1)->next(a() == 0);
+      cp1.start_with(a() == 0)->goto_next<2,4>(a() == 1)->next(a() == 0);
       cp1.last_transition_bin().hit_minimum(1);
   }
 };
 
-BOOST_AUTO_TEST_CASE(transition_cons_next_test) {
-  my_transitionCovergroup_consNext cg{"covergroup3"};
+BOOST_AUTO_TEST_CASE(transition_goto_test) {
+  my_transitionCovergroup_goto cg{"covergroup3"};
 
   sample_from_list(cg, cg.a, {0, 1, 0, 1, 2, 0, 0, 1, 0, 0, 0, 1});
 
   BOOST_REQUIRE(cg.covered());
 }
 
-struct my_transitionCovergroup_nconsNext : public crv_covergroup {
+struct my_transitionCovergroup_ncons : public crv_covergroup {
   crv_variable<unsigned> a;
 
   crv_coverpoint cp1{"coverpoint1"};
 
-  my_transitionCovergroup_nconsNext(crv_object_name) {
+  my_transitionCovergroup_ncons(crv_object_name) {
       //1
-      cp1.start_with_nonconsecutive(a() == 1);
+      cp1.start_with(a() == 1);
       cp1.last_transition_bin().hit_minimum(4);
       //1 [= 3]
       cp1.start_with_nonconsecutive<3>(a() == 1);
@@ -121,8 +121,8 @@ struct my_transitionCovergroup_nconsNext : public crv_covergroup {
   }
 };
 
-BOOST_AUTO_TEST_CASE(transition_ncons_next_test) {
-  my_transitionCovergroup_nconsNext cg{"covergroup4"};
+BOOST_AUTO_TEST_CASE(transition_ncons_test) {
+  my_transitionCovergroup_ncons cg{"covergroup4"};
 
   sample_from_list(cg, cg.a, {0, 1, 0, 1, 2, 0, 0, 1, 0, 0, 0, 1});
 
@@ -136,16 +136,16 @@ struct my_transitionCovergroup_overlap : public crv_covergroup {
 
   my_transitionCovergroup_overlap(crv_object_name) {
       //0 => 0
-      cp1.start_with<2>(a() == 0);
+      cp1.start_with_consecutive<2>(a() == 0);
       cp1.last_transition_bin().hit_minimum(6);
       //2 => 0[1:2]
-      cp1.start_with(a() == 2)->next<1,2>(a()==0);
+      cp1.start_with(a() == 2)->consecutive_next<1,2>(a()==0);
       cp1.last_transition_bin().hit_minimum(2);
       //0 => 1[->2]
-      cp1.start_with(a() == 0)->consecutive_next<2>(a() == 1);
+      cp1.start_with(a() == 0)->goto_next<2>(a() == 1);
       cp1.last_transition_bin().hit_minimum(1);
       //0[*4] => 2 => 0[*2] => 1 => 0[*3] => 1
-      cp1.start_with<4>(a() == 0)->next(a() == 2)->next<2>(a() == 0)->next(a()==1)->next<3>(a() == 0)->next(a()==1);
+      cp1.start_with_consecutive<4>(a() == 0)->next(a() == 2)->consecutive_next<2>(a() == 0)->next(a()==1)->consecutive_next<3>(a() == 0)->next(a()==1);
       cp1.last_transition_bin().hit_minimum(1);
   }
 };
@@ -165,18 +165,23 @@ struct ieee1800_2012_p530_covergroup : public crv_covergroup {
 
   ieee1800_2012_p530_covergroup(crv_object_name) {
       // b2 = 2 [-> 3:5]
-      cp1.start_with<3, 5>(a() == 2);
+      // 1, 4, 3, [[2, 3, 3, 2, 2], 3, 2], 3, 1, 5, 5, 5, 5, 5, 5 (2 Hits)
+      cp1.start_with_goto<3, 5>(a() == 2);
       cp1.last_transition_bin().hit_minimum(2);
       // b3 = 3 [-> 3:5]
-      cp1.start_with<3, 5>(a() == 3);
+      // 1, 4, [[[3, 2, 3, 3], 2, 2, 3], 2, 3], 1, 5, 5, 5, 5, 5, 5 (3 Hits)
+      cp1.start_with_goto<3, 5>(a() == 3);
       cp1.last_transition_bin().hit_minimum(3);
       // b5 = 5 [* 3]
+      // 1, 4, 3, 2, 3, 3, 2, 2, 3, 2, 3, 1, [5, (5, {5], [5), 5}, 5] (4 Hits)
       cp1.start_with_consecutive<3>(a() == 5);
       cp1.last_transition_bin().hit_minimum(4);
       // b6 = 1 => 3 [-> 4:6] => 1
-      cp1.start_with(a() == 1)->next<4, 6>(a() == 3)->next(a() == 1);
+      // [1, 4, 3, 2, 3, 3, 2, 2, 3, 2, 3, 1], 5, 5, 5, 5, 5, 5 (1 Hit)
+      cp1.start_with(a() == 1)->goto_next<4, 6>(a() == 3)->next(a() == 1);
       cp1.last_transition_bin().hit_minimum(1);
       // b7 = 1 => 2 [= 3:6] => 5
+      // [1, 4, 3, 2, 3, 3, 2, 2, 3, 2, 3, 1, 5], 5, 5, 5, 5, 5 (1 Hit)
       cp1.start_with(a() == 1)->nonconsecutive_next<3, 6>(a() == 2)->next(a() == 5);
       cp1.last_transition_bin().hit_minimum(1);
   }
