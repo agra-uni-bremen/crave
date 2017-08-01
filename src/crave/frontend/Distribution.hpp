@@ -18,6 +18,30 @@ extern RandomSeedManager rng;
 template <typename T>
 struct distribution_tag;
 
+/*
+ * Workaround for the issue that std::uniform_int_distribution is undefined for char,
+ * unsigned char and signed char.
+ */
+template <typename T, typename Generator>
+T uniformly_distributed_value(T const& left, T const& right, Generator& gen) {
+  return std::uniform_int_distribution<T>(left, right)(gen);
+}
+
+template <typename Generator>
+char uniformly_distributed_value(char const& left, char const& right, Generator& gen) {
+  return std::uniform_int_distribution<int>(left, right)(gen);
+}
+
+template <typename Generator>
+signed char uniformly_distributed_value(signed char const& left, signed char const& right, Generator& gen) {
+  return std::uniform_int_distribution<int>(left, right)(gen);
+}
+
+template <typename Generator>
+unsigned char uniformly_distributed_value(unsigned char const& left, unsigned char const& right, Generator& gen) {
+  return std::uniform_int_distribution<int>(left, right)(gen);
+}
+
 /*!
  * \ingroup oldAPI
  * \ingroup newAPI
@@ -103,7 +127,7 @@ struct distribution {
    */
   T nextValue() const {
     if (ranges_.empty()) {
-      return std::uniform_int_distribution<T>(std::numeric_limits<T>::min(), std::numeric_limits<T>::max())(*rng.get());
+      return uniformly_distributed_value(std::numeric_limits<T>::min(), std::numeric_limits<T>::max(), *rng.get());
     }
     weighted_range<T> selected = ranges_.back();
     if (ranges_.size() > 1) {
@@ -114,7 +138,7 @@ struct distribution {
           break;
         }
     }
-    return std::uniform_int_distribution<T>(selected.left_, selected.right_)(*rng.get());
+    return uniformly_distributed_value(selected.left_, selected.right_, *rng.get());
   }
 
  protected:
