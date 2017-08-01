@@ -22,6 +22,10 @@ endfunction(add_all_tests)
 add_library (${PROJECT_NAME}_boost_test ${STATIC_OR_SHARED} boost_test.cpp)
 link_libraries (${PROJECT_NAME}_boost_test ${ALL_EXTERNAL_LIBS} ${PROJECT_NAME})
 
+if (WIN32)
+  add_definitions("-DBOOST_TEST_INCLUDED") # this is to prevent boost autolink
+endif()
+
 add_executable(solver_independent_tests core/solver_independent_tests.cpp)
 add_all_tests(solver_independent_tests core/solver_independent_tests.cpp)
 
