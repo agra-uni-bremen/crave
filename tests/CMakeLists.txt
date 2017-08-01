@@ -4,9 +4,24 @@ endif()
 include_directories (../src)
 
 find_program(AWK awk)
+if (AWK)
+  message(STATUS "Use awk to search for tests")
+  set(search_test_cmd ${AWK} -f search_tests.awk)
+else()
+  find_program(PYTHON python)
+  if(PYTHON)
+    message(STATUS "Use python to search for tests")
+    set(search_test_cmd ${PYTHON} search_tests.py)
+  endif()
+endif()
+
+if (NOT search_test_cmd)
+  message(FATAL_ERROR "Cannot search for tests, either awk or python is required!")
+endif()
+
 function (add_all_tests prog cfile)
   execute_process( COMMAND
-    ${AWK} -f search_tests.awk ${cfile}
+    ${search_test_cmd} ${cfile}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     OUTPUT_VARIABLE test_cases
   )
