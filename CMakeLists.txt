@@ -21,6 +21,30 @@ else()
   message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} does not support -std=c++11. Please use a different C++ compiler.")
 endif()
 
+### packages
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
+set(Boost_NO_BOOST_CMAKE true)
+set(Boost_NO_SYSTEM_PATHS true)
+find_package(Boost REQUIRED COMPONENTS system filesystem)
+
+find_package(GLOG)
+
+if (GLOG_FOUND)
+  add_definitions(-DCRAVE_HAVE_GLOG)
+endif()
+
+if (WITH_SYSTEMC)
+  find_package(SystemC REQUIRED)
+  find_package(Threads REQUIRED)
+endif()
+
+add_subdirectory(metaSMT)
+list(INSERT CMAKE_PREFIX_PATH 0 "${CMAKE_BINARY_DIR}")
+find_package(metaSMT REQUIRED)
+string(REPLACE " " ";" metaSMT_DEFINITIONS "${metaSMT_CXXFLAGS}")
+add_definitions(${metaSMT_DEFINITIONS})
+
 ### SMT solvers
 if (metaSMT_USE_Boolector)
   add_definitions(-DmetaSMT_USE_Boolector)
@@ -49,30 +73,6 @@ endif()
 if (WITH_SYSTEMC)
   add_definitions(-DWITH_SYSTEMC)
 endif()
-
-### packages
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-
-set(Boost_NO_BOOST_CMAKE true)
-set(Boost_NO_SYSTEM_PATHS true)
-find_package(Boost REQUIRED COMPONENTS system filesystem)
-
-find_package(GLOG)
-
-if (GLOG_FOUND)
-  add_definitions(-DCRAVE_HAVE_GLOG)
-endif()
-
-if (WITH_SYSTEMC)
-  find_package(SystemC REQUIRED)
-  find_package(Threads REQUIRED)
-endif()
-
-add_subdirectory(metaSMT)
-list(INSERT CMAKE_PREFIX_PATH 0 "${CMAKE_BINARY_DIR}")
-find_package(metaSMT REQUIRED)
-string(REPLACE " " ";" metaSMT_DEFINITIONS "${metaSMT_CXXFLAGS}")
-add_definitions(${metaSMT_DEFINITIONS})
 
 ### includes
 include_directories(${metaSMT_INCLUDE_DIR})
