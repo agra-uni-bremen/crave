@@ -10,8 +10,8 @@ using namespace crave;
 
 template <typename T>
 bool check_unique(rand_vec<T>& v) {
-  for (uint i = 0; i < v.size(); i++)
-    for (uint j = 0; j < i; j++)
+  for (unsigned i = 0; i < v.size(); i++)
+    for (unsigned j = 0; j < i; j++)
       if (v[i] == v[j]) return false;
   return true;
 }
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(fibo_test) {
   BOOST_REQUIRE_LE(it.v.size(), 50);
   BOOST_REQUIRE_EQUAL(it.v[0], 0);
   BOOST_REQUIRE_EQUAL(it.v[1], 1);
-  for (uint i = 2; i < it.v.size(); i++) BOOST_REQUIRE_EQUAL(it.v[i], it.v[i - 1] + it.v[i - 2]);
+  for (unsigned i = 2; i < it.v.size(); i++) BOOST_REQUIRE_EQUAL(it.v[i], it.v[i - 1] + it.v[i - 2]);
 }
 
 struct Item1 : public rand_obj {
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(free_vector_test) {
   BOOST_REQUIRE(it.next());
   BOOST_REQUIRE(it.u.size() == 0);
   BOOST_REQUIRE(it.v.size() > 0);
-  for (uint i = 0; i < it.v.size(); i++) std::cout << it.v[i] << " ";
+  for (unsigned i = 0; i < it.v.size(); i++) std::cout << it.v[i] << " ";
   std::cout << std::endl;
 }
 
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(default_size_test) {
   Item2 it;
   BOOST_REQUIRE(it.next());
   BOOST_REQUIRE(it.v.size() == default_rand_vec_size());
-  for (uint i = 0; i < it.v.size(); i++) {
+  for (unsigned i = 0; i < it.v.size(); i++) {
     std::cout << it.v[i] << " ";
     BOOST_REQUIRE(100 <= it.v[i] && it.v[i] <= 200);
   }
@@ -89,9 +89,9 @@ BOOST_AUTO_TEST_CASE(unique_test_1) {
   Item3 it;
   BOOST_REQUIRE(it.next());
   BOOST_REQUIRE(it.v.size() == 100);
-  for (uint i = 0; i < it.v.size(); i++) {
+  for (unsigned i = 0; i < it.v.size(); i++) {
     BOOST_REQUIRE(0 <= it.v[i] && it.v[i] < 100);
-    for (uint j = 0; j < i; j++) BOOST_REQUIRE(it.v[i] != it.v[j]);
+    for (unsigned j = 0; j < i; j++) BOOST_REQUIRE(it.v[i] != it.v[j]);
   }
 }
 
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(unique_test_2) {
   gen.disableConstraint("unique");
   BOOST_REQUIRE(gen.next());
   BOOST_REQUIRE(v.size() == 7);
-  for (uint i = 0; i < v.size(); i++) {
+  for (unsigned i = 0; i < v.size(); i++) {
     std::cout << v[i] << " ";
     BOOST_REQUIRE(v[i] < 6);
   }
@@ -143,12 +143,12 @@ BOOST_AUTO_TEST_CASE(constraint_management_test) {
 
   it.disable_constraint("c1");
   BOOST_REQUIRE(it.next());
-  for (uint i = 0; i < it.v.size(); i++) BOOST_REQUIRE_GT(it.v[i], 100);
+  for (unsigned i = 0; i < it.v.size(); i++) BOOST_REQUIRE_GT(it.v[i], 100);
 
   it.enable_constraint("c1");
   it.disable_constraint("c2");
   BOOST_REQUIRE(it.next());
-  for (uint i = 0; i < it.v.size(); i++) BOOST_REQUIRE(it.v[i] <= 100);
+  for (unsigned i = 0; i < it.v.size(); i++) BOOST_REQUIRE(it.v[i] <= 100);
 
   it.enable_constraint("c2");
   BOOST_REQUIRE(!it.next());
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE(index_constraint_test) {
   it.constraint.printDotGraph(std::cout);
   BOOST_REQUIRE(it.next());
   BOOST_REQUIRE(it.v.size() == 50);
-  for (uint i = 0; i < it.v.size(); i++) {
+  for (unsigned i = 0; i < it.v.size(); i++) {
     if (i < 25)
       BOOST_REQUIRE(it.v[i] == i);
     else if (i > 25)
@@ -218,7 +218,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_1) {
   gen(unique(a()));
 
   BOOST_REQUIRE(gen.next());
-  for (uint i = 0; i < a.size(); i++) {
+  for (unsigned i = 0; i < a.size(); i++) {
     BOOST_REQUIRE_LT(a[i], -100);
     std::cout << " " << (int)a[i];
   }
@@ -236,7 +236,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_2) {
   gen(unique(a()));
 
   BOOST_REQUIRE(gen.next());
-  for (uint i = 0; i < a.size(); i++) BOOST_REQUIRE(-10 < a[i] && a[i] < 10);
+  for (unsigned i = 0; i < a.size(); i++) BOOST_REQUIRE(-10 < a[i] && a[i] < 10);
   BOOST_REQUIRE(check_unique(a));
 }
 
@@ -250,7 +250,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_3) {
   gen(unique(a()));
 
   BOOST_REQUIRE(gen.next());
-  for (uint i = 0; i < a.size(); i++) BOOST_REQUIRE(-10 < a[i] && a[i] < 10);
+  for (unsigned i = 0; i < a.size(); i++) BOOST_REQUIRE(-10 < a[i] && a[i] < 10);
   BOOST_REQUIRE(check_unique(a));
 }
 
@@ -265,7 +265,7 @@ BOOST_AUTO_TEST_CASE(mixed_bv_width_4) {
   gen(foreach (a(), _i != 0 || a()[_i] % 2 == 0));
 
   BOOST_REQUIRE(gen.next());
-  for (uint i = 0; i < a.size(); i++) {
+  for (unsigned i = 0; i < a.size(); i++) {
     BOOST_REQUIRE(-3 <= a[i] && a[i] <= 3);
     BOOST_REQUIRE(a[i] != 0);
     if (i == 0)
@@ -284,7 +284,7 @@ BOOST_AUTO_TEST_CASE(bool_rand_vec) {
 
   BOOST_REQUIRE(gen.next());
   BOOST_REQUIRE(a.size() == 10);
-  for (uint i = 1; i < a.size(); i++) BOOST_REQUIRE(a[i] != a[i - 1]);
+  for (unsigned i = 1; i < a.size(); i++) BOOST_REQUIRE(a[i] != a[i - 1]);
 }
 
 struct Item6 : public rand_obj {

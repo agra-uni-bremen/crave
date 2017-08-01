@@ -73,7 +73,7 @@ void VariableDefaultSolver::analyseConstraints() {
     for(std::string & s : inactive_softs_) { LOG(INFO) << " " << s; }
   } else {
     LOG(INFO) << "Partition has unsatisfiable hard constraints:";
-    uint cnt = 0;
+    unsigned cnt = 0;
 
     for(std::vector<std::string> & vs : contradictions_) {
       LOG(INFO) << "  set #" << ++cnt;

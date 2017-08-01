@@ -67,8 +67,8 @@ void VectorSolver::buildSolver(unsigned int const size) {
         replacer.reset();
       }
     } else {
-      for (uint i = 0; i < vec_elements_.size(); i++)
-        for (uint j = i + 1; j < vec_elements_.size(); ++j) {
+      for (unsigned i = 0; i < vec_elements_.size(); i++)
+        for (unsigned j = i + 1; j < vec_elements_.size(); ++j) {
           NotEqualOpr neOp(vec_elements_[i], vec_elements_[j]);
           if (constraint->isSoft())
             solver_->makeSoftAssertion(neOp);

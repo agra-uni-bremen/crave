@@ -59,8 +59,8 @@ class Item : public rand_obj {
     constraint(b() < 10);
     constraint("x", a() != 2);
   }
-  randv<uint> a;
-  randv<uint> b;
+  randv<unsigned> a;
+  randv<unsigned> b;
 
   friend ostream& operator<<(ostream& os, const Item& it) {
     os << it.a << " " << it.b;
@@ -120,7 +120,7 @@ class Item1 : public rand_obj {
     constraint("def", a() == 3);
     constraint("abc", a() == 3);
   }
-  randv<uint> a;
+  randv<unsigned> a;
 };
 
 BOOST_AUTO_TEST_CASE(t2) {
@@ -169,8 +169,8 @@ class ItemPacketBaseConstraint : public rand_obj {
   }
 
   placeholder i_;
-  randv<uint> src_addr;
-  randv<uint> dest_addr;
+  randv<unsigned> src_addr;
+  randv<unsigned> dest_addr;
   randv<unsigned short> msg_length;
   rand_vec<char> msg;
 };
@@ -182,8 +182,8 @@ class ItemPacketHierConstraint : public ItemPacketBaseConstraint {
     constraint(((src_addr() > (dest_addr() + 0x100000)) && (src_addr() < (dest_addr() + 0x200000))) ||
                ((src_addr() < (dest_addr() - 0x10000)) && (src_addr() > (dest_addr() - 0xfffff))));
   }
-  randv<uint> dest_min;
-  randv<uint> dest_max;
+  randv<unsigned> dest_min;
+  randv<unsigned> dest_max;
 
   friend ostream& operator<<(ostream& os, ItemPacketHierConstraint& it) {
     os << it.src_addr << " " << it.dest_addr << " " << it.msg_length << " \n";
@@ -384,12 +384,12 @@ BOOST_AUTO_TEST_CASE(conflict_with_softs_t2) {
 class Item2 : public rand_obj {
  public:
   Item2() : rand_obj(), a(this), b(this) {
-    constraint("d1", dist(a(), distribution<uint>::create(range<uint>(10, 20))));
-    constraint("d2", dist(a(), distribution<uint>::create(range<uint>(30, 50))));
+    constraint("d1", dist(a(), distribution<unsigned>::create(range<unsigned>(10, 20))));
+    constraint("d2", dist(a(), distribution<unsigned>::create(range<unsigned>(30, 50))));
     constraint(b() == a() * 5);
   }
-  randv<uint> a;
-  randv<uint> b;
+  randv<unsigned> a;
+  randv<unsigned> b;
 
   friend ostream& operator<<(ostream& os, const Item2& it) {
     os << it.a << " " << it.b;
@@ -419,8 +419,8 @@ class Item3 : public rand_obj {
     constraint(a() <= 5);
     constraint("c1", b() != 5);
   }
-  randv<uint> a;
-  randv<uint> b;
+  randv<unsigned> a;
+  randv<unsigned> b;
 };
 
 class Item4 : public rand_obj {
@@ -430,7 +430,7 @@ class Item4 : public rand_obj {
     constraint("c2", item.a() == c());
   }
   Item3 item;
-  randv<uint> c;
+  randv<unsigned> c;
 };
 
 BOOST_AUTO_TEST_CASE(hier_constr_t) {

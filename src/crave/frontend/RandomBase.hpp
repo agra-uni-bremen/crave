@@ -118,7 +118,7 @@ class __rand_vec_base1 : public __rand_vec_base {
    */
   void print() {
     std::cout << "vector " << sym_vec.id() << ": ";
-    for (uint i = 0; i < real_vec.size(); i++) std::cout << real_vec[i] << ", ";
+    for (unsigned i = 0; i < real_vec.size(); i++) std::cout << real_vec[i] << ", ";
     std::cout << std::endl;
   }
 
@@ -128,7 +128,7 @@ class __rand_vec_base1 : public __rand_vec_base {
     T2 tmp;
     AssignResultToRef<T2> result(&tmp);
     real_vec.clear();
-    for (uint i = 0; i < values.size(); i++) {
+    for (unsigned i = 0; i < values.size(); i++) {
       result.set_value(values[i]);
       real_vec.push_back(tmp);
     }
@@ -137,7 +137,7 @@ class __rand_vec_base1 : public __rand_vec_base {
   virtual void gen_values(unsigned num) {
     static randv<T1> r(NULL);
     this->clear();
-    for (uint i = 0; i < num; i++) {
+    for (unsigned i = 0; i < num; i++) {
       r.next();
       this->push_back(r);
     }

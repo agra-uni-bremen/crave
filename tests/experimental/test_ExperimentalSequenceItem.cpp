@@ -284,7 +284,7 @@ BOOST_AUTO_TEST_CASE(item_with_vector) {
               << std::endl;
     BOOST_REQUIRE_EQUAL(it.address % 4, 0);
     BOOST_REQUIRE_LE(it.address, 1000);
-    for (uint i = 0; i < it.data.size(); i++) {
+    for (unsigned i = 0; i < it.data.size(); i++) {
       BOOST_REQUIRE_LE(-50, it.data[i]);
       BOOST_REQUIRE_LE(it.data[i], 50);
       if (i > 0) BOOST_REQUIRE_LE(it.data[i - 1], it.data[i]);

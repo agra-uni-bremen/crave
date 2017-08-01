@@ -40,7 +40,7 @@ void ConstraintPartitioner::partition() {
   for(VectorConstraintPtr c : vec_constraints_) { LOG(INFO) << "   " << c->name(); }
 
   LOG(INFO) << "  " << partitions_.size() << " constraint partition(s):";
-  uint cnt = 0;
+  unsigned cnt = 0;
   for(ConstraintPartition & cp : partitions_) { LOG(INFO) << "    #" << ++cnt << ": " << cp; }
 }
 

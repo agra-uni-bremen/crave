@@ -48,7 +48,7 @@ void set_solver_backend(std::string const& type) { FactoryMetaSMT::setSolverType
 
 std::ostream& rand_obj::print_dot_graph(std::ostream& os, bool root = true) {
   if (root) os << "digraph AST {" << std::endl;
-  for (uint i = 0; i < objChildren_.size(); i++) {
+  for (unsigned i = 0; i < objChildren_.size(); i++) {
     objChildren_[i]->print_dot_graph(os, false);
   }
   constraint.printDotGraph(os, false);
@@ -128,20 +128,20 @@ bool rand_obj::disable_constraint(std::string name) {
 bool rand_obj::is_constraint_enabled(std::string name) { return constraint.isConstraintEnabled(name); }
 
 bool rand_obj::gen_base_children() {
-  for (uint i = 0; i < baseChildren_.size(); i++) {
+  for (unsigned i = 0; i < baseChildren_.size(); i++) {
     if (baseChildren_[i]->obj_kind() == "rand_vec") continue; // rand_vec to be generated later
     if (!baseChildren_[i]->next()) return false;
   }
-  for (uint i = 0; i < objChildren_.size(); i++)
+  for (unsigned i = 0; i < objChildren_.size(); i++)
     if (!objChildren_[i]->gen_base_children()) return false;
   return true;
 }
 
 void rand_obj::gather_constraints(Generator* gen) {
-  for (uint i = 0; i < objChildren_.size(); i++) {
+  for (unsigned i = 0; i < objChildren_.size(); i++) {
     objChildren_[i]->gather_constraints(gen);
   }
-  for (uint i = 0; i < baseChildren_.size(); i++) 
+  for (unsigned i = 0; i < baseChildren_.size(); i++) 
     if (baseChildren_[i]->obj_kind() == "rand_vec") {
       __rand_vec_base* rvb = dynamic_cast<__rand_vec_base*>(baseChildren_[i]);
       gen->addVecId(rvb->id()); 

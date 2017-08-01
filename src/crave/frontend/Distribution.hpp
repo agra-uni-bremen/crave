@@ -108,7 +108,7 @@ struct distribution {
     weighted_range<T> selected = ranges_.back();
     if (ranges_.size() > 1) {
       unsigned r = std::uniform_int_distribution<unsigned>(0, selected.accumWeight_ - 1)(*rng.get());
-      for (uint i = 0; i < ranges_.size(); i++)
+      for (unsigned i = 0; i < ranges_.size(); i++)
         if (r < ranges_[i].accumWeight_) {
           selected = ranges_[i];
           break;
@@ -119,7 +119,7 @@ struct distribution {
 
  protected:
   void addRange(weighted_range<T> wr) {
-    for (uint i = 0; i < ranges_.size(); i++)
+    for (unsigned i = 0; i < ranges_.size(); i++)
       if (ranges_[i].overlap(wr)) {
         throw std::runtime_error("Overlapping range exists.");
       }

@@ -10,8 +10,8 @@ using namespace crave;
 
 template <typename T>
 bool check_unique(crv_vector<T>& v) {
-  for (uint i = 0; i < v.size(); i++)
-    for (uint j = 0; j < i; j++)
+  for (unsigned i = 0; i < v.size(); i++)
+    for (unsigned j = 0; j < i; j++)
       if (v[i] == v[j]) return false;
   return true;
 }
@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(fibo_test) {
   BOOST_REQUIRE_LE(it.v.size(), 50);
   BOOST_REQUIRE_EQUAL(it.v[0], 0);
   BOOST_REQUIRE_EQUAL(it.v[1], 1);
-  for (uint i = 2; i < it.v.size(); i++) BOOST_REQUIRE_EQUAL(it.v[i], it.v[i - 1] + it.v[i - 2]);
+  for (unsigned i = 2; i < it.v.size(); i++) BOOST_REQUIRE_EQUAL(it.v[i], it.v[i - 1] + it.v[i - 2]);
 }
 
 struct Item1 : public crv_sequence_item {
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(free_vector_test) {
   Item1 it{"item"};
   BOOST_REQUIRE(it.randomize());
   BOOST_REQUIRE(it.v.size() > 0);
-  for (uint i = 0; i < it.v.size(); i++) std::cout << it.v[i] << " ";
+  for (unsigned i = 0; i < it.v.size(); i++) std::cout << it.v[i] << " ";
   std::cout << std::endl;
 }
 
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(default_size_test) {
   Item2 it{"item"};
   BOOST_REQUIRE(it.randomize());
   BOOST_REQUIRE(5 <= it.v.size() && it.v.size() <= 10);
-  for (uint i = 0; i < it.v.size(); i++) {
+  for (unsigned i = 0; i < it.v.size(); i++) {
     std::cout << it.v[i] << " ";
     BOOST_REQUIRE(100 <= it.v[i] && it.v[i] <= 200);
   }
@@ -81,9 +81,9 @@ BOOST_AUTO_TEST_CASE(unique_test_1) {
   Item3 it{"item"};
   BOOST_REQUIRE(it.randomize());
   BOOST_REQUIRE(it.v.size() == 100);
-  for (uint i = 0; i < it.v.size(); i++) {
+  for (unsigned i = 0; i < it.v.size(); i++) {
     BOOST_REQUIRE(0 <= it.v[i] && it.v[i] < 100);
-    for (uint j = 0; j < i; j++) BOOST_REQUIRE(it.v[i] != it.v[j]);
+    for (unsigned j = 0; j < i; j++) BOOST_REQUIRE(it.v[i] != it.v[j]);
   }
 }
 
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(unique_test_2) {
   item.con2.deactivate();
   BOOST_REQUIRE(item.randomize());
   BOOST_REQUIRE(item.v.size() == 7);
-  for (uint i = 0; i < item.v.size(); i++) {
+  for (unsigned i = 0; i < item.v.size(); i++) {
     std::cout << item.v[i] << " ";
     BOOST_REQUIRE(item.v[i] < 6);
   }
@@ -134,12 +134,12 @@ BOOST_AUTO_TEST_CASE(constraint_management_test) {
   BOOST_REQUIRE(!it.randomize());
   it.c1.deactivate();
   BOOST_REQUIRE(it.randomize());
-  for (uint i = 0; i < it.v.size(); i++) BOOST_REQUIRE_GT(it.v[i], 100);
+  for (unsigned i = 0; i < it.v.size(); i++) BOOST_REQUIRE_GT(it.v[i], 100);
 
   it.c1.activate();
   it.c2.deactivate();
   BOOST_REQUIRE(it.randomize());
-  for (uint i = 0; i < it.v.size(); i++) BOOST_REQUIRE(it.v[i] <= 100);
+  for (unsigned i = 0; i < it.v.size(); i++) BOOST_REQUIRE(it.v[i] <= 100);
 
   it.c2.activate();
   BOOST_REQUIRE(!it.randomize());
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE(index_constraint_test) {
   Item5 it{"item"};
   BOOST_REQUIRE(it.randomize());
   BOOST_REQUIRE(it.v.size() == 50);
-  for (uint i = 0; i < it.v.size(); i++) {
+  for (unsigned i = 0; i < it.v.size(); i++) {
     if (i < 25)
       BOOST_REQUIRE(it.v[i] == i);
     else if (i > 25)
@@ -206,7 +206,7 @@ struct s_mixed_bv_width_1 : public crv_sequence_item {
 BOOST_AUTO_TEST_CASE(mixed_bv_width_1) {
   s_mixed_bv_width_1 item("item");
   BOOST_REQUIRE(item.randomize());
-  for (uint i = 0; i < item.a.size(); i++) {
+  for (unsigned i = 0; i < item.a.size(); i++) {
     BOOST_REQUIRE_LT(item.a[i], -100);
     std::cout << " " << (int)item.a[i];
   }
@@ -223,7 +223,7 @@ struct s_mixed_bv_width_2 : public crv_sequence_item {
 BOOST_AUTO_TEST_CASE(mixed_bv_width_2) {
   s_mixed_bv_width_2 item("item");
   BOOST_REQUIRE(item.randomize());
-  for (uint i = 0; i < item.a.size(); i++) BOOST_REQUIRE(-10 < item.a[i] && item.a[i] < 10);
+  for (unsigned i = 0; i < item.a.size(); i++) BOOST_REQUIRE(-10 < item.a[i] && item.a[i] < 10);
   BOOST_REQUIRE(check_unique(item.a));
 }
 
@@ -237,7 +237,7 @@ struct s_mixed_bv_width_3 : public crv_sequence_item {
 BOOST_AUTO_TEST_CASE(mixed_bv_width_3) {
   s_mixed_bv_width_3 item("item");
   BOOST_REQUIRE(item.randomize());
-  for (uint i = 0; i < item.a.size(); i++) BOOST_REQUIRE(-10 < item.a[i] && item.a[i] < 10);
+  for (unsigned i = 0; i < item.a.size(); i++) BOOST_REQUIRE(-10 < item.a[i] && item.a[i] < 10);
   BOOST_REQUIRE(check_unique(item.a));
 }
 
@@ -251,7 +251,7 @@ struct s_mixed_bv_width_4 : public crv_sequence_item {
 BOOST_AUTO_TEST_CASE(mixed_bv_width_4) {
   s_mixed_bv_width_4 item("item");
   BOOST_REQUIRE(item.randomize());
-  for (uint i = 0; i < item.a.size(); i++) {
+  for (unsigned i = 0; i < item.a.size(); i++) {
     BOOST_REQUIRE(-3 <= item.a[i] && item.a[i] <= 3);
     BOOST_REQUIRE(item.a[i] != 0);
     if (i == 0)
@@ -271,7 +271,7 @@ BOOST_AUTO_TEST_CASE(bool_rand_vec) {
   s_bool_rand_vec item("item");
   BOOST_REQUIRE(item.randomize());
   BOOST_REQUIRE(item.a.size() == 10);
-  for (uint i = 1; i < item.a.size(); i++) BOOST_REQUIRE(item.a[i] != item.a[i - 1]);
+  for (unsigned i = 1; i < item.a.size(); i++) BOOST_REQUIRE(item.a[i] != item.a[i - 1]);
 }
 
 BOOST_AUTO_TEST_SUITE_END()  // Context
