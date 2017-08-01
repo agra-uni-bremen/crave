@@ -13,6 +13,13 @@ before_script:
   tags:
   - docker
 
+.ubuntu16_x86: &ubuntu16_x86
+  image: m0elnx/ubuntu-32bit:latest
+  variables:
+    JDK_PACKAGE_NAME: openjdk-8-jdk
+  tags:
+  - docker
+
 .ubuntu14: &ubuntu14
   image: ubuntu:trusty
   variables:
@@ -171,3 +178,33 @@ build_z3:
   - make -j $NUM_JOBS
   - ctest --schedule-random
   allow_failure: true
+
+build_ubuntu16_x86:
+  <<: *ubuntu16_x86
+  only:
+  - development
+  script:
+  - ./bootstrap.sh -d deps -b cudd -b boolector build -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
+  - cd build
+  - make -j $NUM_JOBS
+  - ctest --schedule-random
+  allow_failure: true
+
+### Windows build with Visual Studio
+build_windows:
+  except:
+  - /.*_fastci$/
+  before_script:
+  - git submodule sync
+  - git submodule update --init
+  script:
+  - call "%VS140COMNTOOLS%VsDevCmd.bat"
+  - rmdir build /s /q
+  - mkdir build
+  - cd build
+  - cmake .. -DBOOST_ROOT="C:\deps\boost_1_60_0" -DmetaSMT_ENABLE_TESTS=off -DZ3_DIR="C:\deps\z3-4.5.0-x86-win" -DCRAVE_TIMEOUT=60 -DCRAVE_EXAMPLES_TIMEOUT=180
+  - cmake --build . --config Debug
+  - ctest
+  tags:
+  - windows
+
