@@ -111,7 +111,7 @@ template <>
 struct randv<bool> : public randv_base<bool> {
   RANDV_COMMON_INTERFACE(bool);
   RANDV_PRIM_INTERFACE(bool);
-  RANDV_BITWISE_INTERFACE(bool);
+//  RANDV_BITWISE_INTERFACE(bool);
 };
 
 /**
