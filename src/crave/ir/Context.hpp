@@ -2,6 +2,8 @@
 
 #pragma once
 
+#pragma warning (disable : 4804)
+
 #include <boost/intrusive_ptr.hpp>
 #include <boost/proto/core.hpp>
 #include <boost/proto/debug.hpp>

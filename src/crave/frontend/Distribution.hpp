@@ -131,7 +131,7 @@ struct distribution {
     }
     weighted_range<T> selected = ranges_.back();
     if (ranges_.size() > 1) {
-      unsigned r = std::uniform_int_distribution<unsigned>(0, selected.accumWeight_ - 1)(*rng.get());
+      uint64_t r = std::uniform_int_distribution<uint64_t>(0, selected.accumWeight_ - 1)(*rng.get());
       for (unsigned i = 0; i < ranges_.size(); i++)
         if (r < ranges_[i].accumWeight_) {
           selected = ranges_[i];

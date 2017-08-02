@@ -33,7 +33,7 @@ unsigned int placeholder_bitsize() { return bitsize_traits<placeholder_tag>::val
 
 placeholder _i;
 
-RandomSeedManager rng(std::time(0));
+RandomSeedManager rng(static_cast<unsigned>(std::time(0)));
 
 std::function<bool(void)> random_bit = [](){return std::uniform_int_distribution<unsigned short>(0, 1)(*rng.get());};
 

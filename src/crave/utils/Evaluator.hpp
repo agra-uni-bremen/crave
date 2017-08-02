@@ -12,6 +12,14 @@
 
 namespace crave {
 
+template <typename Integer>
+Integer get_result(EvalVisitor const& v) {
+  return static_cast<Integer>(v.result().value());
+}
+
+template <>
+bool get_result(EvalVisitor const& v);
+
 class Evaluator {
   typedef EvalVisitor::eval_map eval_map;
 
@@ -35,9 +43,8 @@ class Evaluator {
 
   template <typename Integer>
   Integer result() const {
-    return static_cast<Integer>(visitor_.result().value());
+    return get_result<Integer>(visitor_);
   }
-  uint64_t result() const;
 
  private:
   eval_map assignments_;

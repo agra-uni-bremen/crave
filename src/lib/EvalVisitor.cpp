@@ -312,7 +312,7 @@ void EvalVisitor::visitBitslice(const Bitslice& b) {
 
   Constant const& child = entry.first;
   unsigned long long v = 0;
-  for (int i = b.l(); i <= b.r(); i++) v |= (1 << i);
+  for (int i = b.l(); i <= b.r(); i++) v |= (1LL << i);
   Constant constant((v & child.value()) >> b.l(), b.r() - b.l() + 1, false);
   exprStack_.push(std::make_pair(constant, false));
 }

@@ -22,7 +22,7 @@ struct weighted_range {
    * \param r Right value of the range (inclusive)
    * \param w Weight of the range
    */
-  weighted_range(T l, T r, unsigned w) : left_(l), right_(r), weight_(w), accumWeight_(0) {}
+  weighted_range(T l, T r, uint64_t w) : left_(l), right_(r), weight_(w), accumWeight_(0) {}
 
   /**
    * \brief Compares a weighted range to another range.
@@ -54,8 +54,8 @@ struct weighted_range {
 
   T left_;
   T right_;
-  unsigned weight_;
-  unsigned accumWeight_;
+  uint64_t weight_;
+  uint64_t accumWeight_;
 };
 
 /**
@@ -74,7 +74,7 @@ struct range : weighted_range<T> {
    * \param l Left value of the range (inclusive)
    * \param r Right value of the range (inclusive)
    */
-  range(T l, T r) : weighted_range<T>(l, r, 1u + r - l) {}
+  range(T l, T r) : weighted_range<T>(l, r, r + 1 - l) {}
 };
 
 /**
@@ -93,6 +93,6 @@ struct weighted_value : weighted_range<T> {
    * \param v The value.
    * \param w The weight.
    */
-  weighted_value(T v, unsigned w) : weighted_range<T>(v, v, w) {}
+  weighted_value(T v, uint64_t w) : weighted_range<T>(v, v, w) {}
 };
 }  // namespace crave
