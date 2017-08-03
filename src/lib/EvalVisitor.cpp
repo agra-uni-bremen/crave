@@ -147,11 +147,14 @@ void EvalVisitor::visitEqualOpr(const EqualOpr& eq) {
   VariableExpr* v2 = static_cast<VariableExpr*>(eq.rhs().get());
 
   if (v1->id() != 0 && v2->id() != 0) {
-    eval_map::iterator ite = evalMap_->lower_bound(v1->id());
-    if (ite != evalMap_->end() && v1->id() >= ite->first) {
-      evalMap_->insert(std::make_pair(v2->id(), ite->second));
-    } else {
-      evalMap_->insert(ite, std::make_pair(v1->id(), evalMap_->at(v2->id())));
+    // both operands are variables
+    eval_map::iterator ite1 = evalMap_->find(v1->id());
+    eval_map::iterator ite2 = evalMap_->find(v2->id());
+    if (ite1 != evalMap_->end() && ite2 == evalMap_->end()) {
+      evalMap_->insert(std::make_pair(v2->id(), ite1->second));
+    }
+    if (ite1 == evalMap_->end() && ite2 != evalMap_->end()) {
+      evalMap_->insert(std::make_pair(v1->id(), ite2->second));
     }
   }
 
