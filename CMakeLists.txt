@@ -26,7 +26,16 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 set(Boost_NO_BOOST_CMAKE true)
 set(Boost_NO_SYSTEM_PATHS true)
-find_package(Boost REQUIRED COMPONENTS system filesystem)
+
+if (WIN32)
+  if (MSVC AND (NOT MSVC_VERSION LESS 1900))
+    find_package(Boost REQUIRED)
+  else()
+    message(FATAL_ERROR "CRAVE Windows build only supports Visual Studio C++ 2015 or newer version")
+  endif()
+else()
+  find_package(Boost REQUIRED COMPONENTS system filesystem)
+endif()
 
 find_package(GLOG)
 

@@ -1,6 +1,17 @@
 // Copyright 2012-2016 The CRAVE developers, University of Bremen, Germany. All rights reserved.//
 
+#if (_MSC_VER >= 1900)
+
+#include <experimental/filesystem> // C++-standard header file name
+#include <filesystem> // Microsoft-specific implementation header file name
+namespace fs = std::experimental::filesystem::v1;
+
+#else
+
 #include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
+
+#endif
 
 #include <string>
 
@@ -29,7 +40,6 @@ void init(std::string const& cfg_file) {
   settings.load();
 
   // create the specified directory for logs
-  namespace fs = boost::filesystem;
   fs::path fs_log_dir(settings.dirname());
   if (!fs::exists(fs_log_dir)) fs::create_directory(fs_log_dir);
 
