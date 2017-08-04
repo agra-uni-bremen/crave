@@ -45,6 +45,22 @@ find_package(metaSMT REQUIRED)
 string(REPLACE " " ";" metaSMT_DEFINITIONS "${metaSMT_CXXFLAGS}")
 add_definitions(${metaSMT_DEFINITIONS})
 
+### FIXME this should not be necessary, reuse variables set by metaSMT instead
+if ( WIN32 )
+  message(STATUS "CRAVE Windows build: explicitly disable all solvers except z3!" )
+  set(metaSMT_USE_SWORD off)
+  set(metaSMT_USE_Boolector  off)
+  set(metaSMT_USE_STP off)
+  set(metaSMT_USE_CVC4 off)
+  set(metaSMT_USE_YICES2 off)
+  set(metaSMT_USE_CUDD off)
+  set(metaSMT_USE_MiniSat off)
+  set(metaSMT_USE_picosat off)
+  set(metaSMT_USE_lingeling off)
+  set(metaSMT_USE_Aiger off)
+  set(metaSMT_USE_CW off)
+endif()
+
 ### SMT solvers
 if (metaSMT_USE_Boolector)
   add_definitions(-DmetaSMT_USE_Boolector)
