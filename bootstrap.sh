@@ -19,7 +19,7 @@ Z3=Z3-4.4.1
 MINISAT=minisat-git
 LINGELING=lingeling-ayv-86bf266-140429
 
-CUDD=cudd-2.4.2
+CUDD=cudd-3.0.0
 
 CMAKE=cmake
 BUILD_CMAKE="no"
