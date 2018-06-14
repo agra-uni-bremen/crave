@@ -1,6 +1,8 @@
  Constrained RAndom Verification Enviroment - CRAVE
 ====================================================
 
+[![Build Status](https://travis-ci.org/agra-uni-bremen/crave.svg?branch=development)](https://travis-ci.org/agra-uni-bremen/crave)
+
 For feedback and bug reports: crave@informatik.uni-bremen.de
 
  Preparations
