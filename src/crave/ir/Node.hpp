@@ -6,8 +6,9 @@
 #include <ostream>
 #include <set>
 
-#include <stdint.h>
+#include <cstdint>
 
+#include "../TypeConfig.hpp"
 #include "visitor/NodeVisitor.hpp"
 
 namespace crave {
@@ -82,18 +83,27 @@ class VariableExpr : public Terminal {
 class Constant : public Terminal {
  public:
   Constant() : Terminal(1, true), value_(false) {}
-  Constant(uint64_t val, unsigned int bs, bool s) : Terminal(bs, s), value_(val) {}
+  template<typename T, typename std::enable_if<is_crave_bigint<T>::value && is_crave_bigint<underlying_type>::value, int>::type = 0>
+  Constant(T val, unsigned int bs, bool s) : Terminal(bs, s), value_(val) {}
   explicit Constant(bool b) : Terminal(1, true), value_(b) {}
   Constant(Constant const& c) : Terminal(c.bitsize(), c.sign()), value_(c.value()) {}
+  Constant(int64_t val, unsigned int bs, bool s) : Terminal(bs, s), value_(val) {}
 
   void visit(NodeVisitor* v) const { v->visitConstant(*this); }
 
-  operator uint64_t() const { return value_; }
+  operator underlying_type() const { return value_; }
 
-  uint64_t value() const { return value_; }
+  underlying_type value() const { return value_; }
+
+  template<typename T>
+  typename std::enable_if<std::is_integral<T>::value, T>::type to_integer() const {
+    return static_cast<T>(value_);
+  }
+
+  friend bool operator<(Constant a, Constant b) { return a.value_ < b.value_; }
 
  private:
-  uint64_t value_;
+  underlying_type value_;
 };
 
 class VectorExpr : public Terminal {

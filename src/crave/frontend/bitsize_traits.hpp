@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "../TypeConfig.hpp"
+
 #include <boost/mpl/int.hpp>
 #include <boost/mpl/sizeof.hpp>
 #include <boost/mpl/times.hpp>
@@ -113,6 +115,21 @@ struct is_signed<crave::vector_tag<T> > : public crave::is_signed<T> {};
 
 template <typename T, typename Enable = void>
 struct to_constant_expr {};
+
+/**
+ * big int types
+ */
+template <unsigned W>
+struct bitsize_traits<unsigned_int<W>> : boost::mpl::int_<W> {};
+
+template <unsigned W>
+struct bitsize_traits<detail::signed_int<W>> : boost::mpl::int_<W + 1> {};
+
+template <unsigned W>
+struct is_signed<unsigned_int<W>> : boost::mpl::false_ {};
+
+template <unsigned W>
+struct is_signed<detail::signed_int<W>> : boost::mpl::true_ {};
 
 }  // namespace crave
 

@@ -6,10 +6,12 @@
 #include <limits>
 #include <vector>
 #include <stdexcept>
-	
+
 #include "ConstraintType.hpp"
 #include "WeightedRange.hpp"
 #include "../RandomSeedManager.hpp"
+#include "../TypeConfig.hpp"
+#include "../frontend/bitsize_traits.hpp"
 
 namespace crave {
 
@@ -23,23 +25,70 @@ struct distribution_tag;
  * unsigned char and signed char.
  */
 template <typename T, typename Generator>
-T uniformly_distributed_value(T const& left, T const& right, Generator& gen) {
+typename std::enable_if<std::is_integral<T>::value, T>::type uniformly_distributed_value(T left, T right, Generator& gen) {
   return std::uniform_int_distribution<T>(left, right)(gen);
 }
 
 template <typename Generator>
-char uniformly_distributed_value(char const& left, char const& right, Generator& gen) {
+char uniformly_distributed_value(char left, char right, Generator& gen) {
   return std::uniform_int_distribution<int>(left, right)(gen);
 }
 
 template <typename Generator>
-signed char uniformly_distributed_value(signed char const& left, signed char const& right, Generator& gen) {
+signed char uniformly_distributed_value(signed char left, signed char right, Generator& gen) {
   return std::uniform_int_distribution<int>(left, right)(gen);
 }
 
 template <typename Generator>
-unsigned char uniformly_distributed_value(unsigned char const& left, unsigned char const& right, Generator& gen) {
+unsigned char uniformly_distributed_value(unsigned char left, unsigned char right, Generator& gen) {
   return std::uniform_int_distribution<int>(left, right)(gen);
+}
+
+/**
+ * random bigint
+ */
+namespace detail {
+
+template <unsigned W, typename Generator>
+unsigned_int<W> random_big_unsigned(const unsigned_int<W>&max, Generator& gen) {
+  if (max <= std::numeric_limits<uint64_t>::max())
+    return std::uniform_int_distribution<uint64_t>(0, static_cast<uint64_t>(max))(gen);
+  unsigned_int<W> rem = max & std::numeric_limits<uint64_t>::max();
+  unsigned_int<W> buckets = (max >> 64) + (rem ? 1 : 0);
+  unsigned_int<W> bucket_idx;
+  uint64_t random_r;
+  do {
+    bucket_idx = random_big_unsigned(buckets - 1, gen);
+    random_r = std::uniform_int_distribution<uint64_t>()(gen);
+    // reject sample if out of range (only possible for the last bucket)
+  } while (rem > 0 && bucket_idx + 1 == buckets && random_r > rem);
+  return (bucket_idx << 64) + random_r;
+}
+
+template <unsigned W, typename Generator>
+unsigned_int<W> uniformly_distributed_big_value(const unsigned_int<W>& left, const unsigned_int<W>& right, Generator& gen) {
+  assert(left <= right);
+  return left + random_big_unsigned(right - left, gen);
+}
+
+template <unsigned W, typename Generator>
+signed_int<W> uniformly_distributed_big_value(const signed_int<W>& left, const signed_int<W>& right, Generator& gen) {
+  assert(left <= right);
+  signed_int<W + 1> dist = static_cast<signed_int<W + 1>>(right) - left; // upcast to avoid overflow
+  unsigned_int<W + 1> rdist = random_big_unsigned(static_cast<unsigned_int<W + 1>>(dist), gen);
+  return static_cast<signed_int<W>>(dist + left - rdist);
+}
+
+}
+
+template <typename T, typename Generator>
+typename std::enable_if<is_crave_bigint<T>::value && !is_signed<T>::value, T>::type uniformly_distributed_value(const T& left, const T& right, Generator& gen) {
+  return detail::uniformly_distributed_big_value<bitsize_traits<T>::value, Generator>(left, right, gen);
+}
+
+template <typename T, typename Generator>
+typename std::enable_if<is_crave_bigint<T>::value && is_signed<T>::value, T>::type uniformly_distributed_value(const T& left, const T& right, Generator& gen) {
+  return detail::uniformly_distributed_big_value<bitsize_traits<T>::value - 1, Generator>(left, right, gen);
 }
 
 /*!
@@ -127,18 +176,19 @@ struct distribution {
    */
   T nextValue() const {
     if (ranges_.empty()) {
-      return uniformly_distributed_value(std::numeric_limits<T>::min(), std::numeric_limits<T>::max(), *rng.get());
+      return uniformly_distributed_value<T>(std::numeric_limits<T>::min(), std::numeric_limits<T>::max(), *rng.get());
     }
     weighted_range<T> selected = ranges_.back();
     if (ranges_.size() > 1) {
-      uint64_t r = std::uniform_int_distribution<uint64_t>(0, selected.accumWeight_ - 1)(*rng.get());
+      underlying_type one = 1;
+      underlying_type r = uniformly_distributed_value(one, selected.accumWeight_, *rng.get()) - 1;
       for (unsigned i = 0; i < ranges_.size(); i++)
         if (r < ranges_[i].accumWeight_) {
           selected = ranges_[i];
           break;
         }
     }
-    return uniformly_distributed_value(selected.left_, selected.right_, *rng.get());
+    return uniformly_distributed_value<T>(selected.left_, selected.right_, *rng.get());
   }
 
  protected:

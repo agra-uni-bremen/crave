@@ -197,9 +197,20 @@ void metaSMTVisitorImpl<SolverType>::visitVariableExpr(VariableExpr const &ve) {
 
 template <typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitConstant(Constant const &c) {
-  result_type result = c.isBool() ? (c.value() ? evaluate(solver_, preds::True) : evaluate(solver_, preds::False))
-                                  : (c.sign() ? evaluate(solver_, qf_bv::bvsint(c.value(), c.bitsize()))
-                                              : evaluate(solver_, qf_bv::bvuint(c.value(), c.bitsize())));
+  result_type result;
+  if (c.isBool()) {
+    result = c.value() ? evaluate(solver_, preds::True) : evaluate(solver_, preds::False);
+  } else if (c.bitsize() <= 64) {
+    result = c.sign() ? evaluate(solver_, qf_bv::bvsint(c.to_integer< int64_t>(), c.bitsize()))
+                      : evaluate(solver_, qf_bv::bvuint(c.to_integer<uint64_t>(), c.bitsize()));
+
+  } else {
+    assert(!c.sign() && "only big unsigned constant is currently supported");
+    std::string bin(c.bitsize(), '0');
+    for (unsigned i = 0; i < c.bitsize(); i++)
+      if ((c.value() >> i) & 1) bin[c.bitsize() - i - 1] = '1';
+    result = evaluate(solver_, qf_bv::bvbin(bin));
+  }
   exprStack_.push(std::make_pair(result, c.sign()));
 }
 

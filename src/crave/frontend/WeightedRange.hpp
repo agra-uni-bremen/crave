@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "../TypeConfig.hpp"
+
 namespace crave {
 
 /**
@@ -22,7 +24,7 @@ struct weighted_range {
    * \param r Right value of the range (inclusive)
    * \param w Weight of the range
    */
-  weighted_range(T l, T r, uint64_t w) : left_(l), right_(r), weight_(w), accumWeight_(0) {}
+  weighted_range(T l, T r, underlying_type w) : left_(l), right_(r), weight_(w), accumWeight_(0) {}
 
   /**
    * \brief Compares a weighted range to another range.
@@ -54,8 +56,8 @@ struct weighted_range {
 
   T left_;
   T right_;
-  uint64_t weight_;
-  uint64_t accumWeight_;
+  underlying_type weight_;
+  underlying_type accumWeight_;
 };
 
 /**
@@ -93,6 +95,6 @@ struct weighted_value : weighted_range<T> {
    * \param v The value.
    * \param w The weight.
    */
-  weighted_value(T v, uint64_t w) : weighted_range<T>(v, v, w) {}
+  weighted_value(T v, underlying_type w) : weighted_range<T>(v, v, w) {}
 };
 }  // namespace crave

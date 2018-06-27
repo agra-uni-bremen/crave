@@ -94,7 +94,7 @@ void ReplaceVisitor::visitVariableExpr(VariableExpr const& v) {
 void ReplaceVisitor::visitConstant(Constant const& c) {
   aux_stack_.push(new Constant(c));
   updateResult();
-  subscript_stack_.push(c.value());
+  subscript_stack_.push(c.to_integer<int>());
 }
 void ReplaceVisitor::visitVectorExpr(VectorExpr const& v) {
   std::map<int, NodePtr>::iterator ite(terminals_.lower_bound(v.id()));

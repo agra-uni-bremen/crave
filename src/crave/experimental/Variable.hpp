@@ -171,11 +171,13 @@ class crv_variable {};
  * class for randomisation of a variable
  */
 template <typename T>
-class crv_variable<T, typename std::enable_if<std::is_integral<T>::value>::type> : public crv_variable_base<T> {
+class crv_variable<T, typename std::enable_if<std::is_integral<T>::value || is_crave_bigint<T>::value>::type> : public crv_variable_base<T> {
   CRV_VARIABLE_COMMON_CONSTRUCTORS(T);
   CRV_VARIABLE_ASSIGNMENT_INTERFACE(T);
   CRV_VARIABLE_ARITHMETIC_INTERFACE(T);
   CRV_VARIABLE_BITWISE_INTERFACE(T);
+
+  static_assert(bitsize_traits<T>::value <= bitsize_traits<underlying_type>::value, "requested bit width is too big");
 
  public:
   /**

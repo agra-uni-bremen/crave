@@ -63,7 +63,7 @@ void EvalVisitor::visitNegOpr(const NegOpr& n) {
   stack_entry e;
   pop(e);
 
-  exprStack_.push(std::make_pair(Constant(-e.first.value(), e.first.bitsize(), e.first.sign()), e.second));
+  exprStack_.push(std::make_pair(Constant(0 - e.first.value(), e.first.bitsize(), e.first.sign()), e.second));
 }
 
 void EvalVisitor::visitComplementOpr(const ComplementOpr& c) {
@@ -276,7 +276,7 @@ void EvalVisitor::visitShiftLeftOpr(const ShiftLeftOpr& shl) {
   evalBinExpr(shl, lhs, rhs);
 
   exprStack_.push(std::make_pair(
-      Constant(lhs.first.value() << rhs.first.value(), lhs.first.bitsize(), lhs.first.sign() || rhs.first.sign()),
+      Constant(lhs.first.value() << rhs.first.to_integer<int>(), lhs.first.bitsize(), lhs.first.sign() || rhs.first.sign()),
       lhs.second && rhs.second));
 }
 
@@ -285,7 +285,7 @@ void EvalVisitor::visitShiftRightOpr(const ShiftRightOpr& shr) {
   evalBinExpr(shr, lhs, rhs);
 
   exprStack_.push(std::make_pair(
-      Constant(lhs.first.value() >> rhs.first.value(), lhs.first.bitsize(), lhs.first.sign() || rhs.first.sign()),
+      Constant(lhs.first.value() >> rhs.first.to_integer<int>(), lhs.first.bitsize(), lhs.first.sign() || rhs.first.sign()),
       lhs.second && rhs.second));
 }
 

@@ -20,7 +20,7 @@ extern std::function<bool(void)> random_bit;
  * @return an instance of Constant
  */
 template <typename T>
-struct to_constant_expr<T, typename boost::enable_if<boost::is_integral<T> >::type> {
+struct to_constant_expr<T, typename std::enable_if<std::is_integral<T>::value || is_crave_bigint<T>::value >::type> {
   Constant operator()(T value) { return Constant(value, bitsize_traits<T>::value, crave::is_signed<T>::value); }
 };
 
