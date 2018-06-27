@@ -41,4 +41,10 @@ namespace crave
     return rand_with_gen_->next();
   }
 
+  std::ostream& crv_sequence_item::print_dot_graph(std::ostream& os) {
+    if (!built_)
+      return (os << "Graph is not yet available" << std::endl);
+    return gen_->printDotGraph(os);
+  }
+
 }

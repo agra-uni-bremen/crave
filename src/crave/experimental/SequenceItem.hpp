@@ -59,6 +59,8 @@ class crv_sequence_item : public crv_object {
    */
   void goal(crv_covergroup& group);
 
+  std::ostream& print_dot_graph(std::ostream& os);
+
  protected:
   void request_rebuild() override;
 
