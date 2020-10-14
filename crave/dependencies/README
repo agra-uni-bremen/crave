@@ -1,0 +1,7 @@
+a set of scripts to create and/or build various external libraries.
+
+call 
+  ./build /some/target/folder "package-version" "package-version" ...
+to install the packages to that directory or call setup_cmake_src with 
+the same parameters to setup directories suitable for inclusion in cmake
+projects.

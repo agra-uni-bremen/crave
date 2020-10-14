@@ -1,0 +1,65 @@
+examples_TESTS += integrated/ubus/test
+
+examples_XFAIL_TESTS += 
+
+examples_BUILD += \
+	$(integrated_ubus_BUILD)
+
+examples_CLEAN += 
+
+examples_DIRS += integrated/ubus/vip \
+                 integrated/ubus
+
+examples_FILES += \
+	$(integrated_ubus_H_FILES) \
+	$(integrated_ubus_CXX_FILES) \
+	$(integrated_ubus_BUILD) \
+	$(integrated_ubus_EXTRA)
+
+integrated_ubus_test_SOURCES = \
+	$(integrated_ubus_H_FILES) \
+	$(integrated_ubus_CXX_FILES)
+
+integrated_ubus_CXX_FILES = \
+    integrated/ubus/sc_main.cpp \
+    integrated/ubus/ubus_example_scoreboard.cpp \
+    integrated/ubus/vip/ubus_bus_monitor.cpp \
+    integrated/ubus/vip/ubus_env.cpp \
+    integrated/ubus/vip/ubus_master_agent.cpp \
+    integrated/ubus/vip/ubus_master_driver.cpp \
+    integrated/ubus/vip/ubus_master_monitor.cpp \
+    integrated/ubus/vip/ubus_slave_agent.cpp \
+    integrated/ubus/vip/ubus_slave_driver.cpp \
+    integrated/ubus/vip/ubus_slave_monitor.cpp \
+    integrated/ubus/vip/ubus_transfer.cpp
+
+integrated_ubus_H_FILES = \
+    integrated/ubus/dut_dummy.h \
+    integrated/ubus/test_lib.h \
+    integrated/ubus/ubus_example_master_seq_lib.h \
+    integrated/ubus/ubus_example_scoreboard.h \
+    integrated/ubus/ubus_example_tb.h \
+    integrated/ubus/vip/slave_address_map_info.h \
+    integrated/ubus/vip/ubus.h \
+    integrated/ubus/vip/ubus_bus_monitor.h \
+    integrated/ubus/vip/ubus_bus_status.h \
+    integrated/ubus/vip/ubus_env.h \
+    integrated/ubus/vip/ubus_if.h \
+    integrated/ubus/vip/ubus_master_agent.h \
+    integrated/ubus/vip/ubus_master_driver.h \
+    integrated/ubus/vip/ubus_master_monitor.h \
+    integrated/ubus/vip/ubus_master_seq_lib.h \
+    integrated/ubus/vip/ubus_master_sequencer.h \
+    integrated/ubus/vip/ubus_slave_agent.h \
+    integrated/ubus/vip/ubus_slave_driver.h \
+    integrated/ubus/vip/ubus_slave_monitor.h \
+    integrated/ubus/vip/ubus_slave_seq_lib.h \
+    integrated/ubus/vip/ubus_slave_sequencer.h \
+    integrated/ubus/vip/ubus_transfer.h \
+    integrated/ubus/vip/ubus_version.h
+
+integrated_ubus_BUILD = 
+
+integrated_ubus_EXTRA = 
+
+## Taf!

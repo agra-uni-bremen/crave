@@ -1,0 +1,93 @@
+language: cpp
+dist: xenial
+sudo: false
+
+env:
+# stable
+- metaSMTConfig="--academic"                                            # boolector-2.4.1 with lingeling and minisat
+                                                                        # yices-2.5.2
+- metaSMTConfig="--academic -DmetaSMT_REQUIRE_CXX11=off"                # now without C++11
+                                                                        # 
+- metaSMTConfig="-b boolector-3.0.0"                                    # boolector-3.0.0
+- metaSMTConfig="-b yices-2.6.1"                                        # yices-2.6.1
+- metaSMTConfig="-b Z3-4.5.0-ubuntu-14.04-x64"                          # z3 4.5.0 pre-built
+- metaSMTConfig="-b Z3-4.5.0-ubuntu-14.04-x64" BOOST_VERSION=1.60.0     # z3 4.5.0 pre-built and boost-1.60.0
+- metaSMTConfig="-b Z3-4.5.0-ubuntu-14.04-x64" BOOST_VERSION=1.70.0     # z3 4.5.0 pre-built and boost-1.70.0
+- metaSMTConfig="-b Z3-4.8.4"                                           # z3 4.8.4
+- metaSMTConfig="-b cvc4-1.6"                                           # cvc4 1.6
+- metaSMTConfig="-b stp-2.3.3-basic -b minisat-git"                     # stp 2.3.3 with minisat
+- metaSMTConfig="-b aiger-20071012 -b picosat-936 -b cudd-3.0.0"        # others
+# unstable
+- metaSMTConfig="-b stp-git -b cryptominisat-git -b minisat-git"        # stp upstream with cryptominisat and minisat
+- metaSMTConfig="-b Z3-git"                                             # z3 upstream
+- metaSMTConfig="-b cvc4-unstable"                                      # cvc4 upstream
+
+compiler:
+  - gcc
+  - clang
+
+matrix:
+  exclude:
+  - compiler: clang
+    env: metaSMTConfig="-b Z3-git"
+  - compiler: clang
+    env: metaSMTConfig="-b Z3-4.8.4"
+  - compiler: gcc
+    env: metaSMTConfig="-b cvc4-1.6"
+  - compiler: gcc
+    env: metaSMTConfig="-b cvc4-unstable"
+  - compiler: clang
+    env: metaSMTConfig="-b stp-git -b cryptominisat-git -b minisat-git"
+  - compiler: clang
+    env: metaSMTConfig="--non-free"
+  - compiler: clang
+    env: metaSMTConfig="--non-free" BOOST_VERSION=1.60.0
+  - compiler: clang
+    env: metaSMTConfig="-b aiger-20071012 -b picosat-936 -b cudd-3.0.0"
+  allow_failures:
+  - compiler: gcc
+    env: metaSMTConfig="-b Z3-git"
+  - compiler: clang
+    env: metaSMTConfig="-b cvc4-unstable"
+  - compiler: gcc
+    env: metaSMTConfig="-b stp-git -b cryptominisat-git -b minisat-git"
+
+addons:
+  apt:
+    packages:
+    - libboost-dev
+    - libgmp-dev
+    - gperf # required by yices2
+
+cache:
+  apt: true
+  directories:
+  - deps-gcc
+  - deps-clang
+
+before_install:
+  - git clone https://github.com/agra-uni-bremen/dependencies.git
+  - |
+      if [[ "${BOOST_VERSION}" != "" ]]; then
+        BOOST_DIR=`pwd`/boost-${BOOST_VERSION}
+        BOOST_URL="http://sourceforge.net/projects/boost/files/boost/${BOOST_VERSION}/boost_${BOOST_VERSION//\./_}.tar.gz"
+        mkdir -p ${BOOST_DIR}
+        { travis_retry wget --quiet -O - ${BOOST_URL} | tar --strip-components=1 -xz -C ${BOOST_DIR}; } || exit 1
+        export BOOST_ROOT=${BOOST_DIR}
+      else
+        export BOOST_ROOT=/usr
+      fi
+  - if [[ "${CXX}" == "g++" ]]; then export DEPS="deps-gcc"; fi
+  - if [[ "${CXX}" == "clang++" ]]; then export DEPS="deps-clang"; fi
+  - ./bootstrap.sh --deps ${DEPS} ${metaSMTConfig} -m RELEASE build/
+
+before_script:
+  - cd build
+
+script: make
+
+after_success:
+  - make test
+
+os:
+  - linux

@@ -1,0 +1,87 @@
+--- a/boolector.c	2015-11-29 18:40:12.000000000 +0100
++++ b/boolector.c	2016-10-21 16:20:58.480747682 +0200
+@@ -1947,12 +1947,27 @@
+   BTOR_ABORT_NOT_BV_BOOLECTOR (e0);
+   BTOR_ABORT_NOT_BV_BOOLECTOR (e1);
+   len = btor_get_exp_width (btor, e0);
++  int len1= btor_get_exp_width (btor, e1);
++  if( !btor_is_power_of_2_util (len) 
++      || btor_log_2_util (len) != btor_get_exp_width (btor, e1) ) 
++  {
++    int tolen =  btor_next_power_of_2_util(len);
++    int loglen    = btor_log_2_util(tolen);
++    res = btor_slice_exp(btor, btor_sll_exp ( btor,
++      btor_uext_exp(btor, e0, tolen-len),
++      (len1 > loglen) ?  btor_slice_exp(btor, e1, loglen-1, 0): e1 ),
++      len-1, 0);
++    
++  }
++  else
++  {
+   BTOR_ABORT_BOOLECTOR (!btor_is_power_of_2_util (len),
+       "bit-width of 'e0' must be a power of 2");
+   BTOR_ABORT_BOOLECTOR (
+       btor_log_2_util (len) != btor_get_exp_width (btor, e1),
+       "bit-width of 'e1' must be equal to log2(bit-width of 'e0')");
+   res = btor_sll_exp (btor, e0, e1);
++  }
+   inc_exp_ext_ref_counter (btor, res);
+   BTOR_TRAPI_RETURN_NODE (res);
+ #ifndef NDEBUG
+@@ -1980,12 +1995,27 @@
+   BTOR_ABORT_NOT_BV_BOOLECTOR (e0);
+   BTOR_ABORT_NOT_BV_BOOLECTOR (e1);
+   len = btor_get_exp_width (btor, e0);
++  int len1= btor_get_exp_width (btor, e1);
++  if( !btor_is_power_of_2_util (len) 
++      || btor_log_2_util (len) != btor_get_exp_width (btor, e1) ) 
++  {
++    int tolen =  btor_next_power_of_2_util(len);
++    int loglen    = btor_log_2_util(tolen);
++    res = btor_slice_exp(btor, btor_srl_exp ( btor,
++      btor_uext_exp(btor, e0, tolen-len),
++      (len1 > loglen) ?  btor_slice_exp(btor, e1, loglen-1, 0): e1 ),
++      len-1, 0);
++    
++  }
++  else
++  {
+   BTOR_ABORT_BOOLECTOR (!btor_is_power_of_2_util (len),
+       "bit-width of 'e0' must be a power of 2");
+   BTOR_ABORT_BOOLECTOR (
+       btor_log_2_util (len) != btor_get_exp_width (btor, e1),
+       "bit-width of 'e1' must be equal to log2(bit-width of 'e0')");
+   res = btor_srl_exp (btor, e0, e1);
++  }
+   inc_exp_ext_ref_counter (btor, res);
+   BTOR_TRAPI_RETURN_NODE (res);
+ #ifndef NDEBUG
+@@ -2013,12 +2043,28 @@
+   BTOR_ABORT_NOT_BV_BOOLECTOR (e0);
+   BTOR_ABORT_NOT_BV_BOOLECTOR (e1);
+   len = btor_get_exp_width (btor, e0);
++  int len1= btor_get_exp_width (btor, e1);
++  if( !btor_is_power_of_2_util (len) 
++      || btor_log_2_util (len) != btor_get_exp_width (btor, e1) ) 
++  {
++    int tolen =  btor_next_power_of_2_util(len);
++    int loglen    = btor_log_2_util(tolen);
++    res = btor_slice_exp(btor, btor_sra_exp ( btor,
++      btor_uext_exp(btor, e0, tolen-len),
++      (len1 > loglen) ?  btor_slice_exp(btor, e1, loglen-1, 0): e1 ),
++      len-1, 0);
++    
++  }
++  else
++  {
++  len = btor_get_exp_width (btor, e0);
+   BTOR_ABORT_BOOLECTOR (!btor_is_power_of_2_util (len),
+       "bit-width of 'e0' must be a power of 2");
+   BTOR_ABORT_BOOLECTOR (
+       btor_log_2_util (len) != btor_get_exp_width (btor, e1),
+       "bit-width of 'e1' must be equal to log2(bit-width of 'e0')");
+   res = btor_sra_exp (btor, e0, e1);
++  }
+   inc_exp_ext_ref_counter (btor, res);
+   BTOR_TRAPI_RETURN_NODE (res);
+ #ifndef NDEBUG

@@ -1,0 +1,15 @@
+set(metaSMT_FOUND 1)
+
+@_metaSMT_EXTERNAL_FIND@
+
+set(metaSMT_INCLUDE_DIR  @metaSMT_INCLUDES@)
+set(metaSMT_INCLUDE_DIRS ${metaSMT_INCLUDE_DIR})
+
+set(metaSMT_LIBRARIES @metaSMT_MLIBS@)
+
+get_filename_component(metaSMT_CONFIG_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+include("${metaSMT_CONFIG_DIR}/metaSMT.cmake" )
+set(metaSMT_CXXFLAGS "@metaSMT_CXXFLAGS@")
+
+set(metaSMT_REQUIRE_RTTI "@metaSMT_REQUIRE_RTTI@")
+set(metaSMT_AVAILABLE_QF_ABV_SOLVERS @metaSMT_AVAILABLE_QF_ABV_SOLVERS@)

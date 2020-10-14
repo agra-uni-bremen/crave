@@ -1,0 +1,7 @@
+set(SWORD_VERSION)
+get_filename_component(SWORD_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
+set(SWORD_BIN_DIRS     ${SWORD_DIR}/bin )
+set(SWORD_BIN_DIR     ${SWORD_BIN_DIRS} )
+set(SWORD_INCLUDE_DIRS ${SWORD_DIR}/include )
+set(SWORD_INCLUDE_DIR  ${SWORD_INCLUDE_DIRS} )
+set(SWORD_LIBRARIES    ${SWORD_DIR}/lib/libsword.a )

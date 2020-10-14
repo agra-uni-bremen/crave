@@ -1,0 +1,16 @@
+ /*! 
+ * 
+ * \defgroup newAPI New API (C++11 based API)
+ * \brief Components of the new and used API for CRAVE.
+ * 
+ * The new API uses the latest feature available via C++11, supports Coverage and has a syntax more close to System Verilog contrainted random generation.
+ * You can also randomize object with inline constraints.
+ * 
+ * \defgroup setting Settings
+ * \brief Components used to configure CRAVE.
+ * 
+ * \defgroup operators Operators
+ * \brief Components used for special tasks in constraints.
+ * 
+ * The syntax allows some special operators and operands to be used, which are collected here.
+ */

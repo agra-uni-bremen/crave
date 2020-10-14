@@ -1,0 +1,16 @@
+CRAVE_HOME = ../../build/root
+include $(CRAVE_HOME)/share/crave/crave.makefile
+
+INCLUDES = -I $(crave_INCLUDES)
+LIBS = $(crave_LIBRARIES)
+RPATH = $(crave_RPATH)
+
+SRC = main.cpp
+TARGET = test
+
+all: $(SRC)
+	g++ $(SRC) $(INCLUDES) $(LIBS) $(RPATH) -o $(TARGET) -g -O0
+
+clean:
+	rm -f $(TARGET)
+

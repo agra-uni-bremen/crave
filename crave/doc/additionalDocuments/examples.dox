@@ -1,0 +1,90 @@
+/*!
+ * \example ex1_seed_dist/main.cpp
+ * \brief Basic example of CRAVE using new API.
+ * 
+ * This example demonstrates how to use the new CRAVE API to distribute the value of two variables in a bounded ranges.
+ */
+
+/*!
+ * \example ex2_constr_ref/main.cpp
+ * \brief Example how to use reference to access non-CRAVE variables using new API.
+ * 
+ * This example demonstrates how to use acess variables that are not CRAVE variables.
+ * Non-CRAVE variables cannot be used in a constraint unless it is passed via the function reference.
+ */
+
+/*!
+ * \example ex3_inh_soft_next/main.cpp
+ * \brief Demonstration of inheritence with constraints and soft constraints using new API.
+ * 
+ * <p>This example demonstrates the fact that constraints are not lost if you use inheritence.
+ * Constraints are inherited by subclasses and are not lost in case a subclass object is randomized.</p><p>
+ * Also it is shown how a soft constraint will be deactivated if it contradicts a hard constraint.
+ * This happens here in a sub class, where a hard constraint forces a condition that violates the base classes soft constraint.</p>
+ * <p> Last but not least the examples shows that you are free to override randomize to get some more functionality, like storing immediate results.</p> 
+ */
+
+
+/*!
+ * \example ex4_constr_mng/main.cpp
+ * \brief Demonstration of constraints managing using new API.
+ * 
+ * This example shows how deactivating and activating constraints is done and how it effects the found solution.
+ */
+
+
+/*!
+ * \example ex5_vec_constr/main.cpp
+ * \brief Example usage of vector constraints and vector randomization using new API.
+ * 
+ * Another feature of CRAVE is to randomize vectors and randomize vectors with constraints.
+ * A solution with stdl containern would not work since CRAVE can only randomize randv variables directly.
+ * For a vector of randomizable variables there is rand_vec which is demonstrated here.
+ * Also the vector operators foreach, unique and the placeholders _i are presented here.
+ */
+
+/*!
+ * \example ex6_inline_gen/main.cpp
+ * \brief Example usage of classless generated values.
+ * 
+ * This example demonstrates that you do not have to create a whole class to randomize some variables.
+ * As long as the crv_variable are in scope, you can use them in a more functional way rather than an object orientated way.
+ */
+
+/*!
+ * \example ex7_rand_enum/main.cpp
+ * \brief Example usage of enum randomization using.
+ * 
+ * This example shows how to randomize enum values.
+ * As you can see you must declare the enum with a makro before, but afterwards you may use it as a standart CRAVE variable.
+ */
+
+/*!
+ * \example ex8_make_expression/main.cpp
+ * \brief Sum example.
+ * 
+ * You can simply use crv_array which already has a sum function as demonstrated here.
+ */
+
+/*!
+ * \example ex9_cdg/main.cpp
+ * \brief Demonstration of coverage measuring.
+ * 
+ * You need to define coverpoints and for eah coverpoints some bins that can be hit with random values.
+ */
+
+/*!
+ * \example ex10_variable_prev/main.cpp
+ * \brief Example usage of the prev symlink extension.
+ * 
+ * CRAVE can give you access to the previous value of a random variable.
+ * Simply use "prev" in the parenthesis operator () to access the value before the last randomize() call.
+ */
+
+/*!
+ * \example ex11_randomize_with/main.cpp
+ * \brief Demonstration of inline constraints.
+ * 
+ * An inline contraint can simply be used as a paramter in the method randomize_with.
+ * The given constraint will be used for randomization too.
+ */ 

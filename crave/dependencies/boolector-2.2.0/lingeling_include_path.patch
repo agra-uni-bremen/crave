@@ -1,0 +1,49 @@
+*** a/btorsat.c	2015-11-29 18:40:12.000000000 +0100
+--- btorsat.c	2016-03-07 19:28:35.821854674 +0100
+***************
+*** 16,22 ****
+  #endif
+  
+  #ifdef BTOR_USE_LINGELING
+! #include "lglib.h"
+  #endif
+  
+  #ifdef BTOR_USE_MINISAT
+--- 16,22 ----
+  #endif
+  
+  #ifdef BTOR_USE_LINGELING
+! #include <lglib.h>
+  #endif
+  
+  #ifdef BTOR_USE_MINISAT
+*** a/btorsat.h	2016-03-07 19:40:34.149416668 +0100
+--- btorsat_patch.h	2016-03-07 19:41:24.373665717 +0100
+***************
+*** 83,89 ****
+  };
+  
+  #if defined(BTOR_USE_LINGELING)
+! #include "../lingeling/lglib.h"
+  typedef struct BtorLGL BtorLGL;
+  
+  struct BtorLGL
+--- 83,89 ----
+  };
+  
+  #if defined(BTOR_USE_LINGELING)
+! #include <lglib.h>
+  typedef struct BtorLGL BtorLGL;
+  
+  struct BtorLGL
+--- a/btorminisat.cc	2015-11-29 18:40:12.000000000 +0100
++++ btorminisat.cc	2016-03-22 12:00:12.878664501 +0100
+@@ -19,7 +19,7 @@
+ #define __STDC_FORMAT_MACROS
+ #endif
+ 
+-#include "../minisat/minisat/simp/SimpSolver.h"
++#include <minisat/simp/SimpSolver.h>
+ 
+ #include <cassert>
+ #include <cstring>

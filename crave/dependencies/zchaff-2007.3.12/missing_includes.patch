@@ -1,0 +1,57 @@
+diff -ur zchaff64/cnf_stats.cpp zchaff-2007.3.12/cnf_stats.cpp
+--- zchaff64/cnf_stats.cpp	2007-03-14 03:48:02.000000000 +0100
++++ zchaff-2007.3.12/cnf_stats.cpp	2011-04-08 13:44:00.014474533 +0200
+@@ -2,6 +2,7 @@
+ #include <fstream>
+ #include <cstdlib>
+ #include <cstdio>
++#include <cstring>
+ 
+ #include <set>
+ #include <vector>
+diff -ur zchaff64/sat_solver.cpp zchaff-2007.3.12/sat_solver.cpp
+--- zchaff64/sat_solver.cpp	2007-03-14 03:48:02.000000000 +0100
++++ zchaff-2007.3.12/sat_solver.cpp	2011-04-08 13:44:00.014474533 +0200
+@@ -38,6 +38,7 @@
+ #include <fstream>
+ #include <cstdlib>
+ #include <cstdio>
++#include <cstring>
+ 
+ #include <set>
+ #include <vector>
+diff -ur zchaff64/zchaff_dbase.cpp zchaff-2007.3.12/zchaff_dbase.cpp
+--- zchaff64/zchaff_dbase.cpp	2007-03-14 03:48:27.000000000 +0100
++++ zchaff-2007.3.12/zchaff_dbase.cpp	2011-04-08 13:44:00.015557772 +0200
+@@ -36,6 +36,7 @@
+ #include <iostream>
+ #include <vector>
+ #include <set>
++#include <cstdlib>
+ 
+ using namespace std;
+ 
+diff -ur zchaff64/zminimal.cpp zchaff-2007.3.12/zminimal.cpp
+--- zchaff64/zminimal.cpp	2007-03-14 03:48:02.000000000 +0100
++++ zchaff-2007.3.12/zminimal.cpp	2011-04-08 13:49:40.343011798 +0200
+@@ -39,6 +39,7 @@
+ #include <cstdio>
+ #include <set>
+ #include <vector>
++#include <cstring>
+ 
+ using namespace std;
+ 
+diff -ur zchaff64/zverify_df.cpp zchaff-2007.3.12/zverify_df.cpp
+--- zchaff64/zverify_df.cpp	2007-04-11 20:49:33.000000000 +0200
++++ zchaff-2007.3.12/zverify_df.cpp	2011-04-08 13:44:00.016557463 +0200
+@@ -40,6 +40,9 @@
+ #include <iostream>
+ #include <fstream>
+ #include <assert.h>
++#include <cstdlib>
++#include <cstring>
++#include <unistd.h>
+ 
+ using namespace std;
+ 

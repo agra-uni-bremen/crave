@@ -1,0 +1,115 @@
+#!/bin/bash
+
+base_dir=$( cd $(dirname $0) && pwd )
+source $base_dir/common.sh
+
+usage() {
+  message "usage:                                                                          "
+  message "  ./build {options} <target_dir> <package> {<package>}"
+  message "  ./build <target_dir> {options} <package> {<package>}"
+  message "  ./build ( --help | -h )"
+  message "options:"
+  message "  --build <dir>   build packages in this folder"
+  message "   -b <dir>"
+  message "  --cache <dir>   specify the directory to the sources"
+  message "   -c <dir>       and skips the downloads"
+  message "  --download      only download the packages"
+  message "   -d             (won't work together with cache option)"
+  message "   -j <number>    defines the number of compiling threads"
+}
+
+if [ $# -lt 2 ]; then
+  usage
+  if [[ $1 == *-h* ]]; then
+    exit 0
+  fi
+  exit 21
+fi
+
+from_cache="no"
+dl_only="no"
+num_threads=1
+
+while [ -n "$1" ]; do
+  case $1 in
+    --build|-b)
+        build="$(mkdir -p $2 && cd $2 && pwd)"
+        shift;;
+    --cache|-c)
+        if [ $dl_only = "yes" ]; then
+          message "illegal usage of options"
+          usage;
+          exit 22;
+        fi
+        from_cache="yes";
+        cache="$(mkdir -p $2 && cd $2 && pwd)";
+        shift;;
+    --download|-d)
+        if [ $from_cache = "yes" ]; then
+          message "illegal usage of options"
+          usage;
+          exit 22;
+        fi
+        dl_only="yes";
+        cache=${root:-$(mkdir -p $2 && cd $2 && pwd)};;
+    --help|-h)
+        usage;
+        exit 0;;
+    -j)
+        num_threads="$2";
+        shift;;
+    -j*)
+        num_threads="${1/-j}";;
+    -*)
+        message "unknown parameter: $1";
+        usage;
+        exit 22;;
+    *) # first time is target, further are packages
+        if [ -z $root ]; then
+          root="$(mkdir -p $1 && cd $1 && pwd)"
+        else
+          packages="$packages $1"
+        fi ;;
+  esac
+  shift;
+done
+
+target="$root"
+
+cache="${cache:-$root/cache}"
+build="${build:-$root/build}"
+
+mkdir -p "$target"
+mkdir -p "$cache"
+if [ $dl_only = "no" ]; then
+  mkdir -p "$build"
+fi
+
+packages=$( with_deps $packages )
+
+for p in $packages; do
+  target="$root/$p"
+  export CMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH:$target"
+  if [ -d "$target" ] ; then
+    if [ $duplicate = "skip" ]; then
+      message "skipping $p" &&
+      continue
+    elif [ $duplicate = "remove" ]; then
+      message "removing existing package $p" &&
+      rm -r "$target"
+    elif  [ $duplicate = "rebuild" ]; then
+        message "rebuilding existing package $p" &&
+  	run_scripts build_install
+	continue
+    else
+      error "directory for $p already exists"
+    fi
+  fi
+  if [ $dl_only = "yes" ]; then
+    run_scripts download
+  elif [ $from_cache = "yes" ]; then
+    run_scripts unpack pre_build build_install
+  else
+    run_scripts download unpack pre_build build_install
+  fi
+done

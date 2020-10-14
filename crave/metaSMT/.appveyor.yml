@@ -1,0 +1,58 @@
+# Copyright Louis Dionne 2013-2017
+# Modified by the metaSMT developers <metasmt@informatik.uni-bremen.de> 2017
+# Distributed under the Boost Software License, Version 1.0.
+# (See copy at http://boost.org/LICENSE_1_0.txt)
+clone_folder: c:\projects\metaSMT
+
+shallow_clone: true
+
+os:
+  - Visual Studio 2015
+
+build:
+  verbosity: detailed
+
+configuration:
+  - Debug
+
+# specify custom environment variables
+environment:
+  MSVC_DEFAULT_OPTIONS: ON
+  CMAKE_URL: https://cmake.org/files/v3.7/cmake-3.7.2-win64-x64.zip
+  Z3_URL: https://github.com/Z3Prover/z3/releases/download/z3-4.5.0/z3-4.5.0-x86-win.zip
+  BOOST_URL: https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.7z/download
+
+install:
+  ############################################################################
+  # All external dependencies are installed in C:\projects\deps
+  ############################################################################
+  - mkdir C:\projects\deps
+  - cd C:\projects\deps
+
+  ############################################################################
+  # Install a recent CMake
+  ############################################################################
+  - appveyor DownloadFile %CMAKE_URL% -FileName cmake.zip
+  - 7z x cmake.zip -oC:\projects\deps > nul
+  - move C:\projects\deps\cmake-* C:\projects\deps\cmake # Move to a version-agnostic directory
+  - set PATH=C:\projects\deps\cmake\bin;%PATH%
+  - cmake --version
+  # Install z3
+  - appveyor DownloadFile %Z3_URL% -FileName z3-4.5.0-x86-win.zip
+  - 7z x z3-4.5.0-x86-win.zip -oC:\projects\deps > nul
+  - cp "C:\projects\metaSMT\.windows\Z3Config.cmake" "C:\projects\deps\z3-4.5.0-x86-win"
+  - set PATH=C:\projects\deps\z3-4.5.0-x86-win\bin;%PATH%
+  # Install boost
+  - appveyor DownloadFile %BOOST_URL% -FileName boost_1_63_0.7z
+  - 7z x boost_1_63_0.7z -oC:\projects\deps > nul
+
+before_build:
+  - call "%VS140COMNTOOLS%VsDevCmd.bat"
+  - cd C:\projects\metaSMT
+
+build_script:
+  - mkdir build
+  - cd build
+  - cmake .. -DBOOST_ROOT="C:\projects\deps\boost_1_63_0" -DZ3_DIR="C:\projects\deps\z3-4.5.0-x86-win"
+  - cmake --build .
+  - ctest -VV

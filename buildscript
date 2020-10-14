@@ -1,0 +1,194 @@
+#!/bin/bash
+
+NUM_THREADS=1
+
+install_dependencies () { 
+  echo "Install dependencies using $NUM_THREADS thread(s)"
+  
+  #SystemC
+  echo -n "SystemC: "
+  if [ -z "$SYSTEMC_HOME" ] 
+      then
+        echo "NOT FOUND - Please set SYSTEMC_HOME to a valid SystemC installation"
+        echo -n "Otherwise type "y" to check and install SystemC now: "
+        read line
+        if [ "$line" = "y" ]
+          then
+            echo "Installing SystemC (or just setting the SYSTEMC_HOME variable for installation)"
+            if [ ! -d systemc-2.3.1 ] 
+              then
+                wget http://accellera.org/images/downloads/standards/systemc/systemc-2.3.1.tgz
+                mv systemc-2.3.1.tgz systemc-2.3.1.tar
+                tar xvf systemc-2.3.1.tar
+                cd systemc-2.3.1
+                mkdir objdir
+                cd objdir
+                ../configure
+                make
+                make install
+                cd ../..
+            fi
+            cd systemc-2.3.1
+            export SYSTEMC_HOME=`pwd`
+	    echo "SYSTEMC_HOME set to $SYSTEMC_HOME"
+            cd ..
+          else
+            exit 1
+        fi
+  else
+    echo "found SystemC at $SYSTEMC_HOME"
+  fi
+  
+  #crave
+  echo -n "CRAVE: "
+  if [ -d crave ] 
+    then
+      cd crave
+      if [ ! -d build ]
+      then
+	  echo "Installing CRAVE."
+	  export GLOG_ROOT=/do/not/use
+	  export CRAVE_SOLVERS='cudd z3'
+	  echo "Build CRAVE using $NUM_THREADS thread(s)"
+	  make -j $NUM_THREADS
+	  make install -j $NUM_THREADS     
+	  cd ..
+      else
+	  echo "CRAVE already installed."
+      fi
+  else
+      echo "CRAVE not found"
+  fi
+  
+  #uvm-systemc
+  echo -n "uvm-systemc-1.0-beta2: "
+    if [ ! -d ../include ] && [ -z "$UVM_SYSTEMC_HOME" ] 
+    then
+      echo "install"
+      cd ..
+      export CXXFLAGS=-std=c++11
+      export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$SYSTEMC_HOME/lib-linux64:$SYSTEMC_HOME/lib-linux
+      config/bootstrap
+      mkdir objdir
+      cd objdir
+      ../configure --enable-debug
+      echo "Build UVM-SystemC using $NUM_THREADS thread(s)"
+      make -j $NUM_THREADS
+      make install -j $NUM_THREADS
+     # export UVM_SYSTEMC_HOME=`pwd`
+     # echo "UVM_SYSTEMC_HOME set to $UVM_SYSTEMC_HOME"
+      cd ..
+      #rm -rf objdir
+      cd crave
+  else
+      echo "found UVM-SystemC"
+  fi  
+}
+
+if [ "$1" = '' ] 
+  then
+    echo "  Usage: ./buildscript <task> [Options]"
+    echo "  Tasks: "
+    echo -e "         install [-j n]\t - Install the UBUS example and all dependencies"
+    echo -e "         compile [-j n]\t - (Re)compile the example after changes (You may use -j n to be faster with make)"
+    echo -e "         run     \t - Run the UBUS example"
+    echo -e "         tarball \t - Create a tarball of the repository"
+  else
+    if [ "$2" == "-j" ]
+    then
+      case $3 in
+      ''|*[!0-9]*) ;;
+      *) NUM_THREADS=$3 ;;
+      esac
+    fi
+    case "$1" in
+      install)
+        install_dependencies
+	echo "Dependencies installed."
+        if [ -d build ]
+          then
+            rm -r build
+        fi
+        mkdir build
+        cd build
+	echo "Unix Makefiles process..."
+        cmake -G "Unix Makefiles" ..
+        cd ..
+      ;;
+      compile)
+        cd build
+        make -j $NUM_THREADS
+        cd ..
+      ;;
+      run)
+        build/bin/ubus
+      ;;
+      tarball)
+        name_date=crave2uvm_$(date +"%Y%m%d_%H%M")
+        name_pre=contrib
+	name=$name_pre/crave
+
+	CRAVE_ARCHIVE_LOCAL=`ls crave-*.tar.gz -t`
+        if [ -z "$CRAVE_ARCHIVE_LOCAL" ]
+	    then
+	    echo "Error: missing crave tarball. Please, put a crave tarball to create a uvm-systemc-crave layer tarball."
+	else
+            mkdir -p $name
+            mkdir -p $name/cmake
+            mkdir -p $name/examples
+            mkdir -p $name/src
+            mkdir -p $name/presentation
+            
+            cp -R cmake/* $name/cmake
+            cp -R examples/* $name/examples
+            cp -R src/* $name/src
+            cp presentation/UVM-CRAVE.pdf $name/presentation/UVM-CRAVE.pdf
+            cp CMakeLists.txt $name/CMakeLists.txt
+            CRAVE_ARCHIVE=`ls crave-*.tar.gz -t | head -1`
+            cp $CRAVE_ARCHIVE $name/$CRAVE_ARCHIVE
+            cp buildscript $name/buildscript
+            cp README.md $name/README.md
+        
+            tar -cvzf $name_date.tar.gz $name	    	   	   
+            rm -rf $name_pre
+	fi
+      ;;
+      getcrave)
+	    name_date=crave-$(date +"%Y-%m-%d")
+	    name=crave
+	    git clone --recursive -b crave-z3-convers git@gitlab.informatik.uni-bremen.de:crave-wg/convers.git $name
+	    cd $name/
+
+	    mkdir -p $name
+            mkdir -p $name/cmake
+	    mkdir -p $name/dependencies
+            mkdir -p $name/doc	  
+            mkdir -p $name/examples
+            mkdir -p $name/metaSMT
+            mkdir -p $name/src
+            mkdir -p $name/tests
+            
+            cp -R cmake/* $name/cmake
+	    cp -R dependencies/* $name/dependencies
+	    cp -R doc/* $name/doc
+            cp -R examples/* $name/examples
+	    cp -R metaSMT/* $name/metaSMT
+            cp -R src/* $name/src
+	    cp -R tests/* $name/tests
+
+	    cp bootstrap.sh $name/
+            cp CMakeLists.txt $name/
+	    cp LICENSE $name/
+	    cp Makefile $name
+            cp README.md $name/README.md
+            
+            tar -cvzf $name_date.tar.gz $name	    	   	   
+            rm -rf $name
+	    cp $name_date.tar.gz ../
+	    cd ..
+	    
+	    rm -rf $name
+	    
+      ;;
+    esac
+fi

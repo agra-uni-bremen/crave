@@ -1,0 +1,59 @@
+ /*!\page constrDef Constraint Definition
+  *
+  * \section intro_sec Introduction
+  * The key element of CRAVE is the definition of constraints.
+  * You can think of constraints are something like a condition that variables must be fullfilled when they are randomized.
+  * These conditions can be nearly everthing, ranging from a more bounded range of values to a complex logical condition.
+  * This syntax will be explained here.
+  * Note that this page will use the \ref newAPI in its examples.
+  * 
+  * \subsection naming_sec Definition
+  * Note that there are constraints and expressions.
+  * An <b>expression</b> is statement like "A must be greater than 5" or "A must be inside 1,2 or 3".
+  * A <b>constraint</b> is a list of one or more expressions.
+  * Watch at the API which one in which place is needed.
+  *
+  * \section how_sec How to define constraints?
+  * <p>Constraints or expressions can be defined whereever the API allows you to give them.
+  * Typically this will be by creating a contraint object.
+  * Lets have a look at a minimal example.</p>
+  * <code> 
+  * crv_variable<short> data;<br>
+  * crv_constraint c_neg_data{ -16 < data() };<br>
+  * </code>
+  * <p>First, a randomziable variable of type short named data is created.
+  * This is mostly the starting point, since a constraint always refers to one or more variables.
+  * Second, we create a constraint named c_ned_data.
+  * We used c_ as a prefix for all our named constraints.
+  * The name is followed by {} in which our expression, or constraint, is stated.
+  * This constraint is pretty easy.
+  * It simply states that data should be bigger than -16.
+  * Note how the variable data was accessed.
+  * The paranthese operator () retrieves a symblic link to the variable which CRAVE uses to read and write the variable.
+  * As a rule of thumb, every randomizable variable state in a constraint must have pranthesis after its name.
+  * You may use all operators on these you can think of.
+  * You can compare them and calculate with them.</p>
+  * <code> 
+  * crv_variable<short> data;<br>
+  * crv_constraint c_neg_data{ -16 < data(), data() < 16 };<br>
+  * </code>
+  * <p> If you want to have multiple expressions in a constraint, you can simply seperate them by a comma.
+  * The ammended constraint now bounds data between -16 and 16 since both expressions must be true on randomization.</p>
+  *
+  * \section special_sec Special operators
+  * <p>With the default C++ operators for calculation and comparision you can do many things already, but there is more CRAVE offers you.
+  * In the module \ref operators there are many constraint operators that can be used to have even more functionality.
+  * Lets say we want our variable data have a random value from a countable set of values.
+  * This would look like this:</p>
+  * <code> crv_constraint c_data_range{ crave::inside(data(), std::set<int>{ -16, -8, 0, 2, 4, 8, 16 }) };</code>
+  * <p> The constraint now allows us to specify which values are actual possible and data should have.
+  * The operator crave::inside does the job.
+  * Special operators can be more.
+  * Just look around in \ref operators to see what CRAVE offers to you.</p>
+  *
+  * \section Conclusion
+  * Thats it!
+  * That was all the syntax for constraint definition is made of.
+  * If you need more examples of what is possible, see the examples.
+  * You can even enable and disable constraints or define them as soft constraints that might be violated if a solution can be found doing so.
+  */ 

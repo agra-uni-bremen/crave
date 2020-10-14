@@ -1,0 +1,50 @@
+= TODO List =
+
+== features for metaSMT 4 (future release)==
+ * Type save 
+ * Python Interface/bindings
+ * SMT-Lib 2
+ * Portfolio Solver (Any number of Solvers)
+ * Parallel/Distributed/Clustered solving [network]
+ * Typed Expression (automatic handling)
+ * extend documentation of available commands (SMT expressions, other)
+
+== features for metaSMT 3 (next release)==
+ * CNF-Parser /Solver Frontend [done]
+ * extend documentation of available commands (SMT expressions, other)
+ * Portfolio Solver (2 Threads) [done]
+ * SMT-Lib 2 File output [done, for Z3 2.18]
+ * Typed Expression -> TypedSymbol [done]
+ * Explicit Features [partial]
+ * API declaration an checking [done]
+
+== Future versions (maybe) ==
+ * Solver independent Syntax Trees
+ * SMT-LIB 1 Parser
+ * BitBlasting QF_BV to LIA (or other Logics)
+ * Pseudo Boolean SAT/Solvers
+ * Solver Checking (using a different Solver)
+ * Fuzzing
+ * eFMI ( easy Formal Methods Interface)
+
+== Finished Features ==
+ * support for Boolector (QF_BV, Core Logic) [done]
+ * support for Z3 (QF_BV, Core Logic) [done]
+ * support for MiniSAT (Core Logic) [done]
+ * support for SWORD (QF_BV, Logic) [done]
+ * support for Picosat (Logic) [done]
+ * support for BitBlastig QF_BV to Logic [done]
+ * compile time Solver selection (same api, different solvers) [done]
+
+ * README for installation
+ * install scripts for Solvers (s.a.)  [done]
+ * Example algorithm (Sudoku, Mastermind, etc) [done]
+ * Tool Paper [done]
+ * README/script to setup own projects [done]
+ 
+ * Cardinality Constraints [ done ]
+ * Constraint Groups [done]
+ * Constraint Stack [done]
+ * Array over Bitvector Theory [done]
+ * lazy expressions [done]
+

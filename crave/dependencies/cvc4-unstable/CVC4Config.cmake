@@ -1,0 +1,5 @@
+get_filename_component(CVC4_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
+set(CVC4_BIN_DIRS     ${CVC4_DIR}/bin )
+set(CVC4_INCLUDE_DIRS ${CVC4_DIR}/include )
+set(CVC4_INCLUDE_DIR  ${CVC4_INCLUDE_DIRS} )
+set(CVC4_LIBRARIES    ${CVC4_DIR}/lib/libcvc4.so )
