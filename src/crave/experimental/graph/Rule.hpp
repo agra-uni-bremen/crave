@@ -53,5 +53,5 @@ struct Rule {
 
   void gen();
 };
-}
-}
+}  // namespace graph
+}  // namespace crave

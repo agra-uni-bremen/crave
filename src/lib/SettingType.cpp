@@ -1,7 +1,7 @@
-#include "../crave/utils/SettingsType.hpp"
-
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/version.hpp>
+
+#include "../crave/utils/SettingsType.hpp"
 
 namespace crave {
 
@@ -69,4 +69,4 @@ std::string const& LoggerSetting::dirname() const { return dir_; }
 int LoggerSetting::s_level() const { return s_level_; }
 
 int LoggerSetting::filesize() const { return file_size_; }
-}
+}  // namespace crave

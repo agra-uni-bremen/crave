@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include <vector>
 #include <map>
+#include <vector>
 
-#include "VariableGenerator.hpp"
 #include "../ir/visitor/ReplaceVisitor.hpp"
+#include "VariableGenerator.hpp"
 
 namespace crave {
 

@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include <string>
 #include <map>
+#include <string>
 
+#include "Context.hpp"
 #include "UserConstraintType.hpp"
 #include "UserVectorConstraint.hpp"
-#include "Context.hpp"
 #include "visitor/FixWidthVisitor.hpp"
 
 namespace crave {

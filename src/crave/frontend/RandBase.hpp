@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+
 #include "Constraint.hpp"
 
 namespace crave {
@@ -22,7 +23,7 @@ class rand_base {
  public:
   /**
    * \brief Tries to find the next solution.
-   * 
+   *
    * The next solution can be found if there is a combination of values that meet all defined constraints.
    * It is possible to create contradicts with constraints.
    * In that case false is returned.
@@ -35,12 +36,12 @@ class rand_base {
    * @param vector of all values
    */
   virtual void gather_values(std::vector<int64_t>*) = 0;
-  
+
   /**
-   * \brief Gets the name of this object as a string. 
-   * 
+   * \brief Gets the name of this object as a string.
+   *
    * The name of the object is most likely the name of the class the object is made of.
-   * 
+   *
    * \return Name of this object as a string
    */
   virtual std::string obj_kind() const = 0;
@@ -52,9 +53,9 @@ class rand_base {
 class rand_obj_base : public rand_base {
  public:
   /**
-  * Adds a child object, should not be called by users
-  * @param rb child object
-  */
+   * Adds a child object, should not be called by users
+   * @param rb child object
+   */
   virtual void add_base_child(rand_base* rb) = 0;
 
   virtual std::string obj_kind() const { return "rand_obj"; }

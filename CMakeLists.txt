@@ -1,7 +1,7 @@
 project(crave)
 cmake_minimum_required(VERSION 2.8.9)
 
-set(${PROJECT_NAME}_CONFIG_DIR "share/${PROJECT_NAME}" CACHE PATH 
+set(${PROJECT_NAME}_CONFIG_DIR "share/${PROJECT_NAME}" CACHE PATH
   "where to install CMake and Make Config files")
 
 ############################################################
@@ -174,7 +174,7 @@ set(${PROJECT_NAME}_RPATH "")
 foreach(LIBPATH ${${PROJECT_NAME}_LIBS})
   get_filename_component(LIBDIR ${LIBPATH} PATH)
   LIST(APPEND ${PROJECT_NAME}_RPATH -Wl,-rpath=${LIBDIR})
-endforeach()  
+endforeach()
 string(REPLACE ";" " " ${PROJECT_NAME}_RPATH "${${PROJECT_NAME}_RPATH}")
 
 ## create CRAVE CMake make config file
@@ -191,16 +191,16 @@ file(WRITE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.pc
 "Name: ${PROJECT_NAME}
 Description: Constraint Solver library
 Cflags: -I${${PROJECT_NAME}_MINCLUDE} -D${${PROJECT_NAME}_MDEFS}
-Libs: ${${PROJECT_NAME}_MLIBS} 
+Libs: ${${PROJECT_NAME}_MLIBS}
 ")
 
 ## install
-INSTALL( FILES 
+INSTALL( FILES
 	${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
 	${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.py
 	${PROJECT_BINARY_DIR}/${PROJECT_NAME}.makefile
 	DESTINATION ${${PROJECT_NAME}_CONFIG_DIR})
-INSTALL( FILES 
+INSTALL( FILES
 	${PROJECT_BINARY_DIR}/${PROJECT_NAME}.pc
 	DESTINATION lib/pkgconfig/)
 
@@ -285,4 +285,4 @@ MARK_AS_ADVANCED(
 SET( CMAKE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING
   "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel Profiling."
   FORCE )
-  
+

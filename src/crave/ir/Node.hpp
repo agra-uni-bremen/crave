@@ -1,12 +1,11 @@
 // Copyright 2012-2016 The CRAVE developers, University of Bremen, Germany. All rights reserved.//
 #pragma once
 
-#include <boost/intrusive_ptr.hpp>
+#include <stdint.h>
 
+#include <boost/intrusive_ptr.hpp>
 #include <ostream>
 #include <set>
-
-#include <stdint.h>
 
 #include "visitor/NodeVisitor.hpp"
 

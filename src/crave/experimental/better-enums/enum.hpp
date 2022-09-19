@@ -173,11 +173,13 @@
                                              31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14,  \
                                              13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1))
 
-#define BETTER_ENUMS_ITERATE(X, f, l)                                                                             \
-  X(f, l, 0)                                                                                                      \
-  X(f, l, 1) X(f, l, 2) X(f, l, 3) X(f, l, 4) X(f, l, 5) X(f, l, 6) X(f, l, 7) X(f, l, 8) X(f, l, 9) X(f, l, 10)  \
-      X(f, l, 11) X(f, l, 12) X(f, l, 13) X(f, l, 14) X(f, l, 15) X(f, l, 16) X(f, l, 17) X(f, l, 18) X(f, l, 19) \
-          X(f, l, 20) X(f, l, 21) X(f, l, 22) X(f, l, 23)
+#define BETTER_ENUMS_ITERATE(X, f, l)                                                                              \
+  X(f, l, 0)                                                                                                       \
+  X(f, l, 1)                                                                                                       \
+  X(f, l, 2)                                                                                                       \
+  X(f, l, 3) X(f, l, 4) X(f, l, 5) X(f, l, 6) X(f, l, 7) X(f, l, 8) X(f, l, 9) X(f, l, 10) X(f, l, 11) X(f, l, 12) \
+      X(f, l, 13) X(f, l, 14) X(f, l, 15) X(f, l, 16) X(f, l, 17) X(f, l, 18) X(f, l, 19) X(f, l, 20) X(f, l, 21)  \
+          X(f, l, 22) X(f, l, 23)
 
 #endif  // #ifdef BETTER_ENUMS_MACRO_FILE else case
 
@@ -316,22 +318,19 @@ BETTER_ENUMS_CONSTEXPR_ inline char _to_lower_ascii(char c) {
 
 BETTER_ENUMS_CONSTEXPR_ inline bool _names_match(const char *stringizedName, const char *referenceName,
                                                  std::size_t index = 0) {
-  return _ends_name(stringizedName[index])
-             ? referenceName[index] == '\0'
-             : referenceName[index] == '\0' ? false : stringizedName[index] != referenceName[index]
-                                                          ? false
-                                                          : _names_match(stringizedName, referenceName, index + 1);
+  return _ends_name(stringizedName[index])               ? referenceName[index] == '\0'
+         : referenceName[index] == '\0'                  ? false
+         : stringizedName[index] != referenceName[index] ? false
+                                                         : _names_match(stringizedName, referenceName, index + 1);
 }
 
 BETTER_ENUMS_CONSTEXPR_ inline bool _names_match_nocase(const char *stringizedName, const char *referenceName,
                                                         std::size_t index = 0) {
-  return _ends_name(stringizedName[index])
-             ? referenceName[index] == '\0'
-             : referenceName[index] == '\0'
-                   ? false
-                   : _to_lower_ascii(stringizedName[index]) != _to_lower_ascii(referenceName[index])
-                         ? false
-                         : _names_match_nocase(stringizedName, referenceName, index + 1);
+  return _ends_name(stringizedName[index]) ? referenceName[index] == '\0'
+         : referenceName[index] == '\0'    ? false
+         : _to_lower_ascii(stringizedName[index]) != _to_lower_ascii(referenceName[index])
+             ? false
+             : _names_match_nocase(stringizedName, referenceName, index + 1);
 }
 
 inline void _trim_names(const char *const *raw_names, const char **trimmed_names, char *storage, std::size_t count) {
@@ -504,24 +503,24 @@ struct _initialize_at_program_start {
                                                                                                                        \
   BETTER_ENUMS_CONSTEXPR_ inline Enum::_optional_index Enum::_from_value_loop(Enum::_integral value,                   \
                                                                               std::size_t index) {                     \
-    return index == _size() ? _optional_index() : BETTER_ENUMS_NS(Enum)::_value_array[index]._value == value           \
-                                                      ? _optional_index(index)                                         \
-                                                      : _from_value_loop(value, index + 1);                            \
+    return index == _size()                                             ? _optional_index()                            \
+           : BETTER_ENUMS_NS(Enum)::_value_array[index]._value == value ? _optional_index(index)                       \
+                                                                        : _from_value_loop(value, index + 1);          \
   }                                                                                                                    \
                                                                                                                        \
   BETTER_ENUMS_CONSTEXPR_ inline Enum::_optional_index Enum::_from_string_loop(const char *name, std::size_t index) {  \
     return index == _size() ? _optional_index()                                                                        \
-                            : ::better_enums::_names_match(BETTER_ENUMS_NS(Enum)::_raw_names()[index], name)           \
-                                  ? _optional_index(index)                                                             \
-                                  : _from_string_loop(name, index + 1);                                                \
+           : ::better_enums::_names_match(BETTER_ENUMS_NS(Enum)::_raw_names()[index], name)                            \
+               ? _optional_index(index)                                                                                \
+               : _from_string_loop(name, index + 1);                                                                   \
   }                                                                                                                    \
                                                                                                                        \
   BETTER_ENUMS_CONSTEXPR_ inline Enum::_optional_index Enum::_from_string_nocase_loop(const char *name,                \
                                                                                       std::size_t index) {             \
     return index == _size() ? _optional_index()                                                                        \
-                            : ::better_enums::_names_match_nocase(BETTER_ENUMS_NS(Enum)::_raw_names()[index], name)    \
-                                  ? _optional_index(index)                                                             \
-                                  : _from_string_nocase_loop(name, index + 1);                                         \
+           : ::better_enums::_names_match_nocase(BETTER_ENUMS_NS(Enum)::_raw_names()[index], name)                     \
+               ? _optional_index(index)                                                                                \
+               : _from_string_nocase_loop(name, index + 1);                                                            \
   }                                                                                                                    \
                                                                                                                        \
   BETTER_ENUMS_CONSTEXPR_ inline Enum::_integral Enum::_to_integral() const { return _integral(_value); }              \
@@ -802,10 +801,10 @@ struct map {
   }
 
   BETTER_ENUMS_CONSTEXPR_ optional<Enum> to_enum_nothrow(T value, size_t index = 0) const {
-    return index >= Enum::_size() ? optional<Enum>() : Compare::less(_f(Enum::_values()[index]), value) ||
-                                                               Compare::less(value, _f(Enum::_values()[index]))
-                                                           ? to_enum_nothrow(value, index + 1)
-                                                           : Enum::_values()[index];
+    return index >= Enum::_size() ? optional<Enum>()
+           : Compare::less(_f(Enum::_values()[index]), value) || Compare::less(value, _f(Enum::_values()[index]))
+               ? to_enum_nothrow(value, index + 1)
+               : Enum::_values()[index];
   }
 
  private:
@@ -826,7 +825,7 @@ template <typename T, typename Enum>
 struct only_if_enum {
   typedef T type;
 };
-}
+}  // namespace better_enums
 
 template <typename Char, typename Traits, typename Enum>
 inline typename better_enums::only_if_enum<std::basic_ostream<Char, Traits>, typename Enum::_enumerated>::type &

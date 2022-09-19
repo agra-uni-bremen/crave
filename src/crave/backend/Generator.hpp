@@ -4,38 +4,39 @@
 
 #include <string>
 #include <vector>
+
+#include "../backend/VectorGenerator.hpp"
 #include "../ir/UserConstraint.hpp"
 #include "VariableGenerator.hpp"
-#include "../backend/VectorGenerator.hpp"
 
 namespace crave {
 
 /*!
  * \brief Backend generator to generate random values with constraints.
- * 
+ *
  * Try to avoid usage of this class directly.
  * CRAVE usually uses this class internally.
  */
 struct Generator {
  public:
   Generator()
-    : constr_mng_(),
-      var_ctn_(variable_container()),
-      ctx_(var_ctn_),
-      var_gen_(new VariableGenerator(*var_ctn_)),
-      var_cov_gen_(*var_ctn_),
-      vec_gen_(),
-      covered_(false) {}
+      : constr_mng_(),
+        var_ctn_(variable_container()),
+        ctx_(var_ctn_),
+        var_gen_(new VariableGenerator(*var_ctn_)),
+        var_cov_gen_(*var_ctn_),
+        vec_gen_(),
+        covered_(false) {}
 
   template <typename Expr>
   explicit Generator(Expr expr)
-    : constr_mng_(),
-      var_ctn_(variable_container()),
-      ctx_(var_ctn_),
-      var_gen_(new VariableGenerator(*var_ctn_)),
-      var_cov_gen_(*var_ctn_),
-      vec_gen_(),
-      covered_(false) {
+      : constr_mng_(),
+        var_ctn_(variable_container()),
+        ctx_(var_ctn_),
+        var_gen_(new VariableGenerator(*var_ctn_)),
+        var_cov_gen_(*var_ctn_),
+        vec_gen_(),
+        covered_(false) {
     (*this)(expr);
   }
 

@@ -1,7 +1,8 @@
 #include "../crave/ir/ConstraintPartitioner.hpp"
-#include "../crave/utils/Logging.hpp"
 
 #include <algorithm>
+
+#include "../crave/utils/Logging.hpp"
 
 namespace crave {
 
@@ -14,9 +15,11 @@ void ConstraintPartitioner::reset() {
 
 void ConstraintPartitioner::mergeConstraints(const ConstraintManager& mng) {
   LOG(INFO) << "Merge set " << mng.id_ << " with set(s)";
-  for(unsigned id : constr_mngs_) { LOG(INFO) << " " << id; }
+  for (unsigned id : constr_mngs_) {
+    LOG(INFO) << " " << id;
+  }
   constr_mngs_.insert(mng.id_);
-  for(ConstraintPtr c : mng.constraints_) {
+  for (ConstraintPtr c : mng.constraints_) {
     if (c->isEnabled()) {
       if (c->isVectorConstraint())
         vec_constraints_.push_back(std::static_pointer_cast<UserVectorConstraint>(c));
@@ -33,15 +36,21 @@ void ConstraintPartitioner::partition() {
     partitions_.push_back(cp);
   }
   LOG(INFO) << "Partition results of set(s)";
-  for(unsigned id : constr_mngs_) { LOG(INFO) << " " << id; }
+  for (unsigned id : constr_mngs_) {
+    LOG(INFO) << " " << id;
+  }
   LOG(INFO) << ": ";
 
   LOG(INFO) << "  " << vec_constraints_.size() << " vector constraint(s):";
-  for(VectorConstraintPtr c : vec_constraints_) { LOG(INFO) << "   " << c->name(); }
+  for (VectorConstraintPtr c : vec_constraints_) {
+    LOG(INFO) << "   " << c->name();
+  }
 
   LOG(INFO) << "  " << partitions_.size() << " constraint partition(s):";
   unsigned cnt = 0;
-  for(ConstraintPartition & cp : partitions_) { LOG(INFO) << "    #" << ++cnt << ": " << cp; }
+  for (ConstraintPartition& cp : partitions_) {
+    LOG(INFO) << "    #" << ++cnt << ": " << cp;
+  }
 }
 
 std::vector<ConstraintPartition>& ConstraintPartitioner::getPartitions() { return partitions_; }
@@ -74,4 +83,4 @@ void ConstraintPartitioner::maximizePartition(ConstraintPartition* cp, Constrain
     if (!changed) break;
   }
 }
-}
+}  // namespace crave

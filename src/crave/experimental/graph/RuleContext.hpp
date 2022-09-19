@@ -2,6 +2,7 @@
 #pragma once
 
 #include <boost/proto/proto.hpp>
+
 #include "Rule.hpp"
 
 namespace crave {
@@ -9,7 +10,7 @@ namespace crave {
 namespace graph {
 
 namespace proto = boost::proto;
-    
+
 typedef std::shared_ptr<Rule> RulePtr;
 typedef proto::terminal<Rule>::type rule_type;
 
@@ -112,5 +113,5 @@ struct RuleContext : proto::callable_context<RuleContext, proto::null_context> {
   std::set<std::string> m_assigned_nodes;
   NodePtr m_root;
 };
-}
-}
+}  // namespace graph
+}  // namespace crave

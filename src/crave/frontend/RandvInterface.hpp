@@ -24,8 +24,8 @@ namespace crave {
   }
 
 /**
-* arithmetic operators
-*/
+ * arithmetic operators
+ */
 #define RANDV_ARITHMETIC_INTERFACE(Typename) \
  public:                                     \
   randv<Typename>& operator++() {            \
@@ -111,7 +111,7 @@ template <>
 struct randv<bool> : public randv_base<bool> {
   RANDV_COMMON_INTERFACE(bool);
   RANDV_PRIM_INTERFACE(bool);
-//  RANDV_BITWISE_INTERFACE(bool);
+  //  RANDV_BITWISE_INTERFACE(bool);
 };
 
 /**
@@ -142,10 +142,9 @@ RANDV_INTEGER_TYPE(unsigned long long);
 
 /*!
  *\ingroup oldAPI
- *\deprecated As all old API entities, it is recommended to use the \ref newAPI "new API". The equivalent in the new API is \ref crave::crv_variable
- *\struct crave::randv
- *\brief A randomizable variable of type T.
- * 
+ *\deprecated As all old API entities, it is recommended to use the \ref newAPI "new API". The equivalent in the new API
+ *is \ref crave::crv_variable \struct crave::randv \brief A randomizable variable of type T.
+ *
  * <p>This struct is the type for all randomizable variables of type T.
  * Default the following types of C++ are supported:
  * <ul>
@@ -164,5 +163,7 @@ RANDV_INTEGER_TYPE(unsigned long long);
  * </ul>
  * It is also possible to randomize enumerations.
  * To randomize an enumeration, you must previously declare it with the macro \ref CRAVE_ENUM </p><p>
- * A randv<T> also supports basic binary and arithmetic operations +=,-=,*=,/=,=,|=,&=,%=,<<=,>>=,^=. A very important operator is the operator (). This operator can be used to get a writereference to the randv which is used in the definition of constraints. For details see crave::Constraint</p>
-*/
+ * A randv<T> also supports basic binary and arithmetic operations +=,-=,*=,/=,=,|=,&=,%=,<<=,>>=,^=. A very important
+ *operator is the operator (). This operator can be used to get a writereference to the randv which is used in the
+ *definition of constraints. For details see crave::Constraint</p>
+ */

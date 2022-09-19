@@ -2,18 +2,18 @@
 
 #pragma once
 
+#include <string>
+
 #include "ConstraintBase.hpp"
 #include "Expression.hpp"
 #include "Object.hpp"
-
-#include <string>
 
 namespace crave {
 
 /*!
  * \ingroup newAPI
  * \brief Possible types of constraints.
- * 
+ *
  * For details view crv_constraint_.
  */
 enum ConstraintType { hard, soft };
@@ -21,7 +21,7 @@ enum ConstraintType { hard, soft };
 /**
  * \ingroup newAPI
  * \brief Class for constraints in the new API.
- * 
+ *
  * <p>
  * A constraint can be either a hard or a soft constraint.
  * A hard constraint must always be satisfied by the generated values.
@@ -35,9 +35,9 @@ class crv_constraint_ : public crv_constraint_base {
  public:
   /**
    * \brief Constructor using a name for this constraint.
-   * 
+   *
    * If no name is given, hard_cstr is used for a hard constraint and soft_cstr for a soft constraint.
-   * 
+   *
    * \param crv_object_name Name of the constraint
    */
   crv_constraint_(crv_object_name = (type == ConstraintType::hard ? "hard_cstr" : "soft_cstr")) {}
@@ -50,9 +50,9 @@ class crv_constraint_ : public crv_constraint_base {
 
   /**
    * \brief Constructor with a list of expressions.
-   * 
+   *
    * Constructs a constraint with the default name and the given expressions.
-   * 
+   *
    * \param exprs Constraint expressions
    */
   template <typename... Exprs>
@@ -62,9 +62,9 @@ class crv_constraint_ : public crv_constraint_base {
 
   /**
    * \brief Constructor with a list of expressions and a name.
-   * 
+   *
    * Constructs a constraint with the given name and the given expressions.
-   * 
+   *
    * \param name Name of the constraint as a crv_object_name
    * \param expers Constraint expressions
    */
@@ -75,9 +75,9 @@ class crv_constraint_ : public crv_constraint_base {
 
   /**
    * \brief Constructor with a list of expressions and a name.
-   * 
+   *
    * Constructs a constraint with the given name and the given expressions.
-   * 
+   *
    * \param name Name of the constraint as a char array
    * \param expers Constraint expressions
    */
@@ -86,10 +86,10 @@ class crv_constraint_ : public crv_constraint_base {
 
   /**
    * \brief Assigns another constraint to this constraint.
-   * 
+   *
    * All expressions from the other constraint are copied into this constraint.
    * Both constraints are the same afterwards.
-   * 
+   *
    * \param constraint The other constraint
    * \return Reference to this constraint
    */
@@ -101,9 +101,9 @@ class crv_constraint_ : public crv_constraint_base {
 
   /**
    * \brief Adds a constraint to this constraint.
-   * 
+   *
    * This basically creates a conjunction of two constraints and saves the result in this constraint.
-   * 
+   *
    * \param c The other constraint of the conjunction
    * \return Reference to this constraint
    */

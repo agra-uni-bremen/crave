@@ -5,22 +5,21 @@
 
 #ifdef metaSMT_USE_YICES2
 
-#include "../crave/ir/visitor/metaSMTNodeVisitor.hpp"
-#include "../crave/backend/FactoryMetaSMT.hpp"
-#include "metaSMTNodeVisitorImpl.hpp"
-
 #include <metaSMT/DirectSolver_Context.hpp>
 
-#define DEFINE_SOLVER(SOLVER_ENUM, SOLVER_T)                                                     \
-  namespace crave {                                                                              \
-  template <>                                                                                    \
-  struct FactorySolver<SOLVER_ENUM> {                                                            \
-    typedef metaSMT::DirectSolver_Context<SOLVER_T> SolverType;                                  \
-    static bool isDefined() { return true; }                                                     \
-    static metaSMTVisitor* getNewInstance() { return new metaSMTVisitorImpl<SolverType>(); }     \
-  };                                                                                             \
-  }  // namespace crave
+#include "../crave/backend/FactoryMetaSMT.hpp"
+#include "../crave/ir/visitor/metaSMTNodeVisitor.hpp"
+#include "metaSMTNodeVisitorImpl.hpp"
 
+#define DEFINE_SOLVER(SOLVER_ENUM, SOLVER_T)                                                 \
+  namespace crave {                                                                          \
+  template <>                                                                                \
+  struct FactorySolver<SOLVER_ENUM> {                                                        \
+    typedef metaSMT::DirectSolver_Context<SOLVER_T> SolverType;                              \
+    static bool isDefined() { return true; }                                                 \
+    static metaSMTVisitor* getNewInstance() { return new metaSMTVisitorImpl<SolverType>(); } \
+  };                                                                                         \
+  }  // namespace crave
 
 #include <metaSMT/backend/Yices2.hpp>
 DEFINE_SOLVER(crave::YICES2, metaSMT::solver::Yices2);
@@ -28,5 +27,3 @@ DEFINE_SOLVER(crave::YICES2, metaSMT::solver::Yices2);
 #undef DEFINE_SOLVER
 
 #endif
-
-

@@ -2,27 +2,26 @@
 
 #pragma once
 
-#pragma warning (disable : 4804)
+#pragma warning(disable : 4804)
 
 #include <boost/intrusive_ptr.hpp>
-#include <boost/proto/core.hpp>
-#include <boost/proto/debug.hpp>
 #include <boost/proto/context/callable.hpp>
 #include <boost/proto/context/null.hpp>
+#include <boost/proto/core.hpp>
+#include <boost/proto/debug.hpp>
 #include <boost/range/value_type.hpp>
-
 #include <limits>
 #include <map>
 #include <set>
 #include <utility>
 #include <vector>
 
-#include "../frontend/bitsize_traits.hpp"
-#include "../frontend/Constraint.hpp"
 #include "../frontend/AssignResultToRef.hpp"
-#include "VariableContainer.hpp"
+#include "../frontend/Constraint.hpp"
+#include "../frontend/bitsize_traits.hpp"
 #include "Node.hpp"
 #include "ReferenceExpression.hpp"
+#include "VariableContainer.hpp"
 
 namespace crave {
 
@@ -266,7 +265,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
 
     std::set<Constant> constants;
     distribution<Integer> dist;
-    for(CollectionEntry const & i : boost::proto::value(c)) {
+    for (CollectionEntry const& i : boost::proto::value(c)) {
       constants.insert(Constant(i, width, sign));
       dist(weighted_value<Integer>(i, 1));
     }
@@ -281,7 +280,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
     dist_ref_to_var_map[id] = var_term.id();
     return new LogicalAndOpr(val_equal_tmp, tmp_inside);
   }
-  
+
   template <typename Integer, typename CollectionTerm>
   result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_inside>::type const&,
                          Variable<Integer> const& var_term, CollectionTerm const& c) {
@@ -293,7 +292,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
 
     std::set<Constant> constants;
     distribution<Integer> dist;
-    for(CollectionEntry const & i : boost::proto::value(c)) {
+    for (CollectionEntry const& i : boost::proto::value(c)) {
       constants.insert(Constant(i, width, sign));
       dist(weighted_value<Integer>(i, 1));
     }
@@ -322,7 +321,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
     dist_references_.push_back(std::make_pair(id, ref_expr));
 
     result_type in_ranges;
-    for(weighted_range<DistInt> const & r : dist.ranges()) {
+    for (weighted_range<DistInt> const& r : dist.ranges()) {
       result_type left(new Constant(r.left_, width, sign));
       result_type right(new Constant(r.right_, width, sign));
       result_type left_cond(new LessEqualOpr(left, tmp_var));
@@ -336,8 +335,8 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
     dist_ref_to_var_map[id] = var_term.id();
     return dist.ranges().size() > 0 ? new LogicalAndOpr(var_equal_tmp, in_ranges) : var_equal_tmp;
   }
-  
-   template <typename Integer, typename DistInt>
+
+  template <typename Integer, typename DistInt>
   result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_dist>::type const&,
                          Variable<Integer> const& var_term, distribution_tag<DistInt> const& dist_expr) {
     distribution<DistInt> const& dist = boost::proto::value(dist_expr);
@@ -350,7 +349,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
     dist_references_.push_back(std::make_pair(id, ref_expr));
 
     result_type in_ranges;
-    for(weighted_range<DistInt> const & r : dist.ranges()) {
+    for (weighted_range<DistInt> const& r : dist.ranges()) {
       result_type left(new Constant(r.left_, width, sign));
       result_type right(new Constant(r.right_, width, sign));
       result_type left_cond(new LessEqualOpr(left, tmp_var));
@@ -392,7 +391,7 @@ struct Context : boost::proto::callable_context<Context, boost::proto::null_cont
     }
     return new Bitslice(boost::proto::eval(var_term, *this), rb, lb);
   }
-  
+
   template <typename Integer1, typename Integer2, typename Integer3>
   result_type operator()(boost::proto::tag::function, boost::proto::terminal<operator_bitslice>::type const&,
                          Integer1 const& r, Integer2 const& l, Variable<Integer3> const& var_term) {

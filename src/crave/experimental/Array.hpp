@@ -13,7 +13,7 @@ namespace crave {
 /**
  * \ingroup newAPI
  * \brief Class for an N-element array with random values of type T.
- * 
+ *
  * This class can be used as an array of random variables and should be preferred to the
  * definition 'crv_variable<T> array[N]' as it comes with CRAVE functionality.
  */
@@ -45,9 +45,9 @@ class crv_array : public crv_object {
 
   /**
    * \brief Gets the sum of the array elements as a CRAVE expression.
-   * 
+   *
    * The expression can be used in a constraint.
-   * 
+   *
    * \return sum expression of the elements in the array
    */
   expression sum() {

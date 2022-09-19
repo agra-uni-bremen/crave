@@ -3,8 +3,8 @@
 #pragma once
 
 #include <boost/property_tree/ptree.hpp>
-#include <string>
 #include <set>
+#include <string>
 
 namespace crave {
 

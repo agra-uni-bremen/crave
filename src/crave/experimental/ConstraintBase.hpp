@@ -18,23 +18,23 @@ class crv_constraint_base : public crv_object {
 
  public:
   /**
-  * \brief Get all expressions of this constraint.
-  * \return The expressions of this constraint as a list.
-  */
+   * \brief Get all expressions of this constraint.
+   * \return The expressions of this constraint as a list.
+   */
   virtual expression_list const& expr_list() const = 0;
 
   std::string obj_kind() const override final;
 
   /*!
    * \brief Activates this constraint.
-   * 
+   *
    * An activated constraint will be considered during randomization.
    */
   void activate();
 
   /*!
    * \brief Deactivates this constraint.
-   * 
+   *
    * A deactivated constraint will not be considered during randomization.
    */
   void deactivate();
@@ -59,4 +59,4 @@ class crv_constraint_base : public crv_object {
  protected:
   bool active_;
 };
-}
+}  // namespace crave

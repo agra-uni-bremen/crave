@@ -2,10 +2,9 @@
 
 #pragma once
 
-#include "Variable.hpp"
-
 #include "../frontend/Distribution.hpp"
 #include "../frontend/bitsize_traits_sysc.hpp"
+#include "Variable.hpp"
 
 namespace crave {
 

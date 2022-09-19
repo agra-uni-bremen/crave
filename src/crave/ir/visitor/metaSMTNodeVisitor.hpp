@@ -3,14 +3,13 @@
 #pragma once
 
 #include <boost/intrusive_ptr.hpp>
-
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
-#include "../../frontend/RandomBase.hpp"
 #include "../../frontend/AssignResult.hpp"
+#include "../../frontend/RandomBase.hpp"
 #include "../Node.hpp"
 #include "NodeVisitor.hpp"
 

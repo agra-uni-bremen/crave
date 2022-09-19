@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include <set>
-#include <string>
 #include <list>
 #include <memory>
+#include <set>
+#include <string>
 
 #include "Node.hpp"
 

@@ -19,7 +19,8 @@ struct read_ref_tag : public var_tag<value_type> {
 
 /**
  * ReadReference<T> contains a symbolic variable and a reference to a variable of type T.
- * The value of the symbolic variable will be constrained to be the value of the reference when constrain solving is invoked.
+ * The value of the symbolic variable will be constrained to be the value of the reference when constrain solving is
+ * invoked.
  */
 template <typename value_type_>
 struct ReadReference : public Constraint<typename boost::proto::terminal<read_ref_tag<value_type_> >::type> {
@@ -44,12 +45,11 @@ struct ReadReference : public Constraint<typename boost::proto::terminal<read_re
 /**
  * \ingroup operators
  * \brief Creates a read reference to a non-CRAVE variable.
- * 
+ *
  * This operator creates a reference to normal C++ variable.
- * The difference of using var and crave::reference(var) in constraint definition is the value of var that will be used in constraint solving.
- * In the former case, the value at the time of constraint definition will be used.
- * In the latter case, the current value at the time of constraint solving will be used.
- * \param ref Variable to refer to
+ * The difference of using var and crave::reference(var) in constraint definition is the value of var that will be
+ * used in constraint solving. In the former case, the value at the time of constraint definition will be used. In the
+ * latter case, the current value at the time of constraint solving will be used. \param ref Variable to refer to
  * \return ReadReference for constraint solving to this variable
  */
 template <typename T>

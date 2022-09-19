@@ -14,7 +14,7 @@ struct VariableSolver {
   friend struct VariableGenerator;
 
   VariableSolver(const VariableContainer& vcon, const ConstraintPartition& cp);
-  virtual ~VariableSolver(){}
+  virtual ~VariableSolver() {}
   virtual bool solve() = 0;
 
   template <typename T>

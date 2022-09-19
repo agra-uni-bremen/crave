@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include <random>
 #include <limits>
-#include <vector>
+#include <random>
 #include <stdexcept>
-	
+#include <vector>
+
+#include "../RandomSeedManager.hpp"
 #include "ConstraintType.hpp"
 #include "WeightedRange.hpp"
-#include "../RandomSeedManager.hpp"
 
 namespace crave {
 
@@ -46,7 +46,7 @@ unsigned char uniformly_distributed_value(unsigned char const& left, unsigned ch
  * \ingroup oldAPI
  * \ingroup newAPI
  * \brief Distribution of values to used in constraints.
- * 
+ *
  * This class allows you to create a distribution.
  * You can use crave::dist operator to force a variable to be inside a distribution.
  * A distribution is defined by ranges.
@@ -56,24 +56,24 @@ template <typename T>
 struct distribution {
   /*!
    * \brief Defines an empty distribution.
-   * 
+   *
    * An empty distribution with no ranges corresponds to the whole value range of the base type T.
    */
   distribution() : ranges_() {}
 
   /*!
    * \brief Defines a distribution with a weighted range
-   * 
+   *
    * A weighted range uses weights to define which values should occur more often.
    * See crave::weighted_range for details.
-   * 
+   *
    * \param range weighted range for distribution
    */
   distribution(const weighted_range<T>& range) { addRange(range); }
 
   /**
    * \brief Adds another range to the distribution.
-   * 
+   *
    * \param range A weighted range to add to this distribution
    * \return reference to this distribution
    */
@@ -84,10 +84,10 @@ struct distribution {
 
   /**
    * \brief Creates a distribution to use in constraints.
-   * 
+   *
    * This method creates a distribution_tag<T> which is recognized by the constraint frontend.
    * Typically this is an input argument for crave::dist.
-   * 
+   *
    * \param range A (weighted) range to create a distribution of.
    * \return distribution_tag<T> for constraint definition
    */
@@ -95,10 +95,10 @@ struct distribution {
 
   /**
    * \brief Creates a simple distribution with given left and right bound.
-   * 
+   *
    * This method creates a distribution_tag<T> which is recognized by the constraint frontend.
    * It internally creates an equally distributed range from left to right bound.
-   * 
+   *
    * \param left left bound of the range
    * \param right right bound of the range
    * \return distribution_tag<T> for constraint definition
@@ -120,9 +120,9 @@ struct distribution {
 
   /**
    * \brief Generate next random distribution value.
-   * 
+   *
    * If no ranges exist for this distribution, an uniform distribution over all possible values of T is used.
-   * 
+   *
    * \return T Next random value based on specified weights of ranges.
    */
   T nextValue() const {

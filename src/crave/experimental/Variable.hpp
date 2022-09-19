@@ -2,10 +2,9 @@
 
 #pragma once
 
-#include "VariableBase.hpp"
-
 #include "../frontend/Distribution.hpp"
 #include "../ir/UserExpression.hpp"
+#include "VariableBase.hpp"
 
 namespace crave {
 
@@ -13,7 +12,7 @@ namespace crave {
  * \ingroup newAPI
  * \brief Creates a distribution_tag to be used directly in constraints from a single weighted range.
  * Convenient function, which calls distribution::create.
- * 
+ *
  * \param range a weighted range.
  * \return A distribution_tag of a distribution to be used in constraints.
  */
@@ -25,9 +24,10 @@ distribution_tag<T> make_distribution(weighted_range<T> const& range) {
 /**
  * \ingroup newAPI
  * \brief Creates a distribution_tag to be used directly in constraints from the given ranges.
- * 
- * Convenient function, which should be preferred to chaining calls of distribution::create and distribution::operator().
- * 
+ *
+ * Convenient function, which should be preferred to chaining calls of distribution::create and
+ * distribution::operator().
+ *
  * \param range the first range.
  * \param args the following ranges.
  * \return A distribution_tag of a distribution to be used in constraints.
@@ -136,7 +136,7 @@ distribution_tag<T> make_distribution(weighted_range<T> const& range, Args... ar
 /*!
  *\ingroup newAPI
  *\brief A randomizable variable of type T in new API.
- * 
+ *
  * <p>This class is the type for all randomizable variables of type T.
  * Default the following types of C++ are supported:
  * <ul>
@@ -155,15 +155,15 @@ distribution_tag<T> make_distribution(weighted_range<T> const& range, Args... ar
  * </ul>
  * It is also possible to randomize enumerations.
  * To randomize an enumeration, you must previously declare it with the macro \ref CRAVE_BETTER_ENUM </p><p>
- * A crv_variable<T> also supports basic binary and arithmetic operations +=,-=,*=,/=,=,|=,&=,%=,<<=,>>=,^=. 
- * A very important operator is the operator (). 
+ * A crv_variable<T> also supports basic binary and arithmetic operations +=,-=,*=,/=,=,|=,&=,%=,<<=,>>=,^=.
+ * A very important operator is the operator ().
  * This operator can be used to get a WriteReference which is to be used in the definition of constraints.
  * For details see crave::crv_constraint</p><p>
- * For coverage aspects there is a method named bind() for a crv_variable. 
+ * For coverage aspects there is a method named bind() for a crv_variable.
  * Bind takes another crv_variable as a parameter.
  * If two variables are bound together, they share the same value.
  * </p>
-*/ 
+ */
 template <typename T, typename Enable = void>
 class crv_variable {};
 

@@ -79,5 +79,5 @@ struct ToDotVisitor : NodeVisitor {
   void beginSubgraph(const char* name, const char* color, const char* style);
   void endSubgraph();
 };
-};
-};
+};  // namespace graph
+};  // namespace crave

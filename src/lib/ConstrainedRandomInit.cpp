@@ -2,8 +2,8 @@
 
 #if (_MSC_VER >= 1900)
 
-#include <experimental/filesystem> // C++-standard header file name
-#include <filesystem> // Microsoft-specific implementation header file name
+#include <experimental/filesystem>  // C++-standard header file name
+#include <filesystem>               // Microsoft-specific implementation header file name
 namespace fs = std::experimental::filesystem::v1;
 
 #else
@@ -16,8 +16,8 @@ namespace fs = boost::filesystem;
 #include <string>
 
 #include "../crave/ConstrainedRandom.hpp"
-#include "../crave/utils/Settings.hpp"
 #include "../crave/utils/Logging.hpp"
+#include "../crave/utils/Settings.hpp"
 
 namespace crave {
 
@@ -44,18 +44,18 @@ void init(std::string const& cfg_file) {
   if (!fs::exists(fs_log_dir)) fs::create_directory(fs_log_dir);
 
 #ifdef CRAVE_HAVE_GLOG
- // initalize glog
- FLAGS_log_dir = settings.dirname();
- FLAGS_max_log_size = settings.filesize();
- FLAGS_minloglevel = settings.s_level();
- FLAGS_logtostderr = false;
- FLAGS_logbufsecs = 0;
+  // initalize glog
+  FLAGS_log_dir = settings.dirname();
+  FLAGS_max_log_size = settings.filesize();
+  FLAGS_minloglevel = settings.s_level();
+  FLAGS_logtostderr = false;
+  FLAGS_logbufsecs = 0;
 
- static bool initialized = false;
- if (!initialized) {
-   google::InitGoogleLogging(settings.filename().c_str());
-   initialized = true;
- }
+  static bool initialized = false;
+  if (!initialized) {
+    google::InitGoogleLogging(settings.filename().c_str());
+    initialized = true;
+  }
 #else
   logging_severity = settings.s_level();
 #endif

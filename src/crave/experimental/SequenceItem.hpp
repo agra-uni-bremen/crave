@@ -12,16 +12,16 @@ struct Generator;
 /**
  * \ingroup newAPI
  * \brief Base class for all randomizable objects of CRAVE.
- * 
- * All classes whose objects should be randomized with CRAVE must extends this class. 
+ *
+ * All classes whose objects should be randomized with CRAVE must extends this class.
  * It contains basic functionality and data necessary for randomzation.
  * You can define as members crv_variable to be randomized and crv_constraint for constraints to be randomized.
  */
 class crv_sequence_item : public crv_object {
  public:
-   /*!
-    * \brief Empty constructor.
-    */
+  /*!
+   * \brief Empty constructor.
+   */
   crv_sequence_item();
 
   /**
@@ -36,10 +36,10 @@ class crv_sequence_item : public crv_object {
 
   /**
    * \brief Randomize variables with extra inline constraints.
-   * 
+   *
    * Adds more constraints that should be used to find the next solution for the random variables.
    * This methods works like randomize() except it takes further inline constraints into consideration.
-   * 
+   *
    * \param exprs extra constraints to use for constraint solving
    * \return true if a solution is found, false otherwise.
    */
@@ -51,10 +51,10 @@ class crv_sequence_item : public crv_object {
 
   /**
    * \brief Hints CRAVE to cover a given covergroup.
-   * 
+   *
    * This method can be used to hint CRAVE which coverage goals exist.
    * CRAVE tries to find a solution for all unhit crv_coverpoint that are inside the given crv_covergroup.
-   * 
+   *
    * \param group The crv_covergroup that should be fully covered by CRAVE.
    */
   void goal(crv_covergroup& group);
@@ -68,4 +68,4 @@ class crv_sequence_item : public crv_object {
   bool built_;
   bool cloned_;
 };
-}
+}  // namespace crave

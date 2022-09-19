@@ -1,6 +1,7 @@
 // Copyright 2012-2016 The CRAVE developers, University of Bremen, Germany. All rights reserved.//
 
 #include "../crave/frontend/Operators.hpp"
+
 #include <ostream>
 
 namespace crave {
@@ -53,4 +54,4 @@ OUT& operator<<(OUT& out, operator_bitslice const&) {
   return out << "bitslice";
 }
 template std::ostream& operator<<(std::ostream& out, operator_bitslice const& tag);
-}
+}  // namespace crave

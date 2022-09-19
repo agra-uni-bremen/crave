@@ -2,14 +2,14 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
+
+#include "../ir/UserExpression.hpp"
+#include "../utils/Evaluator.hpp"
 #include "Expression.hpp"
 #include "Object.hpp"
 #include "Variable.hpp"
-#include "../ir/UserExpression.hpp"
-#include "../utils/Evaluator.hpp"
-
-#include <string>
-#include <vector>
 
 namespace crave {
 
@@ -17,7 +17,7 @@ class crv_transition_bin;
 
 /**
  * \brief A state (or node) of a transition checking FSM used by crv_transition_bin
- * 
+ *
  * Each statement of a definition of a transition is translated into a FSM.
  * One statement is exactly one node in this FSM.
  * The logic to traverse this FSM is contained in crv_transition_bin.
@@ -25,7 +25,7 @@ class crv_transition_bin;
 struct crv_transition_fsm_state : std::enable_shared_from_this<crv_transition_fsm_state> {
   friend class crv_transition_bin;
   friend class crv_coverpoint;
-  
+
   //****************************
   // User visible continue-functions
   //****************************
@@ -75,7 +75,7 @@ struct crv_transition_fsm_state : std::enable_shared_from_this<crv_transition_fs
     }
     return nextNode;
   }
-  
+
   //*1
   template <typename Expr>
   static std::shared_ptr<crv_transition_fsm_state> next(std::shared_ptr<crv_transition_fsm_state> node, Expr expr) {
@@ -85,14 +85,14 @@ struct crv_transition_fsm_state : std::enable_shared_from_this<crv_transition_fs
   //*
   template <unsigned int N, unsigned int M = N, typename Expr>
   static std::shared_ptr<crv_transition_fsm_state> consecutive_repeat(std::shared_ptr<crv_transition_fsm_state> node,
-                                                               Expr expr) {
+                                                                      Expr expr) {
     return addState<N, M>(node, expr);
   }
 
   //->
   template <unsigned int N, unsigned int M = N, typename Expr>
   static std::shared_ptr<crv_transition_fsm_state> goto_repeat(std::shared_ptr<crv_transition_fsm_state> node,
-                                                                      Expr expr) {
+                                                               Expr expr) {
     return addState<N, M>(node, expr, GOTO);
   }
 
@@ -104,8 +104,8 @@ struct crv_transition_fsm_state : std::enable_shared_from_this<crv_transition_fs
   }
 
  private:
-  std::shared_ptr<crv_transition_fsm_state> succ; // successor state
-  std::shared_ptr<crv_transition_fsm_state> prev; // previous state
+  std::shared_ptr<crv_transition_fsm_state> succ;  // successor state
+  std::shared_ptr<crv_transition_fsm_state> prev;  // previous state
   expression expr;
   int minHit;
   int maxHit;
@@ -122,42 +122,42 @@ struct crv_transition_fsm_state : std::enable_shared_from_this<crv_transition_fs
 class crv_abstract_bin {
  public:
   /**
-     * \brief Calculates if the bin was hit or not.
-     * 
-     * The calculation can be more or less complex based on the actual bin (plain
-     * or transitional bin) behind it.
-     * 
-     * @param eval_ Evaluator object to use for calculation of a hit
-     */
+   * \brief Calculates if the bin was hit or not.
+   *
+   * The calculation can be more or less complex based on the actual bin (plain
+   * or transitional bin) behind it.
+   *
+   * @param eval_ Evaluator object to use for calculation of a hit
+   */
   virtual void calcHit(Evaluator &eval_) = 0;
 
-  /** 
-      * \brief Returns the minimal hit count.
-      * \return The minimal hit count
-      */
+  /**
+   * \brief Returns the minimal hit count.
+   * \return The minimal hit count
+   */
   unsigned hit_minimum() { return hit_minimum_; }
 
   /**
-     * \brief Sets the minimal hit count to a new value.
-     * \param min New hit minimum.
-     */
+   * \brief Sets the minimal hit count to a new value.
+   * \param min New hit minimum.
+   */
   void hit_minimum(unsigned min) { hit_minimum_ = min; }
 
   /**
-     * \brief Returns the current amount of hits.
-     * \return Counter how often this bin has been hit.
-     */
+   * \brief Returns the current amount of hits.
+   * \return Counter how often this bin has been hit.
+   */
   unsigned hit_count() { return hit_count_; }
 
   /**
-     * \brief Increases the hit counter.
-     */
+   * \brief Increases the hit counter.
+   */
   void incrementHit() { ++hit_count_; }
 
   /**
-     * \brief Checks if the bin is covered or not.
-     * \return true if the bin is covered, false otherwise.
-     */
+   * \brief Checks if the bin is covered or not.
+   * \return true if the bin is covered, false otherwise.
+   */
   bool covered() { return hit_count_ >= hit_minimum_; }
 
  protected:
@@ -172,26 +172,25 @@ class crv_abstract_bin {
 /**
  * \ingroup newAPI
  * \brief A crv_bin represents a set of values for a variable within a coverpoint.
- * 
+ *
  * A crv_bin is hit if a value in the bin has been sampled.
  * A crv_bin is considered as covered if it has been hit at least a pre-defined number of times.
  */
 class crv_bin : public crv_abstract_bin {
  public:
   /**
-  * \brief Constructor with bin expression.
-  * \param expr The expression that must be true to hit this bin.
-  */
+   * \brief Constructor with bin expression.
+   * \param expr The expression that must be true to hit this bin.
+   */
   template <typename Expr>
-  crv_bin(Expr expr, unsigned int pHitMinimum = 1)
-      : bin_expr_(make_expression(expr)) {
+  crv_bin(Expr expr, unsigned int pHitMinimum = 1) : bin_expr_(make_expression(expr)) {
     hit_minimum(pHitMinimum);
   }
 
   /**
-  * \brief Returns the expression this bin must met for a hit.
-  * \return The bin expression
-  */
+   * \brief Returns the expression this bin must met for a hit.
+   * \return The bin expression
+   */
   expression bin_expr() { return bin_expr_; }
 
   void calcHit(Evaluator &eval_) override {
@@ -207,7 +206,7 @@ class crv_bin : public crv_abstract_bin {
 /**
  * \ingroup newAPI
  * \brief A crv_transition_bin represents a transition for a variable within a coverpoint.
- * 
+ *
  * A crv_transition_bin is hit if its designed transition is fully matches by sampled values.
  * A crv_transition_bin is considered as covered if it has been hit at least a pre-defined number of times.
  */

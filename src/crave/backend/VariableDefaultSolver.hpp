@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <vector>
 #include <map>
 #include <string>
+#include <vector>
 
 #include "VariableSolver.hpp"
 

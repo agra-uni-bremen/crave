@@ -48,7 +48,7 @@ echo
 scripts/show_gits_summary.sh
 echo
 scripts/show_linux_distribution.sh
-echo 
+echo
 echo "Environment variables"
 echo "CC: $CC"
 echo "CXX: $CXX"

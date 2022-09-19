@@ -2,22 +2,22 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
+
+#include "../ir/UserExpression.hpp"
+#include "../utils/Evaluator.hpp"
 #include "CoverageBins.hpp"
 #include "Expression.hpp"
 #include "Object.hpp"
 #include "Variable.hpp"
-#include "../ir/UserExpression.hpp"
-#include "../utils/Evaluator.hpp"
-
-#include <string>
-#include <vector>
 
 namespace crave {
 
 /**
  * \ingroup newAPI
  * \brief A covergroup contains a set of bins for a variable
- * 
+ *
  * A covergroup contains a set of bins for a variable.
  * A coverpoint is considered as covered if its bins are covered.
  * A coverpoint is typically bound to a variable and measures its coverage.
@@ -53,9 +53,9 @@ class crv_coverpoint : public crv_object {
 
   /**
    * \brief Sets new bins for the expression list.
-   * 
+   *
    * All currently existing bins are replaced with the given bin expressions.
-   * 
+   *
    * \param list List of bin expressions.
    */
   void operator=(expression_list list) {
@@ -88,9 +88,9 @@ class crv_coverpoint : public crv_object {
 
   /**
    * \brief Creates a cross of two coverpoints cp1 and cp2.
-   * 
+   *
    * Every simple bin of cp1 will be paired with every simple bin of cp2 to create a new bin.
-   * 
+   *
    * \param cp1 First coverpoint of the cross
    * \param cp2 Second coverpoint of the cross
    * \return a std::vector of bins of the crossed product of cp1 bins and cp2 bins.
@@ -104,9 +104,9 @@ class crv_coverpoint : public crv_object {
 
   /**
    * \brief Returns if this coverpoint is covered or not.
-   * 
+   *
    * A coverpoint is covered only is all bins are covered.
-   * 
+   *
    * \return true if the coverpoint is covered, false otherwise.
    */
   bool covered() {
@@ -158,14 +158,14 @@ class crv_coverpoint : public crv_object {
 /**
  * \ingroup newAPI
  * \brief Group of coverpoints.
- * 
+ *
  * A crv_covergroup is the top-level coverage construct that has one or more coverpoints as member variables.
  */
 class crv_covergroup : public crv_object {
  public:
   /**
-  * \brief Empty constructor.
-  */
+   * \brief Empty constructor.
+   */
   crv_covergroup() : points_(), vars_(), built_(false), eval_() {}
 
   /**
@@ -225,9 +225,9 @@ class crv_covergroup : public crv_object {
 
   /**
    * \brief Returns if this covergroup is fully covered or not.
-   * 
+   *
    * A covergroup is covered if all contained coverpoints are covered.
-   * 
+   *
    * \return true if the group is covered, false otherwise
    */
   bool covered() {

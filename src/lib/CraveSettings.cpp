@@ -3,7 +3,14 @@
 namespace crave {
 
 CraveSetting::CraveSetting(std::string const& filename)
-    : Setting(filename), module_name_("crave"), backend_(), specified_seed_(), used_seed_(), BACKEND("backend"), SEED("seed"), LASTSEED("lastseed") {}
+    : Setting(filename),
+      module_name_("crave"),
+      backend_(),
+      specified_seed_(),
+      used_seed_(),
+      BACKEND("backend"),
+      SEED("seed"),
+      LASTSEED("lastseed") {}
 
 void CraveSetting::load_(const ptree& tree) {
   backend_ = tree.get(module_name_ + "." + BACKEND, "auto");
@@ -22,4 +29,4 @@ unsigned int CraveSetting::get_specified_seed() const { return specified_seed_; 
 
 void CraveSetting::set_used_seed(unsigned int seed) { used_seed_ = seed; }
 
-}
+}  // namespace crave

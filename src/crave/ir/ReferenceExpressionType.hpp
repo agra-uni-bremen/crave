@@ -12,4 +12,4 @@ struct ReferenceExpression {
   virtual ~ReferenceExpression() {}
   virtual result_type expr() const = 0;
 };
-}
+}  // namespace crave

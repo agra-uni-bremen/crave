@@ -1,14 +1,15 @@
 // Copyright 2012-2016 The CRAVE developers, University of Bremen, Germany. All rights reserved.//
 
-#include <ctime>
-#include <string>
-#include <fstream>
-
-#include "../crave/backend/FactoryMetaSMT.hpp"
 #include "../crave/ConstrainedRandom.hpp"
-#include "../crave/utils/Settings.hpp"
-#include "../crave/ir/VariableContainer.hpp"
+
+#include <ctime>
+#include <fstream>
+#include <string>
+
 #include "../crave/RandomSeedManager.hpp"
+#include "../crave/backend/FactoryMetaSMT.hpp"
+#include "../crave/ir/VariableContainer.hpp"
+#include "../crave/utils/Settings.hpp"
 
 namespace crave {
 
@@ -35,9 +36,11 @@ placeholder _i;
 
 RandomSeedManager rng(static_cast<unsigned>(std::time(0)));
 
-std::function<bool(void)> random_bit = [](){return std::uniform_int_distribution<unsigned short>(0, 1)(*rng.get());};
+std::function<bool(void)> random_bit = []() { return std::uniform_int_distribution<unsigned short>(0, 1)(*rng.get()); };
 
-std::function<unsigned(unsigned)> random_unsigned = [](unsigned i){return std::uniform_int_distribution<>(0, i - 1)(*rng.get());};
+std::function<unsigned(unsigned)> random_unsigned = [](unsigned i) {
+  return std::uniform_int_distribution<>(0, i - 1)(*rng.get());
+};
 
 // if called with zero seed -> use default seed std::time(0)
 void set_global_seed(unsigned int s) {
@@ -98,8 +101,8 @@ void rand_obj::gather_values(std::vector<int64_t>* ch) {
   }
 }
 
-void rand_obj::add_base_child(rand_base* rb) { 
-  baseChildren_.push_back(rb); 
+void rand_obj::add_base_child(rand_base* rb) {
+  baseChildren_.push_back(rb);
   if (rb->obj_kind() == "rand_vec") request_rebuild();
 }
 
@@ -129,7 +132,7 @@ bool rand_obj::is_constraint_enabled(std::string name) { return constraint.isCon
 
 bool rand_obj::gen_base_children() {
   for (unsigned i = 0; i < baseChildren_.size(); i++) {
-    if (baseChildren_[i]->obj_kind() == "rand_vec") continue; // rand_vec to be generated later
+    if (baseChildren_[i]->obj_kind() == "rand_vec") continue;  // rand_vec to be generated later
     if (!baseChildren_[i]->next()) return false;
   }
   for (unsigned i = 0; i < objChildren_.size(); i++)
@@ -141,10 +144,10 @@ void rand_obj::gather_constraints(Generator* gen) {
   for (unsigned i = 0; i < objChildren_.size(); i++) {
     objChildren_[i]->gather_constraints(gen);
   }
-  for (unsigned i = 0; i < baseChildren_.size(); i++) 
+  for (unsigned i = 0; i < baseChildren_.size(); i++)
     if (baseChildren_[i]->obj_kind() == "rand_vec") {
       __rand_vec_base* rvb = dynamic_cast<__rand_vec_base*>(baseChildren_[i]);
-      gen->addVecId(rvb->id()); 
+      gen->addVecId(rvb->id());
     }
   gen->merge(constraint);
 }

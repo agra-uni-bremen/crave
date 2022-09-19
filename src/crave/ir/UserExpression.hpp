@@ -16,7 +16,7 @@ typedef boost::proto::result_of::make_expr<boost::proto::tag::terminal, Constrai
 /*!
  * \ingroup operators
  * \brief Creates an expression from a boost::proto expression.
- * 
+ *
  * This function allows you to store a constraint expression for later use.
  * @arg boost::proto expression
  * @return expression

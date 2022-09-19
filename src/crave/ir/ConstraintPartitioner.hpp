@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include <vector>
 #include <set>
+#include <vector>
 
-#include "Context.hpp"
 #include "ConstraintManager.hpp"
 #include "ConstraintPartition.hpp"
+#include "Context.hpp"
 
 namespace crave {
 

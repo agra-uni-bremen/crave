@@ -108,12 +108,12 @@ if [[ "$CRAVE_OFFLINE_BUILD" = "ON" ]]; then
     echo "Building cmake in offline build is not allowed."
     exit 1;
   fi
-  
+
   if ! [ -f crave_package_deps.tar.gz ]; then
     echo "Could not find the dependency cache crave_package_deps.tar.gz. Please provide crave_package_deps.tar.gz or switch to online build"
     exit 1;
   fi
-  
+
   mkdir -p $DEPS
   tar --strip-components=1 -C $DEPS -xzf crave_package_deps.tar.gz
   CACHE=$DEPS
@@ -216,14 +216,14 @@ if [ -z "$BOOST_ROOT" ]; then
   REQUIRES="$BOOST $REQUIRES"
   BOOST_ROOT="$DEPS/$BOOST"
   export DEPS_BOOST=$BOOST
-  
+
 fi
- 
+
 if [ -n "$CACHE" ]; then
   CACHE="-c $(mk_and_abs_dir ${CACHE})"
 fi
 
-if ! [ -d dependencies ]; then 
+if ! [ -d dependencies ]; then
   # packaged mode
   echo "could not find the dependency repository"
   exit 2
@@ -245,7 +245,7 @@ if ! ./build -j ${NUM_THREADS:-1} $DL_ONLY "$DEPS" $CACHE $REQUIRES; then
   exit 3
 fi
 
-cd $BUILD_DIR && 
+cd $BUILD_DIR &&
 
 PREFIX_PATH=$(echo " $REQUIRES"| sed "s@[ ^] *@;$DEPS/@g")
 

@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "VariableSolver.hpp"
-#include "VariableDefaultSolver.hpp"
-#include "VariableCoverageSolver.hpp"
-#include "VariableGeneratorType.hpp"
-#include "VariableGeneratorMT.hpp"
-#include "VariableCoverageGenerator.hpp"
 #include "FactoryMetaSMT.hpp"
+#include "VariableCoverageGenerator.hpp"
+#include "VariableCoverageSolver.hpp"
+#include "VariableDefaultSolver.hpp"
+#include "VariableGeneratorMT.hpp"
+#include "VariableGeneratorType.hpp"
+#include "VariableSolver.hpp"

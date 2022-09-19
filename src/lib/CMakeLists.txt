@@ -1,5 +1,5 @@
 
-SET(CRAVE_LIB_SRC 
+SET(CRAVE_LIB_SRC
   ConstrainedRandom.cpp
   ConstrainedRandomInit.cpp
   EvalVisitor.cpp
@@ -40,9 +40,9 @@ SET(CRAVE_LIB_SRC
 
 if (CRAVE_ENABLE_EXPERIMENTAL)
   LIST(APPEND CRAVE_LIB_SRC
-    experimental/Object.cpp	
-    experimental/GraphVisitor.cpp	
-    experimental/ConstrainedRandomGraph.cpp  
+    experimental/Object.cpp
+    experimental/GraphVisitor.cpp
+    experimental/ConstrainedRandomGraph.cpp
     experimental/Experimental.cpp
     experimental/ConstraintBase.cpp
     experimental/SequenceItem.cpp

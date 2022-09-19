@@ -19,11 +19,13 @@ ostream& operator<<(ostream& os, const UserConstraint& constr) {
      << (constr.enabled_ ? "enabled" : "disabled");
   os << ", support vars =";
 
-  for(int item : constr.support_vars_) { os << " " << item; }
+  for (int item : constr.support_vars_) {
+    os << " " << item;
+  }
   return os;
 }
 
-template std::ostream& operator<<<std::ostream>(std::ostream& os, const UserConstraint& constr);
+template std::ostream& operator<< <std::ostream>(std::ostream& os, const UserConstraint& constr);
 
 unsigned UserConstraint::id() const { return id_; }
 
@@ -44,4 +46,4 @@ void UserConstraint::disable() { enabled_ = false; }
 bool UserConstraint::isVectorConstraint() { return false; }
 
 unsigned UserConstraint::complexity() const { return complexity_; }
-}
+}  // namespace crave

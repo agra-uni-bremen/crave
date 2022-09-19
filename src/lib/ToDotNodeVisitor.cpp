@@ -94,7 +94,9 @@ void ToDotVisitor::visitInside(Inside const &o) {
   if (putNode(&o)) {
     visitNode(o);
     out_ << " [label=\"inside\n{ ";
-    for (uint64_t u : o.collection()) { out_ << u << " "; }
+    for (uint64_t u : o.collection()) {
+      out_ << u << " ";
+    }
     out_ << "}\"]" << std::endl;
   }
   visitUnaryExpr(o);

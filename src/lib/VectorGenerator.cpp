@@ -1,7 +1,8 @@
 #include "../crave/backend/VectorGenerator.hpp"
-#include "../crave/utils/Logging.hpp"
 
 #include <string>
+
+#include "../crave/utils/Logging.hpp"
 
 namespace crave {
 VectorSolver::VectorSolver(int vector_id)
@@ -11,7 +12,7 @@ void VectorSolver::addConstraint(VectorConstraintPtr vc) { constraints_.push_bac
 
 bool VectorSolver::solve(const VariableGenerator& var_gen) {
   std::string cstr_name_list;
-  for(VectorConstraintPtr constraint : constraints_) {
+  for (VectorConstraintPtr constraint : constraints_) {
     cstr_name_list += " " + constraint->name();
   }
   LOG(INFO) << "Solve constraints of vector " << vector_id_ << " [" << cstr_name_list << "]";
@@ -29,8 +30,7 @@ bool VectorSolver::solve(const VariableGenerator& var_gen) {
   if (result) {
     solver_->readVector(vec_elements_, vector);
     LOG(INFO) << "Done solving vector " << vector_id_;
-  }
-  else {
+  } else {
     LOG(INFO) << "Failed solving vector " << vector_id_;
   }
   return result;
@@ -50,7 +50,7 @@ void VectorSolver::buildSolver(unsigned int const size) {
     }
   }
 
-  for(VectorConstraintPtr constraint : constraints_) {
+  for (VectorConstraintPtr constraint : constraints_) {
     if (!constraint->isUnique()) {
       ReplaceVisitor replacer(&vec_elements_);
       for (unsigned int i = 0u; i < size; ++i) {
@@ -82,10 +82,10 @@ void VectorSolver::buildSolver(unsigned int const size) {
 VectorGenerator::VectorGenerator() : vector_solvers_() {}
 
 bool VectorGenerator::solve(const VariableGenerator& var_gen, const std::set<int>& vec_ids) {
-  for(VectorSolverMap::value_type & c_pair : vector_solvers_) {
+  for (VectorSolverMap::value_type& c_pair : vector_solvers_) {
     if (!c_pair.second.solve(var_gen)) return false;
   }
-  for(int id : vec_ids) {
+  for (int id : vec_ids) {
     if (vector_solvers_.find(id) != vector_solvers_.end()) continue;
     // unconstrained vector
     __rand_vec_base* vector = vectorBaseMap[id];
@@ -103,7 +103,9 @@ bool VectorGenerator::solve(const VariableGenerator& var_gen, const std::set<int
 
 void VectorGenerator::reset(const std::vector<VectorConstraintPtr>& v) {
   vector_solvers_.clear();
-  for(VectorConstraintPtr vc : v) { addConstraint(vc); }
+  for (VectorConstraintPtr vc : v) {
+    addConstraint(vc);
+  }
 }
 
 void VectorGenerator::addConstraint(VectorConstraintPtr vc) {
@@ -117,4 +119,4 @@ void VectorGenerator::addConstraint(VectorConstraintPtr vc) {
     vector_solvers_.insert(std::make_pair(v_id, vs));
   }
 }
-}
+}  // namespace crave

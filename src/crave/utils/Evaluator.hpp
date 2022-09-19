@@ -2,13 +2,12 @@
 
 #pragma once
 
-#include "stdint.h"
-
 #include <boost/proto/eval.hpp>
 
 #include "../frontend/bitsize_traits.hpp"
-#include "../ir/visitor/EvalVisitor.hpp"
 #include "../ir/UserExpression.hpp"
+#include "../ir/visitor/EvalVisitor.hpp"
+#include "stdint.h"
 
 namespace crave {
 

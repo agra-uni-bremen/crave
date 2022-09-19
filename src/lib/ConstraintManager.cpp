@@ -1,7 +1,8 @@
 #include "../crave/ir/ConstraintManager.hpp"
+
+#include "../crave/ir/visitor/ComplexityEstimationVisitor.hpp"
 #include "../crave/ir/visitor/GetSupportSetVisitor.hpp"
 #include "../crave/ir/visitor/ToDotNodeVisitor.hpp"
-#include "../crave/ir/visitor/ComplexityEstimationVisitor.hpp"
 #include "../crave/utils/Logging.hpp"
 
 namespace crave {
@@ -10,11 +11,13 @@ template <typename ostream>
 ostream& operator<<(ostream& os, const ConstraintManager& set) {
   os << "Set " << set.id_ << " has " << set.constraints_.size() << " constraint(s) and has "
      << (set.changed_ ? "" : "not ") << "changed" << std::endl;
-  for(ConstraintPtr item : set.constraints_) { os << item << std::endl; }
+  for (ConstraintPtr item : set.constraints_) {
+    os << item << std::endl;
+  }
   os << std::flush;
   return os;
 }
-template std::ostream& operator<<<std::ostream>(std::ostream& os, const ConstraintManager& set);
+template std::ostream& operator<< <std::ostream>(std::ostream& os, const ConstraintManager& set);
 
 ConstraintManager::ConstraintManager() : changed_(false) {
   static unsigned ID = 0;
@@ -101,7 +104,7 @@ ConstraintPtr ConstraintManager::makeConstraint(std::string const& name, int c_i
 
 std::ostream& ConstraintManager::printDotGraph(std::ostream& os) {
   ToDotVisitor visitor(os);
-  for(ConstraintPtr c : constraints_) {
+  for (ConstraintPtr c : constraints_) {
     long a = reinterpret_cast<long>(&*c);
     long b = reinterpret_cast<long>(&(*c->expr()));
     os << "\t" << a << " [label=\"" << c->name() << (c->isSoft() ? " soft" : "") << (c->isCover() ? " cover" : "")
@@ -111,4 +114,4 @@ std::ostream& ConstraintManager::printDotGraph(std::ostream& os) {
   }
   return os;
 }
-}
+}  // namespace crave

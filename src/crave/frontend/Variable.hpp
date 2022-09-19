@@ -3,6 +3,7 @@
 #pragma once
 
 #include <boost/proto/core.hpp>
+
 #include "ConstraintType.hpp"
 
 // Variable

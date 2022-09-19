@@ -28,7 +28,7 @@ crv_object::crv_object() {
   crv_object_name* top = crv_name_stack.back();
   top->object_ = this;
   parent_ = !crv_obj_stack.empty() ? crv_obj_stack.back() : root();
-  parent_->children_.push_back(this);  
+  parent_->children_.push_back(this);
   name_ = top->name_;
   orig_name_ = name_;
   // check name conflict

@@ -3,7 +3,6 @@
 #pragma once
 
 #include <boost/intrusive_ptr.hpp>
-
 #include <stack>
 #include <utility>
 

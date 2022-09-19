@@ -12,4 +12,4 @@ bool UserVectorConstraint::isUnique() { return unique_; }
 int UserVectorConstraint::getVectorId() { return *support_vars_.begin(); }
 
 bool UserVectorConstraint::isVectorConstraint() { return true; }
-}
+}  // namespace crave

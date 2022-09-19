@@ -8,16 +8,16 @@ namespace crave {
  * \ingroup oldAPI
  * \ingroup newAPI
  * \brief A weighted range of values of type T
- * 
+ *
  * A weighted range is a range with an annotated weight.
  * The weight indicates the chance to be hit inside a distribution where this range is included.
- * A greater weight means the distribution will hit the range more often. 
+ * A greater weight means the distribution will hit the range more often.
  */
 template <typename T>
 struct weighted_range {
   /**
    * \brief Defines a new weighted range.
-   * 
+   *
    * \param l Left value of the range (inclusive)
    * \param r Right value of the range (inclusive)
    * \param w Weight of the range
@@ -26,10 +26,11 @@ struct weighted_range {
 
   /**
    * \brief Compares a weighted range to another range.
-   * 
-   * A range is less than another range, if its left value is less than the left value of the other range or its left values are equal and the right value of the range is less than the right value of the other range.
-   * In all other cases, it is not.
-   * 
+   *
+   * A range is less than another range, if its left value is less than the left value of the other range or its left
+   * values are equal and the right value of the range is less than the right value of the other range. In all other
+   * cases, it is not.
+   *
    * \param other Other range to compare with
    * \return true if this range is less than the other range, false otherwise.
    */
@@ -42,7 +43,7 @@ struct weighted_range {
 
   /**
    * \brief Checks if this range overlaps another range.
-   * 
+   *
    * \param other Other range to check overlap with
    * \return true if this range overlaps the other range, false otherwise.
    */
@@ -62,7 +63,7 @@ struct weighted_range {
  * \ingroup oldAPI
  * \ingroup newAPI
  * \brief A range of values of type T.
- * 
+ *
  * A range with default weight that is equal to its size.
  * For details about the weight see the base class crave::weighted_range.
  */
@@ -70,7 +71,7 @@ template <typename T>
 struct range : weighted_range<T> {
   /*!
    * \brief Defines a new range from a left value to a right value.
-   * 
+   *
    * \param l Left value of the range (inclusive)
    * \param r Right value of the range (inclusive)
    */
@@ -81,7 +82,7 @@ struct range : weighted_range<T> {
  * \ingroup oldAPI
  * \ingroup newAPI
  * \brief A single value of type T with a weight.
- * 
+ *
  * A weighted value is a weighted range containing only one element.
  * For details about the weight see the base class crave::weighted_range.
  */
@@ -89,7 +90,7 @@ template <typename T>
 struct weighted_value : weighted_range<T> {
   /*!
    * \brief Defines a new weighted value with its weight.
-   * 
+   *
    * \param v The value.
    * \param w The weight.
    */

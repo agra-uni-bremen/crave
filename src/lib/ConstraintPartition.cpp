@@ -1,4 +1,5 @@
 #include "../crave/ir/ConstraintPartition.hpp"
+
 #include <ostream>
 
 namespace crave {
@@ -7,13 +8,15 @@ template <typename ostream>
 ostream& operator<<(ostream& os, const ConstraintPartition& cp) {
   os << "[ ";
 
-  for(ConstraintPtr c : cp) { os << c->name() << " "; }
+  for (ConstraintPtr c : cp) {
+    os << c->name() << " ";
+  }
   os << "]";
   os << std::flush;
   return os;
 }
 
-template std::ostream& operator<<<std::ostream>(std::ostream& os, const ConstraintPartition& cp);
+template std::ostream& operator<< <std::ostream>(std::ostream& os, const ConstraintPartition& cp);
 
 typedef ConstraintList::iterator iterator;
 typedef ConstraintList::const_iterator const_iterator;
@@ -43,4 +46,4 @@ std::set<int> const& ConstraintPartition::supportSet() const { return support_va
 std::map<int, ConstraintList> const& ConstraintPartition::singleVariableConstraintMap() const {
   return singleVariableConstraintMap_;
 }
-}
+}  // namespace crave

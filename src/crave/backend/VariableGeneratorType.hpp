@@ -10,14 +10,14 @@
 namespace crave {
 
 /**
-     *
-     */
+ *
+ */
 struct VariableGenerator {
   typedef std::shared_ptr<VariableSolver> VarSolverPtr;
 
   explicit VariableGenerator(const VariableContainer& vcon);
-  
-  virtual ~VariableGenerator(){}
+
+  virtual ~VariableGenerator() {}
 
   virtual void reset(std::vector<ConstraintPartition>& partitions);
 
@@ -25,7 +25,7 @@ struct VariableGenerator {
 
   template <typename T>
   bool read(const Variable<T>& var, T* value) const {
-    for(VarSolverPtr vs : solvers_) {
+    for (VarSolverPtr vs : solvers_) {
       if (vs->read(var, value)) return true;
     }
     return false;

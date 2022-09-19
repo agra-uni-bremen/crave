@@ -1,9 +1,10 @@
 // Copyright 2012-2016 The CRAVE developers, University of Bremen, Germany. All rights reserved.//
 
-#include "../../crave/experimental/graph/Node.hpp"
 #include "../../crave/experimental/graph/GraphVisitor.hpp"
 
 #include <boost/assert.hpp>
+
+#include "../../crave/experimental/graph/Node.hpp"
 
 namespace crave {
 
@@ -18,14 +19,18 @@ void PrintVisitor::visitTerminal(Terminal& t) { ++depth, printNode(t), --depth; 
 void PrintVisitor::visitSelector(Selector& sel) {
   ++depth;
   printNode(sel);
-  for(NodePtr n : sel.children) { n->accept(*this); }
+  for (NodePtr n : sel.children) {
+    n->accept(*this);
+  }
   --depth;
 }
 
 void PrintVisitor::visitSequence(Sequence& seq) {
   ++depth;
   printNode(seq);
-  for(NodePtr n : seq.children) { n->accept(*this); }
+  for (NodePtr n : seq.children) {
+    n->accept(*this);
+  }
   --depth;
 }
 
@@ -38,7 +43,7 @@ void UpdateVisitor::visitNonTerminal(NonTerminal& nt) {
   }
 
   std::vector<NodePtr> updated_children;
-  for(NodePtr n : nt.children) {
+  for (NodePtr n : nt.children) {
     NodePtr tmp = n;
     if (n->name() && m_named_nodes.find(n->name()) != m_named_nodes.end()) {
       // update named child
@@ -118,7 +123,7 @@ void ToDotVisitor::visitSelector(Selector& nt) {
   createNode(1, start, "start", "point", 0);
   createNode(1, end, "end", "point", 0);
 
-  for(NodePtr n : nt.children) {
+  for (NodePtr n : nt.children) {
     n->accept(*this);
     result_type& r = m_stack.top();
     m_stack.pop();
@@ -141,7 +146,7 @@ void ToDotVisitor::visitSequence(Sequence& nt) {
   createNode(1, end, "end", "point", 0);
 
   int last = start;
-  for(NodePtr n : nt.children) {
+  for (NodePtr n : nt.children) {
     n->accept(*this);
     result_type& r = m_stack.top();
     m_stack.pop();
@@ -155,5 +160,5 @@ void ToDotVisitor::visitSequence(Sequence& nt) {
 }
 
 #undef TDV_INDENT
-};
-};
+};  // namespace graph
+};  // namespace crave

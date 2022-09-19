@@ -2,22 +2,21 @@
 
 #pragma once
 
+#include <list>
+#include <map>
 #include <ostream>
+#include <set>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <list>
-#include <stdexcept>
-#include <map>
-#include <set>
 
-#include "UserConstraintType.hpp"
-#include "UserVectorConstraint.hpp"
-#include "ConstraintPartition.hpp"
 #include "ConstraintManager.hpp"
+#include "ConstraintPartition.hpp"
 #include "ConstraintPartitioner.hpp"
-
 #include "Context.hpp"
 #include "Node.hpp"
+#include "UserConstraintType.hpp"
+#include "UserVectorConstraint.hpp"
 #include "visitor/FixWidthVisitor.hpp"
 #include "visitor/GetSupportSetVisitor.hpp"
 #include "visitor/ToDotNodeVisitor.hpp"

@@ -1,14 +1,12 @@
 // Copyright 2012-2017 The CRAVE developers, University of Bremen, Germany. All rights reserved.
 #pragma once
 
+#include <functional>
 #include <string>
 
-#include <functional>
-
+#include "../ir/Node.hpp"
 #include "AssignResult.hpp"
 #include "bitsize_traits.hpp"
-
-#include "../ir/Node.hpp"
 
 namespace crave {
 

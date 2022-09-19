@@ -16,4 +16,4 @@ class VariableGeneratorMT : public VariableGenerator {
   void solve(VarSolverPtr vs);
   bool result_;
 };
-}
+}  // namespace crave

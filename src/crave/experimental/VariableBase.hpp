@@ -12,9 +12,9 @@ namespace crave {
  */
 struct crv_variable_base_ : public crv_object {
   /**
-  * get an instance of Constant, which captures the current value of this variable.
-  * @return a Constant
-  */
+   * get an instance of Constant, which captures the current value of this variable.
+   * @return a Constant
+   */
   virtual Constant constant_expr() = 0;
 
   /**
@@ -32,14 +32,13 @@ struct crv_variable_base_ : public crv_object {
   std::string obj_kind() const override final { return "crv_variable"; }
 };
 
-
 struct prev_ {};
 /*!
  * \ingroup newAPI
  * \brief A symbol to refer the previously generated value.
  *
  * crave::prev allows you to access the value the crv_variable had before calling randomize().
- * You can use this variable in the parenthese operator () as an argument. 
+ * You can use this variable in the parenthese operator () as an argument.
  */
 extern prev_ prev;
 
@@ -111,4 +110,4 @@ class crv_variable_base : public crv_variable_base_ {
   T value;
   crv_variable_base* bound_var;
 };
-}
+}  // namespace crave

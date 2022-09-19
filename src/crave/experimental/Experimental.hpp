@@ -2,6 +2,10 @@
 
 #pragma once
 
+#include <type_traits>
+#include <vector>
+
+#include "../backend/Generator.hpp"
 #include "Array.hpp"
 #include "Constraint.hpp"
 #include "Coverage.hpp"
@@ -10,22 +14,16 @@
 #include "SequenceItem.hpp"
 #include "Variable.hpp"
 #include "Vector.hpp"
-
-#include "../backend/Generator.hpp"
-
 #include "better-enums/enum.hpp"
-
-#include <type_traits>
-#include <vector>
 
 namespace crave {
 
 /**
  * \ingroup newAPI
  * \brief Solves given list of expressions and tries to calculate a solution.
- * 
+ *
  * This function can be used to create an inline solution for constraints.
- * 
+ *
  * \return true if a solution is found, false otherwise.
  */
 template <typename... Exprs>
@@ -92,7 +90,7 @@ class crv_variable<T, typename std::enable_if<simple_enum_wrapper<T>::defined>::
 /*!
  * \def CRAVE_EXPERIMENTAL_ENUM(enum_name, ...)
  * \brief Old style enum declartion in new API.
- * 
+ *
  * This macro allows you to define your enum in the old way but with the new API in background.
  * You need to declare your enum first, then use its name and comma seperated values.
  */
@@ -106,7 +104,7 @@ class crv_variable<T, typename std::enable_if<simple_enum_wrapper<T>::defined>::
 /*!
  * \def CRAVE_BETTER_ENUM(enum_name, ...)
  * \brief Simplified enum declaration in new API.
- * 
+ *
  * This macros allows you to define a new enum type together with its values.
  * Simply put the desired type name as name and enumerate the possible values with commata seperated afterwards.
  */
@@ -120,7 +118,7 @@ class crv_variable<T, typename std::enable_if<simple_enum_wrapper<T>::defined>::
 /*!
  * \def CRAVE_EXPERIMENTAL_ENUM(enum_name, ...)
  * \brief Old style enum declartion in new API.
- * 
+ *
  * This macro allows you to define your enum in the old way but with the new API in background.
  * You need to declare your enum first, then use its name and comma seperated values.
  */
@@ -136,7 +134,7 @@ class crv_variable<T, typename std::enable_if<simple_enum_wrapper<T>::defined>::
 /*!
  * \def CRAVE_BETTER_ENUM(enum_name, ...)
  * \brief Simplified enum declaration in new API.
- * 
+ *
  * This macros allows you to define a new enum type together with its values.
  * Simply put the desired type name as name and enumerate the possible values with commata seperated afterwards.
  */
@@ -146,7 +144,7 @@ class crv_variable<T, typename std::enable_if<simple_enum_wrapper<T>::defined>::
   template <>                                           \
   struct is_better_enum<enum_name> : std::true_type {}; \
   }  // namespace crave
-   
+
 #endif
 
-/*! @}*/ 
+/*! @}*/

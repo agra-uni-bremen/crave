@@ -80,4 +80,4 @@ void rand_obj_gen::print_bench_values() {
   std::cout << "Elapsed generation time (sum):\t " << elapsed_gen_time / static_cast<double>(CLOCKS_PER_SEC)
             << std::endl;
 }
-}
+}  // namespace crave

@@ -1,11 +1,14 @@
 // Copyright 2012-2016 The CRAVE developers, University of Bremen, Germany. All rights reserved.//
 #include "../crave/RandomSeedManager.hpp"
+
 #include <functional>
 
 RandomSeedManager::RandomSeedManager(unsigned int seed) : default_rng_(seed), seed_(seed) {}
 
 RandomSeedManager::~RandomSeedManager() {
-  for(random_map_t::value_type & entry : randomMap_) { delete entry.second; }
+  for (random_map_t::value_type& entry : randomMap_) {
+    delete entry.second;
+  }
 }
 
 void RandomSeedManager::set_global_seed(unsigned int s) {
@@ -13,9 +16,7 @@ void RandomSeedManager::set_global_seed(unsigned int s) {
   default_rng_.seed(s);
 }
 
-unsigned int RandomSeedManager::get_seed() {
-  return seed_;
-}
+unsigned int RandomSeedManager::get_seed() { return seed_; }
 
 #ifndef WITH_SYSTEMC
 

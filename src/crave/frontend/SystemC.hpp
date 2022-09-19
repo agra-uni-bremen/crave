@@ -3,6 +3,7 @@
 #pragma once
 
 #include <vector>
+
 #include "Distribution.hpp"
 #include "RandomBase.hpp"
 #include "bitsize_traits_sysc.hpp"

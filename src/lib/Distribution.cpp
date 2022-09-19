@@ -1,4 +1,5 @@
 #include "../crave/frontend/Distribution.hpp"
+
 #include <random>
 
 namespace crave {
@@ -17,4 +18,4 @@ std::vector<weighted_range<bool> > const& distribution<bool>::ranges() const {
   static std::vector<weighted_range<bool> > v;
   return v;
 }
-}
+}  // namespace crave

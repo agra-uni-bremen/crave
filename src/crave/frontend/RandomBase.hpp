@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <vector>
+
 #include "AssignResultToRef.hpp"
 #include "Constraint.hpp"
 #include "Distribution.hpp"
@@ -30,9 +31,9 @@ class __rand_vec_base {
   virtual ~__rand_vec_base() {}
   /**
    * \brief Sets values of this vector with a given std::vector.
-   * 
+   *
    * The values are parsed from a std::string in order to get numeral values as well as enum values.
-   * 
+   *
    * \param values Values to set for this vector.
    */
   virtual void set_values(const std::vector<std::string>&) = 0;
@@ -51,11 +52,11 @@ class __rand_vec_base {
 
   /**
    * \brief Generate random values for a given vector size.
-   * 
+   *
    * Creates a number of random values for this vector.
    * All values are stored inside the vector.
    * Afterwards the size of this vector ist num.
-   * 
+   *
    * \param num vector size.
    */
   virtual void gen_values(unsigned num) = 0;
@@ -66,7 +67,7 @@ extern std::map<int, __rand_vec_base*> vectorBaseMap;
 /**
  * \ingroup oldAPI
  * \brief Template specialization of random vectors.
- * 
+ *
  * This class distintcts the variable type of the symbol (T1) and the true values type to be stored (T2).
  * In subclasses, T1 and T2 are the same exept for the bool case.
  */
@@ -93,16 +94,16 @@ class __rand_vec_base1 : public __rand_vec_base {
 
   /**
    * \brief Pushes a value into the real vector.
-   * 
+   *
    * The semantic is the same as std::vector::push_back().
-   * 
+   *
    * \param x the value to be pushed
    */
   void push_back(const T1& x) { real_vec.push_back(x); }
 
   /**
    * \brief Removes all values from the internal real vector.
-   * 
+   *
    * The semantic is the same as std::vector::clear().
    */
   void clear() { real_vec.clear(); }
@@ -154,7 +155,7 @@ class __rand_vec_base1 : public __rand_vec_base {
  * \ingroup oldAPI
  * \ingroup newAPI
  * \brief Base class of a random vector.
- * 
+ *
  * Simply sets T1 equal T2.
  */
 template <typename T>
@@ -169,9 +170,9 @@ class __rand_vec<bool> : public __rand_vec_base1<bool, char> {};
 
 /**
  * \ingroup oldAPI
- * \deprecated As all old API entities, it is recommended to use the \ref newAPI "new API". The equivalent in the new API is \ref crave::crv_vector
- * \brief A vector of randomizable values of Type T.
- * 
+ * \deprecated As all old API entities, it is recommended to use the \ref newAPI "new API". The equivalent in the new
+ * API is \ref crave::crv_vector \brief A vector of randomizable values of Type T.
+ *
  * The random vector is the way to define a vector of randomziable values.
  * Constraints can be defined with random accessed alements or the whole vector.
  */
@@ -188,10 +189,10 @@ class rand_vec : public __rand_vec<T>, public rand_base {
 
   /**
    * \brief Generate next random values for all elements.
-   * 
+   *
    * Generates as many random values as defined by default_rand_vec_size().
    * The size of the vector is equal to default_rand_vec_size() afterwards.
-   * 
+   *
    * \return true
    */
   virtual bool next() {

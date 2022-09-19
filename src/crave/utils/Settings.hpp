@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "SettingsType.hpp"
 #include "CraveSettings.hpp"
+#include "SettingsType.hpp"
 
 namespace crave {}  // end namespace crave

@@ -6,4 +6,4 @@
 	url = https://github.com/hoangmle/crave-examples.git
 [submodule "metaSMT"]
 	path = metaSMT
-	url = https://github.com/hoangmle/metaSMT.git
+	url = ../wd-verilator-for-asic-verification-metasmt.git

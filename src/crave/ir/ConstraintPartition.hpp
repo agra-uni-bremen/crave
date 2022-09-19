@@ -3,8 +3,9 @@
 #pragma once
 
 #include <list>
-#include <set>
 #include <map>
+#include <set>
+
 #include "UserConstraintType.hpp"
 
 namespace crave {

@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "ReferenceExpressionType.hpp"
 #include "../frontend/bitsize_traits.hpp"
+#include "ReferenceExpressionType.hpp"
 
 namespace crave {
 

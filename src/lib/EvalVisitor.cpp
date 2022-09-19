@@ -2,8 +2,8 @@
 
 #include "../crave/ir/visitor/EvalVisitor.hpp"
 
-#include <stdexcept>
 #include <set>
+#include <stdexcept>
 
 namespace crave {
 
@@ -292,9 +292,7 @@ void EvalVisitor::visitShiftRightOpr(const ShiftRightOpr& shr) {
 void EvalVisitor::visitVectorAccess(const VectorAccess&) {
   throw std::runtime_error("VectorAccess is not allowed in EvalVisitor.");
 }
-void EvalVisitor::visitForEach(const ForEach&) {
-  throw std::runtime_error("ForEach is not allowed in EvalVisitor.");
-}
+void EvalVisitor::visitForEach(const ForEach&) { throw std::runtime_error("ForEach is not allowed in EvalVisitor."); }
 void EvalVisitor::visitUnique(const Unique&) { throw std::runtime_error("Unique is not allowed in EvalVisitor."); }
 
 void EvalVisitor::visitIfThenElse(const IfThenElse& ite) {

@@ -23,7 +23,8 @@ struct write_ref_tag : public var_tag<value_type> {
 
 /**
  * WriteReference<T> is an important internal class for randomization.
- * It contains a symbolic variable to be used in constraints and a pointer to value of type T, which will be updated after constraint solving.
+ * It contains a symbolic variable to be used in constraints and a pointer to value of type T, which will be updated
+ * after constraint solving.
  */
 template <typename value_type_>
 struct WriteReference : public Constraint<typename boost::proto::terminal<write_ref_tag<value_type_> >::type> {

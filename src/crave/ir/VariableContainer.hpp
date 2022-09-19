@@ -3,12 +3,12 @@
 #pragma once
 
 #include <map>
-#include <utility>
 #include <memory>
+#include <utility>
 #include <vector>
 
-#include "ReferenceExpression.hpp"
 #include "../frontend/AssignResult.hpp"
+#include "ReferenceExpression.hpp"
 
 namespace crave {
 

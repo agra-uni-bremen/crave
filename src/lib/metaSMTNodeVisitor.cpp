@@ -1,23 +1,23 @@
 // Copyright 2012-2016 The CRAVE developers, University of Bremen, Germany. All rights reserved.//
 
 #include "../crave/ir/visitor/metaSMTNodeVisitor.hpp"
+
+#include <metaSMT/BitBlast.hpp>
+#include <metaSMT/DirectSolver_Context.hpp>
+#include <string>
+
 #include "../crave/backend/FactoryMetaSMT.hpp"
 #include "../crave/utils/Logging.hpp"
 #include "metaSMTNodeVisitorImpl.hpp"
 
-#include <metaSMT/BitBlast.hpp>
-#include <metaSMT/DirectSolver_Context.hpp>
-
-#include <string>
-
-#define DEFINE_SOLVER(SOLVER_ENUM, SOLVER_T)                                                     \
-  namespace crave {                                                                              \
-  template <>                                                                                    \
-  struct FactorySolver<SOLVER_ENUM> {                                                            \
-    typedef metaSMT::DirectSolver_Context<SOLVER_T> SolverType;                                  \
-    static bool isDefined() { return true; }                                                     \
-    static metaSMTVisitor* getNewInstance() { return new metaSMTVisitorImpl<SolverType>(); }     \
-  };                                                                                             \
+#define DEFINE_SOLVER(SOLVER_ENUM, SOLVER_T)                                                 \
+  namespace crave {                                                                          \
+  template <>                                                                                \
+  struct FactorySolver<SOLVER_ENUM> {                                                        \
+    typedef metaSMT::DirectSolver_Context<SOLVER_T> SolverType;                              \
+    static bool isDefined() { return true; }                                                 \
+    static metaSMTVisitor* getNewInstance() { return new metaSMTVisitorImpl<SolverType>(); } \
+  };                                                                                         \
   }  // namespace crave
 
 #ifdef metaSMT_USE_Boolector
@@ -32,7 +32,7 @@ class BoolectorSolver : public metaSMT::solver::Boolector {
 #endif
   }
 };
-}
+}  // namespace crave
 DEFINE_SOLVER(crave::BOOLECTOR, crave::BoolectorSolver);
 #endif
 
@@ -58,6 +58,7 @@ DEFINE_SOLVER(crave::Z3, metaSMT::solver::Z3_Backend);
 
 #ifdef metaSMT_USE_CUDD
 #include <metaSMT/backend/CUDD_Distributed.hpp>
+
 #include "../crave/RandomSeedManager.hpp"
 namespace crave {
 extern RandomSeedManager rng;
@@ -65,7 +66,7 @@ class CUDD_Solver : public metaSMT::solver::CUDD_Distributed {
  public:
   CUDD_Solver() { gen.seed((*crave::rng.get())()); }
 };
-}
+}  // namespace crave
 DEFINE_SOLVER(crave::CUDD, metaSMT::BitBlast<crave::CUDD_Solver>);
 #endif
 
@@ -132,7 +133,7 @@ metaSMTVisitor* FactoryMetaSMT::getNewInstance(SolverTypes type) {
       TRY_GET_SOLVER_WHEN_UNDEFINED(Z3);
       TRY_GET_SOLVER_WHEN_UNDEFINED(CVC4);
       TRY_GET_SOLVER_WHEN_UNDEFINED(CUDD);
-      throw std::runtime_error("No solver has been defined.");  
+      throw std::runtime_error("No solver has been defined.");
   }
 }
 

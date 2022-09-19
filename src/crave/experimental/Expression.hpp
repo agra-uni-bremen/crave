@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include <vector>
+
 #include "../frontend/bitsize_traits.hpp"
 #include "../ir/UserExpression.hpp"
-
-#include <vector>
 
 namespace crave {
 
@@ -20,7 +20,7 @@ class expression_list {
   /**
    * \brief Constructor with expressions.
    * \param exprs Comma seperated list of expressions
-  */
+   */
   template <typename... Exprs>
   expression_list(Exprs... exprs) : exprs_() {
     add_exprs(exprs...);
@@ -49,36 +49,36 @@ class expression_list {
 
   /**
    * \brief Get the begin iterator.
-   * 
+   *
    * Returns the same iterator a std::vector would return.
-   * 
+   *
    * \return Begin iterator of the list
    */
   container_type::iterator begin() { return exprs_.begin(); }
 
   /**
    * \brief Get the end iterator.
-   * 
+   *
    * Returns the same iterator a std::vector would return.
-   * 
+   *
    * \return End iterator of the list
    */
   container_type::iterator end() { return exprs_.end(); }
 
   /**
    * \brief Get the const begin iterator.
-   * 
+   *
    * Returns the same iterator a std::vector would return.
-   * 
+   *
    * \return Const begin iterator of the list
    */
   container_type::const_iterator begin() const { return exprs_.begin(); }
 
   /**
    * \brief Get the const end iterator.
-   * 
+   *
    * Returns the same iterator a std::vector would return.
-   * 
+   *
    * \return Const end iterator of the list
    */
   container_type::const_iterator end() const { return exprs_.end(); }

@@ -1,9 +1,9 @@
 // Copyright 2012-2017 The CRAVE developers, University of Bremen, Germany. All rights reserved.//
 #pragma once
 
-#include <string>
 #include <map>
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace crave {
@@ -26,7 +26,7 @@ struct Node {
   /**
    * constructor
    * @param name name of the Node
-  */
+   */
   Node(const char* name = 0) : m_name(name) {}
 
   /**
@@ -83,5 +83,5 @@ struct Sequence : NonTerminal {
   virtual const char* obj_kind() const { return "Sequence"; }
   virtual void accept(NodeVisitor& v);
 };
-};
-};
+};  // namespace graph
+};  // namespace crave
