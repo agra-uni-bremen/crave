@@ -23,8 +23,6 @@ add_executable(
   # core/test_UserConstraint.cpp
   # core/test_Vector_Constraint.cpp
   main.cpp)
-target_link_libraries(${PROJECT_NAME}_tests ${PROJECT_NAME}
-                      ${ALL_EXTERNAL_LIBS})
 
 if(SystemCLanguage_FOUND)
   # target_sources(${PROJECT_NAME}_tests PRIVATE core/test_SystemC_Data.cpp)
@@ -36,10 +34,19 @@ target_include_directories(
 
 target_link_directories(
   ${PROJECT_NAME}_tests PRIVATE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/lib>
-  $<INSTALL_INTERFACE:lib>)
+  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/metaSMT/lib> $<INSTALL_INTERFACE:lib>)
+target_link_libraries(${PROJECT_NAME}_tests ${PROJECT_NAME}
+                      ${${PROJECT_NAME}_LIBS})
+
+get_target_property(LIB_DIRS ${PROJECT_NAME}_tests LINK_DIRECTORIES)
+message(WARNING "Lib dirs: ${LIB_DIRS}")
+
+get_target_property(LIBS ${PROJECT_NAME}_tests LINK_LIBRARIES)
+message(WARNING "Libs: ${LIBS}")
 
 if(metaSMT_USE_Boolector)
-  add_test(NAME Boolector_backend COMMAND ${PROJECT_NAME}_tests --backend-Boolector)
+  add_test(NAME Boolector_backend COMMAND ${PROJECT_NAME}_tests
+                                          --backend-Boolector)
   set_tests_properties(Boolector_backend PROPERTIES TIMEOUT 30)
 endif()
 if(metaSMT_USE_STP)

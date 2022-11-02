@@ -101,6 +101,15 @@ endif(SystemCLanguage_FOUND)
 # build
 add_subdirectory(src)
 
+# config
+set(${PROJECT_NAME}_LIBS ${PROJECT_NAME} ${ALL_EXTERNAL_LIBS}
+                         ${metaSMT_LIBRARIES})
+
+get_directory_property(ALL_INCLUDES INCLUDE_DIRECTORIES)
+set(${PROJECT_NAME}_INCLUDE ${CMAKE_INSTALL_PREFIX}/include ${ALL_INCLUDES})
+
+get_directory_property(${PROJECT_NAME}_DEFS COMPILE_DEFINITIONS)
+
 # tests
 if(CRAVE_ENABLE_TESTS)
   enable_testing()
@@ -112,21 +121,14 @@ if(CRAVE_BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()
 
-# config
-set(${PROJECT_NAME}_LIBS ${CMAKE_INSTALL_PREFIX}/lib/lib${PROJECT_NAME}.a
-                         ${ALL_EXTERNAL_LIBS} ${metaSMT_LIBRARIES})
-
-get_directory_property(ALL_INCLUDES INCLUDE_DIRECTORIES)
-set(${PROJECT_NAME}_INCLUDE ${CMAKE_INSTALL_PREFIX}/include ${ALL_INCLUDES})
-
-get_directory_property(${PROJECT_NAME}_DEFS COMPILE_DEFINITIONS)
-
 # create CRAVE CMake config file
+set(${PROJECT_NAME}_LIB_PATHS ${CMAKE_INSTALL_PREFIX}/lib/lib${PROJECT_NAME}.a
+                              ${ALL_EXTERNAL_LIBS} ${metaSMT_LIB_PATHS})
 file(
   WRITE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
   "set(${PROJECT_NAME}_FOUND 1)
 set(${PROJECT_NAME}_INCLUDE_DIR ${${PROJECT_NAME}_INCLUDE})
-set(${PROJECT_NAME}_LIBRARIES ${${PROJECT_NAME}_LIBS})
+set(${PROJECT_NAME}_LIBRARIES ${${PROJECT_NAME}_LIB_PATHS})
 set(${PROJECT_NAME}_DEFINITIONS ${${PROJECT_NAME}_DEFS})
 ")
 
@@ -134,15 +136,15 @@ set(${PROJECT_NAME}_DEFINITIONS ${${PROJECT_NAME}_DEFS})
 file(
   WRITE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.py
   "${PROJECT_NAME}_INCLUDES = '${${PROJECT_NAME}_INCLUDE}'
-${PROJECT_NAME}_LIBRARIES = '${${PROJECT_NAME}_LIBS}'
+${PROJECT_NAME}_LIBRARIES = '${${PROJECT_NAME}_LIB_PATHS}'
 ${PROJECT_NAME}_DEFINITIONS = '${${PROJECT_NAME}_DEFS}'
 ")
 
-string(REPLACE ";" " " ${PROJECT_NAME}_MLIBS "${${PROJECT_NAME}_LIBS}")
+string(REPLACE ";" " " ${PROJECT_NAME}_MLIBS "${${PROJECT_NAME}_LIB_PATHS}")
 string(REPLACE ";" " -I" ${PROJECT_NAME}_MINCLUDE "${${PROJECT_NAME}_INCLUDE}")
 string(REPLACE ";" " -D" ${PROJECT_NAME}_MDEFS "${${PROJECT_NAME}_DEFS}")
 set(${PROJECT_NAME}_RPATH "")
-foreach(LIBPATH ${${PROJECT_NAME}_LIBS})
+foreach(LIBPATH ${${PROJECT_NAME}_LIB_PATHS})
   get_filename_component(LIBDIR ${LIBPATH} PATH)
   list(APPEND ${PROJECT_NAME}_RPATH -Wl,-rpath=${LIBDIR})
 endforeach()
@@ -158,7 +160,7 @@ ${PROJECT_NAME}_RPATH := ${${PROJECT_NAME}_RPATH}
 ")
 
 # create CRAVE pkgconfig make config file
-string(REPLACE ";" " " ${PROJECT_NAME}_MLIBS "${${PROJECT_NAME}_LIBS}")
+string(REPLACE ";" " " ${PROJECT_NAME}_MLIBS "${${PROJECT_NAME}_LIB_PATHS}")
 file(
   WRITE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.pc
   "Name: ${PROJECT_NAME}
@@ -175,7 +177,11 @@ install(
   DESTINATION ${${PROJECT_NAME}_CONFIG_DIR})
 install(FILES ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.pc
         DESTINATION lib/pkgconfig/)
-install(DIRECTORY ${PROJECT_BINARY_DIR}/metaSMT/lib DESTINATION . FILES_MATCHING PATTERN "lib*.a")
+install(
+  DIRECTORY ${PROJECT_BINARY_DIR}/metaSMT/lib
+  DESTINATION .
+  FILES_MATCHING
+  PATTERN "lib*.a")
 
 # ##############################################################################
 # CPack settings                          ##

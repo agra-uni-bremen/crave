@@ -10,8 +10,15 @@ set(EXAMPLES
 foreach(ex ${EXAMPLES})
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${ex}")
     add_executable(${ex} ${ex}/main.cpp)
-    target_include_directories(${ex} PRIVATE ${PROJECT_SOURCE_DIR}/src)
-    target_link_libraries(${ex} ${PROJECT_NAME})
+    target_include_directories(
+      ${ex} PRIVATE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+                    $<INSTALL_INTERFACE:include>)
+
+    target_link_directories(
+      ${ex} PRIVATE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/lib>
+      $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/metaSMT/lib>
+      $<INSTALL_INTERFACE:lib>)
+    target_link_libraries(${ex} ${PROJECT_NAME} ${${PROJECT_NAME}_LIBS})
   endif()
 endforeach(ex)
 

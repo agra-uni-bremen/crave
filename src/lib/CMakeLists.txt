@@ -35,6 +35,8 @@ target_include_directories(
   ${PROJECT_NAME}
   PRIVATE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/metaSMT/include>
           $<INSTALL_INTERFACE:include>)
+set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY
+                                                 ${PROJECT_BINARY_DIR}/lib)
 
 target_link_directories(
   ${PROJECT_NAME} PRIVATE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/metaSMT/lib>
