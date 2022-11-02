@@ -20,7 +20,7 @@ struct VariableSolver {
   template <typename T>
   bool read(Variable<T> const& var, T* value) {
     if (var_ctn_.variables.find(var.id()) == var_ctn_.variables.end()) return false;
-    AssignResultToRef<T> result(value);
+    AssignResultToRef<T> result(value, bitsize_traits<T>::value, std::is_signed<T>::value);
     solver_->read(*var_ctn_.variables[var.id()], result);
     return true;
   }

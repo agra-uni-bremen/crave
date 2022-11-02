@@ -5,9 +5,9 @@
 #include <functional>
 #include <map>
 #include <metaSMT/DirectSolver_Context.hpp>
-#include <metaSMT/frontend/QF_BV.hpp>
 #include <metaSMT/support/cardinality.hpp>
 #include <metaSMT/support/contradiction_analysis.hpp>
+#include <metaSMT/tags/QF_BV.hpp>
 #include <stack>
 #include <string>
 #include <utility>
@@ -18,8 +18,8 @@
 #include "../crave/ir/visitor/metaSMTNodeVisitor.hpp"
 
 namespace crave {
-namespace preds = metaSMT::logic;
-namespace qf_bv = metaSMT::logic::QF_BV;
+namespace preds = metaSMT::logic::tag;
+namespace qf_bv = metaSMT::logic::QF_BV::tag;
 using metaSMT::evaluate;
 
 extern std::function<unsigned(unsigned)> random_unsigned;
@@ -60,7 +60,7 @@ class metaSMTVisitorImpl : public metaSMTVisitor {
   virtual void visitPlusOpr(PlusOpr const &);
   virtual void visitMinusOpr(MinusOpr const &);
   virtual void visitMultipliesOpr(MultipliesOpr const &);
-  virtual void visitDevideOpr(DevideOpr const &);
+  virtual void visitDivideOpr(DivideOpr const &);
   virtual void visitModuloOpr(ModuloOpr const &);
   virtual void visitShiftLeftOpr(ShiftLeftOpr const &);
   virtual void visitShiftRightOpr(ShiftRightOpr const &);
@@ -185,9 +185,9 @@ void metaSMTVisitorImpl<SolverType>::visitVariableExpr(VariableExpr const &ve) {
     result = ite->second;
   } else {
     if (ve.isBool())
-      result = evaluate(solver_, preds::new_variable());
+      result = solver_(metaSMT::logic::new_variable());
     else
-      result = evaluate(solver_, qf_bv::new_bitvector(ve.bitsize()));
+      result = solver_(metaSMT::logic::QF_BV::new_bitvector(ve.bitsize()));
     terminals_.insert(ite, std::make_pair(ve.id(), result));
   }
 
@@ -196,9 +196,9 @@ void metaSMTVisitorImpl<SolverType>::visitVariableExpr(VariableExpr const &ve) {
 
 template <typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitConstant(Constant const &c) {
-  result_type result = c.isBool() ? (c.value() ? evaluate(solver_, preds::True) : evaluate(solver_, preds::False))
-                                  : (c.sign() ? evaluate(solver_, qf_bv::bvsint(c.value(), c.bitsize()))
-                                              : evaluate(solver_, qf_bv::bvuint(c.value(), c.bitsize())));
+  result_type result = c.isBool() ? (c.value() ? solver_(true) : solver_(false))
+                                  : (c.sign() ? solver_(qf_bv::bvsint_tag{}, c.value(), c.bitsize())
+                                              : solver_(qf_bv::bvuint_tag{}, c.value(), c.bitsize()));
   exprStack_.push(std::make_pair(result, c.sign()));
 }
 
@@ -209,7 +209,7 @@ void metaSMTVisitorImpl<SolverType>::visitNotOpr(NotOpr const &o) {
   stack_entry entry;
   pop(entry);
 
-  result_type result = evaluate(solver_, preds::Not(entry.first));
+  result_type result = solver_(preds::not_tag{}, entry.first);
   exprStack_.push(std::make_pair(result, entry.second));
 }
 
@@ -220,7 +220,7 @@ void metaSMTVisitorImpl<SolverType>::visitNegOpr(NegOpr const &o) {
   stack_entry entry;
   pop(entry);
 
-  result_type result = evaluate(solver_, qf_bv::bvneg(entry.first));
+  result_type result = solver_(qf_bv::bvneg_tag{}, entry.first);
   exprStack_.push(std::make_pair(result, entry.second));
 }
 
@@ -231,7 +231,7 @@ void metaSMTVisitorImpl<SolverType>::visitComplementOpr(ComplementOpr const &o) 
   stack_entry entry;
   pop(entry);
 
-  result_type result = evaluate(solver_, qf_bv::bvnot(entry.first));
+  result_type result = solver_(qf_bv::bvnot_tag{}, entry.first);
   exprStack_.push(std::make_pair(result, entry.second));
 }
 
@@ -242,12 +242,12 @@ void metaSMTVisitorImpl<SolverType>::visitInside(Inside const &in) {
   stack_entry entry;
   pop(entry);
 
-  result_type result = evaluate(solver_, preds::False);
+  result_type result = solver_(false);
   for (Constant c : in.collection()) {
     stack_entry constExpr;
     c.visit(this);
     pop(constExpr);
-    result = evaluate(solver_, preds::Or(result, preds::equal(entry.first, constExpr.first)));
+    result = solver_(preds::equal_tag{}, entry.first, constExpr.first);
   }
 
   exprStack_.push(std::make_pair(result, false));
@@ -262,9 +262,9 @@ void metaSMTVisitorImpl<SolverType>::visitExtendExpr(ExtendExpression const &e) 
 
   result_type result;
   if (entry.second)
-    result = evaluate(solver_, qf_bv::sign_extend(e.value(), entry.first));
+    result = solver_(qf_bv::sign_extend_tag{}, e.value(), entry.first);
   else
-    result = evaluate(solver_, qf_bv::zero_extend(e.value(), entry.first));
+    result = solver_(qf_bv::zero_extend_tag{}, e.value(), entry.first);
 
   exprStack_.push(std::make_pair(result, entry.second));
 }
@@ -274,7 +274,7 @@ void metaSMTVisitorImpl<SolverType>::visitAndOpr(AndOpr const &o) {
   stack_entry fst, snd;
   evalBinExpr(o, fst, snd);
 
-  result_type result = evaluate(solver_, qf_bv::bvand(fst.first, snd.first));
+  result_type result = solver_(qf_bv::bvand_tag{}, fst.first, snd.first);
   exprStack_.push(std::make_pair(result, fst.second || snd.second));
 }
 
@@ -283,7 +283,7 @@ void metaSMTVisitorImpl<SolverType>::visitOrOpr(OrOpr const &o) {
   stack_entry fst, snd;
   evalBinExpr(o, fst, snd);
 
-  result_type result = evaluate(solver_, qf_bv::bvor(fst.first, snd.first));
+  result_type result = solver_(qf_bv::bvor_tag{}, fst.first, snd.first);
   exprStack_.push(std::make_pair(result, fst.second || snd.second));
 }
 
@@ -292,7 +292,7 @@ void metaSMTVisitorImpl<SolverType>::visitLogicalAndOpr(LogicalAndOpr const &o) 
   stack_entry fst, snd;
   evalBinExpr(o, fst, snd);
 
-  result_type result = evaluate(solver_, preds::And(fst.first, snd.first));
+  result_type result = solver_(preds::and_tag{}, fst.first, snd.first);
   exprStack_.push(std::make_pair(result, fst.second || snd.second));
 }
 
@@ -301,7 +301,7 @@ void metaSMTVisitorImpl<SolverType>::visitLogicalOrOpr(LogicalOrOpr const &o) {
   stack_entry fst, snd;
   evalBinExpr(o, fst, snd);
 
-  result_type result = evaluate(solver_, preds::Or(fst.first, snd.first));
+  result_type result = solver_(preds::or_tag{}, fst.first, snd.first);
   exprStack_.push(std::make_pair(result, fst.second || snd.second));
 }
 
@@ -310,7 +310,7 @@ void metaSMTVisitorImpl<SolverType>::visitXorOpr(XorOpr const &o) {
   stack_entry fst, snd;
   evalBinExpr(o, fst, snd);
 
-  result_type result = evaluate(solver_, qf_bv::bvxor(fst.first, snd.first));
+  result_type result = solver_(qf_bv::bvxor_tag{}, fst.first, snd.first);
   exprStack_.push(std::make_pair(result, fst.second || snd.second));
 }
 
@@ -319,7 +319,7 @@ void metaSMTVisitorImpl<SolverType>::visitEqualOpr(EqualOpr const &o) {
   stack_entry fst, snd;
   evalBinExpr(o, fst, snd);
 
-  result_type result = evaluate(solver_, preds::equal(fst.first, snd.first));
+  result_type result = solver_(preds::equal_tag{}, fst.first, snd.first);
   exprStack_.push(std::make_pair(result, false));
 }
 
@@ -328,7 +328,7 @@ void metaSMTVisitorImpl<SolverType>::visitNotEqualOpr(NotEqualOpr const &o) {
   stack_entry fst, snd;
   evalBinExpr(o, fst, snd);
 
-  result_type result = evaluate(solver_, preds::nequal(fst.first, snd.first));
+  result_type result = solver_(preds::nequal_tag{}, fst.first, snd.first);
   exprStack_.push(std::make_pair(result, false));
 }
 
@@ -344,13 +344,15 @@ void metaSMTVisitorImpl<SolverType>::visitLessOpr(LessOpr const &o) {
 
   result_type result;
   if (lhs_signed && rhs_signed) {
-    result = evaluate(solver_, qf_bv::bvslt(lhs, rhs));
+    result = solver_(qf_bv::bvslt_tag{}, lhs, rhs);
   } else if (!(lhs_signed || rhs_signed)) {
-    result = evaluate(solver_, qf_bv::bvult(lhs, rhs));
+    result = solver_(qf_bv::bvult_tag{}, lhs, rhs);
   } else if (lhs_signed) {
-    result = evaluate(solver_, qf_bv::bvslt(qf_bv::sign_extend(1, lhs), qf_bv::zero_extend(1, rhs)));
+    result = solver_(qf_bv::bvslt_tag{}, solver_(qf_bv::sign_extend_tag{}, 1, lhs),
+                     solver_(qf_bv::zero_extend_tag{}, 1, rhs));
   } else {
-    result = evaluate(solver_, qf_bv::bvslt(qf_bv::zero_extend(1, lhs), qf_bv::sign_extend(1, rhs)));
+    result = solver_(qf_bv::bvslt_tag{}, solver_(qf_bv::zero_extend_tag{}, 1, lhs),
+                     solver_(qf_bv::sign_extend_tag{}, 1, rhs));
   }
   exprStack_.push(std::make_pair(result, false));
 }
@@ -367,13 +369,15 @@ void metaSMTVisitorImpl<SolverType>::visitLessEqualOpr(LessEqualOpr const &o) {
 
   result_type result;
   if (lhs_signed && rhs_signed) {
-    result = evaluate(solver_, qf_bv::bvsle(lhs, rhs));
+    result = solver_(qf_bv::bvsle_tag{}, lhs, rhs);
   } else if (!(lhs_signed || rhs_signed)) {
-    result = evaluate(solver_, qf_bv::bvule(lhs, rhs));
+    result = solver_(qf_bv::bvule_tag{}, lhs, rhs);
   } else if (lhs_signed) {
-    result = evaluate(solver_, qf_bv::bvsle(qf_bv::sign_extend(1, lhs), qf_bv::zero_extend(1, rhs)));
+    result = solver_(qf_bv::bvsle_tag{}, solver_(qf_bv::sign_extend_tag{}, 1, lhs),
+                     solver_(qf_bv::zero_extend_tag{}, 1, rhs));
   } else {
-    result = evaluate(solver_, qf_bv::bvsle(qf_bv::zero_extend(1, lhs), qf_bv::sign_extend(1, rhs)));
+    result = solver_(qf_bv::bvsle_tag{}, solver_(qf_bv::zero_extend_tag{}, 1, lhs),
+                     solver_(qf_bv::sign_extend_tag{}, 1, rhs));
   }
   exprStack_.push(std::make_pair(result, false));
 }
@@ -390,13 +394,15 @@ void metaSMTVisitorImpl<SolverType>::visitGreaterOpr(GreaterOpr const &o) {
 
   result_type result;
   if (lhs_signed && rhs_signed) {
-    result = evaluate(solver_, qf_bv::bvsgt(lhs, rhs));
+    result = solver_(qf_bv::bvsgt_tag{}, lhs, rhs);
   } else if (!(lhs_signed || rhs_signed)) {
-    result = evaluate(solver_, qf_bv::bvugt(lhs, rhs));
+    result = solver_(qf_bv::bvugt_tag{}, lhs, rhs);
   } else if (lhs_signed) {
-    result = evaluate(solver_, qf_bv::bvsgt(qf_bv::sign_extend(1, lhs), qf_bv::zero_extend(1, rhs)));
+    result = solver_(qf_bv::bvsgt_tag{}, solver_(qf_bv::sign_extend_tag{}, 1, lhs),
+                     solver_(qf_bv::zero_extend_tag{}, 1, rhs));
   } else {
-    result = evaluate(solver_, qf_bv::bvsgt(qf_bv::zero_extend(1, lhs), qf_bv::sign_extend(1, rhs)));
+    result = solver_(qf_bv::bvsgt_tag{}, solver_(qf_bv::zero_extend_tag{}, 1, lhs),
+                     solver_(qf_bv::sign_extend_tag{}, 1, rhs));
   }
   exprStack_.push(std::make_pair(result, false));
 }
@@ -413,13 +419,15 @@ void metaSMTVisitorImpl<SolverType>::visitGreaterEqualOpr(GreaterEqualOpr const 
 
   result_type result;
   if (lhs_signed && rhs_signed) {
-    result = evaluate(solver_, qf_bv::bvsge(lhs, rhs));
+    result = solver_(qf_bv::bvsge_tag{}, lhs, rhs);
   } else if (!(lhs_signed || rhs_signed)) {
-    result = evaluate(solver_, qf_bv::bvuge(lhs, rhs));
+    result = solver_(qf_bv::bvuge_tag{}, lhs, rhs);
   } else if (lhs_signed) {
-    result = evaluate(solver_, qf_bv::bvsge(qf_bv::sign_extend(1, lhs), qf_bv::zero_extend(1, rhs)));
+    result = solver_(qf_bv::bvsge_tag{}, solver_(qf_bv::sign_extend_tag{}, 1, lhs),
+                     solver_(qf_bv::zero_extend_tag{}, 1, rhs));
   } else {
-    result = evaluate(solver_, qf_bv::bvsge(qf_bv::zero_extend(1, lhs), qf_bv::sign_extend(1, rhs)));
+    result = solver_(qf_bv::bvsge_tag{}, solver_(qf_bv::zero_extend_tag{}, 1, lhs),
+                     solver_(qf_bv::sign_extend_tag{}, 1, rhs));
   }
   exprStack_.push(std::make_pair(result, false));
 }
@@ -429,7 +437,7 @@ void metaSMTVisitorImpl<SolverType>::visitPlusOpr(PlusOpr const &o) {
   stack_entry fst, snd;
   evalBinExpr(o, fst, snd);
 
-  result_type result = evaluate(solver_, qf_bv::bvadd(fst.first, snd.first));
+  result_type result = solver_(qf_bv::bvadd_tag{}, fst.first, snd.first);
   exprStack_.push(std::make_pair(result, fst.second || snd.second));
 }
 
@@ -438,7 +446,7 @@ void metaSMTVisitorImpl<SolverType>::visitMinusOpr(MinusOpr const &o) {
   stack_entry fst, snd;
   evalBinExpr(o, fst, snd);
 
-  result_type result = evaluate(solver_, qf_bv::bvsub(fst.first, snd.first));
+  result_type result = solver_(qf_bv::bvsub_tag{}, fst.first, snd.first);
   exprStack_.push(std::make_pair(result, fst.second || snd.second));
 }
 
@@ -447,12 +455,12 @@ void metaSMTVisitorImpl<SolverType>::visitMultipliesOpr(MultipliesOpr const &o) 
   stack_entry fst, snd;
   evalBinExpr(o, fst, snd);
 
-  result_type result = evaluate(solver_, qf_bv::bvmul(fst.first, snd.first));
+  result_type result = solver_(qf_bv::bvmul_tag{}, fst.first, snd.first);
   exprStack_.push(std::make_pair(result, fst.second || snd.second));
 }
 
 template <typename SolverType>
-void metaSMTVisitorImpl<SolverType>::visitDevideOpr(DevideOpr const &o) {
+void metaSMTVisitorImpl<SolverType>::visitDivideOpr(DivideOpr const &o) {
   stack_entry rhs_p, lhs_p;
   evalBinExpr(o, lhs_p, rhs_p);
 
@@ -463,13 +471,15 @@ void metaSMTVisitorImpl<SolverType>::visitDevideOpr(DevideOpr const &o) {
 
   result_type result;
   if (lhs_signed && rhs_signed) {
-    result = evaluate(solver_, qf_bv::bvsdiv(lhs, rhs));
+    result = solver_(qf_bv::bvsdiv_tag{}, lhs, rhs);
   } else if (!(lhs_signed || rhs_signed)) {
-    result = evaluate(solver_, qf_bv::bvudiv(lhs, rhs));
+    result = solver_(qf_bv::bvudiv_tag{}, lhs, rhs);
   } else if (lhs_signed) {
-    result = evaluate(solver_, qf_bv::bvsdiv(qf_bv::sign_extend(1, lhs), qf_bv::zero_extend(1, rhs)));
+    result = solver_(qf_bv::bvsdiv_tag{}, solver_(qf_bv::sign_extend_tag{}, 1, lhs),
+                     solver_(qf_bv::zero_extend_tag{}, 1, rhs));
   } else {
-    result = evaluate(solver_, qf_bv::bvsdiv(qf_bv::zero_extend(1, lhs), qf_bv::sign_extend(1, rhs)));
+    result = solver_(qf_bv::bvsdiv_tag{}, solver_(qf_bv::zero_extend_tag{}, 1, lhs),
+                     solver_(qf_bv::sign_extend_tag{}, 1, rhs));
   }
   exprStack_.push(std::make_pair(result, lhs_signed || rhs_signed));
 }
@@ -485,9 +495,9 @@ void metaSMTVisitorImpl<SolverType>::visitModuloOpr(ModuloOpr const &o) {
 
   result_type result;
   if (lhs_signed)
-    result = evaluate(solver_, qf_bv::bvsrem(lhs, rhs));
+    result = solver_(qf_bv::bvsrem_tag{}, lhs, rhs);
   else
-    result = evaluate(solver_, qf_bv::bvurem(lhs, rhs));
+    result = solver_(qf_bv::bvurem_tag{}, lhs, rhs);
 
   exprStack_.push(std::make_pair(result, lhs_signed || rhs_p.second));
 }
@@ -497,7 +507,7 @@ void metaSMTVisitorImpl<SolverType>::visitShiftLeftOpr(ShiftLeftOpr const &o) {
   stack_entry fst, snd;
   evalBinExpr(o, fst, snd);
 
-  result_type result = evaluate(solver_, qf_bv::bvshl(fst.first, snd.first));
+  result_type result = solver_(qf_bv::bvshl_tag{}, fst.first, snd.first);
   exprStack_.push(std::make_pair(result, fst.second));
 }
 
@@ -506,7 +516,7 @@ void metaSMTVisitorImpl<SolverType>::visitShiftRightOpr(ShiftRightOpr const &o) 
   stack_entry fst, snd;
   evalBinExpr(o, fst, snd);
 
-  result_type result = evaluate(solver_, qf_bv::bvshr(fst.first, snd.first));
+  result_type result = solver_(qf_bv::bvshr_tag{}, fst.first, snd.first);
   exprStack_.push(std::make_pair(result, fst.second));
 }
 
@@ -514,7 +524,8 @@ template <typename SolverType>
 void metaSMTVisitorImpl<SolverType>::visitIfThenElse(IfThenElse const &ite) {
   stack_entry fst, snd, trd;
   evalTernExpr(ite, fst, snd, trd);
-  result_type result = evaluate(solver_, preds::Ite(preds::equal(fst.first, preds::True), snd.first, trd.first));
+  result_type result =
+      solver_(preds::ite_tag{}, solver_(preds::equal_tag{}, fst.first, solver_(true)), snd.first, trd.first);
   exprStack_.push(std::make_pair(result, false));
 }
 
@@ -525,7 +536,7 @@ void metaSMTVisitorImpl<SolverType>::visitBitslice(Bitslice const &b) {
   stack_entry entry;
   pop(entry);
 
-  result_type result = evaluate(solver_, qf_bv::extract(b.r(), b.l(), entry.first));
+  result_type result = solver_(qf_bv::extract_tag{}, b.r(), b.l(), entry.first);
 
   exprStack_.push(std::make_pair(result, false));
 }
@@ -554,7 +565,7 @@ void metaSMTVisitorImpl<SolverType>::makeAssertion(Node const &expr) {
   stack_entry entry;
   pop(entry);
 
-  metaSMT::assertion(solver_, preds::equal(entry.first, preds::True));
+  metaSMT::assertion(solver_, solver_(preds::equal_tag{}, entry.first, solver_(true)));
 }
 
 template <typename SolverType>
@@ -584,7 +595,7 @@ void metaSMTVisitorImpl<SolverType>::makeAssumption(Node const &expr) {
   stack_entry entry;
   pop(entry);
 
-  assumptions_.push_back(evaluate(solver_, preds::equal(entry.first, preds::True)));
+  assumptions_.push_back(solver_(preds::equal_tag{}, entry.first, solver_(true)));
 }
 
 template <typename SolverType>
@@ -592,10 +603,10 @@ std::vector<unsigned int> metaSMTVisitorImpl<SolverType>::analyseSofts() {
   std::vector<unsigned int> result;
   // implements soft constraint semantics of the HVL e
   for (unsigned int i = 0; i < softs_.size(); i++) {
-    metaSMT::assumption(solver_, preds::equal(softs_[i], preds::True));
+    metaSMT::assumption(solver_, solver_(preds::equal_tag{}, softs_[i], solver_(true)));
     if (metaSMT::solve(solver_)) {
       // accept
-      metaSMT::assertion(solver_, preds::equal(softs_[i], preds::True));
+      metaSMT::assertion(solver_, solver_(preds::equal_tag{}, softs_[i], solver_(true)));
     } else {
       // reject
       result.push_back(i);
@@ -618,12 +629,12 @@ std::vector<std::vector<unsigned int> > metaSMTVisitorImpl<SolverType>::analyseC
     stack_entry st_entry;
     pop(st_entry);
 
-    result_type var(evaluate(solver_, preds::new_variable()));
-    metaSMT::assertion(solver_, preds::implies(var, st_entry.first));
+    result_type var(solver_(metaSMT::logic::new_variable()));
+    metaSMT::assertion(solver_, solver_(preds::implies_tag{}, var, st_entry.first));
     result_map.insert(std::make_pair(entry.first, var));
   }
 
-  results = metaSMT::analyze_conflicts(solver_, result_map, metaSMT::evaluate(solver_, preds::True), results);
+  results = metaSMT::analyze_conflicts(solver_, result_map, solver_(true), results);
 
   return results;
 }
@@ -646,7 +657,7 @@ bool metaSMTVisitorImpl<SolverType>::solve(bool ignoreSofts) {
 
     if (!ignoreSofts) {
       for (result_type const &item : softs_) {
-        metaSMT::assumption(solver_, preds::equal(item, preds::True));
+        metaSMT::assumption(solver_, solver_(preds::equal_tag{}, item, solver_(true)));
       }
     }
 

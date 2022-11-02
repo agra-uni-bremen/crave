@@ -1,5 +1,9 @@
 #include "../crave/utils/RandObjGenerator.hpp"
 
+#include <iostream>
+
+#include "../crave/frontend/WriteReference.hpp"
+
 namespace crave {
 
 rand_obj_gen::rand_obj_gen(unsigned int num, rand_obj_base* obj)

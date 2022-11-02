@@ -8,6 +8,7 @@
 #include <limits>
 #include <vector>
 
+#include "../frontend/RandBase.hpp"
 #include "../frontend/RandomBase.hpp"
 
 namespace crave {

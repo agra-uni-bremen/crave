@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include <boost/intrusive_ptr.hpp>
+#include <memory>
 #include <ostream>
 #include <set>
 
@@ -13,7 +13,7 @@ namespace crave {
 
 class Node;
 
-typedef boost::intrusive_ptr<Node> NodePtr;
+typedef std::shared_ptr<Node> NodePtr;
 
 class Node {
  protected:
@@ -24,12 +24,6 @@ class Node {
  public:
   virtual void visit(NodeVisitor* v) const { v->visitNode(*this); }
   std::ostream& printDot(std::ostream& out) const;
-
-  // reference counting
-  friend inline void intrusive_ptr_add_ref(Node* n) { ++(n->count_); }
-  friend inline void intrusive_ptr_release(Node* n) {
-    if (--(n->count_) == 0) delete n;
-  }
 
  private:
   unsigned int count_;
@@ -111,7 +105,7 @@ class VectorExpr : public Terminal {
 class UnaryExpression : public Node {
  protected:
   explicit UnaryExpression(NodePtr c) : Node(), child_(c) {}
-  UnaryExpression(UnaryExpression const& u) : Node(), child_() { child_.operator=(u.child().get()); }
+  UnaryExpression(UnaryExpression const& u) : Node(), child_() { child_ = u.child(); }
 
  public:
   virtual void visit(NodeVisitor* v) const { v->visitUnaryExpr(*this); }
@@ -185,8 +179,8 @@ class BinaryExpression : public Node {
  protected:
   BinaryExpression(NodePtr lhs, NodePtr rhs) : lhs_(lhs), rhs_(rhs) {}
   BinaryExpression(BinaryExpression const& b) : Node(), lhs_(), rhs_() {
-    lhs_.operator=(b.lhs().get());
-    rhs_.operator=(b.rhs().get());
+    lhs_ = b.lhs();
+    rhs_ = b.rhs();
   }
 
  public:
@@ -321,12 +315,12 @@ class MultipliesOpr : public BinaryOperator {
   void visit(NodeVisitor* v) const { v->visitMultipliesOpr(*this); }
 };
 
-class DevideOpr : public BinaryOperator {
+class DivideOpr : public BinaryOperator {
  public:
-  DevideOpr(NodePtr lhs, NodePtr rhs) : BinaryOperator(lhs, rhs) {}
-  DevideOpr(DevideOpr const& d) : BinaryOperator(d) {}
+  DivideOpr(NodePtr lhs, NodePtr rhs) : BinaryOperator(lhs, rhs) {}
+  DivideOpr(DivideOpr const& d) : BinaryOperator(d) {}
 
-  void visit(NodeVisitor* v) const { v->visitDevideOpr(*this); }
+  void visit(NodeVisitor* v) const { v->visitDivideOpr(*this); }
 };
 
 class ModuloOpr : public BinaryOperator {
@@ -365,9 +359,9 @@ class TernaryExpression : public Node {
  protected:
   explicit TernaryExpression(NodePtr a, NodePtr b, NodePtr c) : Node(), a_(a), b_(b), c_(c) {}
   TernaryExpression(TernaryExpression const& t) : Node(t), a_(), b_(), c_() {
-    a_.operator=(t.a().get());
-    b_.operator=(t.b().get());
-    c_.operator=(t.c().get());
+    a_ = t.a();
+    b_ = t.b();
+    c_ = t.c();
   }
 
  public:

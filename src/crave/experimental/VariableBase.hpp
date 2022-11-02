@@ -3,7 +3,6 @@
 #pragma once
 
 #include "../frontend/Constraint.hpp"
-#include "../ir/UserExpression.hpp"
 #include "Object.hpp"
 
 namespace crave {

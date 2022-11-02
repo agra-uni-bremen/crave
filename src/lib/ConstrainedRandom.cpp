@@ -9,7 +9,6 @@
 #include "../crave/RandomSeedManager.hpp"
 #include "../crave/backend/FactoryMetaSMT.hpp"
 #include "../crave/ir/VariableContainer.hpp"
-#include "../crave/utils/Settings.hpp"
 
 namespace crave {
 

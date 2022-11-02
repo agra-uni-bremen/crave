@@ -15,33 +15,30 @@ namespace crave {
  * define various type traits for SystemC data types
  */
 template <int N>
-struct is_signed<sc_dt::sc_bv<N> > : boost::mpl::false_ {};
+struct is_signed<sc_dt::sc_bv<N> > : std::false_type {};
 
 template <int N>
-struct is_signed<sc_dt::sc_int<N> > : boost::mpl::true_ {};
+struct is_signed<sc_dt::sc_int<N> > : std::true_type {};
 
 template <int N>
-struct is_signed<sc_dt::sc_uint<N> > : boost::mpl::false_ {};
-
-template <typename T, int N = 0>
-struct is_sysc_dt : boost::mpl::false_ {};
+struct is_signed<sc_dt::sc_uint<N> > : std::false_type {};
 
 template <int N>
-struct is_sysc_dt<sc_dt::sc_bv<N> > : boost::mpl::true_ {};
+struct is_sysc_dt<sc_dt::sc_bv<N> > : std::true_type {};
 
 template <int N>
-struct is_sysc_dt<sc_dt::sc_int<N> > : boost::mpl::true_ {};
+struct is_sysc_dt<sc_dt::sc_int<N> > : std::true_type {};
 
 template <int N>
-struct is_sysc_dt<sc_dt::sc_uint<N> > : boost::mpl::true_ {};
+struct is_sysc_dt<sc_dt::sc_uint<N> > : std::true_type {};
 
 template <class SCDT>
 struct sc_dt_width {};
 
 template <template <int> class SCDT, int N>
-struct sc_dt_width<SCDT<N> > : boost::mpl::int_<N> {};
+struct sc_dt_width<SCDT<N> > : std::integral_constant<std::size_t, N> {};
 
 template <typename T>
-struct bitsize_traits<T, typename boost::enable_if<is_sysc_dt<T> >::type> : sc_dt_width<T> {};
+struct bitsize_traits<T, typename std::enable_if<is_sysc_dt<T>::value>::type> : sc_dt_width<T> {};
 
 }  // namespace crave

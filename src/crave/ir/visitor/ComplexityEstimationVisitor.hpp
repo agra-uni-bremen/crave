@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <boost/intrusive_ptr.hpp>
+#include <memory>
 #include <stack>
 #include <utility>
 
@@ -12,7 +12,7 @@
 namespace crave {
 
 class ComplexityEstimationVisitor : NodeVisitor {
-  typedef boost::intrusive_ptr<Node> result_type;
+  typedef std::shared_ptr<Node> result_type;
   typedef std::pair<result_type, unsigned int> stack_entry;
 
  public:
@@ -49,7 +49,7 @@ class ComplexityEstimationVisitor : NodeVisitor {
   virtual void visitPlusOpr(PlusOpr const&);
   virtual void visitMinusOpr(MinusOpr const&);
   virtual void visitMultipliesOpr(MultipliesOpr const&);
-  virtual void visitDevideOpr(DevideOpr const&);
+  virtual void visitDivideOpr(DivideOpr const&);
   virtual void visitModuloOpr(ModuloOpr const&);
   virtual void visitShiftLeftOpr(ShiftLeftOpr const&);
   virtual void visitShiftRightOpr(ShiftRightOpr const&);

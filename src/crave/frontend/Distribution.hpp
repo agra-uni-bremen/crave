@@ -8,15 +8,11 @@
 #include <vector>
 
 #include "../RandomSeedManager.hpp"
-#include "ConstraintType.hpp"
 #include "WeightedRange.hpp"
 
 namespace crave {
 
 extern RandomSeedManager rng;
-
-template <typename T>
-struct distribution_tag;
 
 /*
  * Workaround for the issue that std::uniform_int_distribution is undefined for char,
@@ -83,31 +79,6 @@ struct distribution {
   }
 
   /**
-   * \brief Creates a distribution to use in constraints.
-   *
-   * This method creates a distribution_tag<T> which is recognized by the constraint frontend.
-   * Typically this is an input argument for crave::dist.
-   *
-   * \param range A (weighted) range to create a distribution of.
-   * \return distribution_tag<T> for constraint definition
-   */
-  static distribution_tag<T> create(const weighted_range<T>& range) { return distribution_tag<T>(distribution(range)); }
-
-  /**
-   * \brief Creates a simple distribution with given left and right bound.
-   *
-   * This method creates a distribution_tag<T> which is recognized by the constraint frontend.
-   * It internally creates an equally distributed range from left to right bound.
-   *
-   * \param left left bound of the range
-   * \param right right bound of the range
-   * \return distribution_tag<T> for constraint definition
-   */
-  static distribution_tag<T> simple_range(T left, T right) {
-    return distribution_tag<T>(distribution(range<T>(left, right)));
-  }
-
-  /**
    * \brief Deletes all ranges of this distribution
    */
   void reset() { ranges_.clear(); }
@@ -163,25 +134,12 @@ template <>
 struct distribution<bool> {
   explicit distribution(const double prob = 0.5);
 
-  static distribution_tag<bool> create(const double prob);
-
   bool nextValue() const;
 
   std::vector<weighted_range<bool> > const& ranges() const;
 
  private:
   double prob_;
-};
-
-template <typename T>
-struct distribution_tag : public Constraint<typename boost::proto::terminal<distribution<T> >::type> {
-  typedef Constraint<typename boost::proto::terminal<distribution<T> >::type> base_type;
-  explicit distribution_tag(distribution<T> d) : base_type(boost::proto::make_expr<boost::proto::tag::terminal>(d)) {}
-
-  distribution_tag& operator()(const weighted_range<T>& range) {
-    boost::proto::value (*this)(range);
-    return *this;
-  }
 };
 
 }  // namespace crave

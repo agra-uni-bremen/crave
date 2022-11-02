@@ -2,36 +2,18 @@
 
 #pragma once
 
-#include "ConstraintType.hpp"
 #include "Variable.hpp"
 
 namespace crave {
-// Vector
-
-/**
- * tag class for vector
- */
-template <typename value_type>
-struct vector_tag {
-  /**
-   * constructor
-   * @param id id of this object
-   */
-  explicit vector_tag(int id) : id_(id) {}
-  int id_;
-};
-
 /**
  * class for internal symbolic vector variables
  */
 template <typename value_type_>
-struct Vector : public Constraint<typename boost::proto::terminal<vector_tag<value_type_> >::type> {
-  typedef Constraint<typename boost::proto::terminal<vector_tag<value_type_> >::type> base_type;
-
+struct Vector {
   /**
    * constructor
    */
-  Vector() : base_type(boost::proto::make_expr<boost::proto::tag::terminal>(vector_tag<value_type_>(new_var_id()))) {}
+  Vector() : id_(new_var_id()) {}
 
   typedef value_type_ value_type;
 
@@ -39,7 +21,7 @@ struct Vector : public Constraint<typename boost::proto::terminal<vector_tag<val
    * get id of this symbolic vector
    * @return id
    */
-  int id() const { return boost::proto::value(*this).id_; }
+  int id() const { return id_; }
 
   /**
    * number of elements in vector as a symbolic variable to used in constraints
@@ -48,6 +30,7 @@ struct Vector : public Constraint<typename boost::proto::terminal<vector_tag<val
   const Variable<unsigned int>& size() const { return size_; }
 
  private:
+  int id_;
   Variable<unsigned int> size_;
 };
 }  // namespace crave

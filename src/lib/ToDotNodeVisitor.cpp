@@ -138,7 +138,7 @@ void ToDotVisitor::visitMinusOpr(MinusOpr const &o) { binaryOperator(o, "minus (
 
 void ToDotVisitor::visitMultipliesOpr(MultipliesOpr const &o) { binaryOperator(o, "multiplies (*)"); }
 
-void ToDotVisitor::visitDevideOpr(DevideOpr const &o) { binaryOperator(o, "divide (/)"); }
+void ToDotVisitor::visitDivideOpr(DivideOpr const &o) { binaryOperator(o, "divide (/)"); }
 
 void ToDotVisitor::visitModuloOpr(ModuloOpr const &o) { binaryOperator(o, "modulo (%)"); }
 

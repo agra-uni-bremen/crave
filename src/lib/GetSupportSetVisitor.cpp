@@ -71,7 +71,7 @@ void GetSupportSetVisitor::visitMinusOpr(const MinusOpr& m) { visitBinaryExpr(m)
 
 void GetSupportSetVisitor::visitMultipliesOpr(const MultipliesOpr& m) { visitBinaryExpr(m); }
 
-void GetSupportSetVisitor::visitDevideOpr(const DevideOpr& d) { visitBinaryExpr(d); }
+void GetSupportSetVisitor::visitDivideOpr(const DivideOpr& d) { visitBinaryExpr(d); }
 
 void GetSupportSetVisitor::visitModuloOpr(const ModuloOpr& m) { visitBinaryExpr(m); }
 

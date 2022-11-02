@@ -44,7 +44,7 @@ class GetSupportSetVisitor : public NodeVisitor {
   virtual void visitPlusOpr(PlusOpr const&);
   virtual void visitMinusOpr(MinusOpr const&);
   virtual void visitMultipliesOpr(MultipliesOpr const&);
-  virtual void visitDevideOpr(DevideOpr const&);
+  virtual void visitDivideOpr(DivideOpr const&);
   virtual void visitModuloOpr(ModuloOpr const&);
   virtual void visitShiftLeftOpr(ShiftLeftOpr const&);
   virtual void visitShiftRightOpr(ShiftRightOpr const&);

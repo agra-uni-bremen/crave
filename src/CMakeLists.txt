@@ -1,7 +1,7 @@
 add_subdirectory(lib)
 
-install(DIRECTORY crave
+install(
+  DIRECTORY crave
   DESTINATION include
-  FILES_MATCHING PATTERN "*.hpp"
-)
-
+  FILES_MATCHING
+  PATTERN "*.hpp")

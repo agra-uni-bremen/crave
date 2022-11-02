@@ -7,7 +7,6 @@
 
 #include "ConstraintManager.hpp"
 #include "ConstraintPartition.hpp"
-#include "Context.hpp"
 
 namespace crave {
 

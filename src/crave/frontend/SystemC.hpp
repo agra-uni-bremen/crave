@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "Distribution.hpp"
-#include "RandomBase.hpp"
+#include "RandvInterface.hpp"
 #include "bitsize_traits_sysc.hpp"
 
 namespace crave {
@@ -14,7 +14,7 @@ namespace crave {
  * create constrant expression from a value of SystemC data types
  */
 template <typename T>
-struct to_constant_expr<T, typename boost::enable_if<is_sysc_dt<T> >::type> {
+struct to_constant_expr<T, typename std::enable_if<is_sysc_dt<T>::value>::type> {
   Constant operator()(T value) {
     return Constant(value.to_uint64(), bitsize_traits<T>::value, crave::is_signed<T>::value);
   }

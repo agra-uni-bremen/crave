@@ -18,7 +18,7 @@ struct ReferenceExpressionImpl : public ReferenceExpression {
   virtual ReferenceExpression::result_type expr() const {
     unsigned width = bitsize_traits<Integer>::value;
     bool sign = crave::is_signed<Integer>::value;
-    return new EqualOpr(expr_, new Constant(value_, width, sign));
+    return std::make_shared<EqualOpr>(expr_, std::make_shared<Constant>(value_, width, sign));
   }
 
  private:

@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <boost/intrusive_ptr.hpp>
 #include <map>
 #include <memory>
 #include <string>
@@ -17,7 +16,7 @@ namespace crave {
 
 class metaSMTVisitor : public NodeVisitor {
  protected:
-  typedef boost::intrusive_ptr<VariableExpr> VariablePtr;
+  typedef std::shared_ptr<VariableExpr> VariablePtr;
 
  public:
   virtual void makeAssertion(Node const&) = 0;

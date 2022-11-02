@@ -14,7 +14,7 @@ namespace crave {
  *
  */
 struct VectorSolver {
-  typedef boost::intrusive_ptr<VariableExpr> VariablePtr;
+  typedef std::shared_ptr<VariableExpr> VariablePtr;
   typedef std::vector<VariablePtr> VectorElements;
 
   explicit VectorSolver(int vector_id);

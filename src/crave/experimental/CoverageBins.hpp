@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 
-#include "../ir/UserExpression.hpp"
 #include "../utils/Evaluator.hpp"
 #include "Expression.hpp"
 #include "Object.hpp"

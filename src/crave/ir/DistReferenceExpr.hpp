@@ -3,6 +3,7 @@
 #pragma once
 
 #include "../frontend/Distribution.hpp"
+#include "ReferenceExpressionType.hpp"
 
 namespace crave {
 
@@ -13,7 +14,7 @@ struct DistReferenceExpr : ReferenceExpression {
   virtual ReferenceExpression::result_type expr() const {
     unsigned width = bitsize_traits<Integer>::value;
     bool sign = crave::is_signed<Integer>::value;
-    return new EqualOpr(expr_, new Constant(dist_.nextValue(), width, sign));
+    return std::make_shared<EqualOpr>(expr_, std::make_shared<Constant>(dist_.nextValue(), width, sign));
   }
 
  private:

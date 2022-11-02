@@ -25,12 +25,7 @@
 namespace crave {
 class BoolectorSolver : public metaSMT::solver::Boolector {
  public:
-  BoolectorSolver() {
-#ifndef metaSMT_BOOLECTOR_1_API
-    boolector_set_opt(_btor, "rewrite_level", 1);
-//    assert(boolector_set_sat_solver_minisat(_btor));
-#endif
-  }
+  BoolectorSolver() { boolector_set_opt(_btor, BTOR_OPT_REWRITE_LEVEL, 1); }
 };
 }  // namespace crave
 DEFINE_SOLVER(crave::BOOLECTOR, crave::BoolectorSolver);
@@ -89,8 +84,12 @@ void FactoryMetaSMT::setSolverType(std::string const& type) {
     solver_type_ = YICES2;
   else if (type == "Z3")
     solver_type_ = Z3;
-  else if (type == "Cudd")
+  else if (type == "CUDD")
     solver_type_ = CUDD;
+  else {
+    std::cerr << "Invalid solver backend: " << type << std::endl;
+    std::abort();
+  }
 }
 
 #define TRY_GET_SOLVER(solver)                                                        \

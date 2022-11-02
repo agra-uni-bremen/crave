@@ -22,7 +22,6 @@ struct Generator {
   Generator()
       : constr_mng_(),
         var_ctn_(variable_container()),
-        ctx_(var_ctn_),
         var_gen_(new VariableGenerator(*var_ctn_)),
         var_cov_gen_(*var_ctn_),
         vec_gen_(),
@@ -32,7 +31,6 @@ struct Generator {
   explicit Generator(Expr expr)
       : constr_mng_(),
         var_ctn_(variable_container()),
-        ctx_(var_ctn_),
         var_gen_(new VariableGenerator(*var_ctn_)),
         var_cov_gen_(*var_ctn_),
         vec_gen_(),
@@ -44,39 +42,37 @@ struct Generator {
 
   void enable_multithreading();
 
-  template <typename Expr>
-  Generator& operator()(Expr expr) {
-    constr_mng_.makeConstraint(expr, &ctx_);
+  Generator& operator()(NodePtr expr) { return hard(expr); }
+
+  Generator& operator()(std::string constraint_name, NodePtr expr) { return hard(constraint_name, expr); }
+
+  Generator& hard(NodePtr expr) {
+    constr_mng_.makeConstraint(expr);
     return *this;
   }
 
-  template <typename Expr>
-  Generator& operator()(std::string constraint_name, Expr expr) {
-    constr_mng_.makeConstraint(constraint_name, expr, &ctx_);
+  Generator& hard(std::string constraint_name, NodePtr expr) {
+    constr_mng_.makeConstraint(constraint_name, expr);
     return *this;
   }
 
-  template <typename Expr>
-  Generator& soft(Expr e) {
-    constr_mng_.makeConstraint(e, &ctx_, true);
+  Generator& soft(NodePtr e) {
+    constr_mng_.makeConstraint(e, true);
     return *this;
   }
 
-  template <typename Expr>
-  Generator& soft(std::string name, Expr e) {
-    constr_mng_.makeConstraint(name, e, &ctx_, true);
+  Generator& soft(std::string name, NodePtr e) {
+    constr_mng_.makeConstraint(name, e, true);
     return *this;
   }
 
-  template <typename Expr>
-  Generator& cover(Expr e) {
-    constr_mng_.makeConstraint(e, &ctx_, false, true);
+  Generator& cover(NodePtr e) {
+    constr_mng_.makeConstraint(e, false, true);
     return *this;
   }
 
-  template <typename Expr>
-  Generator& cover(std::string name, Expr e) {
-    constr_mng_.makeConstraint(name, e, &ctx_, false, true);
+  Generator& cover(std::string name, NodePtr e) {
+    constr_mng_.makeConstraint(name, e, false, true);
     return *this;
   }
 
@@ -119,6 +115,31 @@ struct Generator {
     return result;
   }
 
+  template <typename T>
+  NodePtr write_var(Variable<T>& v) {
+    return var_ctn_->new_write_var(&v, bitsize_traits<T>::value, std::is_signed<T>::value);
+  }
+  template <typename T>
+  NodePtr write_var(T& v) {
+    return var_ctn_->new_write_var(&v, bitsize_traits<T>::value, std::is_signed<T>::value);
+  }
+  template <typename T>
+  NodePtr write_var(randv<T>& v) {
+    return var_ctn_->new_write_var(&v.value_ref(), bitsize_traits<T>::value, std::is_signed<T>::value);
+  }
+  template <typename T>
+  NodePtr read_var(const Variable<T>& v) {
+    return var_ctn_->new_read_var(&v, bitsize_traits<T>::value, std::is_signed<T>::value);
+  }
+  template <typename T>
+  NodePtr read_var(const T& v) {
+    return var_ctn_->new_read_var(&v, bitsize_traits<T>::value, std::is_signed<T>::value);
+  }
+  template <typename T>
+  NodePtr read_var(randv<T>& v) {
+    return var_ctn_->new_read_var(&v.value_ref(), bitsize_traits<T>::value, std::is_signed<T>::value);
+  }
+
   void addVecId(int id) { to_be_generated_vec_ids_.insert(id); }
 
  private:
@@ -129,9 +150,6 @@ struct Generator {
   // variables
   VariableContainer* var_ctn_;
   std::set<int> to_be_generated_vec_ids_;
-
-  // context
-  Context ctx_;
 
   // variable solvers
   VariableGenerator* var_gen_;

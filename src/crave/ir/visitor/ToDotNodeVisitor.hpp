@@ -45,7 +45,7 @@ class ToDotVisitor : public NodeVisitor {
   void visitPlusOpr(PlusOpr const&);
   void visitMinusOpr(MinusOpr const&);
   void visitMultipliesOpr(MultipliesOpr const&);
-  void visitDevideOpr(DevideOpr const&);
+  void visitDivideOpr(DivideOpr const&);
   void visitModuloOpr(ModuloOpr const&);
   void visitShiftLeftOpr(ShiftLeftOpr const&);
   void visitShiftRightOpr(ShiftRightOpr const&);

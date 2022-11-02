@@ -2,6 +2,7 @@
 
 #include "../crave/ir/visitor/ReplaceVisitor.hpp"
 
+#include <cassert>
 #include <map>
 #include <stdexcept>
 
@@ -73,7 +74,7 @@ void ReplaceVisitor::visitPlaceholder(Placeholder const& p) {
     // v already exists
     aux_stack_.push(ite->second);
   } else {
-    aux_stack_.push(new Constant(vec_idx_, placeholder_bitsize(), false));
+    aux_stack_.push(std::make_shared<Constant>(vec_idx_, placeholder_bitsize(), false));
     terminals_.insert(std::make_pair(p.id(), aux_stack_.top()));
   }
   updateResult();
@@ -85,14 +86,14 @@ void ReplaceVisitor::visitVariableExpr(VariableExpr const& v) {
     // v already exists
     aux_stack_.push(ite->second);
   } else {
-    aux_stack_.push(new VariableExpr(v));
+    aux_stack_.push(std::make_shared<VariableExpr>(v));
     terminals_.insert(std::make_pair(v.id(), aux_stack_.top()));
   }
   updateResult();
   subscript_stack_.push(0);
 }
 void ReplaceVisitor::visitConstant(Constant const& c) {
-  aux_stack_.push(new Constant(c));
+  aux_stack_.push(std::make_shared<Constant>(c));
   updateResult();
   subscript_stack_.push(c.value());
 }
@@ -102,7 +103,7 @@ void ReplaceVisitor::visitVectorExpr(VectorExpr const& v) {
     // v already exists
     aux_stack_.push(ite->second);
   } else {
-    aux_stack_.push(new VectorExpr(v));
+    aux_stack_.push(std::make_shared<VectorExpr>(v));
     terminals_.insert(std::make_pair(v.id(), aux_stack_.top()));
   }
   updateResult();
@@ -111,7 +112,7 @@ void ReplaceVisitor::visitVectorExpr(VectorExpr const& v) {
 void ReplaceVisitor::visitNotOpr(NotOpr const& n) {
   NodePtr child;
   evalUnaryExpr(n, child);
-  aux_stack_.push(new NotOpr(child));
+  aux_stack_.push(std::make_shared<NotOpr>(child));
   updateResult();
   int idx = subscript_stack_.top();
   subscript_stack_.pop();
@@ -120,7 +121,7 @@ void ReplaceVisitor::visitNotOpr(NotOpr const& n) {
 void ReplaceVisitor::visitNegOpr(NegOpr const& n) {
   NodePtr child;
   evalUnaryExpr(n, child);
-  aux_stack_.push(new NegOpr(child));
+  aux_stack_.push(std::make_shared<NegOpr>(child));
   updateResult();
   int idx = subscript_stack_.top();
   subscript_stack_.pop();
@@ -129,7 +130,7 @@ void ReplaceVisitor::visitNegOpr(NegOpr const& n) {
 void ReplaceVisitor::visitComplementOpr(ComplementOpr const& c) {
   NodePtr child;
   evalUnaryExpr(c, child);
-  aux_stack_.push(new ComplementOpr(child));
+  aux_stack_.push(std::make_shared<ComplementOpr>(child));
   updateResult();
   int idx = subscript_stack_.top();
   subscript_stack_.pop();
@@ -138,19 +139,19 @@ void ReplaceVisitor::visitComplementOpr(ComplementOpr const& c) {
 void ReplaceVisitor::visitInside(Inside const& i) {
   NodePtr child;
   evalUnaryExpr(i, child);
-  aux_stack_.push(new Inside(child, i.collection()));
+  aux_stack_.push(std::make_shared<Inside>(child, i.collection()));
   updateResult();
 }
 void ReplaceVisitor::visitExtendExpr(ExtendExpression const& e) {
   NodePtr child;
   evalUnaryExpr(e, child);
-  aux_stack_.push(new ExtendExpression(child, e.value()));
+  aux_stack_.push(std::make_shared<ExtendExpression>(child, e.value()));
   updateResult();
 }
 void ReplaceVisitor::visitAndOpr(AndOpr const& a) {
   NodePtr lhs, rhs;
   evalBinExpr(a, lhs, rhs);
-  aux_stack_.push(new AndOpr(lhs, rhs));
+  aux_stack_.push(std::make_shared<AndOpr>(lhs, rhs));
   updateResult();
   int l_val, r_val;
   evalBinSubscript(l_val, r_val);
@@ -159,7 +160,7 @@ void ReplaceVisitor::visitAndOpr(AndOpr const& a) {
 void ReplaceVisitor::visitOrOpr(OrOpr const& o) {
   NodePtr lhs, rhs;
   evalBinExpr(o, lhs, rhs);
-  aux_stack_.push(new OrOpr(lhs, rhs));
+  aux_stack_.push(std::make_shared<OrOpr>(lhs, rhs));
   updateResult();
   int l_val, r_val;
   evalBinSubscript(l_val, r_val);
@@ -168,7 +169,7 @@ void ReplaceVisitor::visitOrOpr(OrOpr const& o) {
 void ReplaceVisitor::visitLogicalAndOpr(LogicalAndOpr const& a) {
   NodePtr lhs, rhs;
   evalBinExpr(a, lhs, rhs);
-  aux_stack_.push(new LogicalAndOpr(lhs, rhs));
+  aux_stack_.push(std::make_shared<LogicalAndOpr>(lhs, rhs));
   updateResult();
   int l_val, r_val;
   evalBinSubscript(l_val, r_val);
@@ -177,7 +178,7 @@ void ReplaceVisitor::visitLogicalAndOpr(LogicalAndOpr const& a) {
 void ReplaceVisitor::visitLogicalOrOpr(LogicalOrOpr const& o) {
   NodePtr lhs, rhs;
   evalBinExpr(o, lhs, rhs);
-  aux_stack_.push(new LogicalOrOpr(lhs, rhs));
+  aux_stack_.push(std::make_shared<LogicalOrOpr>(lhs, rhs));
   updateResult();
   int l_val, r_val;
   evalBinSubscript(l_val, r_val);
@@ -186,7 +187,7 @@ void ReplaceVisitor::visitLogicalOrOpr(LogicalOrOpr const& o) {
 void ReplaceVisitor::visitXorOpr(XorOpr const& x) {
   NodePtr lhs, rhs;
   evalBinExpr(x, lhs, rhs);
-  aux_stack_.push(new XorOpr(lhs, rhs));
+  aux_stack_.push(std::make_shared<XorOpr>(lhs, rhs));
   updateResult();
   int l_val, r_val;
   evalBinSubscript(l_val, r_val);
@@ -195,7 +196,7 @@ void ReplaceVisitor::visitXorOpr(XorOpr const& x) {
 void ReplaceVisitor::visitEqualOpr(EqualOpr const& e) {
   NodePtr lhs, rhs;
   evalBinExpr(e, lhs, rhs);
-  aux_stack_.push(new EqualOpr(lhs, rhs));
+  aux_stack_.push(std::make_shared<EqualOpr>(lhs, rhs));
   updateResult();
   int l_val, r_val;
   evalBinSubscript(l_val, r_val);
@@ -204,7 +205,7 @@ void ReplaceVisitor::visitEqualOpr(EqualOpr const& e) {
 void ReplaceVisitor::visitNotEqualOpr(NotEqualOpr const& n) {
   NodePtr lhs, rhs;
   evalBinExpr(n, lhs, rhs);
-  aux_stack_.push(new NotEqualOpr(lhs, rhs));
+  aux_stack_.push(std::make_shared<NotEqualOpr>(lhs, rhs));
   updateResult();
   int l_val, r_val;
   evalBinSubscript(l_val, r_val);
@@ -213,7 +214,7 @@ void ReplaceVisitor::visitNotEqualOpr(NotEqualOpr const& n) {
 void ReplaceVisitor::visitLessOpr(LessOpr const& l) {
   NodePtr lhs, rhs;
   evalBinExpr(l, lhs, rhs);
-  aux_stack_.push(new LessOpr(lhs, rhs));
+  aux_stack_.push(std::make_shared<LessOpr>(lhs, rhs));
   updateResult();
   int l_val, r_val;
   evalBinSubscript(l_val, r_val);
@@ -222,7 +223,7 @@ void ReplaceVisitor::visitLessOpr(LessOpr const& l) {
 void ReplaceVisitor::visitLessEqualOpr(LessEqualOpr const& l) {
   NodePtr lhs, rhs;
   evalBinExpr(l, lhs, rhs);
-  aux_stack_.push(new LessEqualOpr(lhs, rhs));
+  aux_stack_.push(std::make_shared<LessEqualOpr>(lhs, rhs));
   updateResult();
   int l_val, r_val;
   evalBinSubscript(l_val, r_val);
@@ -231,7 +232,7 @@ void ReplaceVisitor::visitLessEqualOpr(LessEqualOpr const& l) {
 void ReplaceVisitor::visitGreaterOpr(GreaterOpr const& g) {
   NodePtr lhs, rhs;
   evalBinExpr(g, lhs, rhs);
-  aux_stack_.push(new GreaterOpr(lhs, rhs));
+  aux_stack_.push(std::make_shared<GreaterOpr>(lhs, rhs));
   updateResult();
   int l_val, r_val;
   evalBinSubscript(l_val, r_val);
@@ -240,7 +241,7 @@ void ReplaceVisitor::visitGreaterOpr(GreaterOpr const& g) {
 void ReplaceVisitor::visitGreaterEqualOpr(GreaterEqualOpr const& g) {
   NodePtr lhs, rhs;
   evalBinExpr(g, lhs, rhs);
-  aux_stack_.push(new GreaterEqualOpr(lhs, rhs));
+  aux_stack_.push(std::make_shared<GreaterEqualOpr>(lhs, rhs));
   updateResult();
   int l_val, r_val;
   evalBinSubscript(l_val, r_val);
@@ -249,7 +250,7 @@ void ReplaceVisitor::visitGreaterEqualOpr(GreaterEqualOpr const& g) {
 void ReplaceVisitor::visitPlusOpr(PlusOpr const& p) {
   NodePtr lhs, rhs;
   evalBinExpr(p, lhs, rhs);
-  aux_stack_.push(new PlusOpr(lhs, rhs));
+  aux_stack_.push(std::make_shared<PlusOpr>(lhs, rhs));
   updateResult();
   int l_val, r_val;
   evalBinSubscript(l_val, r_val);
@@ -258,7 +259,7 @@ void ReplaceVisitor::visitPlusOpr(PlusOpr const& p) {
 void ReplaceVisitor::visitMinusOpr(MinusOpr const& m) {
   NodePtr lhs, rhs;
   evalBinExpr(m, lhs, rhs);
-  aux_stack_.push(new MinusOpr(lhs, rhs));
+  aux_stack_.push(std::make_shared<MinusOpr>(lhs, rhs));
   updateResult();
   int l_val, r_val;
   evalBinSubscript(l_val, r_val);
@@ -267,16 +268,16 @@ void ReplaceVisitor::visitMinusOpr(MinusOpr const& m) {
 void ReplaceVisitor::visitMultipliesOpr(MultipliesOpr const& m) {
   NodePtr lhs, rhs;
   evalBinExpr(m, lhs, rhs);
-  aux_stack_.push(new MultipliesOpr(lhs, rhs));
+  aux_stack_.push(std::make_shared<MultipliesOpr>(lhs, rhs));
   updateResult();
   int l_val, r_val;
   evalBinSubscript(l_val, r_val);
   subscript_stack_.push(l_val * r_val);
 }
-void ReplaceVisitor::visitDevideOpr(DevideOpr const& d) {
+void ReplaceVisitor::visitDivideOpr(DivideOpr const& d) {
   NodePtr lhs, rhs;
   evalBinExpr(d, lhs, rhs);
-  aux_stack_.push(new DevideOpr(lhs, rhs));
+  aux_stack_.push(std::make_shared<DivideOpr>(lhs, rhs));
   updateResult();
   int l_val, r_val;
   evalBinSubscript(l_val, r_val);
@@ -285,7 +286,7 @@ void ReplaceVisitor::visitDevideOpr(DevideOpr const& d) {
 void ReplaceVisitor::visitModuloOpr(ModuloOpr const& m) {
   NodePtr lhs, rhs;
   evalBinExpr(m, lhs, rhs);
-  aux_stack_.push(new ModuloOpr(lhs, rhs));
+  aux_stack_.push(std::make_shared<ModuloOpr>(lhs, rhs));
   updateResult();
   int l_val, r_val;
   evalBinSubscript(l_val, r_val);
@@ -294,7 +295,7 @@ void ReplaceVisitor::visitModuloOpr(ModuloOpr const& m) {
 void ReplaceVisitor::visitShiftLeftOpr(ShiftLeftOpr const& s) {
   NodePtr lhs, rhs;
   evalBinExpr(s, lhs, rhs);
-  aux_stack_.push(new ShiftLeftOpr(lhs, rhs));
+  aux_stack_.push(std::make_shared<ShiftLeftOpr>(lhs, rhs));
   updateResult();
   int l_val, r_val;
   evalBinSubscript(l_val, r_val);
@@ -303,7 +304,7 @@ void ReplaceVisitor::visitShiftLeftOpr(ShiftLeftOpr const& s) {
 void ReplaceVisitor::visitShiftRightOpr(ShiftRightOpr const& s) {
   NodePtr lhs, rhs;
   evalBinExpr(s, lhs, rhs);
-  aux_stack_.push(new ShiftRightOpr(lhs, rhs));
+  aux_stack_.push(std::make_shared<ShiftRightOpr>(lhs, rhs));
   updateResult();
   int l_val, r_val;
   evalBinSubscript(l_val, r_val);
@@ -318,7 +319,7 @@ void ReplaceVisitor::visitVectorAccess(VectorAccess const& v) {
   if (0 <= i && i < static_cast<int>(variables_->size())) {
     VectorExpr& vec = *static_cast<VectorExpr*>(lhs.get());
     VariableExpr& var = *static_cast<VariableExpr*>(variables_->at(i).get());
-    variables_->at(i) = new VariableExpr(var.id(), vec.bitsize(), vec.sign());
+    variables_->at(i) = std::make_shared<VariableExpr>(var.id(), vec.bitsize(), vec.sign());
 
     aux_stack_.push(variables_->at(i));
   } else {
@@ -331,7 +332,7 @@ void ReplaceVisitor::visitVectorAccess(VectorAccess const& v) {
 void ReplaceVisitor::visitIfThenElse(IfThenElse const& i) {
   NodePtr a, b, c;
   evalTernExpr(i, a, b, c);
-  aux_stack_.push(new IfThenElse(a, b, c));
+  aux_stack_.push(std::make_shared<IfThenElse>(a, b, c));
   updateResult();
   int a_val, b_val, c_val;
   evalTernSubscript(a_val, b_val, c_val);
@@ -347,7 +348,7 @@ void ReplaceVisitor::visitUnique(Unique const&) {
 void ReplaceVisitor::visitBitslice(Bitslice const& b) {
   NodePtr child;
   evalUnaryExpr(b, child);
-  aux_stack_.push(new Bitslice(child, b.r(), b.l()));
+  aux_stack_.push(std::make_shared<Bitslice>(child, b.r(), b.l()));
   updateResult();
   int idx = subscript_stack_.top();
   subscript_stack_.pop();

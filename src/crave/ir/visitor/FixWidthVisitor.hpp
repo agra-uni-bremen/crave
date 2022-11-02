@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include <boost/intrusive_ptr.hpp>
+#include <cassert>
+#include <memory>
 #include <stack>
 #include <utility>
 
@@ -12,7 +13,7 @@
 namespace crave {
 
 class FixWidthVisitor : NodeVisitor {
-  typedef boost::intrusive_ptr<Node> result_type;
+  typedef std::shared_ptr<Node> result_type;
   typedef std::pair<result_type, int> stack_entry;
 
  public:
@@ -49,7 +50,7 @@ class FixWidthVisitor : NodeVisitor {
   virtual void visitPlusOpr(PlusOpr const&);
   virtual void visitMinusOpr(MinusOpr const&);
   virtual void visitMultipliesOpr(MultipliesOpr const&);
-  virtual void visitDevideOpr(DevideOpr const&);
+  virtual void visitDivideOpr(DivideOpr const&);
   virtual void visitModuloOpr(ModuloOpr const&);
   virtual void visitShiftLeftOpr(ShiftLeftOpr const&);
   virtual void visitShiftRightOpr(ShiftRightOpr const&);

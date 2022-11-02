@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "../frontend/bitsize_traits.hpp"
-#include "../ir/UserExpression.hpp"
 
 namespace crave {
 

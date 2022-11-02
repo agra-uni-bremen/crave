@@ -1,9 +1,3 @@
-[submodule "dependencies"]
-	path = dependencies
-	url = https://github.com/agra-uni-bremen/dependencies.git
-[submodule "examples"]
-	path = examples
-	url = https://github.com/hoangmle/crave-examples.git
 [submodule "metaSMT"]
-	path = metaSMT
-	url = ../wd-verilator-for-asic-verification-metasmt.git
+    path = metaSMT
+    url = ../metaSMT.git

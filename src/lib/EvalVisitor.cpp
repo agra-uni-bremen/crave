@@ -227,7 +227,7 @@ void EvalVisitor::visitMultipliesOpr(const MultipliesOpr& m) {
       lhs.second && rhs.second));
 }
 
-void EvalVisitor::visitDevideOpr(const DevideOpr& d) {
+void EvalVisitor::visitDivideOpr(const DivideOpr& d) {
   stack_entry lhs, rhs;
   evalBinExpr(d, lhs, rhs);
 

@@ -2,15 +2,15 @@
 
 #pragma once
 
+#include <iostream>
 #include <map>
 #include <string>
 #include <vector>
 
 #include "AssignResultToRef.hpp"
-#include "Constraint.hpp"
 #include "Distribution.hpp"
 #include "RandBase.hpp"
-#include "RandvInterface.hpp"
+#include "VectorConstraint.hpp"
 
 namespace crave {
 

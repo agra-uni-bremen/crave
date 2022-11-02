@@ -9,6 +9,4 @@ bool get_result(EvalVisitor const& v) {
 
 void Evaluator::assign(unsigned id, Constant c) { assignments_[id] = c; }
 
-bool Evaluator::evaluate(expression const& expr) { return visitor_.evaluate(*boost::proto::value(expr)); }
-
 }  // namespace crave

@@ -2,10 +2,7 @@
 
 #pragma once
 
-#include <boost/proto/eval.hpp>
-
 #include "../frontend/bitsize_traits.hpp"
-#include "../ir/UserExpression.hpp"
 #include "../ir/visitor/EvalVisitor.hpp"
 #include "stdint.h"
 
@@ -33,12 +30,6 @@ class Evaluator {
   }
 
   void assign(unsigned id, Constant c);
-
-  template <typename Expr>
-  bool evaluate(Expr expr) {
-    return evaluate(make_expression(expr));
-  }
-  bool evaluate(expression const& expr);
 
   template <typename Integer>
   Integer result() const {

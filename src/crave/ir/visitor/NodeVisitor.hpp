@@ -44,7 +44,7 @@ class Bitslice;
 class PlusOpr;
 class MinusOpr;
 class MultipliesOpr;
-class DevideOpr;
+class DivideOpr;
 class ModuloOpr;
 
 // misc
@@ -92,7 +92,7 @@ class NodeVisitor {
   virtual void visitPlusOpr(PlusOpr const&) = 0;
   virtual void visitMinusOpr(MinusOpr const&) = 0;
   virtual void visitMultipliesOpr(MultipliesOpr const&) = 0;
-  virtual void visitDevideOpr(DevideOpr const&) = 0;
+  virtual void visitDivideOpr(DivideOpr const&) = 0;
   virtual void visitModuloOpr(ModuloOpr const&) = 0;
   virtual void visitShiftLeftOpr(ShiftLeftOpr const&) = 0;
   virtual void visitShiftRightOpr(ShiftRightOpr const&) = 0;

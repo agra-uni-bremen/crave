@@ -2,6 +2,7 @@
 
 #include "../crave/ir/visitor/ComplexityEstimationVisitor.hpp"
 
+#include <cassert>
 #include <stdexcept>
 
 namespace crave {
@@ -67,14 +68,14 @@ void ComplexityEstimationVisitor::visitSimpleUnaryExpr(const T& object) {
   visitUnaryExpr(object);
   stack_entry e;
   pop(e);
-  exprStack_.push(std::make_pair(new T(e.first), e.second));
+  exprStack_.push(std::make_pair(std::make_shared<T>(e.first), e.second));
 }
 
 template <typename T>
 void ComplexityEstimationVisitor::visitSimpleBinExpr(const T& object) {
   stack_entry lhs, rhs;
   evalBinExpr(object, lhs, rhs);
-  exprStack_.push(std::make_pair(new T(lhs.first, rhs.first), lhs.second + rhs.second));
+  exprStack_.push(std::make_pair(std::make_shared<T>(lhs.first, rhs.first), lhs.second + rhs.second));
 }
 
 template <typename T>
@@ -91,7 +92,7 @@ void ComplexityEstimationVisitor::visitComplexBinExpr(const T& object) {
   } else {
     complexity = rhs.second;
   }
-  exprStack_.push(std::make_pair(new T(lhs.first, rhs.first), complexity));
+  exprStack_.push(std::make_pair(std::make_shared<T>(lhs.first, rhs.first), complexity));
 }
 
 void ComplexityEstimationVisitor::visitPlaceholder(const Placeholder&) {
@@ -99,15 +100,15 @@ void ComplexityEstimationVisitor::visitPlaceholder(const Placeholder&) {
 }
 
 void ComplexityEstimationVisitor::visitVariableExpr(const VariableExpr& v) {
-  exprStack_.push(std::make_pair(new VariableExpr(v), v.bitsize()));
+  exprStack_.push(std::make_pair(std::make_shared<VariableExpr>(v), v.bitsize()));
 }
 
 void ComplexityEstimationVisitor::visitConstant(const Constant& c) {
-  exprStack_.push(std::make_pair(new Constant(c), 0));
+  exprStack_.push(std::make_pair(std::make_shared<Constant>(c), 0));
 }
 
 void ComplexityEstimationVisitor::visitVectorExpr(const VectorExpr& v) {
-  exprStack_.push(std::make_pair(new VectorExpr(v), v.bitsize()));
+  exprStack_.push(std::make_pair(std::make_shared<VectorExpr>(v), v.bitsize()));
 }
 
 void ComplexityEstimationVisitor::visitNotOpr(const NotOpr& n) { visitSimpleUnaryExpr(n); }
@@ -120,7 +121,7 @@ void ComplexityEstimationVisitor::visitInside(const Inside& i) {
   visitUnaryExpr(i);
   stack_entry e;
   pop(e);
-  exprStack_.push(std::make_pair(new Inside(e.first, i.collection()), e.second));
+  exprStack_.push(std::make_pair(std::make_shared<Inside>(e.first, i.collection()), e.second));
 }
 
 void ComplexityEstimationVisitor::visitExtendExpr(const ExtendExpression& e) {
@@ -129,7 +130,7 @@ void ComplexityEstimationVisitor::visitExtendExpr(const ExtendExpression& e) {
   stack_entry entry;
   pop(entry);
 
-  exprStack_.push(std::make_pair(new ExtendExpression(entry.first, e.value()), entry.second));
+  exprStack_.push(std::make_pair(std::make_shared<ExtendExpression>(entry.first, e.value()), entry.second));
 }
 
 void ComplexityEstimationVisitor::visitAndOpr(const AndOpr& a) { visitSimpleBinExpr(a); }
@@ -160,7 +161,7 @@ void ComplexityEstimationVisitor::visitMinusOpr(const MinusOpr& m) { visitSimple
 
 void ComplexityEstimationVisitor::visitMultipliesOpr(const MultipliesOpr& m) { visitComplexBinExpr(m); }
 
-void ComplexityEstimationVisitor::visitDevideOpr(const DevideOpr& d) { visitComplexBinExpr(d); }
+void ComplexityEstimationVisitor::visitDivideOpr(const DivideOpr& d) { visitComplexBinExpr(d); }
 
 void ComplexityEstimationVisitor::visitModuloOpr(const ModuloOpr& m) { visitComplexBinExpr(m); }
 
@@ -183,7 +184,8 @@ void ComplexityEstimationVisitor::visitUnique(const Unique&) {
 void ComplexityEstimationVisitor::visitIfThenElse(const IfThenElse& ite) {
   stack_entry a, b, c;
   evalTernExpr(ite, a, b, c);
-  exprStack_.push(std::make_pair(new IfThenElse(a.first, b.first, c.first), a.second + b.second + c.second));
+  exprStack_.push(
+      std::make_pair(std::make_shared<IfThenElse>(a.first, b.first, c.first), a.second + b.second + c.second));
 }
 
 void ComplexityEstimationVisitor::visitBitslice(const Bitslice& b) {
@@ -192,7 +194,7 @@ void ComplexityEstimationVisitor::visitBitslice(const Bitslice& b) {
   stack_entry e;
   pop(e);
 
-  exprStack_.push(std::make_pair(new Bitslice(e.first, b.r(), b.l()), b.r() - b.l() + 1));
+  exprStack_.push(std::make_pair(std::make_shared<Bitslice>(e.first, b.r(), b.l()), b.r() - b.l() + 1));
 }
 
 }  // end namespace crave

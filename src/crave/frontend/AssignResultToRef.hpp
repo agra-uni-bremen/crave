@@ -18,7 +18,7 @@ extern std::function<bool(void)> random_bit;
  * @return an instance of Constant
  */
 template <typename T>
-struct to_constant_expr<T, typename boost::enable_if<boost::is_integral<T> >::type> {
+struct to_constant_expr<T, typename std::enable_if<std::is_integral<T>::value>::type> {
   Constant operator()(T value) { return Constant(value, bitsize_traits<T>::value, crave::is_signed<T>::value); }
 };
 
@@ -28,22 +28,18 @@ struct to_constant_expr<T, typename boost::enable_if<boost::is_integral<T> >::ty
 template <typename T>
 struct AssignResultToRef : AssignResult {
  public:
-  explicit AssignResultToRef(T* ref) : value_(ref) {}
+  explicit AssignResultToRef(T* ref, size_t width, bool sign) : value_(ref), width_(width), sign_(sign) {}
 
  public:
-  Constant value_as_constant() const { return to_constant_expr<T>()(*value_); }
+  Constant value_as_constant() const { return value_as_constant_impl(); }
 
-  Constant to_constant(std::string const& str) const {
-    T v;
-    set_value(str, &v);
-    return to_constant_expr<T>()(v);
-  }
+  Constant to_constant(std::string const& str) const { return to_constant_impl(str); }
 
   void set_value(std::string const& str) { set_value(str, value_); }
 
  private:
   void set_value(std::string const& str, T* val) const {
-    *val = ((crave::is_signed<T>::value && str[0] == '1') ? -1 : 0);
+    *val = ((sign_ && str[0] == '1') ? -1 : 0);
     for (std::string::const_iterator ite = str.begin(); ite != str.end(); ++ite) {
       *val <<= 1;
       switch (*ite) {
@@ -63,7 +59,33 @@ struct AssignResultToRef : AssignResult {
     }
   }
 
+  template <typename U = T>
+  typename std::enable_if<is_sysc_dt<U>::value, Constant>::type value_as_constant_impl() const {
+    return Constant(value_->to_uint(), width_, sign_);
+  }
+
+  template <typename U = T>
+  typename std::enable_if<!is_sysc_dt<U>::value, Constant>::type value_as_constant_impl() const {
+    return Constant(*value_, width_, sign_);
+  }
+
+  template <typename U = T>
+  typename std::enable_if<is_sysc_dt<U>::value, Constant>::type to_constant_impl(std::string const& str) const {
+    U v;
+    set_value(str, &v);
+    return Constant(v.to_uint(), width_, sign_);
+  }
+
+  template <typename U = T>
+  typename std::enable_if<!is_sysc_dt<U>::value, Constant>::type to_constant_impl(std::string const& str) const {
+    U v;
+    set_value(str, &v);
+    return Constant(v, width_, sign_);
+  }
+
  protected:
   T* value_;
+  size_t width_;
+  bool sign_;
 };
 }  // namespace crave

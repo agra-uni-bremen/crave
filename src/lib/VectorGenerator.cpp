@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "../crave/ConstrainedRandom.hpp"
+#include "../crave/frontend/RandomBase.hpp"
 #include "../crave/utils/Logging.hpp"
 
 namespace crave {
@@ -46,7 +48,7 @@ void VectorSolver::buildSolver(unsigned int const size) {
     unsigned int old_size = vec_elements_.size();
     vec_elements_.resize(size);
     for (unsigned int i = old_size; i < size; ++i) {
-      vec_elements_[i] = new VariableExpr(new_var_id(), 1u, true);
+      vec_elements_[i] = std::make_shared<VariableExpr>(new_var_id(), 1u, true);
     }
   }
 

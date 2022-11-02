@@ -3,7 +3,6 @@
 #pragma once
 
 #include "../frontend/Distribution.hpp"
-#include "../ir/UserExpression.hpp"
 #include "VariableBase.hpp"
 
 namespace crave {

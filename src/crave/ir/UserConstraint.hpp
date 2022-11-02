@@ -13,7 +13,6 @@
 #include "ConstraintManager.hpp"
 #include "ConstraintPartition.hpp"
 #include "ConstraintPartitioner.hpp"
-#include "Context.hpp"
 #include "Node.hpp"
 #include "UserConstraintType.hpp"
 #include "UserVectorConstraint.hpp"

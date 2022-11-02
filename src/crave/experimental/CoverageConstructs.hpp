@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 
-#include "../ir/UserExpression.hpp"
 #include "../utils/Evaluator.hpp"
 #include "CoverageBins.hpp"
 #include "Expression.hpp"

@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "ConstraintType.hpp"
-#include "Operators.hpp"
 #include "PlaceHolder.hpp"
 #include "ReadReference.hpp"
 #include "Variable.hpp"

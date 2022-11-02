@@ -1,15 +1,16 @@
-// Copyright 2012-2016 The CRAVE developers, University of Bremen, Germany. All rights reserved.//
+
 
 #pragma once
 
-#include <boost/preprocessor.hpp>
 #include <set>
 #include <string>
 #include <vector>
 
 #include "backend/Generator.hpp"
+#include "frontend/Operators.hpp"
 #include "frontend/RandomBase.hpp"
-#include "ir/UserExpression.hpp"
+#include "frontend/RandvInterface.hpp"
+#include "frontend/ReadReference.hpp"
 #include "utils/Logging.hpp"
 
 /*!
@@ -150,6 +151,7 @@ class rand_obj : public rand_obj_base {
 /*!
  * \addtogroup oldAPI
  *  @{
+ *
  * \def CRAVE_ENUM(name, ...)
  * \deprecated It is recommended to use the \ref newAPI "new API". The equivalent in the new API is \ref
  * CRAVE_BETTER_ENUM \brief Defines a randomizable enum for CRAVE.

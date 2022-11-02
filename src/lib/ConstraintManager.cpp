@@ -1,6 +1,7 @@
 #include "../crave/ir/ConstraintManager.hpp"
 
 #include "../crave/ir/visitor/ComplexityEstimationVisitor.hpp"
+#include "../crave/ir/visitor/FixWidthVisitor.hpp"
 #include "../crave/ir/visitor/GetSupportSetVisitor.hpp"
 #include "../crave/ir/visitor/ToDotNodeVisitor.hpp"
 #include "../crave/utils/Logging.hpp"
@@ -67,8 +68,11 @@ bool ConstraintManager::isChanged() const { return changed_; }
 
 void ConstraintManager::resetChanged() { changed_ = false; }
 
-ConstraintPtr ConstraintManager::makeConstraint(std::string const& name, int c_id, NodePtr n, Context* ctx,
-                                                bool const soft, bool const cover) {
+ConstraintPtr ConstraintManager::makeConstraint(std::string const& name, int c_id, NodePtr n, bool const soft,
+                                                bool const cover) {
+  FixWidthVisitor fwv;
+  n = fwv.fixWidth(*n);
+
   LOG(INFO) << "New " << (soft ? "soft " : "") << (cover ? "cover " : "") << "constraint " << name << " in set " << id_;
 
   if (constr_map_.find(name) != constr_map_.end()) {
@@ -80,9 +84,9 @@ ConstraintPtr ConstraintManager::makeConstraint(std::string const& name, int c_i
 
   ConstraintPtr c;
 
-  if (boost::dynamic_pointer_cast<ForEach>(n) != 0) {
+  if (std::dynamic_pointer_cast<ForEach>(n) != 0) {
     c = std::make_shared<UserVectorConstraint>(c_id, n, name, gssv.getSupportVars(), false, soft, cover);
-  } else if (boost::dynamic_pointer_cast<Unique>(n) != 0) {
+  } else if (std::dynamic_pointer_cast<Unique>(n) != 0) {
     c = std::make_shared<UserVectorConstraint>(c_id, n, name, gssv.getSupportVars(), true, soft, cover);
   } else {
     c = std::make_shared<UserConstraint>(c_id, n, name, gssv.getSupportVars(), soft, cover);

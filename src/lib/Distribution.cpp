@@ -5,10 +5,6 @@
 namespace crave {
 distribution<bool>::distribution(const double prob) : prob_(prob) {}
 
-distribution_tag<bool> distribution<bool>::create(const double prob) {
-  return distribution_tag<bool>(distribution<bool>(prob));
-}
-
 bool distribution<bool>::nextValue() const {
   std::bernoulli_distribution dist(prob_);
   return dist(*rng.get());

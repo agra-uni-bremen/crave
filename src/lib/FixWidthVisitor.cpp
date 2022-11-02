@@ -37,11 +37,11 @@ void FixWidthVisitor::evalBinExpr(BinaryExpression const& bin, stack_entry& fst,
   if (!fixWidth) return;
   if (fst.second < snd.second) {
     unsigned int diff = snd.second - fst.second;
-    fst.first = result_type(new ExtendExpression(fst.first.get(), diff));
+    fst.first = result_type(std::make_shared<ExtendExpression>(fst.first, diff));
     fst.second = snd.second;
   } else if (fst.second > snd.second) {
     unsigned int diff = fst.second - snd.second;
-    snd.first = result_type(new ExtendExpression(snd.first.get(), diff));
+    snd.first = result_type(std::make_shared<ExtendExpression>(snd.first, diff));
     snd.second = fst.second;
   }
 }
@@ -77,7 +77,7 @@ template <typename T>
 void FixWidthVisitor::visitNumberResultBinExpr(const T& object) {
   stack_entry lhs, rhs;
   evalBinExpr(object, lhs, rhs);
-  exprStack_.push(std::make_pair(new T(lhs.first, rhs.first), lhs.second));
+  exprStack_.push(std::make_pair(std::make_shared<T>(lhs.first, rhs.first), lhs.second));
 }
 
 template <typename T>
@@ -85,30 +85,30 @@ void FixWidthVisitor::visitNumberResultUnaryExpr(const T& object) {
   visitUnaryExpr(object);
   stack_entry e;
   pop(e);
-  exprStack_.push(std::make_pair(new T(e.first), e.second));
+  exprStack_.push(std::make_pair(std::make_shared<T>(e.first), e.second));
 }
 
 template <typename T>
 void FixWidthVisitor::visitBooleanResultBinExpr(const T& object) {
   stack_entry lhs, rhs;
   evalBinExpr(object, lhs, rhs);
-  exprStack_.push(std::make_pair(new T(lhs.first, rhs.first), 1));
+  exprStack_.push(std::make_pair(std::make_shared<T>(lhs.first, rhs.first), 1));
 }
 
 void FixWidthVisitor::visitPlaceholder(const Placeholder& pl) {
-  exprStack_.push(std::make_pair(new Placeholder(pl), placeholder_bitsize()));
+  exprStack_.push(std::make_pair(std::make_shared<Placeholder>(pl), placeholder_bitsize()));
 }
 
 void FixWidthVisitor::visitVariableExpr(const VariableExpr& v) {
-  exprStack_.push(std::make_pair(new VariableExpr(v), v.bitsize()));
+  exprStack_.push(std::make_pair(std::make_shared<VariableExpr>(v), v.bitsize()));
 }
 
 void FixWidthVisitor::visitConstant(const Constant& c) {
-  exprStack_.push(std::make_pair(new Constant(c), c.bitsize()));
+  exprStack_.push(std::make_pair(std::make_shared<Constant>(c), c.bitsize()));
 }
 
 void FixWidthVisitor::visitVectorExpr(const VectorExpr& v) {
-  exprStack_.push(std::make_pair(new VectorExpr(v), v.bitsize()));
+  exprStack_.push(std::make_pair(std::make_shared<VectorExpr>(v), v.bitsize()));
 }
 
 void FixWidthVisitor::visitNotOpr(const NotOpr& n) { visitNumberResultUnaryExpr(n); }
@@ -123,7 +123,7 @@ void FixWidthVisitor::visitInside(const Inside& i) {
   stack_entry e;
   pop(e);
 
-  exprStack_.push(std::make_pair(new Inside(e.first, i.collection()), 1));
+  exprStack_.push(std::make_pair(std::make_shared<Inside>(e.first, i.collection()), 1));
 }
 
 void FixWidthVisitor::visitExtendExpr(const ExtendExpression& e) {
@@ -132,7 +132,7 @@ void FixWidthVisitor::visitExtendExpr(const ExtendExpression& e) {
   stack_entry entry;
   pop(entry);
 
-  exprStack_.push(std::make_pair(new ExtendExpression(entry.first, e.value()), entry.second));
+  exprStack_.push(std::make_pair(std::make_shared<ExtendExpression>(entry.first, e.value()), entry.second));
 }
 
 void FixWidthVisitor::visitAndOpr(const AndOpr& a) { visitNumberResultBinExpr(a); }
@@ -163,7 +163,7 @@ void FixWidthVisitor::visitMinusOpr(const MinusOpr& m) { visitNumberResultBinExp
 
 void FixWidthVisitor::visitMultipliesOpr(const MultipliesOpr& m) { visitNumberResultBinExpr(m); }
 
-void FixWidthVisitor::visitDevideOpr(const DevideOpr& d) { visitNumberResultBinExpr(d); }
+void FixWidthVisitor::visitDivideOpr(const DivideOpr& d) { visitNumberResultBinExpr(d); }
 
 void FixWidthVisitor::visitModuloOpr(const ModuloOpr& m) { visitNumberResultBinExpr(m); }
 
@@ -174,13 +174,13 @@ void FixWidthVisitor::visitShiftRightOpr(const ShiftRightOpr& shr) { visitNumber
 void FixWidthVisitor::visitVectorAccess(const VectorAccess& va) {
   stack_entry lhs, rhs;
   evalBinExpr(va, lhs, rhs, false);
-  exprStack_.push(std::make_pair(new VectorAccess(lhs.first, rhs.first), lhs.second));
+  exprStack_.push(std::make_pair(std::make_shared<VectorAccess>(lhs.first, rhs.first), lhs.second));
 }
 
 void FixWidthVisitor::visitForEach(const ForEach& fe) {
   stack_entry lhs, rhs;
   evalBinExpr(fe, lhs, rhs, false);
-  exprStack_.push(std::make_pair(new ForEach(lhs.first, rhs.first), 1));
+  exprStack_.push(std::make_pair(std::make_shared<ForEach>(lhs.first, rhs.first), 1));
 }
 
 void FixWidthVisitor::visitUnique(const Unique& u) { visitNumberResultUnaryExpr(u); }
@@ -189,7 +189,7 @@ void FixWidthVisitor::visitIfThenElse(const IfThenElse& ite) {
   stack_entry a, b, c;
   evalTernExpr(ite, a, b, c);
 
-  exprStack_.push(std::make_pair(new IfThenElse(a.first, b.first, c.first), a.second));
+  exprStack_.push(std::make_pair(std::make_shared<IfThenElse>(a.first, b.first, c.first), a.second));
 }
 
 void FixWidthVisitor::visitBitslice(const Bitslice& b) {
@@ -198,7 +198,7 @@ void FixWidthVisitor::visitBitslice(const Bitslice& b) {
   stack_entry e;
   pop(e);
 
-  exprStack_.push(std::make_pair(new Bitslice(e.first, b.r(), b.l()), b.r() - b.l() + 1));
+  exprStack_.push(std::make_pair(std::make_shared<Bitslice>(e.first, b.r(), b.l()), b.r() - b.l() + 1));
 }
 
 }  // end namespace crave
