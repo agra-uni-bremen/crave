@@ -1,0 +1,43 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        backend: [Boolector, STP, CVC4]
+
+    name: Build and test with ${{matrix.backend}} backend
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y cmake bison flex python3-pip default-jdk libgmp-dev libz-dev
+        sudo pip3 install toml
+
+    - name: Configure
+      run: |
+        cmake -B ${{github.workspace}}/build -DmetaSMT_USE_${{matrix.backend}}=ON \
+                                             -DCRAVE_ENABLE_TESTS=ON \
+                                             -DCRAVE_BUILD_EXAMPLES=ON \
+                                             -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      run: ctest
