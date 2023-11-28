@@ -11,7 +11,7 @@ foreach(ex ${EXAMPLES})
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${ex}")
     add_executable(${ex} ${ex}/main.cpp)
     target_include_directories(
-      ${ex} PRIVATE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+      ${ex} PRIVATE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
                     $<INSTALL_INTERFACE:include>)
 
     target_link_directories(

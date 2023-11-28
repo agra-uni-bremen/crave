@@ -1,7 +1,7 @@
 foreach(ex IN ITEMS ALU4 ALU12 ALU16 ALU24 ALU32)
   add_executable(${ex} ${ex}.cpp)
   target_include_directories(
-    ${ex} PRIVATE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+    ${ex} PRIVATE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
                   $<INSTALL_INTERFACE:include>)
 
   target_link_directories(

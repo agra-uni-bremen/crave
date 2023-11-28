@@ -30,6 +30,7 @@ endif(SystemCLanguage_FOUND)
 
 target_include_directories(
   ${PROJECT_NAME}_tests PRIVATE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+                                $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
                                 $<INSTALL_INTERFACE:include>)
 
 target_link_directories(
